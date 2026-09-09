@@ -317,7 +317,7 @@ function talkToKin(person, character) {
   } else if (person.entityType === 'blatant_entity') {
     quote = window.getRandomElement(ENTITY_QUOTES);
     effects.occult = +6;
-    effects.sanity = -5;
+    effects.sanity = -2;
   } else if (person.role === 'Father' || person.role === 'Mother') {
     const parentQuotes = [
       `"${person.name} told you: 'Make sure your bedroom lock is fastened tonight. The neighborhood watch reported another stray dog pack near the culvert.'"`,
@@ -514,7 +514,7 @@ function askForMoney(person, character, requestedAmount = null) {
       granted: false,
       amount: 0,
       message,
-      effects: { happiness: -4, relationship: -relLoss }
+      effects: { happiness: -2, relationship: -relLoss }
     };
   }
 }
@@ -534,9 +534,9 @@ function argueWithKin(person, character) {
     `You snapped at ${person.name} and slammed your bedroom door in their face.`,
     `You accused ${person.name} of ignoring the strange noises in the walls, resulting in a cold, hostile silence.`
   ];
-  const message = `${window.getRandomElement(insults)} (-${relLoss}% Relationship, -8% Happiness).`;
+  const message = `${window.getRandomElement(insults)} (-${relLoss}% Relationship, -2% Happiness).`;
 
-  return { success: true, message, effects: { relationship: -relLoss, happiness: -8, sanity: -3 } };
+  return { success: true, message, effects: { relationship: -relLoss, happiness: -2, sanity: -1 } };
 }
 
 function investigateKin(person, character) {
@@ -577,7 +577,7 @@ function investigateKin(person, character) {
     message: clue,
     revealed,
     entityType: person.entityType,
-    effects: { occult: +6, sanity: -6 }
+    effects: { occult: +6, sanity: -2 }
   };
 }
 
@@ -602,13 +602,13 @@ function offerTributeToEntity(person, character) {
     `You offered an antique tarnished coin and three drops of your own blood to ${person.name} in the cellar.`
   ];
 
-  const message = `${window.getRandomElement(tributes)}\nIn return, they bestowed +${shillingsGained} Paranormal Shillings upon you (+20% Relationship, +12% Occult, -6% Humanity).`;
+  const message = `${window.getRandomElement(tributes)}\nIn return, they bestowed +${shillingsGained} Paranormal Shillings upon you (+20% Relationship, +12% Occult, -2% Humanity).`;
 
   return {
     success: true,
     message,
     shillings: shillingsGained,
-    effects: { shillings: shillingsGained, occult: +12, humanity: -6, sanity: -4 }
+    effects: { shillings: shillingsGained, occult: +12, humanity: -2, sanity: -2 }
   };
 }
 
@@ -749,8 +749,8 @@ function tickKinYear(character) {
       ];
       p.deathCause = window.getRandomElement(causes);
       logs.push(`[TRAGEDY] Your ${p.role.toLowerCase()}, ${p.name}, passed away at age ${p.age}. ${p.deathCause}`);
-      character.stats.happiness = Math.max(0, character.stats.happiness - 35);
-      character.stats.sanity = Math.max(0, character.stats.sanity - 20);
+      character.stats.happiness = Math.max(0, character.stats.happiness - 3);
+      character.stats.sanity = Math.max(0, character.stats.sanity - 3);
       return;
     }
 
@@ -776,8 +776,8 @@ function tickKinYear(character) {
       s.deathYear = character.year;
       s.deathCause = "Drowned in the frozen canal after walking onto thin ice on a dare.";
       logs.push(`[TRAGEDY] Your ${s.role.toLowerCase()}, ${s.name}, died at age ${s.age}. ${s.deathCause}`);
-      character.stats.happiness = Math.max(0, character.stats.happiness - 25);
-      character.stats.sanity = Math.max(0, character.stats.sanity - 15);
+      character.stats.happiness = Math.max(0, character.stats.happiness - 3);
+      character.stats.sanity = Math.max(0, character.stats.sanity - 2);
     }
   });
 
@@ -796,7 +796,7 @@ function tickKinYear(character) {
       const inheritance = Math.round(500 * country.wageMultiplier);
       character.money += inheritance;
       logs.push(`[OBITUARY] Your ${g.role.toLowerCase()}, ${g.name}, passed away at age ${g.age}. Left you an inheritance of ${window.formatMoney(inheritance, character.countryCode)}.`);
-      character.stats.happiness = Math.max(0, character.stats.happiness - 15);
+      character.stats.happiness = Math.max(0, character.stats.happiness - 2);
     }
   });
 

@@ -286,12 +286,12 @@ const ACTIVITIES_LIST = [
 
         // Rare Creepypasta cartridge event
         if (Math.random() < 0.15) {
-          character.stats.sanity = Math.max(0, character.stats.sanity - 8);
+          character.stats.sanity = Math.max(0, character.stats.sanity - 2);
           character.stats.occult = Math.min(100, character.stats.occult + 6);
           return {
             success: true,
             title: "Unlicensed Bootleg Cartridge",
-            message: "You loaded an unmarked gray floppy disc. The game had no music, only low mechanical breathing, and all the NPC sprites had hollow red sockets (-8% Sanity, +6% Occult)."
+            message: "You loaded an unmarked gray floppy disc. The game had no music, only low mechanical breathing, and all the NPC sprites had hollow red sockets (-2% Sanity, +6% Occult)."
           };
         }
 
@@ -340,19 +340,19 @@ const ACTIVITIES_LIST = [
       } else if (attemptIndex === 1) {
         character.stats.vitality = Math.min(100, character.stats.vitality + 3);
         character.stats.looks = Math.min(100, character.stats.looks + 1);
-        character.stats.happiness = Math.max(0, character.stats.happiness - 3);
+        character.stats.happiness = Math.max(0, character.stats.happiness - 2);
         return {
           success: true,
           title: "Additional Training",
-          message: "You pushed through extra cardio repetitions; your muscles burned with lactic acid (+3% Vitality, +1% Looks, -3% Happiness)."
+          message: "You pushed through extra cardio repetitions; your muscles burned with lactic acid (+3% Vitality, +1% Looks, -2% Happiness)."
         };
       } else {
         character.stats.vitality = Math.min(100, character.stats.vitality + 1);
-        character.stats.happiness = Math.max(0, character.stats.happiness - 4);
+        character.stats.happiness = Math.max(0, character.stats.happiness - 2);
         return {
           success: true,
           title: "Physical Exhaustion",
-          message: "Overexertion strained your joints; you barely managed to finish your sets (+1% Vitality, -4% Happiness)."
+          message: "Overexertion strained your joints; you barely managed to finish your sets (+1% Vitality, -2% Happiness)."
         };
       }
     }
@@ -413,27 +413,27 @@ const ACTIVITIES_LIST = [
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
         character.stats.smarts = Math.min(100, character.stats.smarts + 5);
-        character.stats.happiness = Math.max(0, character.stats.happiness - 4);
+        character.stats.happiness = Math.max(0, character.stats.happiness - 2);
         return {
           success: true,
           title: "Academic Devotion",
-          message: "You reviewed formulas and history dates until 1:00 AM under a buzzing desk lamp. Your teachers will note your sharp academic rigor (+5% Smarts, -4% Happiness)."
+          message: "You reviewed formulas and history dates until 1:00 AM under a buzzing desk lamp. Your teachers will note your sharp academic rigor (+5% Smarts, -2% Happiness)."
         };
       } else if (attemptIndex === 1) {
         character.stats.smarts = Math.min(100, character.stats.smarts + 3);
-        character.stats.happiness = Math.max(0, character.stats.happiness - 5);
+        character.stats.happiness = Math.max(0, character.stats.happiness - 2);
         return {
           success: true,
           title: "Cramming Through Exhaustion",
-          message: "You forced yourself through supplementary math workbooks; mental fatigue weighed on you (+3% Smarts, -5% Happiness)."
+          message: "You forced yourself through supplementary math workbooks; mental fatigue weighed on you (+3% Smarts, -2% Happiness)."
         };
       } else {
         character.stats.smarts = Math.min(100, character.stats.smarts + 1);
-        character.stats.happiness = Math.max(0, character.stats.happiness - 6);
+        character.stats.happiness = Math.max(0, character.stats.happiness - 3);
         return {
           success: true,
           title: "Severe Burnout",
-          message: "You stared at the same page of formulas for an hour, your mind exhausted and numb (+1% Smarts, -6% Happiness)."
+          message: "You stared at the same page of formulas for an hour, your mind exhausted and numb (+1% Smarts, -3% Happiness)."
         };
       }
     }
@@ -452,7 +452,7 @@ const ACTIVITIES_LIST = [
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
         character.stats.occult = Math.min(100, character.stats.occult + 8);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 6);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 2);
 
         const roll = Math.random();
         if (roll < 0.4) {
@@ -476,17 +476,17 @@ const ACTIVITIES_LIST = [
           return {
             success: true,
             title: "Whispers in the Insulation",
-            message: "You sat in the pitch darkness beneath the joists. The galvanized pipes vibrated with low syllables you almost understood (+8% Occult, -6% Sanity)."
+            message: "You sat in the pitch darkness beneath the joists. The galvanized pipes vibrated with low syllables you almost understood (+8% Occult, -2% Sanity)."
           };
         }
       } else {
         character.stats.occult = Math.min(100, character.stats.occult + 4);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 4);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 2);
         character.shillings += 1;
         return {
           success: true,
           title: "Thorough Search",
-          message: "You returned to the crawlspace with a hand mirror, uncovering +1 Paranormal Shilling lodged under a brick (+4% Occult, -4% Sanity, +1 Shilling)."
+          message: "You returned to the crawlspace with a hand mirror, uncovering +1 Paranormal Shilling lodged under a brick (+4% Occult, -2% Sanity, +1 Shilling)."
         };
       }
     }
@@ -503,7 +503,7 @@ const ACTIVITIES_LIST = [
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
         character.stats.occult = Math.min(100, character.stats.occult + 7);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 5);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 2);
         const shillings = Math.floor(Math.random() * 3) + 2;
         character.shillings += shillings;
 
@@ -515,16 +515,16 @@ const ACTIVITIES_LIST = [
         return {
           success: true,
           title: "Number Station Broadcast",
-          message: `Through the static speaker, you recorded: ${window.getRandomElement(broadcast)}\n(+7% Occult, -5% Sanity, +${shillings} Shillings).`
+          message: `Through the static speaker, you recorded: ${window.getRandomElement(broadcast)}\n(+7% Occult, -2% Sanity, +${shillings} Shillings).`
         };
       } else {
         character.stats.occult = Math.min(100, character.stats.occult + 3);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 3);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 2);
         character.shillings += 1;
         return {
           success: true,
           title: "Fading Frequency",
-          message: "The unassigned frequency degraded into a repetitive Morse tone before cutting to dead air (+3% Occult, -3% Sanity, +1 Shilling)."
+          message: "The unassigned frequency degraded into a repetitive Morse tone before cutting to dead air (+3% Occult, -2% Sanity, +1 Shilling)."
         };
       }
     }
@@ -541,8 +541,8 @@ const ACTIVITIES_LIST = [
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
         character.stats.occult = Math.min(100, character.stats.occult + 12);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 8);
-        character.stats.humanity = Math.max(0, character.stats.humanity - 4);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 3);
+        character.stats.humanity = Math.max(0, character.stats.humanity - 2);
         
         const shillings = Math.floor(Math.random() * 8) + 6; // 6-13 Shillings
         character.shillings += shillings;
@@ -550,18 +550,18 @@ const ACTIVITIES_LIST = [
         return {
           success: true,
           title: "The Third Rail Labyrinth",
-          message: `You crept two miles past the service barricades into flooded Victorian brick tunnels. On an abandoned maintenance altar, you gathered +${shillings} Paranormal Shillings (+12% Occult, -8% Sanity, -4% Humanity).`
+          message: `You crept two miles past the service barricades into flooded Victorian brick tunnels. On an abandoned maintenance altar, you gathered +${shillings} Paranormal Shillings (+12% Occult, -3% Sanity, -2% Humanity).`
         };
       } else {
         character.stats.occult = Math.min(100, character.stats.occult + 6);
-        character.stats.sanity = Math.max(0, character.stats.sanity - 5);
-        character.stats.humanity = Math.max(0, character.stats.humanity - 2);
+        character.stats.sanity = Math.max(0, character.stats.sanity - 2);
+        character.stats.humanity = Math.max(0, character.stats.humanity - 1);
         const shillings = Math.floor(Math.random() * 4) + 2;
         character.shillings += shillings;
         return {
           success: true,
           title: "Deep Tunnel Return",
-          message: `You retraced the damp subway catacombs. Municipal patrols were inspecting the third rail, forcing a hasty escape (+6% Occult, -5% Sanity, -2% Humanity, +${shillings} Shillings).`
+          message: `You retraced the damp subway catacombs. Municipal patrols were inspecting the third rail, forcing a hasty escape (+6% Occult, -2% Sanity, -1% Humanity, +${shillings} Shillings).`
         };
       }
     }

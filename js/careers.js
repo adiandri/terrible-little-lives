@@ -292,7 +292,7 @@ const PARANORMAL_CAREERS = [
     title: "Nocturnal Mortuary Custodian",
     minAge: 18,
     payoutShillings: 45,
-    sanityCost: 5,
+    sanityCost: 1,
     reqs: { minOccult: 10, minSanity: 45 },
     desc: "Mopping drainage troughs after autopsies. Sometimes the refrigerated drawers rattle from the inside."
   },
@@ -301,7 +301,7 @@ const PARANORMAL_CAREERS = [
     title: "Late-Night Cable Tarot Reader",
     minAge: 18,
     payoutShillings: 50,
-    sanityCost: 6,
+    sanityCost: 1,
     reqs: { minOccult: 15, minLooks: 55 },
     desc: "Reading cursed Major Arcana decks for desperate callers at 3 AM. A surprising number of cards draw themselves."
   },
@@ -310,7 +310,7 @@ const PARANORMAL_CAREERS = [
     title: "Condemned Sites Livestreamer",
     minAge: 16,
     payoutShillings: 60,
-    sanityCost: 8,
+    sanityCost: 1,
     reqs: { minOccult: 15, minLooks: 60 },
     desc: "Exploring shuttered asylums with gimbal night-cams. Chat donates in black coins when shadows move on stream."
   },
@@ -319,7 +319,7 @@ const PARANORMAL_CAREERS = [
     title: "Ghost Frequency Radio Monitor",
     minAge: 18,
     payoutShillings: 65,
-    sanityCost: 7,
+    sanityCost: 1,
     reqs: { minOccult: 20, minSanity: 55 },
     desc: "Tuning software-defined radios to dead military frequencies between 1400 and 1420 MHz. The static breathes."
   },
@@ -328,7 +328,7 @@ const PARANORMAL_CAREERS = [
     title: "Historical Vault Grave Robber",
     minAge: 18,
     payoutShillings: 80,
-    sanityCost: 10,
+    sanityCost: 2,
     reqs: { minOccult: 20, minVitality: 65, maxHumanity: 55 },
     desc: "Prying loose mausoleum flagstones with iron crowbars to harvest silver rings from 19th-century skeletons."
   },
@@ -337,7 +337,7 @@ const PARANORMAL_CAREERS = [
     title: "Dark Web Occult Audio Archiver",
     minAge: 18,
     payoutShillings: 90,
-    sanityCost: 12,
+    sanityCost: 2,
     reqs: { minOccult: 25, minSmarts: 55 },
     desc: "Transcribing tape recordings recovered from vanished speleologists. The recordings contain unpronounceable names."
   },
@@ -346,7 +346,7 @@ const PARANORMAL_CAREERS = [
     title: "Sleep Lab Nightmare Cipherist",
     minAge: 19,
     payoutShillings: 85,
-    sanityCost: 9,
+    sanityCost: 2,
     reqs: { minOccult: 25, minSanity: 60 },
     desc: "Analyzing EEG polysomnograms of patients suffering synchronized nightmares of a submerged obsidian city."
   },
@@ -357,7 +357,7 @@ const PARANORMAL_CAREERS = [
     title: "Condemned Aqueduct Spelunker",
     minAge: 19,
     payoutShillings: 110,
-    sanityCost: 14,
+    sanityCost: 2,
     reqs: { minOccult: 30, minVitality: 70 },
     desc: "Wading through waist-deep stagnant municipal sluices beneath the city to trace non-human claw marks on brickwork."
   },
@@ -366,7 +366,7 @@ const PARANORMAL_CAREERS = [
     title: "Esoteric Society Cult Recruiter",
     minAge: 20,
     payoutShillings: 120,
-    sanityCost: 11,
+    sanityCost: 2,
     reqs: { minOccult: 30, minLooks: 70 },
     desc: "Schmoozing tech founders and wealthy gallery owners into private basement ceremonies with silver masks."
   },
@@ -375,7 +375,7 @@ const PARANORMAL_CAREERS = [
     title: "Cursed Property Night Watchman",
     minAge: 20,
     payoutShillings: 130,
-    sanityCost: 15,
+    sanityCost: 2,
     reqs: { minOccult: 35, minSanity: 50 },
     desc: "Guarding foreclosed homes where whole families vanished into the sheetrock. Salt the thresholds every two hours."
   },
@@ -384,7 +384,7 @@ const PARANORMAL_CAREERS = [
     title: "Pine Barrens Cryptid Tracker",
     minAge: 20,
     payoutShillings: 140,
-    sanityCost: 13,
+    sanityCost: 2,
     reqs: { minOccult: 35, minVitality: 65 },
     desc: "Tracking deer carcasses hung thirty feet up in hemlock trees by things that don't cast shadows in moonlight."
   },
@@ -393,7 +393,7 @@ const PARANORMAL_CAREERS = [
     title: "Cursed Antiquities Fence",
     minAge: 21,
     payoutShillings: 150,
-    sanityCost: 12,
+    sanityCost: 2,
     reqs: { minOccult: 35, maxHumanity: 60 },
     desc: "Brokering bone carvings and stolen brass censers out of a dingy pawnshop backroom to cloaked buyers."
   },
@@ -402,7 +402,7 @@ const PARANORMAL_CAREERS = [
     title: "Dead Language Glyph Translator",
     minAge: 21,
     payoutShillings: 160,
-    sanityCost: 15,
+    sanityCost: 2,
     reqs: { minOccult: 35, minSmarts: 75 },
     desc: "Deciphering fragments of Akkadian and pre-Sumerian clay shards that give you migraines and nosebleeds."
   },
@@ -411,7 +411,7 @@ const PARANORMAL_CAREERS = [
     title: "Forbidden Archive Conservator",
     minAge: 21,
     payoutShillings: 170,
-    sanityCost: 16,
+    sanityCost: 2,
     reqs: { minOccult: 40, minSmarts: 65, minSanity: 65 },
     desc: "Binding decaying grimoires in lead-threaded pigskin. Some pages bite back if handled with bare skin."
   },
@@ -420,7 +420,7 @@ const PARANORMAL_CAREERS = [
     title: "Black Market Relic Courier",
     minAge: 21,
     payoutShillings: 180,
-    sanityCost: 18,
+    sanityCost: 3,
     reqs: { minOccult: 45, minVitality: 60 },
     desc: "Transporting sealed lead trunks across international rail lines without ever opening the wax seals."
   },
@@ -429,7 +429,7 @@ const PARANORMAL_CAREERS = [
     title: "Occult Lineage Genealogist",
     minAge: 23,
     payoutShillings: 190,
-    sanityCost: 14,
+    sanityCost: 2,
     reqs: { minOccult: 45, minLooks: 65 },
     desc: "Arranging unions between families bearing dormant reptilian genes to ensure the lineage continues."
   },
@@ -438,7 +438,7 @@ const PARANORMAL_CAREERS = [
     title: "Mediumistic Trance Vessel",
     minAge: 20,
     payoutShillings: 210,
-    sanityCost: 24,
+    sanityCost: 3,
     reqs: { minOccult: 45, maxHumanity: 50, minVitality: 55 },
     desc: "Inhaling poisonous incense so dead patricians can speak through your larynx during midnight seances."
   },
@@ -449,7 +449,7 @@ const PARANORMAL_CAREERS = [
     title: "Black Market Soul Pawnbroker",
     minAge: 22,
     payoutShillings: 240,
-    sanityCost: 20,
+    sanityCost: 3,
     reqs: { minOccult: 50, maxHumanity: 45 },
     desc: "Appraising glass jars containing the final exhaled breaths of dying debtors. You trade them for Shillings."
   },
@@ -458,7 +458,7 @@ const PARANORMAL_CAREERS = [
     title: "Flooded Ossuary Free-Diver",
     minAge: 22,
     payoutShillings: 250,
-    sanityCost: 22,
+    sanityCost: 3,
     reqs: { minOccult: 50, minVitality: 75, minSanity: 60 },
     desc: "Diving into submerged limestone catacombs beneath Paris without air tanks to retrieve gold talismans."
   },
@@ -467,7 +467,7 @@ const PARANORMAL_CAREERS = [
     title: "Independent Exorcist Apprentice",
     minAge: 22,
     payoutShillings: 260,
-    sanityCost: 25,
+    sanityCost: 3,
     reqs: { minOccult: 60, minSanity: 60, minVitality: 55 },
     desc: "Pinning down possessed bodies while ancient Latin phrases blister your ears and furniture levitates."
   },
@@ -476,7 +476,7 @@ const PARANORMAL_CAREERS = [
     title: "Occult Salon Grand Master",
     minAge: 24,
     payoutShillings: 270,
-    sanityCost: 18,
+    sanityCost: 3,
     reqs: { minOccult: 40, minLooks: 75 },
     desc: "Hosting decadent masquerade galas in secluded estates where sacrifices are performed behind velvet drapes."
   },
@@ -485,7 +485,7 @@ const PARANORMAL_CAREERS = [
     title: "Deep Bunkered Containment Sentry",
     minAge: 23,
     payoutShillings: 290,
-    sanityCost: 28,
+    sanityCost: 3,
     reqs: { minOccult: 55, minSanity: 70, minVitality: 65 },
     desc: "Standing watch outside a concrete vault where something knocks in prime numbers from inside."
   },
@@ -494,7 +494,7 @@ const PARANORMAL_CAREERS = [
     title: "Black Ichor Toxicologist",
     minAge: 24,
     payoutShillings: 310,
-    sanityCost: 22,
+    sanityCost: 3,
     reqs: { minOccult: 50, minSmarts: 80 },
     desc: "Distilling non-terrestrial bile found inside desecrated livestock carcasses in a lead-lined cleanroom."
   },
@@ -503,7 +503,7 @@ const PARANORMAL_CAREERS = [
     title: "Mortuary Syndicate Specimen Harvester",
     minAge: 24,
     payoutShillings: 350,
-    sanityCost: 30,
+    sanityCost: 3,
     reqs: { minOccult: 60, maxHumanity: 35, minVitality: 60 },
     desc: "Supplying subterranean ghoul colonies with unclaimed autopsied limbs in exchange for ancient silver talers."
   },
@@ -514,7 +514,7 @@ const PARANORMAL_CAREERS = [
     title: "Architect of Non-Euclidean Sanctuaries",
     minAge: 26,
     payoutShillings: 420,
-    sanityCost: 32,
+    sanityCost: 3,
     reqs: { minOccult: 65, minSmarts: 85 },
     desc: "Drafting building blueprints with impossible acoustic corridors that amplify resonance for eldritch arrival."
   },
@@ -523,7 +523,7 @@ const PARANORMAL_CAREERS = [
     title: "Grand Inquisitor of the Silent Circle",
     minAge: 28,
     payoutShillings: 500,
-    sanityCost: 35,
+    sanityCost: 3,
     reqs: { minOccult: 75, minSanity: 75, maxHumanity: 40 },
     desc: "The absolute pinnacle of the modern occult underworld. You pass lethal judgment on warlocks who breach the veil."
   }

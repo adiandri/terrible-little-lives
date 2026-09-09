@@ -35,7 +35,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Reach your tiny hands out toward the tapping shadow.",
         outcome: "The cold shadow touches the glass directly across from your fingers. A tiny silver shilling falls onto the windowsill with a soft chime.",
-        effects: { occult: +12, sanity: -6, shillings: +2 }
+        effects: { occult: +12, sanity: -2, shillings: +2 }
       },
       {
         text: "Squeeze your eyes shut and pretend you are fast asleep.",
@@ -59,7 +59,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Repeat the sharp clicking sound coming from behind the radiator.",
         outcome: "The kitchen goes dead silent. Your father glances nervously at the heating vent, his smile fading into unease.",
-        effects: { occult: +10, sanity: -4, humanity: -2 }
+        effects: { occult: +10, sanity: -2, humanity: -1 }
       },
       {
         text: "Spit your applesauce cheerfully onto the tray and laugh.",
@@ -83,7 +83,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Stare directly into the doctor's unblinking eyes without flinching.",
         outcome: "The doctor pauses, letting out a low hum of approval. He presses a cold commemorative medallion into your tiny palm.",
-        effects: { occult: +14, sanity: -5, shillings: +2 }
+        effects: { occult: +14, sanity: -2, shillings: +2 }
       },
       {
         text: "Kick your foot out and knock the metal tray off the stool.",
@@ -107,7 +107,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Wave your hand and wait to see what gesture the shadow returns.",
         outcome: "The shadow lingers, then slowly raises six long fingers in a slow greeting. A chill runs down your tiny spine.",
-        effects: { occult: +15, sanity: -10, shillings: +1 }
+        effects: { occult: +15, sanity: -3, shillings: +1 }
       },
       {
         text: "Hop out of bed and boldly unplug the nightlight from the wall socket.",
@@ -131,7 +131,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Slide a dandelion blossom through the wooden lattice.",
         outcome: "A pale, elongated hand accepts the blossom. In exchange, two cool antique brass shillings are slid across the grass to your shoes.",
-        effects: { occult: +16, shillings: +4, humanity: -4, sanity: -6 }
+        effects: { occult: +16, shillings: +4, humanity: -1, sanity: -2 }
       },
       {
         text: "Throw a handful of dry dirt at the lattice and run away.",
@@ -155,7 +155,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Press your ear against the center of the crayon labyrinth.",
         outcome: "You hear distant subterranean rail traffic and whispering voices calling out forgotten names. Your eyes dilate in fascination.",
-        effects: { occult: +18, sanity: -12, smarts: +4 }
+        effects: { occult: +18, sanity: -3, smarts: +4 }
       },
       {
         text: "Push the heavy wooden dresser back against the wall to hide it.",
@@ -179,7 +179,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Sneak the key into your pocket and turn the cellar lock.",
         outcome: "You push the cellar door open an inch. Cool, damp air smelling of copper and wet coal rushes out, and you pocket a tarnished token.",
-        effects: { occult: +15, sanity: -8, shillings: +2 }
+        effects: { occult: +15, sanity: -2, shillings: +2 }
       },
       {
         text: "Hand the key to your mother and say 'Key goes in pocket.'",
@@ -203,7 +203,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Press your fingers flat against the glass over your reflection's hand.",
         outcome: "The glass feels strangely warm like human skin. A static spark jumps between your fingertips, leaving a faint pale mark.",
-        effects: { occult: +16, sanity: -10, humanity: -4 }
+        effects: { occult: +16, sanity: -2, humanity: -1 }
       },
       {
         text: "Make a ridiculous tongue-out face to test it.",
@@ -222,17 +222,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Scream at the top of your lungs for your parents.",
         outcome: "Your dad storms in and unplugs the router. He assumes it was a neighborhood hacker, but his hands tremble.",
-        effects: { sanity: -6, happiness: -5 }
+        effects: { sanity: -2, happiness: -2 }
       },
       {
         text: "Turn around and look into the darkness.",
         outcome: "A silhouette with limbs like bent aluminum pipes is crouched atop your wardrobe. You black out and wake up with a severe nosebleed.",
-        effects: { sanity: -18, occult: +15, vitality: -5, shillings: +2 }
+        effects: { sanity: -3, occult: +15, vitality: -2, shillings: +2 }
       },
       {
         text: "Hide under your weighted blanket and recite the alphabet backwards.",
         outcome: "The speaker lets out a mechanical sigh like escaping steam. Silence returns, but the room smells of burnt plastic.",
-        effects: { sanity: -4, happiness: -2 }
+        effects: { sanity: -2, happiness: -1 }
       }
     ]
   },
@@ -246,12 +246,12 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Point at the tunnel and yell 'Look, mom!'",
         outcome: "Your mother yanks your arm roughly and stares into her phone. 'Stop looking at track workers,' she snaps, though the platform was totally empty.",
-        effects: { sanity: -5, happiness: -4 }
+        effects: { sanity: -2, happiness: -2 }
       },
       {
         text: "Stare into the tunnel without blinking.",
         outcome: "The crawling figure pauses. It reaches into its grease-stained pocket and tosses a tarnished blackened silver coin onto the platform edge.",
-        effects: { sanity: -14, occult: +16, shillings: +5, humanity: -4 }
+        effects: { sanity: -3, occult: +16, shillings: +5, humanity: -1 }
       },
       {
         text: "Look away immediately and hold your breath.",
@@ -270,17 +270,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Accept the transfer and open the photo file.",
         outcome: "The image is high-resolution. Between the hanging coats, two pale humanoid eyes reflect the camera flash. EXIF data says it was taken 12 seconds ago.",
-        effects: { sanity: -22, occult: +18, vitality: -4 }
+        effects: { sanity: -3, occult: +18, vitality: -2 }
       },
       {
         text: "Immediately kick the closet door shut and wedge your desk chair under the knob.",
         outcome: "Something slams heavily against the inside of the door once, making the wood creak. Then absolute silence.",
-        effects: { sanity: -10, vitality: +5, happiness: -8 }
+        effects: { sanity: -2, vitality: +5, happiness: -3 }
       },
       {
         text: "Turn off Bluetooth and run to your parents' bedroom.",
         outcome: "Your parents search the closet. Nothing is there except your winter coats and a handful of wet salt on the floor.",
-        effects: { sanity: -5, happiness: -3 }
+        effects: { sanity: -2, happiness: -1 }
       }
     ]
   },
@@ -294,12 +294,12 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Use a sterile diabetic lancet, fill a vial, and mail it to the PO Box.",
         outcome: "Three days later, an unmarked padded envelope arrives in your locker containing five heavy blackened silver coins. A cold ache throbs in your sternum.",
-        effects: { shillings: +50, humanity: -18, vitality: -10, occult: +20 }
+        effects: { shillings: +50, humanity: -3, vitality: -3, occult: +20 }
       },
       {
         text: "Reply with the local police department's IP address.",
         outcome: "The user sends back a video stream of your front porch taken five minutes ago. Your screen glitched with static.",
-        effects: { sanity: -16, happiness: -12 }
+        effects: { sanity: -3, happiness: -3 }
       },
       {
         text: "Delete Telegram and factory reset your phone.",
@@ -318,17 +318,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Step out into the ankle-deep black water to explore.",
         outcome: "You find rusted hospital gurneys and a brass safety deposit box. Inside sits a pristine occult ledger and wet currency.",
-        effects: { sanity: -25, occult: +30, shillings: +85, money: +400, humanity: -10 }
+        effects: { sanity: -3, occult: +30, shillings: +85, money: +400, humanity: -2 }
       },
       {
         text: "Frantically mash the 'Door Close' and 'Floor 1' buttons.",
         outcome: "The doors hesitate, catching on something soft before snapping shut. The elevator groans and shoots back to the lobby.",
-        effects: { sanity: -8, vitality: -2 }
+        effects: { sanity: -2, vitality: -1 }
       },
       {
         text: "Take a flash photo and send it to your building manager.",
         outcome: "The building manager calls you within two minutes, his voice terrified: 'Delete that photo right now and don't speak to anyone about it.'",
-        effects: { sanity: -12, occult: +10 }
+        effects: { sanity: -3, occult: +10 }
       }
     ]
   },
@@ -342,17 +342,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Take the money and push the gurney.",
         outcome: "Whatever is inside the body bag is warm, breathing irregularly, and speaks your birth date as the elevator descends. You wash your hands for an hour.",
-        effects: { money: +800, shillings: +35, humanity: -20, sanity: -15 }
+        effects: { money: +800, shillings: +35, humanity: -3, sanity: -3 }
       },
       {
         text: "Refuse and sprint for the illuminated fire exit.",
         outcome: "You burst into the rainy street. Behind you, the hospital alarm sirens begin their slow, wailing cycle.",
-        effects: { sanity: +4, vitality: -5 }
+        effects: { sanity: +4, vitality: -2 }
       },
       {
         text: "Notify the armed security guards at the front desk.",
         outcome: "The guards exchange silent glances, lock the glass doors, and tell you that room 104 is off-limits tonight.",
-        effects: { sanity: -10, occult: +12 }
+        effects: { sanity: -3, occult: +12 }
       }
     ]
   },
@@ -366,17 +366,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Creep down the dark hallway and inspect the cellar keyhole.",
         outcome: "You peer through the brass keyhole. An unblinking yellow eye is looking back at you from three inches away. You stifle a shriek and retreat to your sleeping bag.",
-        effects: { sanity: -15, occult: +12, happiness: -6 }
+        effects: { sanity: -3, occult: +12, happiness: -2 }
       },
       {
         text: "Slide an envelope of sea salt across the cellar threshold.",
         outcome: "The thudding instantly halts. A low, appreciative hiss echoes through the floorboards. The next morning, two antique coins sit outside the door.",
-        effects: { sanity: -4, occult: +15, shillings: +4, humanity: -2 }
+        effects: { sanity: -2, occult: +15, shillings: +4, humanity: -1 }
       },
       {
         text: "Pull the blankets over your head and wait for morning.",
         outcome: "You don't sleep a wink until dawn filters through the venetian blinds. The kitchen smells of burnt lard.",
-        effects: { sanity: -3, happiness: -4 }
+        effects: { sanity: -2, happiness: -2 }
       }
     ]
   },
@@ -390,17 +390,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Surrender your cash and walk away quietly.",
         outcome: "Trent sneers, snatches your bills, and pushes you against the wall. You go without hot lunch for three days.",
-        effects: { money: -25, happiness: -12, sanity: -4 }
+        effects: { money: -25, happiness: -3, sanity: -2 }
       },
       {
         text: "Call out to your companion who has been watching silently.",
         outcome: "Your friend steps from the shadows. Their jaw clicks awkwardly as their gaze unmoors the bully's nerve. Trent turns ash-pale, drops his own wallet, and flees sobbing.",
-        effects: { money: +40, happiness: +10, occult: +8, humanity: -4 }
+        effects: { money: +40, happiness: +10, occult: +8, humanity: -1 }
       },
       {
         text: "Fight back with all your strength.",
         outcome: "You land a solid punch to his nose, but take a bruised rib in return. The principal suspends both of you for two days.",
-        effects: { vitality: -8, happiness: -4, smarts: +2 }
+        effects: { vitality: -3, happiness: -2, smarts: +2 }
       }
     ]
   },
@@ -419,7 +419,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Shrewdly check its collar for identification.",
         outcome: "Attached to its flea collar is a weathered tin tag engraved with your family's home address—dated 1968, before your house was built.",
-        effects: { sanity: -12, occult: +14, shillings: +3 }
+        effects: { sanity: -3, occult: +14, shillings: +3 }
       },
       {
         text: "Shoo the animal away with a broom.",
@@ -438,7 +438,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Take a deep gulp of the metallic black water.",
         outcome: "It tastes of zinc, iron, and burnt sugar. Your vision sharpens with unearthly lucidity, though violent stomach cramps keep you home for two days.",
-        effects: { vitality: -12, smarts: +8, occult: +14, shillings: +2, money: +10 }
+        effects: { vitality: -3, smarts: +8, occult: +14, shillings: +2, money: +10 }
       },
       {
         text: "Collect a sample in an empty plastic water bottle.",
@@ -448,7 +448,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Tell them they're all idiots and walk to class.",
         outcome: "They mock you as a coward, but none of them are brave enough to drink it either.",
-        effects: { happiness: -3, sanity: +4 }
+        effects: { happiness: -2, sanity: +4 }
       }
     ]
   },
@@ -462,17 +462,17 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Carefully photograph every clause of the blood deed.",
         outcome: "The contract covenants the first-born child of the house to 'The Pale Warden of the Reservoir' upon their 21st year in exchange for thirty years of solvent mortgages.",
-        effects: { sanity: -18, occult: +20, smarts: +6 }
+        effects: { sanity: -3, occult: +20, smarts: +6 }
       },
       {
         text: "Confront your parents directly at dinner.",
         outcome: "Your father's fork clatters against his plate. He turns pale as salt, confiscates the box, and locks the attic trapdoor with heavy padlocks.",
-        effects: { sanity: -8, happiness: -10 }
+        effects: { sanity: -2, happiness: -2 }
       },
       {
         text: "Steal the antique wax seal and coins from the bottom of the box.",
         outcome: "You pocket eight heavy blackened shillings and replace the deed. Your hands smell of sulfur for days.",
-        effects: { shillings: +8, humanity: -6, money: +80 }
+        effects: { shillings: +8, humanity: -2, money: +80 }
       }
     ]
   },
@@ -491,7 +491,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Hand it over to your parents immediately.",
         outcome: "Your mother looks terrified upon recognizing the box's brass fittings. She refuses to speak of it and hides it in her cedar trunk.",
-        effects: { sanity: -4, happiness: -4 }
+        effects: { sanity: -2, happiness: -2 }
       },
       {
         text: "Pawn the music box at the antique exchange down the block.",
@@ -510,7 +510,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Slip away from the faculty line and investigate the tree line.",
         outcome: "You find footprints in the wet mud as large as bathtubs, filled with boiling black water. You retrieve an abandoned surveyor's transit and shillings.",
-        effects: { occult: +18, sanity: -12, shillings: +10, vitality: -4 }
+        effects: { occult: +18, sanity: -3, shillings: +10, vitality: -2 }
       },
       {
         text: "Keep your classmates calm and stay with the homeroom group.",
@@ -520,7 +520,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Take a video and upload it to social media.",
         outcome: "Your post gains 40,000 views within ten minutes before the video is abruptly wiped and your account is shadowbanned.",
-        effects: { looks: +4, happiness: +6, sanity: -6 }
+        effects: { looks: +4, happiness: +6, sanity: -2 }
       }
     ]
   },
@@ -542,7 +542,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Whisper a rhythmic rhyme you read in an old cemetery pamphlet.",
         outcome: "A sudden freak whirlwind sweeps across the blacktop. The bully trips into a puddle of black grease, sobbing in sudden terror.",
-        effects: { occult: +14, sanity: -6, humanity: -4 }
+        effects: { occult: +14, sanity: -2, humanity: -1 }
       },
       {
         text: "Offer to trade a shiny canal quartz pebble for your sandwich.",
@@ -566,7 +566,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Sit cross-legged and hold a pretend tea party with the doll.",
         outcome: "A pleasant chill fills the room. When you finish, you find a pristine silver sixpence nestled in the doll's velvet reticule.",
-        effects: { occult: +16, sanity: -8, shillings: +3 }
+        effects: { occult: +16, sanity: -2, shillings: +3 }
       },
       {
         text: "Show the doll to your grandfather and ask about its history.",
@@ -585,12 +585,12 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Sprint out the front door into the rain to the neighbor's porch.",
         outcome: "The neighbor lets you dry off by their hearth. Your parents arrive twenty minutes later, thanking them profusely.",
-        effects: { vitality: -2, sanity: +6, happiness: +4 }
+        effects: { vitality: -1, sanity: +6, happiness: +4 }
       },
       {
         text: "Slowly wave both hands at the television screen.",
         outcome: "The screen shows you waving. Then, from the hallway in the video feed, a dark shape steps into view behind your shoulder.",
-        effects: { occult: +20, sanity: -18, vitality: -4 }
+        effects: { occult: +20, sanity: -3, vitality: -2 }
       },
       {
         text: "Pull the television power cord from the wall outlet.",
@@ -618,7 +618,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Join hands and focus your intent on the darkened glass.",
         outcome: "The mirror surface turns oily black. A chorus of discordant whispers fills your skull with ancient astrological formulae.",
-        effects: { occult: +22, sanity: -16, smarts: +8, shillings: +4 }
+        effects: { occult: +22, sanity: -3, smarts: +8, shillings: +4 }
       },
       {
         text: "Toss a pinch of table salt over the mirror and take a photo.",
@@ -642,7 +642,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Squeeze through the chain link with your phone flashlight.",
         outcome: "You explore tiled archways covered in dried moss. In an old ticket booth, you find a tin box with vintage banknotes and +12 Shillings.",
-        effects: { occult: +18, sanity: -10, shillings: +12, money: +150 }
+        effects: { occult: +18, sanity: -2, shillings: +12, money: +150 }
       },
       {
         text: "Alert the platform attendant about the unpadlocked gate.",
@@ -661,12 +661,12 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Take the long, illuminated avenue and accept being grounded.",
         outcome: "You arrive home late. Your parents give you a lecture and extra chores, but you sleep in peace.",
-        effects: { sanity: +4, happiness: -5 }
+        effects: { sanity: +4, happiness: -2 }
       },
       {
         text: "Vault the wrought-iron gate and sprint past the mausoleums.",
         outcome: "Cold wind howls through the weeping willows. Something skitters parallel to you in the shadows, but you reach your porch in time.",
-        effects: { vitality: +6, sanity: -8, occult: +8 }
+        effects: { vitality: +6, sanity: -2, occult: +8 }
       },
       {
         text: "Text your parents that the bus was delayed while briskly walking.",
@@ -694,7 +694,7 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Sign the lease and wait by the dumbwaiter at 1:00 AM with a camera.",
         outcome: "A brass tray ascends the shaft containing an antique leather envelope filled with legal bearer bonds and silver shillings.",
-        effects: { shillings: +25, money: +600, occult: +20, sanity: -15, humanity: -6 }
+        effects: { shillings: +25, money: +600, occult: +20, sanity: -3, humanity: -2 }
       },
       {
         text: "Reject the apartment and report the landlord to housing authorities.",
@@ -718,12 +718,12 @@ const INTERACTIVE_DILEMMAS = [
       {
         text: "Unlock the vault door with your master key and step inside.",
         outcome: "Frost coats the glass display cases. Standing before an unlabelled Babylonian tablet, you hear a voice speak your true name in dead syllables.",
-        effects: { occult: +25, sanity: -20, shillings: +15, smarts: +8 }
+        effects: { occult: +25, sanity: -3, shillings: +15, smarts: +8 }
       },
       {
         text: "Review the CCTV loop from the vault camera for the past hour.",
         outcome: "The footage shows a shadow detaching from the ceiling and standing motionless in the center of the vault for 45 minutes.",
-        effects: { smarts: +7, sanity: -8, occult: +10 }
+        effects: { smarts: +7, sanity: -2, occult: +10 }
       }
     ]
   },

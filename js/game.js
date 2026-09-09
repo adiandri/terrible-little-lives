@@ -1143,9 +1143,9 @@ class TerribleGame {
         currentYearLog.entries.push(`Paid annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
       } else {
         this.character.money = 0;
-        this.modifyStat('happiness', -10);
+        this.modifyStat('happiness', -3);
         this.modifyStat('vitality', -2);
-        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety severely strained your health.`);
+        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety strained your well-being.`);
       }
     } else {
       // Minor allowance / home dynamic
@@ -2540,7 +2540,8 @@ class TerribleGame {
             pillText = val > 0 ? `Closeness +${val}%` : `Closeness ${val}%`;
           } else {
             const statName = key.charAt(0).toUpperCase() + key.slice(1);
-            pillText = val > 0 ? `${statName} +${val}%` : `${statName} ${val}%`;
+            const displayVal = val < 0 ? Math.max(-3, val) : val;
+            pillText = displayVal > 0 ? `${statName} +${displayVal}%` : `${statName} ${displayVal}%`;
           }
 
           const pill = document.createElement('span');
@@ -2732,8 +2733,10 @@ class TerribleGame {
 
   modifyStat(stat, delta) {
     if (this.character.stats[stat] !== undefined) {
-      this.character.stats[stat] = Math.max(0, Math.min(100, this.character.stats[stat] + delta));
-      if (delta < -10) {
+      // Never decrease scores by 7% or more; max decrease is capped at 2-3 points (especially for sanity and mortality stats)
+      const effectiveDelta = delta < 0 ? Math.max(-3, delta) : delta;
+      this.character.stats[stat] = Math.max(0, Math.min(100, this.character.stats[stat] + effectiveDelta));
+      if (effectiveDelta < -2) {
         window.soundEngine.playWhisper();
       }
     }

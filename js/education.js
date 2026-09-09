@@ -70,8 +70,10 @@
   function modStat(character, stat, delta) {
     if (!character) return 50;
     if (!character.stats) character.stats = {};
+    // Never decrease scores by 7% or more; max decrease is capped at 2-3 points (especially for sanity and mortality stats)
+    const effectiveDelta = delta < 0 ? Math.max(-3, delta) : delta;
     const curr = character.stats[stat] !== undefined ? character.stats[stat] : (character[stat] !== undefined ? character[stat] : 50);
-    const updated = Math.max(0, Math.min(100, Math.round(curr + delta)));
+    const updated = Math.max(0, Math.min(100, Math.round(curr + effectiveDelta)));
     character.stats[stat] = updated;
     character[stat] = updated;
     return updated;
@@ -559,13 +561,14 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
-    edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - Math.floor(Math.random() * 5) - 4);
-    modStat(character, 'happiness', 5);
+    const gradeLoss = Math.floor(Math.random() * 2) + 2; // -2 to -3%
+    edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - gradeLoss);
+    modStat(character, 'happiness', 3);
     
     // Disciplinary risk
     const caught = Math.random() < 0.4;
     let body = `You hopped the perimeter fence and spent third period listening to distant radio music behind the grandstands.`;
-    const effects = { happiness: 5, grades: -6 };
+    const effects = { happiness: 3, grades: -gradeLoss };
 
     if (caught) {
       edu.disciplinaryRecord = (edu.disciplinaryRecord || 0) + 1;
@@ -600,9 +603,9 @@
 
     if (mystery.id === 'boiler_crawlspace') {
       modStat(character, 'occult', 6);
-      modStat(character, 'sanity', -5);
+      modStat(character, 'sanity', -2);
       effects.occult = 6;
-      effects.sanity = -5;
+      effects.sanity = -2;
       body = "You slipped behind the furnace pipes. Amidst spiderwebs and hot asbestos pipes, you discovered charcoal sigils drawn onto the floorboards and a child's silver locket that still ticks faintly.";
       if (Math.random() < 0.3) {
         character.shillings = (character.shillings || 0) + 2;
@@ -611,23 +614,23 @@
       }
     } else if (mystery.id === 'drained_pool') {
       modStat(character, 'occult', 5);
-      modStat(character, 'sanity', -4);
+      modStat(character, 'sanity', -2);
       effects.occult = 5;
-      effects.sanity = -4;
+      effects.sanity = -2;
       body = "You climbed down the rusted brass ladder into the dry deep end. In the center drain, a wet handprint was visible that evaporated under your flashlight beam.";
     } else if (mystery.id === 'sealed_stairwell') {
       modStat(character, 'smarts', 2);
       modStat(character, 'occult', 4);
-      modStat(character, 'sanity', -3);
+      modStat(character, 'sanity', -2);
       effects.smarts = 2;
       effects.occult = 4;
-      effects.sanity = -3;
+      effects.sanity = -2;
       body = "You managed to slip a brass wire into the padlock. Behind the door lay an architectural blueprint from 1922 indicating an entire subterranean annex erased from modern maps.";
     } else if (mystery.id === 'pa_broadcast') {
       modStat(character, 'occult', 7);
-      modStat(character, 'sanity', -6);
+      modStat(character, 'sanity', -3);
       effects.occult = 7;
-      effects.sanity = -6;
+      effects.sanity = -3;
       body = "You waited alone until 5:45 PM. The speakers hissed with white noise, followed by rhythmic whispering in an unearthly cadence that made your teeth hum. When you looked out the window, all the crows on the power lines were facing the transmitter tower.";
     }
 
@@ -699,8 +702,8 @@
         title = "Playground Dare Completed!";
         body = `You dared ${classmate.name} to eat a strange dried mushroom found beneath the gymnasium bleachers. A crowd gathered and cheered!`;
       } else {
-        modStat(character, 'vitality', -5);
-        effects.vitality = -5;
+        modStat(character, 'vitality', -2);
+        effects.vitality = -2;
         title = "Dare Gone Wrong";
         body = `The dare resulted in a minor scuffle behind the bicycle shed. You scraped your knee on broken gravel.`;
       }
@@ -884,9 +887,9 @@
       }
     } else if (actionType === 'ask_boiler_room') {
       modStat(character, 'occult', 5);
-      modStat(character, 'sanity', -4);
+      modStat(character, 'sanity', -2);
       effects.occult = 5;
-      effects.sanity = -4;
+      effects.sanity = -2;
       title = `Inquired About the Boiler Room`;
       body = `${staffMember.name}'s eyes narrowed. He looked both ways before whispering: "The foundation was poured over an old quarry shaft in 1894. If you hear rhythmic metallic banging down there when the coal stoves are off... don't go looking."`;
     } else if (actionType === 'search_lost_found') {
@@ -899,9 +902,9 @@
         body = `${staffMember.name} let you rummage through the wooden crate. At the bottom of an abandoned winter coat, you found $${found}!`;
       } else if (roll < 0.7) {
         modStat(character, 'occult', 4);
-        modStat(character, 'sanity', -3);
+        modStat(character, 'sanity', -2);
         effects.occult = 4;
-        effects.sanity = -3;
+        effects.sanity = -2;
         body = `You pulled out an old silver signet ring with an engraving of an unblinking eye. It felt strangely warm against your skin. (+4% Occult)`;
       } else {
         body = `You dug through stacks of moth-eaten woolen scarves and mismatched rain boots, finding nothing of real note.`;
@@ -935,9 +938,9 @@
         };
       }
       modStat(character, 'occult', 10);
-      modStat(character, 'sanity', -8);
+      modStat(character, 'sanity', -3);
       effects.occult = 10;
-      effects.sanity = -8;
+      effects.sanity = -3;
       title = `The Locked Glass Cabinet`;
       body = `${staffMember.name} quietly turned a brass key in the oak cabinet and allowed you to inspect a hand-bound volume with vellum leaves. The illustrations depicted stars arranged in geometries that made your eyes water.`;
     }
