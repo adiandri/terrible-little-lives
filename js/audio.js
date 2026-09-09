@@ -2,7 +2,7 @@
 class SoundEngine {
   constructor() {
     this.ctx = null;
-    this.isMuted = false;
+    this.isMuted = typeof localStorage !== 'undefined' && localStorage.getItem('TLL_AUDIO_MUTED') === 'true';
   }
 
   init() {
@@ -21,9 +21,18 @@ class SoundEngine {
     }
   }
 
-  toggleMute() {
-    this.isMuted = !this.isMuted;
+  setMuted(muted) {
+    this.isMuted = !!muted;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('TLL_AUDIO_MUTED', this.isMuted ? 'true' : 'false');
+      }
+    } catch (e) {}
     return this.isMuted;
+  }
+
+  toggleMute() {
+    return this.setMuted(!this.isMuted);
   }
 
   playTick() {

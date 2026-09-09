@@ -36,8 +36,13 @@ class TerribleGame {
     };
 
     this.activeThemeFilter = 'all';
+    this.vibrationEnabled = typeof localStorage !== 'undefined' && localStorage.getItem('TLL_VIBRATION') !== 'false';
+    this.textSize = (window.getTextSize && window.getTextSize()) || 'normal';
+
     this.initElements();
+    this.applyTextSize(this.textSize, false);
     this.syncThemeLabel();
+    this.syncSettingsUI();
     this.bindEvents();
     this.populateCreatorDropdowns();
     this.syncCreatorUI();
@@ -61,6 +66,7 @@ class TerribleGame {
       btnToCreator: document.getElementById('btn-to-creator'),
       btnQuickLife: document.getElementById('btn-quick-life'),
       btnToCrypt: document.getElementById('btn-to-crypt'),
+      btnLandingSettings: document.getElementById('btn-landing-settings'),
       btnLandingTheme: document.getElementById('btn-landing-theme'),
       txtCurrentThemeName: document.getElementById('txt-current-theme-name'),
       btnLandingMute: document.getElementById('btn-landing-mute'),
@@ -69,6 +75,7 @@ class TerribleGame {
       // Creator UI
       creatorAvatarCanvas: document.getElementById('creator-avatar-canvas'),
       btnRandomAvatar: document.getElementById('btn-random-avatar'),
+      btnCreatorSettings: document.getElementById('btn-creator-settings'),
       btnCreatorRandomizeAll: document.getElementById('btn-creator-randomize-all'),
       btnCreatorBack: document.getElementById('btn-creator-back'),
       tabAppearance: document.getElementById('tab-appearance'),
@@ -126,6 +133,7 @@ class TerribleGame {
       charAgeYear: document.getElementById('char-age-year'),
       charMoney: document.getElementById('char-money'),
       charShillings: document.getElementById('char-shillings'),
+      btnGameSettings: document.getElementById('btn-game-settings'),
       btnGameTheme: document.getElementById('btn-game-theme'),
       btnGameGodmode: document.getElementById('btn-game-godmode'),
       btnToMenu: document.getElementById('btn-to-menu'),
@@ -205,9 +213,23 @@ class TerribleGame {
       slideLiveShillings: document.getElementById('slide-live-shillings'),
       lblLiveShillings: document.getElementById('lbl-live-shillings'),
 
-      // Theme Modal
-      themeModal: document.getElementById('theme-modal'),
-      btnCloseThemeModal: document.getElementById('btn-close-theme-modal'),
+      // Settings & Theme Modal
+      settingsModal: document.getElementById('settings-modal'),
+      btnCloseSettings: document.getElementById('btn-close-settings'),
+      btnSoundOff: document.getElementById('btn-sound-off'),
+      btnSoundOn: document.getElementById('btn-sound-on'),
+      settingsSoundIcon: document.getElementById('settings-sound-icon'),
+      btnVibeOff: document.getElementById('btn-vibe-off'),
+      btnVibeOn: document.getElementById('btn-vibe-on'),
+      settingsVibeIcon: document.getElementById('settings-vibe-icon'),
+      btnTextSmall: document.getElementById('btn-text-small'),
+      btnTextNormal: document.getElementById('btn-text-normal'),
+      btnTextLarge: document.getElementById('btn-text-large'),
+      btnTextHuge: document.getElementById('btn-text-huge'),
+      settingsTextSizeLabel: document.getElementById('settings-text-size-label'),
+      settingsTextPreview: document.getElementById('settings-text-preview'),
+      themeModal: document.getElementById('settings-modal') || document.getElementById('theme-modal'),
+      btnCloseThemeModal: document.getElementById('btn-close-settings') || document.getElementById('btn-close-theme-modal'),
       tabThemeAll: document.getElementById('tab-theme-all'),
       tabThemeDark: document.getElementById('tab-theme-dark'),
       tabThemeLight: document.getElementById('tab-theme-light'),
@@ -420,10 +442,10 @@ class TerribleGame {
     // Audio Toggles
     if (this.dom.btnLandingMute) {
       this.dom.btnLandingMute.addEventListener('click', () => {
-        const isMuted = window.soundEngine.toggleMute();
-        const iconName = isMuted ? 'volume-x' : 'volume-2';
-        if (this.dom.landingMuteIcon) this.dom.landingMuteIcon.setAttribute('data-lucide', iconName);
-        if (window.lucide) window.lucide.createIcons();
+        if (window.soundEngine) {
+          window.soundEngine.toggleMute();
+          this.syncSettingsUI();
+        }
       });
     }
 
@@ -779,16 +801,30 @@ class TerribleGame {
       this.showScreen('screen-crypt');
     });
 
-    // Theme Switcher Controls
-    if (this.dom.btnLandingTheme) {
-      this.dom.btnLandingTheme.addEventListener('click', () => this.openThemeModal());
-    }
-    if (this.dom.btnGameTheme) {
-      this.dom.btnGameTheme.addEventListener('click', () => this.openThemeModal());
-    }
-    if (this.dom.btnCloseThemeModal) {
-      this.dom.btnCloseThemeModal.addEventListener('click', () => this.closeThemeModal());
-    }
+    // Settings & Theme Switcher Controls
+    const openSettings = () => this.openSettingsModal();
+    if (this.dom.btnLandingSettings) this.dom.btnLandingSettings.addEventListener('click', openSettings);
+    if (this.dom.btnCreatorSettings) this.dom.btnCreatorSettings.addEventListener('click', openSettings);
+    if (this.dom.btnGameSettings) this.dom.btnGameSettings.addEventListener('click', openSettings);
+    if (this.dom.btnLandingTheme) this.dom.btnLandingTheme.addEventListener('click', openSettings);
+    if (this.dom.btnGameTheme) this.dom.btnGameTheme.addEventListener('click', openSettings);
+    if (this.dom.btnCloseSettings) this.dom.btnCloseSettings.addEventListener('click', () => this.closeSettingsModal());
+    if (this.dom.btnCloseThemeModal) this.dom.btnCloseThemeModal.addEventListener('click', () => this.closeSettingsModal());
+
+    // Sound toggle buttons
+    if (this.dom.btnSoundOff) this.dom.btnSoundOff.addEventListener('click', () => this.setSoundEnabled(false));
+    if (this.dom.btnSoundOn) this.dom.btnSoundOn.addEventListener('click', () => this.setSoundEnabled(true));
+
+    // Vibration toggle buttons
+    if (this.dom.btnVibeOff) this.dom.btnVibeOff.addEventListener('click', () => this.setVibrationEnabled(false));
+    if (this.dom.btnVibeOn) this.dom.btnVibeOn.addEventListener('click', () => this.setVibrationEnabled(true));
+
+    // Text size buttons
+    if (this.dom.btnTextSmall) this.dom.btnTextSmall.addEventListener('click', () => this.setTextSize('small'));
+    if (this.dom.btnTextNormal) this.dom.btnTextNormal.addEventListener('click', () => this.setTextSize('normal'));
+    if (this.dom.btnTextLarge) this.dom.btnTextLarge.addEventListener('click', () => this.setTextSize('large'));
+    if (this.dom.btnTextHuge) this.dom.btnTextHuge.addEventListener('click', () => this.setTextSize('huge'));
+
     if (this.dom.tabThemeAll) {
       this.dom.tabThemeAll.addEventListener('click', () => this.filterThemes('all'));
     }
@@ -1034,7 +1070,7 @@ class TerribleGame {
     if (!this.character.isAlive || this.activeDilemma) return;
 
     window.soundEngine.playTick();
-    if (navigator.vibrate) navigator.vibrate(35);
+    this.vibrate(35);
 
     this.character.age += 1;
     this.character.year += 1;
@@ -1240,7 +1276,7 @@ class TerribleGame {
   triggerDilemma(dilemma) {
     this.activeDilemma = dilemma;
     window.soundEngine.playDread();
-    if (navigator.vibrate) navigator.vibrate([50, 40, 80]);
+    this.vibrate([50, 40, 80]);
 
     this.dom.dilemmaTitle.textContent = dilemma.title;
     this.dom.dilemmaPrompt.textContent = dilemma.prompt;
@@ -1276,7 +1312,7 @@ class TerribleGame {
     if (!this.activeDilemma) return;
 
     window.soundEngine.playClick();
-    if (navigator.vibrate) navigator.vibrate(30);
+    this.vibrate(30);
 
     const dilemma = this.activeDilemma;
     const choice = dilemma.choices[choiceIdx];
@@ -2760,7 +2796,7 @@ class TerribleGame {
     this.addToCrypt(this.character);
 
     window.soundEngine.playDeath();
-    if (navigator.vibrate) navigator.vibrate([150, 100, 350]);
+    this.vibrate([150, 100, 350]);
 
     this.showDeathModal();
     this.saveGame();
@@ -2788,6 +2824,7 @@ class TerribleGame {
       this.dom.deathModal,
       this.dom.godmodeModal,
       this.dom.careersModal,
+      this.dom.settingsModal,
       this.dom.themeModal,
       this.dom.kinModal,
       this.dom.kinDetailModal,
@@ -3088,23 +3125,154 @@ class TerribleGame {
     }
   }
 
-  openThemeModal() {
+  vibrate(pattern) {
+    if (!this.vibrationEnabled) return;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(pattern);
+      }
+    } catch (e) {}
+  }
+
+  openSettingsModal() {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
-    this.activeThemeFilter = 'all';
-    this.filterThemes('all');
-    if (this.dom.themeModal) {
-      this.dom.themeModal.classList.remove('hidden');
-      this.dom.themeModal.style.display = 'flex';
+    this.syncSettingsUI();
+    this.filterThemes(this.activeThemeFilter || 'all');
+    const modal = this.dom.settingsModal || this.dom.themeModal;
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
     }
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
   }
 
-  closeThemeModal() {
-    if (this.dom.themeModal) {
+  closeSettingsModal() {
+    if (this.dom.settingsModal) {
+      this.dom.settingsModal.classList.add('hidden');
+      this.dom.settingsModal.style.display = 'none';
+    }
+    if (this.dom.themeModal && this.dom.themeModal !== this.dom.settingsModal) {
       this.dom.themeModal.classList.add('hidden');
       this.dom.themeModal.style.display = 'none';
+    }
+  }
+
+  openThemeModal() {
+    this.openSettingsModal();
+  }
+
+  closeThemeModal() {
+    this.closeSettingsModal();
+  }
+
+  setSoundEnabled(enabled) {
+    if (window.soundEngine) {
+      window.soundEngine.setMuted(!enabled);
+      if (enabled && window.soundEngine.playClick) {
+        window.soundEngine.playClick();
+      }
+    }
+    this.syncSettingsUI();
+  }
+
+  setVibrationEnabled(enabled) {
+    this.vibrationEnabled = !!enabled;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('TLL_VIBRATION', this.vibrationEnabled ? 'true' : 'false');
+      }
+    } catch (e) {}
+    if (this.vibrationEnabled) {
+      this.vibrate(35);
+    }
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    this.syncSettingsUI();
+  }
+
+  applyTextSize(size, playSound = true) {
+    this.textSize = ['small', 'normal', 'large', 'huge'].includes(size) ? size : 'normal';
+    if (window.applyTextSize) {
+      window.applyTextSize(this.textSize);
+    } else {
+      document.documentElement.setAttribute('data-text-size', this.textSize);
+      try {
+        localStorage.setItem('TLL_TEXT_SIZE', this.textSize);
+      } catch (e) {}
+    }
+    if (playSound && window.soundEngine && window.soundEngine.playClick) {
+      window.soundEngine.playClick();
+    }
+    this.syncSettingsUI();
+  }
+
+  setTextSize(size) {
+    this.applyTextSize(size, true);
+  }
+
+  syncSettingsUI() {
+    const isMuted = window.soundEngine ? window.soundEngine.isMuted : false;
+    const isSoundOn = !isMuted;
+
+    // Update sound toggle buttons
+    if (this.dom.btnSoundOff && this.dom.btnSoundOn) {
+      if (isSoundOn) {
+        this.dom.btnSoundOn.className = "px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold transition-all";
+        this.dom.btnSoundOff.className = "px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all";
+      } else {
+        this.dom.btnSoundOff.className = "px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/40 font-bold transition-all";
+        this.dom.btnSoundOn.className = "px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all";
+      }
+    }
+
+    // Update landing mute icon
+    if (this.dom.landingMuteIcon) {
+      this.dom.landingMuteIcon.setAttribute('data-lucide', isMuted ? 'volume-x' : 'volume-2');
+    }
+    if (this.dom.settingsSoundIcon) {
+      this.dom.settingsSoundIcon.setAttribute('data-lucide', isMuted ? 'volume-x' : 'volume-2');
+      this.dom.settingsSoundIcon.className = `w-4 h-4 ${isMuted ? 'text-red-400' : 'text-emerald-400'}`;
+    }
+
+    // Update vibration toggle buttons
+    if (this.dom.btnVibeOff && this.dom.btnVibeOn) {
+      if (this.vibrationEnabled) {
+        this.dom.btnVibeOn.className = "px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-400 border border-sky-500/40 font-bold transition-all";
+        this.dom.btnVibeOff.className = "px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all";
+      } else {
+        this.dom.btnVibeOff.className = "px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/40 font-bold transition-all";
+        this.dom.btnVibeOn.className = "px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all";
+      }
+    }
+    if (this.dom.settingsVibeIcon) {
+      this.dom.settingsVibeIcon.className = `w-4 h-4 ${this.vibrationEnabled ? 'text-sky-400' : 'text-dust'}`;
+    }
+
+    // Update text size buttons
+    const curSize = this.textSize || 'normal';
+    const textBtns = [
+      { el: this.dom.btnTextSmall, key: 'small', label: 'Small' },
+      { el: this.dom.btnTextNormal, key: 'normal', label: 'Normal' },
+      { el: this.dom.btnTextLarge, key: 'large', label: 'Large' },
+      { el: this.dom.btnTextHuge, key: 'huge', label: 'Huge' }
+    ];
+
+    textBtns.forEach(b => {
+      if (!b.el) return;
+      if (b.key === curSize) {
+        b.el.className = "py-1 rounded-md bg-slatecard text-amber-300 border border-amber-500/50 font-bold shadow-xs transition-all";
+      } else {
+        b.el.className = "py-1 rounded-md text-dust hover:text-parchment transition-all";
+      }
+    });
+
+    if (this.dom.settingsTextSizeLabel) {
+      this.dom.settingsTextSizeLabel.textContent = curSize.toUpperCase();
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
     }
   }
 

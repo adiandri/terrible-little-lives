@@ -266,10 +266,29 @@ function initThemeSystem() {
   applyTheme(activeId);
 }
 
-// Auto-run on script load to avoid FOUC
+function getTextSize() {
+  try {
+    const saved = localStorage.getItem('TLL_TEXT_SIZE');
+    if (['small', 'normal', 'large', 'huge'].includes(saved)) return saved;
+  } catch (e) {}
+  return 'normal';
+}
+
+function applyTextSize(size) {
+  const s = ['small', 'normal', 'large', 'huge'].includes(size) ? size : 'normal';
+  document.documentElement.setAttribute('data-text-size', s);
+  try {
+    localStorage.setItem('TLL_TEXT_SIZE', s);
+  } catch (e) {}
+}
+
+// Auto-run on script load to avoid FOUC & unstyled text scale
 initThemeSystem();
+applyTextSize(getTextSize());
 
 window.THEMES_DATA = THEMES_DATA;
 window.getActiveThemeId = getActiveThemeId;
 window.applyTheme = applyTheme;
 window.initThemeSystem = initThemeSystem;
+window.getTextSize = getTextSize;
+window.applyTextSize = applyTextSize;

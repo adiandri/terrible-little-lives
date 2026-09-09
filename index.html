@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Themes Management Engine (Runs synchronously to prevent FOUC) -->
-  <script src="js/themes.js?v=8"></script>
+  <script src="js/themes.js?v=16"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -121,6 +121,30 @@
 
     input[type=range] {
       accent-color: var(--accent-primary);
+    }
+
+    /* Typography Text Size Scaling */
+    html[data-text-size="small"] {
+      font-size: 14px;
+    }
+    html[data-text-size="normal"] {
+      font-size: 16px;
+    }
+    html[data-text-size="large"] {
+      font-size: 18px;
+    }
+    html[data-text-size="huge"] {
+      font-size: 20px;
+    }
+
+    html[data-text-size="small"] [class*="text-["] {
+      font-size: 0.88em;
+    }
+    html[data-text-size="large"] [class*="text-["] {
+      font-size: 1.12em;
+    }
+    html[data-text-size="huge"] [class*="text-["] {
+      font-size: 1.25em;
     }
 
     /* Adaptive Badges & Cards for Light & Dark Modes */
@@ -366,7 +390,11 @@
           <i data-lucide="radio" class="w-4 h-4 text-crimson"></i>
           <span>MODERN ERA • 2024</span>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1.5">
+          <button id="btn-landing-settings" class="p-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment transition-all flex items-center space-x-1.5" title="Game Settings">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span class="text-[10px] font-mono font-bold hidden sm:inline">SETTINGS</span>
+          </button>
           <button id="btn-landing-theme" class="p-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment transition-all flex items-center space-x-1.5" title="Switch Theme">
             <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
             <span class="text-[10px] font-mono font-bold hidden sm:inline" id="txt-current-theme-name">THEME</span>
@@ -436,9 +464,14 @@
           <span>Back</span>
         </button>
         <h2 class="font-serif font-bold text-sm tracking-wider text-parchment uppercase">Soul Inquest</h2>
-        <button id="btn-creator-randomize-all" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-amber-400" title="Randomize Entire Soul">
-          <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
-        </button>
+        <div class="flex items-center space-x-1.5">
+          <button id="btn-creator-settings" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment transition-colors" title="Settings">
+            <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+          </button>
+          <button id="btn-creator-randomize-all" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-amber-400 transition-colors" title="Randomize Entire Soul">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
       </header>
 
       <!-- Scrollable Creator Body -->
@@ -734,8 +767,11 @@
             </div>
           </div>
 
-          <!-- Top-Right Actions (Theme, Godmode & Menu) -->
+          <!-- Top-Right Actions (Settings, Theme, Godmode & Menu) -->
           <div class="flex items-center space-x-1.5 shrink-0 pl-2">
+            <button id="btn-game-settings" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors" title="Game Settings">
+              <i data-lucide="settings" class="w-4 h-4"></i>
+            </button>
             <button id="btn-game-theme" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors" title="Switch Theme">
               <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
             </button>
@@ -1566,36 +1602,99 @@
       </div>
     </div>
 
-    <!-- THEME SELECTION MODAL -->
-    <div id="theme-modal" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-center items-center">
-      <div class="w-full max-w-sm bg-slatecard border border-leadborder rounded-2xl p-4 flex flex-col max-h-[85%] shadow-2xl overflow-hidden">
+    <!-- SETTINGS & THEMES MODAL -->
+    <div id="settings-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-center items-center">
+      <div class="w-full max-w-sm bg-slatecard border border-leadborder rounded-2xl p-4 flex flex-col max-h-[90%] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
         <!-- Header -->
         <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
           <div class="flex items-center space-x-2">
-            <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Aesthetic Themes</h3>
+            <i data-lucide="settings" class="w-4 h-4 text-crimson"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Game Settings</h3>
           </div>
-          <button id="btn-close-theme-modal" class="p-1 rounded text-dust hover:text-parchment">
+          <button id="btn-close-settings" class="p-1 rounded text-dust hover:text-parchment transition-colors" title="Close Settings">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <!-- Filter tabs: All, Dark, Light -->
-        <div class="grid grid-cols-3 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
-          <button id="tab-theme-all" class="py-1 rounded-lg bg-slatecard text-parchment font-serif font-bold text-[11px] transition-all text-center">
-            All (8)
-          </button>
-          <button id="tab-theme-dark" class="py-1 rounded-lg text-dust hover:text-parchment font-serif font-bold text-[11px] transition-all text-center">
-            🌙 Dark
-          </button>
-          <button id="tab-theme-light" class="py-1 rounded-lg text-dust hover:text-parchment font-serif font-bold text-[11px] transition-all text-center">
-            ☀️ Light
-          </button>
-        </div>
+        <!-- Scrollable Settings Body -->
+        <div class="flex-1 overflow-y-auto custom-scroll space-y-3 pr-1">
+          <!-- 1. Sound Effects Toggle -->
+          <div class="bg-inputbg p-3 rounded-xl border border-leadborder">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <i id="settings-sound-icon" data-lucide="volume-2" class="w-4 h-4 text-emerald-400"></i>
+                <div>
+                  <div class="font-serif font-bold text-xs text-parchment">Sound Effects</div>
+                  <div class="text-[10px] text-dust">Gothic synths, ticks & death knell</div>
+                </div>
+              </div>
+              <div class="flex items-center bg-trackbg p-0.5 rounded-lg border border-leadborder text-[11px] font-mono">
+                <button id="btn-sound-off" class="px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all">OFF</button>
+                <button id="btn-sound-on" class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold transition-all">ON</button>
+              </div>
+            </div>
+          </div>
 
-        <!-- Theme List Container -->
-        <div id="themes-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
-          <!-- Injected dynamically by game.js -->
+          <!-- 2. Haptic Vibration Toggle -->
+          <div class="bg-inputbg p-3 rounded-xl border border-leadborder">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <i id="settings-vibe-icon" data-lucide="vibrate" class="w-4 h-4 text-sky-400"></i>
+                <div>
+                  <div class="font-serif font-bold text-xs text-parchment">Haptic Vibration</div>
+                  <div class="text-[10px] text-dust">Physical feedback on year & dilemmas</div>
+                </div>
+              </div>
+              <div class="flex items-center bg-trackbg p-0.5 rounded-lg border border-leadborder text-[11px] font-mono">
+                <button id="btn-vibe-off" class="px-2.5 py-1 rounded-md text-dust hover:text-parchment transition-all">OFF</button>
+                <button id="btn-vibe-on" class="px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-400 border border-sky-500/40 font-bold transition-all">ON</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Text Size Adjustment -->
+          <div class="bg-inputbg p-3 rounded-xl border border-leadborder space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <i data-lucide="type" class="w-4 h-4 text-amber-400"></i>
+                <div>
+                  <div class="font-serif font-bold text-xs text-parchment">Text Size</div>
+                  <div class="text-[10px] text-dust">Scale narrative and ledger text</div>
+                </div>
+              </div>
+              <span id="settings-text-size-label" class="font-mono text-[10px] text-amber-400 font-bold uppercase">Normal</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1 bg-trackbg p-0.5 rounded-lg border border-leadborder text-[11px] font-mono text-center">
+              <button id="btn-text-small" class="py-1 rounded-md text-dust hover:text-parchment transition-all">Small</button>
+              <button id="btn-text-normal" class="py-1 rounded-md bg-slatecard text-parchment border border-leadborder font-bold transition-all">Normal</button>
+              <button id="btn-text-large" class="py-1 rounded-md text-dust hover:text-parchment transition-all">Large</button>
+              <button id="btn-text-huge" class="py-1 rounded-md text-dust hover:text-parchment transition-all">Huge</button>
+            </div>
+            <div class="text-center p-2 rounded bg-slatecard/60 border border-leadborder/60">
+              <p id="settings-text-preview" class="text-xs text-parchment italic font-serif leading-relaxed">"The leaden fog curls through the cemetery gates."</p>
+            </div>
+          </div>
+
+          <!-- 4. Themes Selection -->
+          <div class="space-y-2 pt-1 border-t border-leadborder/70">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
+                <span class="font-serif font-bold text-xs text-parchment uppercase tracking-wider">Aesthetic Themes</span>
+              </div>
+              <!-- Filter tabs: All, Dark, Light -->
+              <div class="flex items-center space-x-1 bg-trackbg p-0.5 rounded-lg border border-leadborder text-[10px] font-mono">
+                <button id="tab-theme-all" class="px-2 py-0.5 rounded-md bg-slatecard text-parchment font-bold transition-all">All</button>
+                <button id="tab-theme-dark" class="px-2 py-0.5 rounded-md text-dust hover:text-parchment transition-all">🌙 Dark</button>
+                <button id="tab-theme-light" class="px-2 py-0.5 rounded-md text-dust hover:text-parchment transition-all">☀️ Light</button>
+              </div>
+            </div>
+
+            <!-- Theme List Container -->
+            <div id="themes-list" class="space-y-2">
+              <!-- Injected dynamically by game.js -->
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1749,15 +1848,15 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=15"></script>
-  <script src="js/avatar.js?v=15"></script>
-  <script src="js/names.js?v=15"></script>
-  <script src="js/careers.js?v=15"></script>
-  <script src="js/gifts.js?v=15"></script>
-  <script src="js/kin.js?v=15"></script>
-  <script src="js/activities.js?v=15"></script>
-  <script src="js/events.js?v=15"></script>
-  <script src="js/education.js?v=15"></script>
-  <script src="js/game.js?v=15"></script>
+  <script src="js/audio.js?v=16"></script>
+  <script src="js/avatar.js?v=16"></script>
+  <script src="js/names.js?v=16"></script>
+  <script src="js/careers.js?v=16"></script>
+  <script src="js/gifts.js?v=16"></script>
+  <script src="js/kin.js?v=16"></script>
+  <script src="js/activities.js?v=16"></script>
+  <script src="js/events.js?v=16"></script>
+  <script src="js/education.js?v=16"></script>
+  <script src="js/game.js?v=16"></script>
 </body>
 </html>
