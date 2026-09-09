@@ -160,6 +160,174 @@ const INTERACTIVE_DILEMMAS = [
         effects: { sanity: -10, occult: +12 }
       }
     ]
+  },
+  {
+    id: "sleepover_basement_lock",
+    minAge: 7,
+    maxAge: 12,
+    title: "The Locked Cellar Door",
+    prompt: "During a Friday night sleepover at a friend's suburban house, the heavy wooden cellar door begins thudding softly at 2:15 AM in slow, three-beat intervals. Your friend whispers: 'Ignore it. My dad says it's just the old water pipes settling.'",
+    choices: [
+      {
+        text: "Creep down the dark hallway and inspect the cellar keyhole.",
+        outcome: "You peer through the brass keyhole. An unblinking yellow eye is looking back at you from three inches away. You stifle a shriek and retreat to your sleeping bag.",
+        effects: { sanity: -15, occult: +12, happiness: -6 }
+      },
+      {
+        text: "Slide an envelope of sea salt across the cellar threshold.",
+        outcome: "The thudding instantly halts. A low, appreciative hiss echoes through the floorboards. The next morning, two antique coins sit outside the door.",
+        effects: { sanity: -4, occult: +15, shillings: +4, humanity: -2 }
+      },
+      {
+        text: "Pull the blankets over your head and wait for morning.",
+        outcome: "You don't sleep a wink until dawn filters through the venetian blinds. The kitchen smells of burnt lard.",
+        effects: { sanity: -3, happiness: -4 }
+      }
+    ]
+  },
+  {
+    id: "school_bully_hallway",
+    minAge: 9,
+    maxAge: 14,
+    title: "Behind the Gymnasium Bleachers",
+    prompt: "The school bully, a burly kid named Trent, corners you behind the gym equipment cages and demands all your lunch money and your digital watch.",
+    choices: [
+      {
+        text: "Surrender your cash and walk away quietly.",
+        outcome: "Trent sneers, snatches your bills, and pushes you against the wall. You go without hot lunch for three days.",
+        effects: { money: -25, happiness: -12, sanity: -4 }
+      },
+      {
+        text: "Call out to your companion who has been watching silently.",
+        outcome: "Your friend steps from the shadows. Their jaw clicks awkwardly as their gaze unmoors the bully's nerve. Trent turns ash-pale, drops his own wallet, and flees sobbing.",
+        effects: { money: +40, happiness: +10, occult: +8, humanity: -4 }
+      },
+      {
+        text: "Fight back with all your strength.",
+        outcome: "You land a solid punch to his nose, but take a bruised rib in return. The principal suspends both of you for two days.",
+        effects: { vitality: -8, happiness: -4, smarts: +2 }
+      }
+    ]
+  },
+  {
+    id: "three_eared_stray",
+    minAge: 6,
+    maxAge: 11,
+    title: "The Creature in the Culvert",
+    prompt: "A scruffy black cat with three distinct ears and a crooked spine follows you home from school. When it purrs, the digital time on your wrist quartz watch jumps backwards by four minutes.",
+    choices: [
+      {
+        text: "Smuggle the cat into your bedroom and feed it tuna fish.",
+        outcome: "The creature sleeps at the foot of your bed, purring in odd frequencies. Your fever breaks, and nightmares no longer wake you.",
+        effects: { vitality: +10, sanity: +8, happiness: +12, occult: +6 }
+      },
+      {
+        text: "Shrewdly check its collar for identification.",
+        outcome: "Attached to its flea collar is a weathered tin tag engraved with your family's home address—dated 1968, before your house was built.",
+        effects: { sanity: -12, occult: +14, shillings: +3 }
+      },
+      {
+        text: "Shoo the animal away with a broom.",
+        outcome: "The cat stares at you with calm, human-like contempt, turns on three joints, and vanishes into the storm sewer.",
+        effects: { happiness: -2 }
+      }
+    ]
+  },
+  {
+    id: "playground_dare",
+    minAge: 8,
+    maxAge: 13,
+    title: "The Oxidized Fountain",
+    prompt: "Classmates gather around the corroded bronze drinking fountain at the edge of the school athletic field. Black mineral sludge bubbles from the spigot. 'A dollar if you drink it,' someone dares.",
+    choices: [
+      {
+        text: "Take a deep gulp of the metallic black water.",
+        outcome: "It tastes of zinc, iron, and burnt sugar. Your vision sharpens with unearthly lucidity, though violent stomach cramps keep you home for two days.",
+        effects: { vitality: -12, smarts: +8, occult: +14, shillings: +2, money: +10 }
+      },
+      {
+        text: "Collect a sample in an empty plastic water bottle.",
+        outcome: "The liquid glows faint indigo when held under a blue smartphone light. You keep it hidden in your sock drawer.",
+        effects: { occult: +8, smarts: +4, shillings: +1 }
+      },
+      {
+        text: "Tell them they're all idiots and walk to class.",
+        outcome: "They mock you as a coward, but none of them are brave enough to drink it either.",
+        effects: { happiness: -3, sanity: +4 }
+      }
+    ]
+  },
+  {
+    id: "attic_parchment_mortgage",
+    minAge: 12,
+    maxAge: 16,
+    title: "The Covenant in the Insulation",
+    prompt: "While looking for old holiday decorations in the attic crawlspace, you find an iron lockbox. Inside is your family home's original deed, but written beneath your father's signature is a second agreement inked in dark dried blood.",
+    choices: [
+      {
+        text: "Carefully photograph every clause of the blood deed.",
+        outcome: "The contract covenants the first-born child of the house to 'The Pale Warden of the Reservoir' upon their 21st year in exchange for thirty years of solvent mortgages.",
+        effects: { sanity: -18, occult: +20, smarts: +6 }
+      },
+      {
+        text: "Confront your parents directly at dinner.",
+        outcome: "Your father's fork clatters against his plate. He turns pale as salt, confiscates the box, and locks the attic trapdoor with heavy padlocks.",
+        effects: { sanity: -8, happiness: -10 }
+      },
+      {
+        text: "Steal the antique wax seal and coins from the bottom of the box.",
+        outcome: "You pocket eight heavy blackened shillings and replace the deed. Your hands smell of sulfur for days.",
+        effects: { shillings: +8, humanity: -6, money: +80 }
+      }
+    ]
+  },
+  {
+    id: "birthday_unknown_benefactor",
+    minAge: 10,
+    maxAge: 15,
+    title: "The Package with No Postmark",
+    prompt: "On your birthday, an unmarked wooden music box wrapped in brown butcher paper arrives on the front porch with your name written in calligraphic script. There is no return address.",
+    choices: [
+      {
+        text: "Wind the brass key and listen to the melody.",
+        outcome: "The cylinder plucks out a chilling, beautiful lullaby. As the chime ends, a secret drawer springs open revealing cash and a carved ivory pendant.",
+        effects: { happiness: +10, money: +150, shillings: +5, occult: +10 }
+      },
+      {
+        text: "Hand it over to your parents immediately.",
+        outcome: "Your mother looks terrified upon recognizing the box's brass fittings. She refuses to speak of it and hides it in her cedar trunk.",
+        effects: { sanity: -4, happiness: -4 }
+      },
+      {
+        text: "Pawn the music box at the antique exchange down the block.",
+        outcome: "The elderly pawnbroker's eyes widen. He hands you three times the standard appraisal value and closes his shop early.",
+        effects: { money: +350, humanity: -2 }
+      }
+    ]
+  },
+  {
+    id: "school_fire_drill_fog",
+    minAge: 13,
+    maxAge: 18,
+    title: "The Alarm in the Fog",
+    prompt: "During an unscheduled 1:30 PM fire drill, the entire student body is evacuated onto the football field. A dense, unnatural yellow fog rolls in from the highway. In the distance, two towering silhouettes walk along the tree line.",
+    choices: [
+      {
+        text: "Slip away from the faculty line and investigate the tree line.",
+        outcome: "You find footprints in the wet mud as large as bathtubs, filled with boiling black water. You retrieve an abandoned surveyor's transit and shillings.",
+        effects: { occult: +18, sanity: -12, shillings: +10, vitality: -4 }
+      },
+      {
+        text: "Keep your classmates calm and stay with the homeroom group.",
+        outcome: "The teachers hustle everyone back inside as sirens echo from the city center. Nobody speaks about the silhouettes.",
+        effects: { sanity: +4, humanity: +4 }
+      },
+      {
+        text: "Take a video and upload it to social media.",
+        outcome: "Your post gains 40,000 views within ten minutes before the video is abruptly wiped and your account is shadowbanned.",
+        effects: { looks: +4, happiness: +6, sanity: -6 }
+      }
+    ]
   }
 ];
 

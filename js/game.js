@@ -8,6 +8,10 @@ class TerribleGame {
     this.usedDilemmaIds = new Set();
     this.crypt = this.loadCrypt();
     this.activeCareerTab = 'mundane';
+    this.selectedKin = null;
+    this.activeKinFilter = 'all';
+    this.activeActivityFilter = 'all';
+    this.revelationTarget = null;
     
     // Creator draft state
     this.creatorState = {
@@ -207,7 +211,42 @@ class TerribleGame {
       tabThemeAll: document.getElementById('tab-theme-all'),
       tabThemeDark: document.getElementById('tab-theme-dark'),
       tabThemeLight: document.getElementById('tab-theme-light'),
-      themeListContainer: document.getElementById('themes-list')
+      themeListContainer: document.getElementById('themes-list'),
+
+      // Kin Modal
+      btnTabKin: document.getElementById('btn-tab-kin'),
+      kinModal: document.getElementById('kin-modal'),
+      btnCloseKin: document.getElementById('btn-close-kin'),
+      kinList: document.getElementById('kin-list'),
+      kinFilterBtns: document.querySelectorAll('.kin-filter-btn'),
+
+      // Kin Detail Modal
+      kinDetailModal: document.getElementById('kin-detail-modal'),
+      btnCloseKinDetail: document.getElementById('btn-close-kin-detail'),
+      kinDetailTitle: document.getElementById('kin-detail-title'),
+      kinDetailDossier: document.getElementById('kin-detail-dossier'),
+      btnKinSpendTime: document.getElementById('btn-kin-spend-time'),
+      btnKinConverse: document.getElementById('btn-kin-converse'),
+      btnKinAskMoney: document.getElementById('btn-kin-ask-money'),
+      btnKinInvestigate: document.getElementById('btn-kin-investigate'),
+      btnKinTribute: document.getElementById('btn-kin-tribute'),
+      btnKinArgue: document.getElementById('btn-kin-argue'),
+
+      // Activities Modal
+      btnTabActivities: document.getElementById('btn-tab-activities'),
+      activitiesModal: document.getElementById('activities-modal'),
+      btnCloseActivities: document.getElementById('btn-close-activities'),
+      activitiesList: document.getElementById('activities-list'),
+      activitiesStaminaBadge: document.getElementById('activities-stamina-badge'),
+      activityFilterBtns: document.querySelectorAll('.activity-filter-btn'),
+
+      // Revelation Modal
+      revelationModal: document.getElementById('revelation-modal'),
+      revelationName: document.getElementById('revelation-name'),
+      revelationText: document.getElementById('revelation-text'),
+      btnRevelationLoyal: document.getElementById('btn-revelation-loyal'),
+      btnRevelationReport: document.getElementById('btn-revelation-report'),
+      btnRevelationIgnore: document.getElementById('btn-revelation-ignore')
     };
   }
 
@@ -468,6 +507,78 @@ class TerribleGame {
     });
     this.dom.btnApplyLiveGodmode.addEventListener('click', () => this.applyLiveGodmodeTweaks());
 
+    // Kin Modal Controls
+    if (this.dom.btnTabKin) {
+      this.dom.btnTabKin.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.openKinModal();
+      });
+    }
+    if (this.dom.btnCloseKin) {
+      this.dom.btnCloseKin.addEventListener('click', () => this.closeKinModal());
+    }
+    if (this.dom.kinFilterBtns) {
+      this.dom.kinFilterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          window.soundEngine.playClick();
+          this.filterKin(e.currentTarget.dataset.filter);
+        });
+      });
+    }
+
+    // Kin Detail Modal Controls
+    if (this.dom.btnCloseKinDetail) {
+      this.dom.btnCloseKinDetail.addEventListener('click', () => this.closeKinDetailModal());
+    }
+    if (this.dom.btnKinSpendTime) {
+      this.dom.btnKinSpendTime.addEventListener('click', () => this.handleKinAction('spend_time'));
+    }
+    if (this.dom.btnKinConverse) {
+      this.dom.btnKinConverse.addEventListener('click', () => this.handleKinAction('converse'));
+    }
+    if (this.dom.btnKinAskMoney) {
+      this.dom.btnKinAskMoney.addEventListener('click', () => this.handleKinAction('ask_money'));
+    }
+    if (this.dom.btnKinInvestigate) {
+      this.dom.btnKinInvestigate.addEventListener('click', () => this.handleKinAction('investigate'));
+    }
+    if (this.dom.btnKinTribute) {
+      this.dom.btnKinTribute.addEventListener('click', () => this.handleKinAction('tribute'));
+    }
+    if (this.dom.btnKinArgue) {
+      this.dom.btnKinArgue.addEventListener('click', () => this.handleKinAction('argue'));
+    }
+
+    // Activities Modal Controls
+    if (this.dom.btnTabActivities) {
+      this.dom.btnTabActivities.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.openActivitiesModal();
+      });
+    }
+    if (this.dom.btnCloseActivities) {
+      this.dom.btnCloseActivities.addEventListener('click', () => this.closeActivitiesModal());
+    }
+    if (this.dom.activityFilterBtns) {
+      this.dom.activityFilterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          window.soundEngine.playClick();
+          this.filterActivities(e.currentTarget.dataset.category);
+        });
+      });
+    }
+
+    // Revelation Modal Controls
+    if (this.dom.btnRevelationLoyal) {
+      this.dom.btnRevelationLoyal.addEventListener('click', () => this.handleRevelationChoice('loyal'));
+    }
+    if (this.dom.btnRevelationReport) {
+      this.dom.btnRevelationReport.addEventListener('click', () => this.handleRevelationChoice('report'));
+    }
+    if (this.dom.btnRevelationIgnore) {
+      this.dom.btnRevelationIgnore.addEventListener('click', () => this.handleRevelationChoice('ignore'));
+    }
+
     // Death Modal actions
     this.dom.btnNewLife.addEventListener('click', () => {
       this.hideModals();
@@ -653,6 +764,13 @@ class TerribleGame {
           if (this.character.stats && this.character.stats.looks === undefined) {
             this.character.stats.looks = 70;
           }
+          if (!this.character.kin) {
+            this.character.kin = window.generateFamily(this.character);
+          }
+          if (this.character.actionsLeft === undefined) {
+            this.character.actionsLeft = 4;
+            this.character.maxActions = 4;
+          }
           
           this.logs = data.logs || [];
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
@@ -671,9 +789,23 @@ class TerribleGame {
 
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
+    this.character.kin = window.generateFamily(this.character);
+    this.character.actionsLeft = 4;
+    this.character.maxActions = 4;
     this.usedDilemmaIds.clear();
 
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+
+    const familySummary = [];
+    if (this.character.kin.parents && this.character.kin.parents.length > 0) {
+      familySummary.push(`Parents: ${this.character.kin.parents.map(p => `${p.name} (${p.occupation})`).join(', ')}.`);
+    }
+    if (this.character.kin.siblings && this.character.kin.siblings.length > 0) {
+      familySummary.push(`Siblings: ${this.character.kin.siblings.map(s => `${s.name} (Age ${s.age})`).join(', ')}.`);
+    }
+    if (this.character.kin.grandparents && this.character.kin.grandparents.length > 0) {
+      familySummary.push(`Living Grandparents: ${this.character.kin.grandparents.map(g => `${g.name}`).join(', ')}.`);
+    }
 
     this.logs = [
       {
@@ -682,6 +814,7 @@ class TerribleGame {
         entries: [
           `Born in ${this.character.city}, ${country.name} (${country.flag}).`,
           this.character.origin,
+          ...familySummary,
           `Inherent Trait: ${this.character.trait.name} - ${this.character.trait.desc}`,
           `Starting Fiat Balance: ${window.formatMoney(this.character.money, this.character.countryCode)}.`,
           `Secret Paranormal Shillings: ${this.character.shillings} s.`
@@ -704,6 +837,9 @@ class TerribleGame {
     this.character.age += 1;
     this.character.year += 1;
 
+    // Replenish annual energy pool
+    this.character.actionsLeft = this.character.maxActions || 4;
+
     // Status titles by age
     if (this.character.age <= 2) this.character.statusTitle = "Infant";
     else if (this.character.age <= 6) this.character.statusTitle = "Toddler";
@@ -719,7 +855,49 @@ class TerribleGame {
       entries: []
     };
 
-    // 1. Economic Updates (Mundane Salary)
+    // Ensure kin exists and tick their simulation (aging, allowances, mortality, friend discovery)
+    if (!this.character.kin) {
+      this.character.kin = window.generateFamily(this.character);
+    }
+    const kinLogs = window.tickKinYear(this.character) || [];
+
+    // ==========================================
+    // 5-7 MULTI-EVENT YEARLY CHRONICLE
+    // ==========================================
+
+    // 1. Life Stage & Developmental Milestone
+    if (this.character.age === 1) {
+      currentYearLog.entries.push(`Turned 1 year old. You learned to crawl across cold hardwood floorboards, watching dust motes spin in pale sunlight.`);
+    } else if (this.character.age <= 4) {
+      const toddlerMilestones = [
+        `Turned ${this.character.age}. You learned to speak in fragmented sentences, pointing out shadows that lingered too long in the corners.`,
+        `Turned ${this.character.age}. You spent hours stacking wooden blocks, knocking them over whenever footsteps passed the doorway.`,
+        `Turned ${this.character.age}. Your nursery window stayed damp with winter frost; you learned to recognize passing siren wails.`
+      ];
+      currentYearLog.entries.push(window.getRandomElement(toddlerMilestones));
+    } else if (this.character.age <= 11) {
+      const elementaryMilestones = [
+        `Turned ${this.character.age}. Attended municipal primary school in ${this.character.city}. Fluorescent bulbs hummed steadily over chalkboards.`,
+        `Turned ${this.character.age}. Traded pencil erasers and horror comics with classmates beneath the playground stairwell.`,
+        `Turned ${this.character.age}. Handed in school homework while rumors circulated about stray animals vanishing around the city reservoir.`
+      ];
+      currentYearLog.entries.push(window.getRandomElement(elementaryMilestones));
+    } else if (this.character.age <= 17) {
+      const adolescentMilestones = [
+        `Turned ${this.character.age}. Navigated high school corridors, peer cliques, and the suffocating pressure of an uncertain future.`,
+        `Turned ${this.character.age}. Late night study sessions in ${this.character.city} accompanied by distant freight trains and sirens.`,
+        `Turned ${this.character.age}. High school rumors whispered about students slipping into the drainage tunnels after dark.`
+      ];
+      currentYearLog.entries.push(window.getRandomElement(adolescentMilestones));
+    } else if (this.character.age <= 29) {
+      currentYearLog.entries.push(`Turned ${this.character.age}. Confronting the harsh grind of young adulthood in ${this.character.city}.`);
+    } else if (this.character.age <= 59) {
+      currentYearLog.entries.push(`Turned ${this.character.age}. Navigating the relentless responsibilities and quiet isolation of adult life.`);
+    } else {
+      currentYearLog.entries.push(`Turned ${this.character.age}. Watching decades of memories blur together through the fog of ${this.character.city}.`);
+    }
+
+    // 2. Career / Vocation / School Performance
     if (this.character.job) {
       const base = this.character.job.baseSalary || this.character.job.baseSalaryUSD || 24000;
       const salary = window.getAdjustedSalary(base, this.character.countryCode);
@@ -729,9 +907,24 @@ class TerribleGame {
       if (this.character.job.stress > 25 && Math.random() < 0.4) {
         this.modifyStat('vitality', -1);
       }
+    } else if (this.character.age >= 18) {
+      const unemploymentVignettes = [
+        "Lacking full-time employment, you scraped together odd cash errands and gig deliveries.",
+        "Submitted electronic resumes to indifferent corporate job portals without response.",
+        "Struggled to secure steady work; spent afternoons browsing want-ads in the municipal library."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(unemploymentVignettes));
+    } else {
+      // Minor school life
+      const schoolReports = [
+        "Received annual school report card. Teachers noted quiet behavior and an unusual fascination with local folklore.",
+        "Passed annual academic examinations without issue; your teachers praised your steady focus.",
+        "Sat through mandatory standardized testing under buzzing gymnasium halogen lamps."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(schoolReports));
     }
 
-    // 2. Paranormal Gig Payout & Sanity Toll
+    // 3. Living Expenses & Economy
     if (this.character.paranormalGig) {
       const gig = this.character.paranormalGig;
       this.character.shillings += gig.payoutShillings;
@@ -739,23 +932,69 @@ class TerribleGame {
       currentYearLog.entries.push(`Collected +${gig.payoutShillings} s. from occult contract (${gig.title}). The ordeal drained -${gig.sanityCost}% Sanity.`);
     }
 
-    // 3. Modern Living Expenses (Rent, Groceries, Utilities)
     if (this.character.age >= 18) {
       const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
       const annualRentCost = country.annualLivingCost || 16000;
 
       if (this.character.money >= annualRentCost) {
         this.character.money -= annualRentCost;
-        if (this.character.age === 18) {
-          currentYearLog.entries.push(`Paid first annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
-        }
+        currentYearLog.entries.push(`Paid annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
       } else {
-        // Poverty strain
         this.character.money = 0;
         this.modifyStat('happiness', -10);
         this.modifyStat('vitality', -2);
-        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety took a toll on health.`);
+        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety severely strained your health.`);
       }
+    } else {
+      // Minor allowance / home dynamic
+      const homeDynamics = [
+        "Family household groceries were paid for by your parents; the refrigerator remained stocked with basic staples.",
+        "Helped with chores around the house in exchange for dinner and a warm bed.",
+        "Listened to parental discussions about the rising cost of municipal electricity and heating oil."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(homeDynamics));
+    }
+
+    // 4. Kin Dynamics, Allowances & Family Mortality
+    if (kinLogs.length > 0) {
+      kinLogs.forEach(kl => currentYearLog.entries.push(kl));
+    } else {
+      const kinVignettes = [
+        "Your family shared quiet evening meals beneath the yellow kitchen light.",
+        "Your acquaintances and friends went about their normal routines across the district.",
+        "A peaceful, uneventful year passed within your immediate family circle."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(kinVignettes));
+    }
+
+    // 5. Urban Atmosphere & Ambient Lore
+    const ambientPool = (window.AMBIENT_YEAR_EVENTS || (window.GAME_DATA && window.GAME_DATA.AMBIENT_YEAR_EVENTS) || []).filter(e =>
+      this.character.age >= e.minAge && this.character.age <= e.maxAge
+    );
+    if (ambientPool.length > 0) {
+      const ambient = ambientPool[Math.floor(Math.random() * ambientPool.length)];
+      currentYearLog.entries.push(ambient.text);
+    } else {
+      currentYearLog.entries.push("Another restless year went by under neon billboard glare and rain-slicked asphalt.");
+    }
+
+    // 6. Psychological / Sensory Reality Distortion
+    if (this.character.stats.sanity < 30) {
+      const modernWhispers = [
+        "Your phone face-unlock triggered at 3:14 AM while the screen was pointed at an empty closet.",
+        "You woke up with black grit under your fingernails and your browser history opened to deleted surveillance footage.",
+        "Your smart TV booted into a static test pattern transmitting the sound of wet footsteps approaching."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(modernWhispers));
+      this.modifyStat('sanity', -3);
+    } else {
+      const sensoryEvents = [
+        "A late-night storm knocked out municipal transformers; the entire district plunged into dead silence for hours.",
+        "You noticed several stray cats perched motionless on fire escapes, all staring toward the same locked sewer grate.",
+        "A low-frequency hum resonated through your water pipes every Tuesday at dawn.",
+        "You found an old cassette tape on the subway platform with your name written on the magnetic strip in dried marker."
+      ];
+      currentYearLog.entries.push(window.getRandomElement(sensoryEvents));
     }
 
     // Natural vitality & looks age erosion
@@ -764,7 +1003,7 @@ class TerribleGame {
       this.modifyStat('looks', -1);
     }
 
-    // 4. Check for Interactive Dilemmas
+    // 7. Interactive Dilemma or Ambient Encounter
     const dilemmaPool = window.INTERACTIVE_DILEMMAS || (window.GAME_DATA && window.GAME_DATA.INTERACTIVE_DILEMMAS) || [];
     const availableDilemmas = dilemmaPool.filter(d => 
       this.character.age >= d.minAge && 
@@ -772,7 +1011,7 @@ class TerribleGame {
       !this.usedDilemmaIds.has(d.id)
     );
 
-    if (availableDilemmas.length > 0 && Math.random() < 0.6) {
+    if (availableDilemmas.length > 0 && Math.random() < 0.7) {
       const chosen = availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
       this.usedDilemmaIds.add(chosen.id);
       this.activeDilemma = chosen;
@@ -782,29 +1021,8 @@ class TerribleGame {
       this.triggerDilemma(chosen);
       this.saveGame();
       return;
-    }
-
-    // 5. Ambient Atmospheric Events
-    const ambientPool = (window.AMBIENT_YEAR_EVENTS || (window.GAME_DATA && window.GAME_DATA.AMBIENT_YEAR_EVENTS) || []).filter(e =>
-      this.character.age >= e.minAge && this.character.age <= e.maxAge
-    );
-
-    if (ambientPool.length > 0 && Math.random() < 0.7) {
-      const ambient = ambientPool[Math.floor(Math.random() * ambientPool.length)];
-      currentYearLog.entries.push(ambient.text);
     } else {
-      currentYearLog.entries.push("Another restless year went by under neon billboard glare and rain-slicked asphalt.");
-    }
-
-    // 6. Low Sanity Hallucinations
-    if (this.character.stats.sanity < 30 && Math.random() < 0.65) {
-      const modernWhispers = [
-        "Your phone face-unlock triggered at 3:14 AM while the screen pointed at an empty closet.",
-        "You woke up with black grit under your fingernails and your browser history opened to deleted surveillance footage.",
-        "Your smart TV booted into a static test pattern transmitting the sound of wet footsteps approaching."
-      ];
-      currentYearLog.entries.push(modernWhispers[Math.floor(Math.random() * modernWhispers.length)]);
-      this.modifyStat('sanity', -3);
+      currentYearLog.entries.push("A rumor spread through town about a locked basement door found open near the city reservoir.");
     }
 
     this.logs.push(currentYearLog);
@@ -1090,6 +1308,535 @@ class TerribleGame {
     this.saveGame();
   }
 
+  // ==========================================
+  // KIN & ACQUAINTANCES SYSTEM
+  // ==========================================
+
+  openKinModal() {
+    if (!this.character.kin) {
+      this.character.kin = window.generateFamily(this.character);
+    }
+    this.dom.kinModal.classList.remove('hidden');
+    this.dom.kinModal.style.display = 'flex';
+    this.renderKinList(this.activeKinFilter);
+  }
+
+  closeKinModal() {
+    this.dom.kinModal.classList.add('hidden');
+    this.dom.kinModal.style.display = 'none';
+  }
+
+  filterKin(filter) {
+    this.activeKinFilter = filter;
+    this.dom.kinFilterBtns.forEach(btn => {
+      if (btn.dataset.filter === filter) {
+        btn.className = "kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all";
+      } else {
+        btn.className = "kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all";
+      }
+    });
+    this.renderKinList(filter);
+  }
+
+  getAllKinList() {
+    if (!this.character.kin) return [];
+    const { parents = [], siblings = [], grandparents = [], friends = [] } = this.character.kin;
+    return [
+      ...parents.map(p => ({ ...p, category: 'family' })),
+      ...siblings.map(s => ({ ...s, category: 'family' })),
+      ...grandparents.map(g => ({ ...g, category: 'family' })),
+      ...friends.map(f => ({ ...f, category: 'friend' }))
+    ];
+  }
+
+  renderKinList(filter = 'all') {
+    this.dom.kinList.innerHTML = '';
+    const all = this.getAllKinList();
+    const filtered = all.filter(p => {
+      if (filter === 'family') return p.category === 'family';
+      if (filter === 'friends') return p.category === 'friend';
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      this.dom.kinList.innerHTML = `
+        <div class="text-center py-8 text-dust/70 text-xs italic font-serif">
+          No acquaintances found under this category.
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(person => {
+      const card = document.createElement('div');
+      const isAlive = person.alive;
+
+      card.className = `p-3 rounded-xl border transition-all ${
+        isAlive 
+          ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
+          : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
+      }`;
+
+      const relColor = person.relationship > 75 ? 'bg-emerald-500' : (person.relationship > 40 ? 'bg-amber-500' : 'bg-red-500');
+
+      let statusBadge = '';
+      if (!isAlive) {
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-500/30">Deceased</span>`;
+      } else if (person.isRevealed && person.entityType !== 'human') {
+        const entityLabel = person.entityType === 'disguised_mimic' ? 'Disguised Mimic' : (person.entityType === 'blatant_entity' ? 'Abyssal Entity' : 'Anomaly');
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40 animate-pulse">👁️ ${entityLabel}</span>`;
+      } else if (person.suspicion > 30) {
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">Suspicion: ${person.suspicion}%</span>`;
+      }
+
+      const roleIcon = person.role.includes('Mother') || person.role.includes('Father') ? 'users' : (person.category === 'friend' ? 'user-plus' : 'user');
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center space-x-2 min-w-0">
+            <div class="w-7 h-7 rounded-lg bg-leadborder/30 flex items-center justify-center text-parchment shrink-0">
+              <i data-lucide="${roleIcon}" class="w-3.5 h-3.5 text-dust"></i>
+            </div>
+            <div class="truncate">
+              <h4 class="font-serif font-bold text-xs text-parchment truncate">${person.name}</h4>
+              <p class="text-[10px] text-dust font-mono">${person.role} • Age ${person.age} ${person.occupation ? `• ${person.occupation}` : ''}</p>
+            </div>
+          </div>
+          <div class="shrink-0 flex items-center space-x-1.5">
+            ${statusBadge}
+            ${isAlive ? `<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-dust/60"></i>` : ''}
+          </div>
+        </div>
+
+        ${isAlive ? `
+          <div class="mt-2 space-y-1">
+            <div class="flex justify-between items-center text-[9px] font-mono text-dust">
+              <span>Closeness / Bond</span>
+              <span class="font-bold text-parchment">${person.relationship}%</span>
+            </div>
+            <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+              <div class="h-full ${relColor} transition-all duration-300 rounded-full" style="width: ${person.relationship}%"></div>
+            </div>
+          </div>
+        ` : `
+          <p class="text-[10px] italic text-dust/80 mt-1">${person.deathCause || 'Passed away.'}</p>
+        `}
+      `;
+
+      if (isAlive) {
+        card.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          this.openKinDetailModal(person);
+        });
+      }
+
+      this.dom.kinList.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  openKinDetailModal(person) {
+    this.selectedKin = person;
+    this.dom.kinDetailModal.classList.remove('hidden');
+    this.dom.kinDetailModal.style.display = 'flex';
+    this.renderKinDetail(person);
+  }
+
+  closeKinDetailModal() {
+    this.dom.kinDetailModal.classList.add('hidden');
+    this.dom.kinDetailModal.style.display = 'none';
+    this.renderKinList(this.activeKinFilter);
+  }
+
+  renderKinDetail(person) {
+    this.dom.kinDetailTitle.textContent = `${person.name} (${person.role})`;
+
+    const relColor = person.relationship > 75 ? 'bg-emerald-500' : (person.relationship > 40 ? 'bg-amber-500' : 'bg-red-500');
+
+    let entityInfo = '';
+    if (person.isRevealed && person.entityType !== 'human') {
+      entityInfo = `
+        <div class="p-2 rounded-lg bg-purple-950/40 border border-purple-500/30 text-[10px] space-y-1">
+          <div class="font-bold text-purple-300 flex items-center gap-1">
+            <i data-lucide="eye" class="w-3 h-3"></i>
+            <span>Unmasked Entity: ${person.entityType.replace('_', ' ').toUpperCase()}</span>
+          </div>
+          <div class="text-dust font-mono">Pact Status: <span class="text-parchment font-bold uppercase">${person.loyaltyStatus || person.loyalty || 'Unaligned'}</span></div>
+        </div>
+      `;
+    } else if (person.category === 'friend' && person.suspicion > 0) {
+      entityInfo = `
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-[9px] font-mono text-amber-300">
+            <span>Occult Suspicion Meter</span>
+            <span>${person.suspicion}%</span>
+          </div>
+          <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+            <div class="h-full bg-amber-500 rounded-full" style="width: ${person.suspicion}%"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    this.dom.kinDetailDossier.innerHTML = `
+      <div class="flex items-start justify-between">
+        <div>
+          <h4 class="font-serif font-bold text-sm text-parchment">${person.name}</h4>
+          <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age}</p>
+          ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5">Employed: ${person.occupation}</p>` : ''}
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
+            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 4}
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-1 pt-1">
+        <div class="flex justify-between items-center text-[9px] font-mono text-dust">
+          <span>Closeness / Relationship</span>
+          <span class="font-bold text-parchment">${person.relationship}%</span>
+        </div>
+        <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+          <div class="h-full ${relColor} rounded-full" style="width: ${person.relationship}%"></div>
+        </div>
+      </div>
+
+      ${entityInfo}
+    `;
+
+    // Button states & anti-spam disables
+    const actions = person.actionsDone || {};
+    const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
+
+    const setupBtn = (btn, isDone, doneLabel) => {
+      if (!btn) return;
+      if (noEnergy || isDone) {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        if (isDone) {
+          const desc = btn.querySelector('.text-\\[10px\\]');
+          if (desc) desc.textContent = doneLabel;
+        }
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    };
+
+    setupBtn(this.dom.btnKinSpendTime, actions.spentTime, "Already spent quality time together this year.");
+    setupBtn(this.dom.btnKinConverse, actions.talked, "Already had a deep talk this year.");
+    
+    // Ask money only for parents / grandparents
+    const canAskMoney = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
+    if (this.dom.btnKinAskMoney) {
+      if (!canAskMoney) {
+        this.dom.btnKinAskMoney.classList.add('hidden');
+        this.dom.btnKinAskMoney.style.display = 'none';
+      } else {
+        this.dom.btnKinAskMoney.classList.remove('hidden');
+        this.dom.btnKinAskMoney.style.display = 'flex';
+        setupBtn(this.dom.btnKinAskMoney, actions.askedMoney, "Already asked for money this year.");
+      }
+    }
+
+    // Investigate button (for friends/unknowns)
+    if (this.dom.btnKinInvestigate) {
+      if (person.category !== 'friend' || (person.isRevealed && person.entityType === 'human')) {
+        this.dom.btnKinInvestigate.classList.add('hidden');
+        this.dom.btnKinInvestigate.style.display = 'none';
+      } else {
+        this.dom.btnKinInvestigate.classList.remove('hidden');
+        this.dom.btnKinInvestigate.style.display = 'flex';
+        setupBtn(this.dom.btnKinInvestigate, actions.investigated, "Already observed their habits this year.");
+      }
+    }
+
+    // Tribute button (only if entity unmasked)
+    if (this.dom.btnKinTribute) {
+      if (person.isRevealed && person.entityType !== 'human') {
+        this.dom.btnKinTribute.classList.remove('hidden');
+        this.dom.btnKinTribute.style.display = 'flex';
+        setupBtn(this.dom.btnKinTribute, actions.tribute, "Already offered occult tribute this year.");
+      } else {
+        this.dom.btnKinTribute.classList.add('hidden');
+        this.dom.btnKinTribute.style.display = 'none';
+      }
+    }
+
+    setupBtn(this.dom.btnKinArgue, actions.argued, "Already had a heated argument this year.");
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  handleKinAction(actionType) {
+    if (!this.selectedKin) return;
+    const person = this.selectedKin;
+
+    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+
+    let result = null;
+
+    if (actionType === 'spend_time') {
+      result = window.spendTimeToKin(person, this.character);
+    } else if (actionType === 'converse') {
+      result = window.talkToKin(person, this.character);
+    } else if (actionType === 'ask_money') {
+      result = window.askForMoney(person, this.character);
+    } else if (actionType === 'investigate') {
+      result = window.investigateKin(person, this.character);
+    } else if (actionType === 'tribute') {
+      result = window.offerTributeToEntity(person, this.character);
+    } else if (actionType === 'argue') {
+      result = window.argueWithKin(person, this.character);
+    }
+
+    if (!result || !result.success) {
+      alert(result ? (result.reason || result.message) : "Action could not be completed.");
+      return;
+    }
+
+    // Deduct 1 action point
+    this.character.actionsLeft -= 1;
+
+    // Apply stat effects
+    if (result.effects) {
+      for (const [stat, val] of Object.entries(result.effects)) {
+        if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
+        else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
+        else if (stat !== 'relationship') this.modifyStat(stat, val);
+      }
+    }
+
+    // Sound effect
+    if (actionType === 'tribute' || (result.effects && result.effects.occult)) {
+      window.soundEngine.playDread();
+    } else if (actionType === 'ask_money' && result.amount > 0) {
+      window.soundEngine.playCoin();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    // Append to latest year's log
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${person.name}] ${result.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+
+    // Check if an entity was unmasked!
+    if (result.revealed) {
+      this.closeKinDetailModal();
+      this.closeKinModal();
+      this.openRevelationModal(person);
+      return;
+    }
+
+    this.renderKinDetail(person);
+  }
+
+  openRevelationModal(person) {
+    this.revelationTarget = person;
+    window.soundEngine.playDread();
+    this.dom.revelationModal.classList.remove('hidden');
+    this.dom.revelationModal.style.display = 'flex';
+
+    this.dom.revelationName.textContent = `Unmasked: ${person.name}`;
+    
+    if (person.entityType === 'disguised_mimic') {
+      this.dom.revelationText.textContent = `You discovered that ${person.name} is a Flesh Mimic. Behind their casual clothes, their torso is lined with rows of human and canine incisors. They look at you pleadingly, tilting their head.`;
+    } else if (person.entityType === 'blatant_entity') {
+      this.dom.revelationText.textContent = `You cornered ${person.name} in an empty alley. Their skin unraveled like black parchment, revealing an ancient entity composed of static and hollow eyes.`;
+    } else {
+      this.dom.revelationText.textContent = `You uncovered undeniable proof that ${person.name} is an anomalous breach entity from the deep veil. They do not age or bleed normal blood.`;
+    }
+  }
+
+  handleRevelationChoice(choice) {
+    const person = this.revelationTarget;
+    if (!person) {
+      this.dom.revelationModal.classList.add('hidden');
+      this.dom.revelationModal.style.display = 'none';
+      return;
+    }
+
+    const latestLog = this.logs[this.logs.length - 1];
+
+    if (choice === 'loyal') {
+      person.loyaltyStatus = 'loyal';
+      person.loyalty = 'loyal';
+      person.relationship = 100;
+      this.character.shillings += 15;
+      this.modifyStat('occult', +10);
+      this.modifyStat('sanity', -5);
+      if (latestLog) {
+        latestLog.entries.push(`[PACT FORGED] You swore secrecy to ${person.name}. They gifted you 15 Paranormal Shillings and promised protection (+10% Occult, -5% Sanity, +15 Shillings).`);
+      }
+      window.soundEngine.playCoin();
+    } else if (choice === 'report') {
+      person.alive = false;
+      person.deathCause = "Reported to municipal authorities. Fled into the subterranean conduit network.";
+      this.modifyStat('sanity', -10);
+      this.modifyStat('happiness', -15);
+      if (latestLog) {
+        latestLog.entries.push(`[EXPULSION] You alerted authorities about ${person.name}. Squad cars and unmarked hazmat vans raided the neighborhood, but the entity dissolved into the storm sewers, leaving behind blackened ichor.`);
+      }
+      window.soundEngine.playDread();
+    } else {
+      person.loyaltyStatus = 'wary';
+      this.modifyStat('sanity', -2);
+      if (latestLog) {
+        latestLog.entries.push(`You swallowed your panic and pretended you saw nothing. ${person.name} watches you carefully from the back of the classroom.`);
+      }
+      window.soundEngine.playTick();
+    }
+
+    this.revelationTarget = null;
+    this.dom.revelationModal.classList.add('hidden');
+    this.dom.revelationModal.style.display = 'none';
+    this.renderAll();
+    this.saveGame();
+  }
+
+  // ==========================================
+  // ACTIVITIES & PURSUITS SYSTEM
+  // ==========================================
+
+  openActivitiesModal() {
+    this.dom.activitiesModal.classList.remove('hidden');
+    this.dom.activitiesModal.style.display = 'flex';
+    this.renderActivitiesList(this.activeActivityFilter);
+  }
+
+  closeActivitiesModal() {
+    this.dom.activitiesModal.classList.add('hidden');
+    this.dom.activitiesModal.style.display = 'none';
+  }
+
+  filterActivities(category) {
+    this.activeActivityFilter = category;
+    this.dom.activityFilterBtns.forEach(btn => {
+      if (btn.dataset.category === category) {
+        btn.className = "activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all";
+      } else {
+        btn.className = "activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all";
+      }
+    });
+    this.renderActivitiesList(category);
+  }
+
+  renderActivitiesList(category = 'all') {
+    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 4} Actions Left`;
+
+    this.dom.activitiesList.innerHTML = '';
+    const list = window.ACTIVITIES_LIST || [];
+    const filtered = list.filter(act => {
+      const ageMatches = this.character.age >= act.minAge && this.character.age <= act.maxAge;
+      if (!ageMatches) return false;
+      if (category !== 'all' && act.category !== category) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      this.dom.activitiesList.innerHTML = `
+        <div class="text-center py-8 text-dust/70 text-xs italic font-serif">
+          No pursuits available for your current age (${this.character.age}) in this category.
+        </div>
+      `;
+      return;
+    }
+
+    const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
+
+    filtered.forEach(act => {
+      const card = document.createElement('div');
+      card.className = `p-3.5 rounded-xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2 shadow-xs`;
+
+      const catBadgeColor = act.category === 'forbidden' ? 'text-crimson bg-crimson/10 border-crimson/30' :
+        (act.category === 'mind' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' : 
+        (act.category === 'social' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30'));
+
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-lg bg-leadborder/30 flex items-center justify-center text-parchment shrink-0">
+              <i data-lucide="${act.icon || 'compass'}" class="w-4 h-4 text-parchment"></i>
+            </div>
+            <div>
+              <h4 class="font-serif font-bold text-xs text-parchment">${act.name}</h4>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-semibold ${catBadgeColor}">${act.category}</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-dust">Age ${act.minAge}-${act.maxAge}</span>
+        </div>
+
+        <p class="text-[11px] text-dust leading-relaxed">${act.desc}</p>
+
+        <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
+          <span class="text-[10px] font-mono text-dust/80">Cost: 1 Action</span>
+          <button class="btn-do-activity px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
+            noEnergy 
+              ? 'opacity-50 cursor-not-allowed bg-leadborder/30 text-dust' 
+              : 'bg-slatecard hover:bg-cardhover text-parchment border border-leadborder active:scale-95 shadow-xs'
+          }" ${noEnergy ? 'disabled' : ''}>
+            Engage
+          </button>
+        </div>
+      `;
+
+      const btn = card.querySelector('.btn-do-activity');
+      if (btn && !noEnergy) {
+        btn.addEventListener('click', () => {
+          this.handleActivityClick(act.id);
+        });
+      }
+
+      this.dom.activitiesList.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  handleActivityClick(activityId) {
+    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+
+    const result = window.performActivity(activityId, this.character);
+    if (!result || !result.success) {
+      alert(result ? result.message : "Activity could not be performed.");
+      return;
+    }
+
+    if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'urban_exploration') {
+      window.soundEngine.playDread();
+    } else {
+      window.soundEngine.playTick();
+    }
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${result.title}] ${result.message}`);
+    }
+
+    this.renderAll();
+    this.renderActivitiesList(this.activeActivityFilter);
+    this.saveGame();
+  }
+
   modifyStat(stat, delta) {
     if (this.character.stats[stat] !== undefined) {
       this.character.stats[stat] = Math.max(0, Math.min(100, this.character.stats[stat] + delta));
@@ -1145,7 +1892,11 @@ class TerribleGame {
       this.dom.deathModal,
       this.dom.godmodeModal,
       this.dom.careersModal,
-      this.dom.themeModal
+      this.dom.themeModal,
+      this.dom.kinModal,
+      this.dom.kinDetailModal,
+      this.dom.activitiesModal,
+      this.dom.revelationModal
     ];
 
     modals.forEach(m => {

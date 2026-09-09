@@ -700,12 +700,12 @@
             <i data-lucide="briefcase" class="w-3 h-3 text-sky-400"></i>
             <span>Careers</span>
           </button>
-          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed" title="Coming in next expansion">
-            <i data-lucide="book-open" class="w-3 h-3"></i>
+          <button id="btn-tab-activities" class="py-1 px-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-parchment hover:border-amber-500/60 text-center flex items-center justify-center space-x-1 transition-colors">
+            <i data-lucide="compass" class="w-3 h-3 text-amber-400"></i>
             <span>Activities</span>
           </button>
-          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed" title="Coming in next expansion">
-            <i data-lucide="users" class="w-3 h-3"></i>
+          <button id="btn-tab-kin" class="py-1 px-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-parchment hover:border-purple-500/60 text-center flex items-center justify-center space-x-1 transition-colors">
+            <i data-lucide="users" class="w-3 h-3 text-purple-400"></i>
             <span>Kin</span>
           </button>
         </div>
@@ -775,6 +775,202 @@
         <!-- Jobs List Container -->
         <div id="careers-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1">
           <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- KIN & ACQUAINTANCES MODAL -->
+    <div id="kin-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
+      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Kin & Acquaintances</h3>
+          </div>
+          <button id="btn-close-kin" class="p-1 text-dust hover:text-parchment transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex space-x-1.5 mb-3 bg-ebon/50 p-1 rounded-lg border border-leadborder shrink-0">
+          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all" data-filter="all">All</button>
+          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-filter="family">Family</button>
+          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-filter="friends">Friends</button>
+        </div>
+
+        <!-- Kin list container -->
+        <div id="kin-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- KIN DETAIL & INTERACTION MODAL -->
+    <div id="kin-detail-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
+      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+            <h3 id="kin-detail-title" class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Kin Dossier</h3>
+          </div>
+          <button id="btn-close-kin-detail" class="p-1 text-dust hover:text-parchment transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Person Dossier Header -->
+        <div id="kin-detail-dossier" class="bg-ebon/40 border border-leadborder rounded-xl p-3.5 mb-3.5 space-y-2 shrink-0">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Actions List -->
+        <div class="space-y-2 overflow-y-auto custom-scroll flex-1 pr-1 pb-1">
+          <button id="btn-kin-spend-time" class="w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Spend Time Together</div>
+                <div class="text-[10px] text-dust">Bond through shared moments and build closeness. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <button id="btn-kin-converse" class="w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 group-hover:scale-105 transition-transform">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-sky-300 transition-colors">Deep Conversation</div>
+                <div class="text-[10px] text-dust">Exchange thoughts, seek advice, or probe their worldview. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <button id="btn-kin-ask-money" class="w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+                <i data-lucide="coins" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Ask For Money / Allowance</div>
+                <div class="text-[10px] text-dust">Request financial help based on their generosity and bond. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <button id="btn-kin-investigate" class="w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-purple-300 transition-colors">Investigate Suspicious Behavior</div>
+                <div class="text-[10px] text-dust">Shadow their movements or inspect their strange quirks. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <button id="btn-kin-tribute" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-crimson/10 border border-crimson/30 flex items-center justify-center text-crimson group-hover:scale-105 transition-transform">
+                <i data-lucide="flame" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-crimson transition-colors">Offer Occult Tribute</div>
+                <div class="text-[10px] text-dust">Pledge secrets, flesh, or devotion to an unmasked entity. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <button id="btn-kin-argue" class="w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-red-300 transition-colors">Argue / Confront</div>
+                <div class="text-[10px] text-dust">Vent pent-up frustration or spark bitter disputes. (1 Action)</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIFE & CHILDHOOD ACTIVITIES MODAL -->
+    <div id="activities-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
+      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="compass" class="w-4 h-4 text-amber-400"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Activities & Pursuits</h3>
+          </div>
+          <button id="btn-close-activities" class="p-1 text-dust hover:text-parchment transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Action points stamina banner -->
+        <div class="flex items-center justify-between bg-ebon/60 border border-leadborder rounded-xl px-3 py-2 mb-2.5 shrink-0">
+          <div class="flex items-center space-x-1.5 text-xs text-dust">
+            <i data-lucide="battery-charging" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span class="font-mono text-[11px]">Energy / Stamina:</span>
+          </div>
+          <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-full">
+            4 / 4 Actions Left
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex space-x-1 mb-3 bg-ebon/50 p-1 rounded-lg border border-leadborder shrink-0 overflow-x-auto custom-scroll">
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all" data-category="all">All</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="leisure">Play</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="mind">Mind</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="forbidden">Occult</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="social">Social</button>
+        </div>
+
+        <!-- Activities List Container -->
+        <div id="activities-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ANOMALY REVELATION POPUP -->
+    <div id="revelation-modal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 p-5 flex flex-col justify-center items-center">
+      <div class="bg-slatecard border-2 border-crimson/50 rounded-2xl p-5 max-w-sm w-full flex flex-col overflow-hidden shadow-2xl text-center animate-in zoom-in-95 duration-200">
+        <div class="w-12 h-12 rounded-full bg-crimson/10 border border-crimson/30 mx-auto flex items-center justify-center text-crimson mb-3">
+          <i data-lucide="eye" class="w-6 h-6 animate-pulse"></i>
+        </div>
+        <div class="text-[10px] font-mono uppercase tracking-widest text-crimson font-bold mb-1">Unsettling Revelation</div>
+        <h3 id="revelation-name" class="font-serif font-bold text-lg text-parchment mb-2">Entity Discovered</h3>
+        <p id="revelation-text" class="text-xs text-dust leading-relaxed mb-5">
+          You uncover evidence that this friend is not human. Beneath their posture lies something shifting and hungry.
+        </p>
+
+        <div class="space-y-2 w-full text-left">
+          <button id="btn-revelation-loyal" class="w-full p-3 rounded-xl bg-crimson/20 hover:bg-crimson/30 border border-crimson/50 text-parchment text-xs font-serif font-bold tracking-wider transition-all flex items-center justify-between">
+            <span>Swear Loyalty & Keep Secret</span>
+            <span class="text-[10px] font-mono text-crimson">+Shillings & Pact</span>
+          </button>
+          <button id="btn-revelation-report" class="w-full p-2.5 rounded-xl bg-ebon/60 hover:bg-cardhover border border-leadborder text-dust hover:text-parchment text-xs font-serif transition-all flex items-center justify-between">
+            <span>Report to Local Authorities</span>
+            <span class="text-[10px] font-mono text-dust">Sever Ties</span>
+          </button>
+          <button id="btn-revelation-ignore" class="w-full p-2 rounded-xl bg-transparent hover:bg-cardhover text-dust/70 hover:text-parchment text-[11px] font-serif transition-all text-center">
+            Pretend You Saw Nothing
+          </button>
         </div>
       </div>
     </div>
@@ -971,11 +1167,13 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=8"></script>
-  <script src="js/avatar.js?v=8"></script>
-  <script src="js/names.js?v=8"></script>
-  <script src="js/careers.js?v=8"></script>
-  <script src="js/events.js?v=8"></script>
-  <script src="js/game.js?v=8"></script>
+  <script src="js/audio.js?v=9"></script>
+  <script src="js/avatar.js?v=9"></script>
+  <script src="js/names.js?v=9"></script>
+  <script src="js/careers.js?v=9"></script>
+  <script src="js/kin.js?v=9"></script>
+  <script src="js/activities.js?v=9"></script>
+  <script src="js/events.js?v=9"></script>
+  <script src="js/game.js?v=9"></script>
 </body>
 </html>
