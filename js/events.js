@@ -1,189 +1,163 @@
-// Horror Life Events & Dilemmas for Terrible Little Lives
+// Modern Era Horror Life Events & Dilemmas for Terrible Little Lives
 
-// Spontaneous one-liner events that happen during normal year progression
 const AMBIENT_YEAR_EVENTS = [
-  { minAge: 1, maxAge: 3, text: "You woke screaming every time the nursery mirror was uncovered." },
-  { minAge: 1, maxAge: 4, text: "The family dog growls whenever it looks directly above your cradle." },
-  { minAge: 2, maxAge: 5, text: "You learned to walk early, but only on the balls of your feet without making a sound." },
-  { minAge: 4, maxAge: 8, text: "You drew black chalk spirals on the cellar bricks until your knuckles bled." },
-  { minAge: 5, maxAge: 9, text: "Your playmate told you there's a second mother sleeping under the garden well." },
-  { minAge: 6, maxAge: 11, text: "A severe winter gripped the county. Three neighboring children went into the woods and did not return." },
-  { minAge: 7, maxAge: 12, text: "You noticed your reflection in the parlor glass blinked a half-second after you did." },
-  { minAge: 8, maxAge: 14, text: "The church bell tolled forty-two times at dusk for an unlisted parishioner." },
-  { minAge: 9, maxAge: 15, text: "You found small bird skulls neatly arranged beneath your pillow." },
-  { minAge: 10, maxAge: 16, text: "Your teeth itch with a dull, throbbing heat when the moon waxes full." },
-  { minAge: 12, maxAge: 18, text: "A traveling phrenologist measured your skull, went deathly pale, and left town without taking payment." },
-  { minAge: 13, maxAge: 19, text: "You smell wet earth and burning tallow wherever you walk alone at night." },
-  { minAge: 14, maxAge: 21, text: "The town gravedigger tipped his hat to you and said, 'Won't be long now, young one.'" }
+  { minAge: 1, maxAge: 3, text: "The smart baby monitor camera in your nursery kept rotating on its motorized swivel to stare at the empty ceiling corner." },
+  { minAge: 1, maxAge: 4, text: "Your parents replaced the Alexa smart speaker after it kept whispering someone's name through static at 3:14 AM." },
+  { minAge: 2, maxAge: 5, text: "You refused to enter the bathroom whenever the LED mirror backlight turned on." },
+  { minAge: 4, maxAge: 7, text: "You drew black chalk spirals on your bedroom iPad screen until the digitizer glass cracked under your nails." },
+  { minAge: 5, maxAge: 9, text: "A neighborhood kid told you that the construction site across the avenue dug up a concrete box wrapped in rusted chains." },
+  { minAge: 6, maxAge: 11, text: "An emergency phone alert sounded at midnight across the entire district, but the notification text was just a string of unrendered unicode glyphs." },
+  { minAge: 7, maxAge: 12, text: "You noticed your front-facing phone camera auto-focus box kept locking onto an invisible point two inches behind your head." },
+  { minAge: 8, maxAge: 14, text: "A severe cold snap froze the municipal water pipes. Neighbors reported black, oily water that smelled of copper coming out of the taps." },
+  { minAge: 9, maxAge: 15, text: "You found three dead sparrows lined up with surgical precision on the external air conditioning compressor unit." },
+  { minAge: 10, maxAge: 16, text: "Your smartphone battery drains from 100% to 0% in three seconds every time you walk under the municipal railway overpass." },
+  { minAge: 12, maxAge: 18, text: "A school counselor called your parents after you wrote an essay detailing what lives underneath the subway third rail." },
+  { minAge: 13, maxAge: 20, text: "You smell ozone and burning damp tallow whenever you take the late-night commuter train home alone." },
+  { minAge: 15, maxAge: 22, text: "An anonymous Discord account added you to a server with zero members and a single voice channel transmitting the sound of laboured underwater breathing." }
 ];
 
-// Interactive Dilemmas (Popups with choices)
 const INTERACTIVE_DILEMMAS = [
   {
-    id: "nursery_corner",
+    id: "nursery_smart_cam",
     minAge: 2,
     maxAge: 4,
-    title: "The Tall Visitor",
-    prompt: "At night, a silhouette too tall for the ceiling stands at the foot of your cot, tilting its head sideways.",
+    title: "The Static Broadcast",
+    prompt: "At 2:40 AM, your bedroom smart speaker turns on. A synthetic, garbled voice speaks through the speaker grille: 'Child in the blue blanket. Do not turn around.'",
     choices: [
       {
-        text: "Cry out for your mother.",
-        outcome: "Your mother rushes in with a lantern. The shadow snaps into the ceiling corners. She slaps your cheek for hysteria.",
-        effects: { sanity: -5, vitality: -2 }
+        text: "Scream at the top of your lungs for your parents.",
+        outcome: "Your dad storms in and unplugs the router. He assumes it was a neighborhood hacker, but his hands tremble.",
+        effects: { sanity: -6, happiness: -5 }
       },
       {
-        text: "Offer it your stuffed cloth bear.",
-        outcome: "The creature kneels with a dry sound like snapping pine twigs. It accepts the toy. When you wake, the bear is made of dried bone.",
-        effects: { sanity: -12, occult: +15, humanity: -5 }
+        text: "Turn around and look into the darkness.",
+        outcome: "A silhouette with limbs like bent aluminum pipes is crouched atop your wardrobe. You black out and wake up with a severe nosebleed.",
+        effects: { sanity: -18, occult: +15, vitality: -5, shillings: +2 }
       },
       {
-        text: "Pull the rough woolen blanket over your eyes and squeeze tight.",
-        outcome: "You hear breath like rattling peas against dry parchment. Hours pass. Morning arrives cold and gray.",
-        effects: { sanity: -4 }
+        text: "Hide under your weighted blanket and recite the alphabet backwards.",
+        outcome: "The speaker lets out a mechanical sigh like escaping steam. Silence returns, but the room smells of burnt plastic.",
+        effects: { sanity: -4, happiness: -2 }
       }
     ]
   },
   {
-    id: "sunken_well",
-    minAge: 5,
-    maxAge: 8,
-    title: "The Sunken Garden Well",
-    prompt: "While playing behind the overgrown carriage house, you find an iron grating covering an old dry well. A voice from within whispers your true birth-name.",
+    id: "subway_third_rail",
+    minAge: 6,
+    maxAge: 9,
+    title: "The Track Collector",
+    prompt: "While waiting for the commuter train with your mother, you drop your toy onto the subway tracks. Down in the tunnel darkness, a figure in a fluorescent vest crawls along the ties with four knees.",
     choices: [
       {
-        text: "Peer through the iron bars into the black.",
-        outcome: "Two milky eyes stare back from twenty feet below. A hand with too many joints presses against the grate. You scream and wet yourself.",
-        effects: { sanity: -18, occult: +8 }
+        text: "Point at the tunnel and yell 'Look, mom!'",
+        outcome: "Your mother yanks your arm roughly and stares into her phone. 'Stop looking at track workers,' she snaps, though the platform was totally empty.",
+        effects: { sanity: -5, happiness: -4 }
       },
       {
-        text: "Whisper back: 'Who are you?'",
-        outcome: "The voice replies: 'I am what was left behind when you were brought upstairs.' It gives you an ancient brass token.",
-        effects: { sanity: -10, occult: +14, coin: +6 }
+        text: "Stare into the tunnel without blinking.",
+        outcome: "The crawling figure pauses. It reaches into its grease-stained pocket and tosses a tarnished blackened silver coin onto the platform edge.",
+        effects: { sanity: -14, occult: +16, shillings: +5, humanity: -4 }
       },
       {
-        text: "Run back to the house and never speak of it.",
-        outcome: "You bolt the back door. That night, wet handprints appear on the exterior stone sill of your room.",
-        effects: { sanity: +3, vitality: -2 }
+        text: "Look away immediately and hold your breath.",
+        outcome: "The train roars in with screeching brakes. The cold draft smells of sulfur and old hair.",
+        effects: { sanity: +3, happiness: +2 }
       }
     ]
   },
   {
-    id: "yellow_tome",
-    minAge: 8,
-    maxAge: 12,
-    title: "The Locked Study",
-    prompt: "Your father left his study key dangling from the brass escutcheon. Inside sits a leather-bound book with locks of coarse hair sewn into the spine.",
-    choices: [
-      {
-        text: "Open the book and decipher the spidery cipher.",
-        outcome: "The diagrams depict the anatomy of beings that walk between wall partitions. Your nose begins to bleed, but your mind catches fire with dread understanding.",
-        effects: { sanity: -16, occult: +22, vitality: -4 }
-      },
-      {
-        text: "Steal the ivory letter opener from the mahogany desk.",
-        outcome: "You slip the sharp ivory relic into your coat. A heavy coldness settles into your ribcage.",
-        effects: { coin: +10, humanity: -5 }
-      },
-      {
-        text: "Lock the door and drop the key where he left it.",
-        outcome: "You walk away. Yet for days, you hear pages turning by themselves behind the heavy oak panel.",
-        effects: { sanity: +4 }
-      }
-    ]
-  },
-  {
-    id: "fever_consumption",
-    minAge: 9,
+    id: "airdrop_intruder",
+    minAge: 11,
     maxAge: 14,
-    title: "The Gray Spasm",
-    prompt: "A coughing sickness sweeps through the settlement. Your throat fills with black phlegm and your skin turns the color of curdled milk. The town leeches offer little hope.",
+    title: "Unknown AirDrop Request",
+    prompt: "While doing homework in your locked bedroom, your smartphone lights up with an AirDrop notification from 'Device_Null': a photo showing you from inside your own closet.",
     choices: [
       {
-        text: "Let the traveling plague doctor bleed you with copper cups.",
-        outcome: "The cups fill with sluggish, foul-smelling grease. The fever breaks, but your veins feel forever hollow and chilled.",
-        effects: { vitality: -20, sanity: +5, coin: -8 }
+        text: "Accept the transfer and open the photo file.",
+        outcome: "The image is high-resolution. Between the hanging coats, two pale humanoid eyes reflect the camera flash. EXIF data says it was taken 12 seconds ago.",
+        effects: { sanity: -22, occult: +18, vitality: -4 }
       },
       {
-        text: "Drink the bitter concoction offered by the village crone in the marsh.",
-        outcome: "You swallow liquid that smells of hemlock and stagnant pond. Your stomach convulsions violently, but by sunrise you are breathing clear.",
-        effects: { vitality: +15, humanity: -12, occult: +10 }
+        text: "Immediately kick the closet door shut and wedge your desk chair under the knob.",
+        outcome: "Something slams heavily against the inside of the door once, making the wood creak. Then absolute silence.",
+        effects: { sanity: -10, vitality: +5, happiness: -8 }
       },
       {
-        text: "Pray on your knees before the family shrine until dawn.",
-        outcome: "No answer comes. You vomit black bile through the morning. The fever burns your lungs scarred and weak.",
-        effects: { vitality: -35, sanity: -8 }
+        text: "Turn off Bluetooth and run to your parents' bedroom.",
+        outcome: "Your parents search the closet. Nothing is there except your winter coats and a handful of wet salt on the floor.",
+        effects: { sanity: -5, happiness: -3 }
       }
     ]
   },
   {
-    id: "cemetery_dare",
-    minAge: 12,
-    maxAge: 16,
-    title: "A Midnight Dare",
-    prompt: "The parish orphans dare you to spend midnight locked inside the crypt of Lord Malgrave—a man rumored to have been buried face-down with an iron stake through his boots.",
-    choices: [
-      {
-        text: "Accept the dare and lock yourself inside.",
-        outcome: "Behind the limestone sarcophagus, something sighs with dry lungs. You find a silver mourning ring slipped off a mummified finger.",
-        effects: { sanity: -14, occult: +12, coin: +15, humanity: -6 }
-      },
-      {
-        text: "Refuse the dare and suffer their ridicule.",
-        outcome: "They pelt you with rotten turnips and call you a coward. Your dignity stings, but you sleep in a warm bed.",
-        effects: { sanity: -2, vitality: -4 }
-      },
-      {
-        text: "Search the grave digger's open pit nearby instead.",
-        outcome: "You discover fresh spade marks and an empty pine box with the lid shattered outward from the inside.",
-        effects: { sanity: -15, occult: +18 }
-      }
-    ]
-  },
-  {
-    id: "the_stranger_carriage",
+    id: "darkweb_leak",
     minAge: 14,
-    maxAge: 18,
-    title: "The Black Carriage",
-    prompt: "A windowless black carriage pulls up alongside the country lane. A gloved hand extends a velvet coin purse. 'A quiet task in the mortuary basement tonight,' a gravel voice rasps. 'Ten sovereigns for an hour of discretion.'",
+    maxAge: 17,
+    title: "The Encrypted Forum Link",
+    prompt: "An anonymous direct message on Telegram links to a hidden .onion forum called 'The Ashen Ledger'. They are offering 50 Shillings for a vial of fresh blood from a living teenager.",
     choices: [
       {
-        text: "Accept the purse and climb inside.",
-        outcome: "You spend an hour holding an oil lantern while they sew lead weights inside a dead man's chest. Your hands reek of embalming salt.",
-        effects: { coin: +35, humanity: -20, sanity: -10, occult: +8 }
+        text: "Use a sterile diabetic lancet, fill a vial, and mail it to the PO Box.",
+        outcome: "Three days later, an unmarked padded envelope arrives in your locker containing five heavy blackened silver coins. A cold ache throbs in your sternum.",
+        effects: { shillings: +50, humanity: -18, vitality: -10, occult: +20 }
       },
       {
-        text: "Decline and back away with your hand on your pocketknife.",
-        outcome: "The driver sneers. The carriage rattles away, leaving sulfur and crushed violet in the road mud.",
-        effects: { sanity: +5 }
+        text: "Reply with the local police department's IP address.",
+        outcome: "The user sends back a video stream of your front porch taken five minutes ago. Your screen glitched with static.",
+        effects: { sanity: -16, happiness: -12 }
       },
       {
-        text: "Report the carriage to the parish constable.",
-        outcome: "The constable listens in silence, then closes his ledger. 'Forget you saw that carriage, child, if you value your lungs.'",
-        effects: { sanity: -8, occult: +6 }
+        text: "Delete Telegram and factory reset your phone.",
+        outcome: "You lose all your photos and chat history, but you sleep without the phone buzzing in your drawer.",
+        effects: { sanity: +5, money: -50 }
       }
     ]
   },
   {
-    id: "attic_séance",
-    minAge: 15,
-    maxAge: 19,
-    title: "The Planchette Session",
-    prompt: "A group of older youths light three black beeswax candles in an abandoned tannery loft and bring out an ivory planchette on a board of cursed walnut wood.",
+    id: "elevator_sub_basement",
+    minAge: 16,
+    maxAge: 20,
+    title: "Floor B-7",
+    prompt: "Returning to your apartment building at 1:15 AM, the elevator digital panel flickers. It bypasses the ground floor and descends past the parking levels, chiming softly as the display reads: 'B-7'. The doors slide open to a flooded tiled corridor.",
     choices: [
       {
-        text: "Place your index finger upon the ivory planchette.",
-        outcome: "The wood screams across the board with violent speed, spelling out the exact year of your doom before snapping into splinters.",
-        effects: { sanity: -22, occult: +25, humanity: -8 }
+        text: "Step out into the ankle-deep black water to explore.",
+        outcome: "You find rusted hospital gurneys and a brass safety deposit box. Inside sits a pristine occult ledger and wet currency.",
+        effects: { sanity: -25, occult: +30, shillings: +85, money: +400, humanity: -10 }
       },
       {
-        text: "Watch from the shadows near the stairs.",
-        outcome: "The candle flames turn blue. One girl begins speaking in a voice like wet stones grinding together. You flee into the night.",
-        effects: { sanity: -8, occult: +10 }
+        text: "Frantically mash the 'Door Close' and 'Floor 1' buttons.",
+        outcome: "The doors hesitate, catching on something soft before snapping shut. The elevator groans and shoots back to the lobby.",
+        effects: { sanity: -8, vitality: -2 }
       },
       {
-        text: "Blow out the candles and break the circle.",
-        outcome: "A sudden freezing gust throws you against the timber wall. Bruised and shivering, you put an end to the blasphemy.",
-        effects: { vitality: -12, sanity: +8, humanity: +10 }
+        text: "Take a flash photo and send it to your building manager.",
+        outcome: "The building manager calls you within two minutes, his voice terrified: 'Delete that photo right now and don't speak to anyone about it.'",
+        effects: { sanity: -12, occult: +10 }
+      }
+    ]
+  },
+  {
+    id: "hospital_er_blackout",
+    minAge: 18,
+    maxAge: 23,
+    title: "The Unregistered Patient",
+    prompt: "You're in the city hospital waiting room when the power cuts out. Emergency red lights blink on. An orderly in blood-stained scrubs offers you an envelope of cash and shillings to help him wheel a sealed steel gurney into the morgue lift.",
+    choices: [
+      {
+        text: "Take the money and push the gurney.",
+        outcome: "Whatever is inside the body bag is warm, breathing irregularly, and speaks your birth date as the elevator descends. You wash your hands for an hour.",
+        effects: { money: +800, shillings: +35, humanity: -20, sanity: -15 }
+      },
+      {
+        text: "Refuse and sprint for the illuminated fire exit.",
+        outcome: "You burst into the rainy street. Behind you, the hospital alarm sirens begin their slow, wailing cycle.",
+        effects: { sanity: +4, vitality: -5 }
+      },
+      {
+        text: "Notify the armed security guards at the front desk.",
+        outcome: "The guards exchange silent glances, lock the glass doors, and tell you that room 104 is off-limits tonight.",
+        effects: { sanity: -10, occult: +12 }
       }
     ]
   }

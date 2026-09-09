@@ -77,7 +77,6 @@
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    /* Custom range slider styling */
     input[type=range] {
       accent-color: #991b1b;
     }
@@ -96,8 +95,8 @@
       <!-- Top Crest -->
       <div class="flex justify-between items-center pt-2">
         <div class="flex items-center space-x-2 text-dust text-xs font-mono">
-          <i data-lucide="moon" class="w-4 h-4 text-crimson"></i>
-          <span>A.D. 1892</span>
+          <i data-lucide="radio" class="w-4 h-4 text-crimson"></i>
+          <span>MODERN ERA • 2024</span>
         </div>
         <button id="btn-landing-mute" class="p-2 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-parchment">
           <i id="landing-mute-icon" data-lucide="volume-2" class="w-4 h-4"></i>
@@ -115,18 +114,18 @@
             Terrible Little Lives
           </h1>
           <p class="text-xs text-dust font-serif tracking-widest mt-2 uppercase">
-            A BitLife Horror Simulator
+            A Modern Horror Life Simulator
           </p>
         </div>
 
         <p class="text-xs text-[#a6a39b] italic max-w-xs mx-auto leading-relaxed pt-2">
-          "From the damp cot to the unmarked grave. Every choice bleeds, and the clock never ceases."
+          "Rent is due on the first. The baby monitor whispers backwards at 3 AM. Earn your salary by day, and count your shillings by night."
         </p>
       </div>
 
       <!-- Action Buttons -->
       <div class="space-y-2.5 pb-2">
-        <!-- Resume Active Life (Hidden by default) -->
+        <!-- Resume Active Life -->
         <button id="btn-landing-resume" class="hidden w-full py-3.5 px-4 rounded-xl bg-[#232732] hover:bg-[#2d3240] border border-blue-900/60 text-parchment font-serif font-bold text-sm tracking-wider shadow-md active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="play" class="w-4 h-4 text-sky-400"></i>
           <span id="label-resume-life">RESUME LIFE</span>
@@ -147,7 +146,7 @@
         <!-- The Crypt (Past Deaths) -->
         <button id="btn-to-crypt" class="w-full py-2.5 px-4 rounded-xl bg-transparent hover:bg-slatecard/50 text-dust hover:text-parchment font-serif text-xs tracking-wider transition-all flex items-center justify-center space-x-1.5">
           <i data-lucide="cross" class="w-3.5 h-3.5 text-crimson"></i>
-          <span>THE PARISH CRYPT (PAST LIVES)</span>
+          <span>THE CITY MORGUE (PAST LIVES)</span>
         </button>
       </div>
     </section>
@@ -198,12 +197,12 @@
           <div class="bg-slatecard border border-leadborder rounded-xl p-3">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust mb-1.5">Skin Complexion</label>
             <select id="sel-skin" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none focus:border-crimson">
-              <option value="porcelain">Porcelain Pale (Victorian)</option>
+              <option value="porcelain">Porcelain Pale</option>
               <option value="ash">Ashen Gray (Cold)</option>
-              <option value="sallow">Sallow (Sickly)</option>
-              <option value="olive">Damp Olive (Swamp)</option>
-              <option value="bruised">Bruised Violet (Unholy)</option>
-              <option value="mortuary">Mortuary Slate (Cadaverous)</option>
+              <option value="sallow">Sallow (Exhausted)</option>
+              <option value="olive">Damp Olive</option>
+              <option value="bruised">Bruised Violet</option>
+              <option value="mortuary">Mortuary Slate</option>
             </select>
           </div>
 
@@ -214,7 +213,7 @@
               <div>
                 <span class="text-[10px] text-dust block mb-1">Shape</span>
                 <select id="sel-eye-shape" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
-                  <option value="sunken">Sunken / Hollow</option>
+                  <option value="sunken">Sunken / Hollow (Insomniac)</option>
                   <option value="wide">Wide / Haunted</option>
                   <option value="narrow">Narrow / Calculating</option>
                   <option value="blind">Milky / Blind</option>
@@ -266,7 +265,7 @@
           <div class="bg-slatecard border border-leadborder rounded-xl p-3">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust mb-1.5">Distinguishing Mark / Accessory</label>
             <select id="sel-mark" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
-              <option value="hollow_circles">Hollow Dark Eye Circles</option>
+              <option value="hollow_circles">Severe Under-Eye Circles</option>
               <option value="spectacles">Round Wire Spectacles</option>
               <option value="scar">Stitched Cheek Scar</option>
               <option value="caul">Translucent Birth Caul</option>
@@ -275,8 +274,27 @@
           </div>
         </div>
 
-        <!-- PANEL B: IDENTITY -->
+        <!-- PANEL B: IDENTITY & COUNTRY -->
         <div id="panel-identity" class="hidden space-y-3">
+          <!-- Country & City Selector -->
+          <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-2">
+            <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Birth Country & City</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <span class="text-[10px] text-dust block mb-1">Country</span>
+                <select id="sel-country" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              <div>
+                <span class="text-[10px] text-dust block mb-1">City</span>
+                <select id="sel-city" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                  <!-- Dynamically populated based on country -->
+                </select>
+              </div>
+            </div>
+          </div>
+
           <!-- Name Inputs -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-2">
             <div class="flex justify-between items-center">
@@ -291,24 +309,14 @@
             </div>
           </div>
 
-          <!-- Gender & Birthplace -->
+          <!-- Gender & Trait -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-2">
-            <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Gender & Birth Origin</label>
-            <div class="grid grid-cols-2 gap-2 mb-2">
-              <select id="sel-gender" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Enigmatic">Enigmatic</option>
-              </select>
-              <select id="sel-birthplace" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
-                <!-- Injected dynamically -->
-              </select>
-            </div>
-          </div>
-
-          <!-- Lineage Trait -->
-          <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-1.5">
-            <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Inherent Dark Trait</label>
+            <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Gender & Inherent Trait</label>
+            <select id="sel-gender" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none mb-2">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Enigmatic">Enigmatic</option>
+            </select>
             <select id="sel-trait" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
               <!-- Injected dynamically -->
             </select>
@@ -398,13 +406,22 @@
               <input id="slider-god-humanity" type="range" min="5" max="100" value="90" class="w-full h-1.5 bg-[#262930] rounded-lg">
             </div>
 
-            <!-- Starting Wealth -->
+            <!-- Starting Mundane Bank Balance (Fiat) -->
             <div class="pt-2 border-t border-leadborder/70">
               <div class="flex justify-between text-xs mb-1">
-                <span class="text-dust flex items-center gap-1"><i data-lucide="coins" class="w-3 h-3 text-amber-300"></i> Starting Wealth (Shillings)</span>
-                <span id="label-god-coin" class="font-mono text-amber-300 font-bold">150 s.</span>
+                <span class="text-dust flex items-center gap-1"><i data-lucide="wallet" class="w-3 h-3 text-emerald-400"></i> Mundane Bank Balance</span>
+                <span id="label-god-money" class="font-mono text-emerald-400 font-bold">$1,500</span>
               </div>
-              <input id="slider-god-coin" type="range" min="0" max="2500" step="25" value="150" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-money" type="range" min="0" max="50000" step="500" value="1500" class="w-full h-1.5 bg-[#262930] rounded-lg">
+            </div>
+
+            <!-- Starting Paranormal Shillings -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-dust flex items-center gap-1"><i data-lucide="coins" class="w-3 h-3 text-amber-400"></i> Paranormal Shillings</span>
+                <span id="label-god-shillings" class="font-mono text-amber-400 font-bold">25 s.</span>
+              </div>
+              <input id="slider-god-shillings" type="range" min="0" max="1500" step="10" value="25" class="w-full h-1.5 bg-[#262930] rounded-lg">
             </div>
           </div>
         </div>
@@ -424,38 +441,39 @@
     <!-- ========================================== -->
     <section id="screen-game" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
       <!-- Top Status / Notch Bar -->
-      <header class="bg-[#14161a] border-b border-leadborder px-4 py-2.5 shrink-0 flex items-center justify-between z-10">
+      <header class="bg-[#14161a] border-b border-leadborder px-4 py-2 shrink-0 flex items-center justify-between z-10">
         <div class="flex items-center space-x-2.5">
           <!-- Modular Miniature Canvas Portrait -->
           <div class="w-10 h-10 rounded-lg overflow-hidden border border-[#85754e]/80 shadow-inner bg-slatecard shrink-0">
             <canvas id="game-header-avatar" width="80" height="80" class="w-full h-full"></canvas>
           </div>
           <div class="leading-tight">
-            <h1 id="char-name" class="font-serif font-bold text-xs sm:text-sm tracking-wide text-parchment truncate max-w-[150px]">Loading...</h1>
+            <h1 id="char-name" class="font-serif font-bold text-xs sm:text-sm tracking-wide text-parchment truncate max-w-[140px]">Loading...</h1>
             <div class="flex items-center space-x-1.5 text-[10px] text-dust">
-              <span id="char-title" class="text-bruised font-medium">Infant</span>
+              <span id="char-job-title" class="text-sky-400 font-medium truncate max-w-[90px]">Infant</span>
               <span>•</span>
-              <span id="char-age-year">Age: 0 | 1892</span>
+              <span id="char-age-year">Age: 0 | 2024</span>
             </div>
           </div>
         </div>
 
-        <!-- Header Actions -->
-        <div class="flex items-center space-x-1">
-          <!-- Live God Mode Inspector Button (Shown if God Mode enabled) -->
-          <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30" title="Open God Mode Inspector">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-          </button>
-          
-          <!-- Coin Badge -->
-          <div class="px-2 py-1 rounded bg-slatecard border border-leadborder text-[11px] font-mono text-amber-400 flex items-center space-x-1">
-            <i data-lucide="coins" class="w-3 h-3"></i>
-            <span id="char-coin">0 s.</span>
+        <!-- Header Actions (Dual Currency Badges) -->
+        <div class="flex items-center space-x-1.5">
+          <!-- Real World Fiat Badge -->
+          <div class="px-2 py-1 rounded bg-[#121814] border border-emerald-900/60 text-[11px] font-mono text-emerald-400 flex items-center space-x-1" title="Mundane Fiat Currency">
+            <i data-lucide="banknote" class="w-3 h-3"></i>
+            <span id="char-money">$0</span>
           </div>
 
-          <!-- Mute Audio Button -->
-          <button id="btn-mute" class="p-1.5 rounded-lg bg-slatecard hover:bg-[#20232a] text-dust hover:text-parchment border border-leadborder transition-colors">
-            <i id="mute-icon" data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+          <!-- Paranormal Shillings Badge -->
+          <div class="px-2 py-1 rounded bg-[#1b1712] border border-amber-900/60 text-[11px] font-mono text-amber-400 flex items-center space-x-1" title="Paranormal Shillings">
+            <i data-lucide="coins" class="w-3 h-3"></i>
+            <span id="char-shillings">0 s.</span>
+          </div>
+
+          <!-- Live God Mode Inspector Button -->
+          <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30" title="Open God Mode Inspector">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
           </button>
 
           <!-- Back to Menu Button -->
@@ -547,17 +565,17 @@
           <span class="text-[10px] text-dust font-sans block tracking-wider">[ +1 Year ]</span>
         </button>
 
-        <!-- Sub Tabs -->
+        <!-- Sub Tabs (Careers Active!) -->
         <div class="grid grid-cols-3 gap-2 text-[10px] text-dust">
-          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed">
-            <i data-lucide="briefcase" class="w-3 h-3"></i>
+          <button id="btn-tab-careers" class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-parchment hover:border-sky-500/60 text-center flex items-center justify-center space-x-1 transition-colors">
+            <i data-lucide="briefcase" class="w-3 h-3 text-sky-400"></i>
             <span>Careers</span>
           </button>
-          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed">
+          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed" title="Coming in next expansion">
             <i data-lucide="book-open" class="w-3 h-3"></i>
             <span>Activities</span>
           </button>
-          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed">
+          <button class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-center flex items-center justify-center space-x-1 opacity-60 cursor-not-allowed" title="Coming in next expansion">
             <i data-lucide="users" class="w-3 h-3"></i>
             <span>Kin</span>
           </button>
@@ -566,7 +584,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 4. THE CRYPT (HALL OF DECEASED SOULS)      -->
+    <!-- 4. THE CRYPT / MORGUE                      -->
     <!-- ========================================== -->
     <section id="screen-crypt" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
       <header class="bg-[#14161a] border-b border-leadborder px-4 py-3 shrink-0 flex items-center justify-between">
@@ -574,8 +592,8 @@
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
           <span>Back</span>
         </button>
-        <h2 class="font-serif font-bold text-sm tracking-wider text-parchment uppercase">The Parish Crypt</h2>
-        <button id="btn-clear-crypt" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-crimson text-xs" title="Clear Crypt Records">
+        <h2 class="font-serif font-bold text-sm tracking-wider text-parchment uppercase">The City Morgue</h2>
+        <button id="btn-clear-crypt" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-crimson text-xs" title="Clear Morgue Records">
           <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
         </button>
       </header>
@@ -588,6 +606,49 @@
     <!-- ========================================== -->
     <!-- MODALS & POPUPS                            -->
     <!-- ========================================== -->
+
+    <!-- CAREERS MODAL (Mundane vs Paranormal) -->
+    <div id="careers-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
+      <div class="bg-[#16181f] border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="briefcase" class="w-4 h-4 text-sky-400"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Employment & Contracts</h3>
+          </div>
+          <button id="btn-close-careers" class="p-1 rounded text-dust hover:text-parchment">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Career Tabs -->
+        <div class="grid grid-cols-2 gap-1 bg-[#101115] p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
+          <button id="tab-career-mundane" class="py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
+            <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Mundane Jobs (Fiat)</span>
+          </button>
+          <button id="tab-career-paranormal" class="py-1.5 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
+            <i data-lucide="moon" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Paranormal (Shillings)</span>
+          </button>
+        </div>
+
+        <!-- Current Status Banner -->
+        <div id="current-employment-banner" class="bg-[#111317] border border-leadborder/70 rounded-xl p-3 mb-3 shrink-0 text-xs flex justify-between items-center">
+          <div>
+            <span class="text-[10px] uppercase text-dust font-mono block">Current Daytime Job:</span>
+            <span id="txt-current-mundane-job" class="font-serif font-bold text-parchment">Unemployed</span>
+          </div>
+          <button id="btn-quit-mundane" class="hidden text-[10px] font-mono px-2 py-1 rounded bg-red-950/60 border border-red-800 text-red-300 hover:bg-red-900">
+            Resign
+          </button>
+        </div>
+
+        <!-- Jobs List Container -->
+        <div id="careers-list" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
 
     <!-- Interactive Dilemma Bottom Sheet -->
     <div id="dilemma-backdrop" class="hidden absolute inset-0 bg-black/75 backdrop-blur-sm z-30 transition-opacity"></div>
@@ -621,7 +682,7 @@
         </div>
 
         <div class="space-y-2 text-xs max-h-[60vh] overflow-y-auto custom-scroll pr-1">
-          <!-- Mid-game Vitality -->
+          <!-- Vitality -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Vitality (Health)</span>
@@ -630,7 +691,7 @@
             <input id="slide-live-vitality" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Sanity -->
+          <!-- Sanity -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Sanity (Mind)</span>
@@ -639,7 +700,7 @@
             <input id="slide-live-sanity" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Happiness -->
+          <!-- Happiness -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Happiness</span>
@@ -648,7 +709,7 @@
             <input id="slide-live-happiness" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Smarts -->
+          <!-- Smarts -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Intelligence</span>
@@ -657,7 +718,7 @@
             <input id="slide-live-smarts" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Occult -->
+          <!-- Occult -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Occult</span>
@@ -666,7 +727,7 @@
             <input id="slide-live-occult" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Humanity -->
+          <!-- Humanity -->
           <div>
             <div class="flex justify-between text-dust mb-1">
               <span>Humanity</span>
@@ -675,13 +736,22 @@
             <input id="slide-live-humanity" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
-          <!-- Mid-game Shillings -->
+          <!-- Live Fiat Money -->
           <div class="pt-2 border-t border-leadborder">
             <div class="flex justify-between text-dust mb-1">
-              <span>Shillings / Coin</span>
-              <span id="lbl-live-coin" class="font-mono text-amber-300 font-bold">100 s.</span>
+              <span>Mundane Bank Balance</span>
+              <span id="lbl-live-money" class="font-mono text-emerald-400 font-bold">$1,500</span>
             </div>
-            <input id="slide-live-coin" type="range" min="0" max="5000" step="50" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-money" type="range" min="0" max="100000" step="500" class="w-full h-1 bg-[#262930] rounded">
+          </div>
+
+          <!-- Live Shillings -->
+          <div>
+            <div class="flex justify-between text-dust mb-1">
+              <span>Paranormal Shillings</span>
+              <span id="lbl-live-shillings" class="font-mono text-amber-400 font-bold">50 s.</span>
+            </div>
+            <input id="slide-live-shillings" type="range" min="0" max="2500" step="10" class="w-full h-1 bg-[#262930] rounded">
           </div>
         </div>
 
@@ -694,24 +764,24 @@
     <!-- Post-Mortem / Coroner Inquest Modal (Death Screen) -->
     <div id="death-modal" class="hidden absolute inset-0 bg-[#0c0d10]/95 backdrop-blur-md z-50 p-6 flex flex-col justify-between items-center text-center">
       <div class="my-auto max-w-xs space-y-4">
-        <!-- Portrait in Brass Frame on Tombstone -->
+        <!-- Portrait in Frame -->
         <div class="w-20 h-20 rounded-lg overflow-hidden border border-[#85754e] shadow-2xl mx-auto">
           <canvas id="death-avatar-canvas" width="100" height="100" class="w-full h-full"></canvas>
         </div>
 
         <div class="space-y-1">
-          <p class="text-xs uppercase tracking-widest text-dust font-mono">CORONER'S POST-MORTEM</p>
-          <h2 id="death-name" class="font-serif font-bold text-xl text-parchment">Silas Blackwood</h2>
-          <p id="death-age" class="text-xs text-crimson font-mono">Age 16 (1904)</p>
+          <p class="text-xs uppercase tracking-widest text-dust font-mono">CORONER'S INQUEST & MORTUARY RECORD</p>
+          <h2 id="death-name" class="font-serif font-bold text-xl text-parchment">Alex Mercer</h2>
+          <p id="death-age" class="text-xs text-crimson font-mono">Age 21 (2024)</p>
         </div>
 
         <div class="bg-slatecard border border-leadborder rounded-xl p-4 text-left space-y-2">
           <div class="text-[10px] font-mono text-dust uppercase">Determined Cause:</div>
           <p id="death-cause" class="text-xs font-semibold text-red-300">Mind Shattered</p>
           <div class="h-px bg-leadborder my-2"></div>
-          <div class="text-[10px] font-mono text-dust uppercase">Parish Record:</div>
+          <div class="text-[10px] font-mono text-dust uppercase">Public Police Record:</div>
           <p id="death-epitaph" class="text-xs text-[#c2beb4] italic leading-relaxed">
-            "Committed to the subterranean wards of Coldwater Sanitarium, murmuring backwards prayers until the end of your days."
+            "Found in a locked high-rise apartment holding an analog camera, repeating unrendered glyphs until vital signs ceased."
           </p>
         </div>
       </div>
@@ -721,7 +791,7 @@
           FORGE ANOTHER SOUL
         </button>
         <button id="btn-death-to-crypt" class="w-full py-2.5 px-4 rounded-xl bg-slatecard hover:bg-[#20232a] border border-leadborder text-dust hover:text-parchment font-serif text-xs tracking-wider transition-all">
-          VISIT THE PARISH CRYPT
+          VISIT THE CITY MORGUE
         </button>
       </div>
     </div>
@@ -729,10 +799,11 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=4"></script>
-  <script src="js/avatar.js?v=4"></script>
-  <script src="js/names.js?v=4"></script>
-  <script src="js/events.js?v=4"></script>
-  <script src="js/game.js?v=4"></script>
+  <script src="js/audio.js?v=5"></script>
+  <script src="js/avatar.js?v=5"></script>
+  <script src="js/names.js?v=5"></script>
+  <script src="js/careers.js?v=5"></script>
+  <script src="js/events.js?v=5"></script>
+  <script src="js/game.js?v=5"></script>
 </body>
 </html>

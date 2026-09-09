@@ -1,4 +1,4 @@
-// Game Engine with Screen Router, Modular Avatar Customizer, God Mode, and Crypt System
+// Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
 
 class TerribleGame {
   constructor() {
@@ -7,14 +7,16 @@ class TerribleGame {
     this.activeDilemma = null;
     this.usedDilemmaIds = new Set();
     this.crypt = this.loadCrypt();
+    this.activeCareerTab = 'mundane';
     
     // Creator draft state
     this.creatorState = {
       avatar: window.generateRandomAvatar(),
-      name: { first: "Silas", surname: "Marrow" },
+      countryCode: "USA",
+      city: "Seattle, WA",
+      name: { first: "Alex", surname: "Mercer" },
       gender: "Male",
-      birthplace: window.GOTHIC_DATA.birthplaces[0],
-      trait: window.GOTHIC_DATA.traits[0],
+      trait: window.MODERN_TRAITS[0],
       isGodMode: true,
       stats: {
         happiness: 75,
@@ -25,7 +27,8 @@ class TerribleGame {
         occult: 25,
         humanity: 90
       },
-      coin: 150
+      money: 1500,
+      shillings: 25
     };
 
     this.initElements();
@@ -76,15 +79,16 @@ class TerribleGame {
       selMark: document.getElementById('sel-mark'),
 
       // Identity Selectors
+      selCountry: document.getElementById('sel-country'),
+      selCity: document.getElementById('sel-city'),
       inputFirstName: document.getElementById('input-first-name'),
       inputSurname: document.getElementById('input-surname'),
       btnRandomName: document.getElementById('btn-random-name'),
       selGender: document.getElementById('sel-gender'),
-      selBirthplace: document.getElementById('sel-birthplace'),
       selTrait: document.getElementById('sel-trait'),
       traitDesc: document.getElementById('trait-desc'),
 
-      // God Mode Controls
+      // God Mode Controls (Creator)
       chkGodmode: document.getElementById('chk-godmode'),
       godmodeSliders: document.getElementById('godmode-sliders'),
       sliderHappiness: document.getElementById('slider-god-happiness'),
@@ -101,19 +105,20 @@ class TerribleGame {
       labelOccult: document.getElementById('label-god-occult'),
       sliderHumanity: document.getElementById('slider-god-humanity'),
       labelHumanity: document.getElementById('label-god-humanity'),
-      sliderCoin: document.getElementById('slider-god-coin'),
-      labelCoin: document.getElementById('label-god-coin'),
+      sliderMoney: document.getElementById('slider-god-money'),
+      labelMoney: document.getElementById('label-god-money'),
+      sliderShillings: document.getElementById('slider-god-shillings'),
+      labelShillings: document.getElementById('label-god-shillings'),
       btnEmbark: document.getElementById('btn-embark'),
 
       // Main Game Header
       gameHeaderAvatar: document.getElementById('game-header-avatar'),
       charName: document.getElementById('char-name'),
-      charTitle: document.getElementById('char-title'),
+      charJobTitle: document.getElementById('char-job-title'),
       charAgeYear: document.getElementById('char-age-year'),
-      charCoin: document.getElementById('char-coin'),
+      charMoney: document.getElementById('char-money'),
+      charShillings: document.getElementById('char-shillings'),
       btnGameGodmode: document.getElementById('btn-game-godmode'),
-      btnMute: document.getElementById('btn-mute'),
-      muteIcon: document.getElementById('mute-icon'),
       btnToMenu: document.getElementById('btn-to-menu'),
 
       // Stat bars
@@ -133,6 +138,16 @@ class TerribleGame {
       // Log feed & Endure button
       logFeed: document.getElementById('log-feed'),
       btnEndure: document.getElementById('btn-endure'),
+      btnTabCareers: document.getElementById('btn-tab-careers'),
+
+      // Careers Modal
+      careersModal: document.getElementById('careers-modal'),
+      btnCloseCareers: document.getElementById('btn-close-careers'),
+      tabCareerMundane: document.getElementById('tab-career-mundane'),
+      tabCareerParanormal: document.getElementById('tab-career-paranormal'),
+      currentMundaneJob: document.getElementById('txt-current-mundane-job'),
+      btnQuitMundane: document.getElementById('btn-quit-mundane'),
+      careersList: document.getElementById('careers-list'),
 
       // Crypt Screen
       cryptList: document.getElementById('crypt-list'),
@@ -172,8 +187,10 @@ class TerribleGame {
       lblLiveOccult: document.getElementById('lbl-live-occult'),
       slideLiveHumanity: document.getElementById('slide-live-humanity'),
       lblLiveHumanity: document.getElementById('lbl-live-humanity'),
-      slideLiveCoin: document.getElementById('slide-live-coin'),
-      lblLiveCoin: document.getElementById('lbl-live-coin')
+      slideLiveMoney: document.getElementById('slide-live-money'),
+      lblLiveMoney: document.getElementById('lbl-live-money'),
+      slideLiveShillings: document.getElementById('slide-live-shillings'),
+      lblLiveShillings: document.getElementById('lbl-live-shillings')
     };
   }
 
@@ -252,15 +269,14 @@ class TerribleGame {
     });
 
     // Audio Toggles
-    const toggleAudio = () => {
-      const isMuted = window.soundEngine.toggleMute();
-      const iconName = isMuted ? 'volume-x' : 'volume-2';
-      this.dom.muteIcon.setAttribute('data-lucide', iconName);
-      this.dom.landingMuteIcon.setAttribute('data-lucide', iconName);
-      if (window.lucide) window.lucide.createIcons();
-    };
-    this.dom.btnMute.addEventListener('click', toggleAudio);
-    this.dom.btnLandingMute.addEventListener('click', toggleAudio);
+    if (this.dom.btnLandingMute) {
+      this.dom.btnLandingMute.addEventListener('click', () => {
+        const isMuted = window.soundEngine.toggleMute();
+        const iconName = isMuted ? 'volume-x' : 'volume-2';
+        if (this.dom.landingMuteIcon) this.dom.landingMuteIcon.setAttribute('data-lucide', iconName);
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
 
     // Creator Tabs
     this.dom.tabAppearance.addEventListener('click', () => this.switchCreatorTab('appearance'));
@@ -282,7 +298,7 @@ class TerribleGame {
 
     [this.dom.selSkin, this.dom.selEyeShape, this.dom.selEyeColor,
      this.dom.selHairStyle, this.dom.selHairColor, this.dom.selMark].forEach(sel => {
-      sel.addEventListener('change', updateAvatarFromSelects);
+      if (sel) sel.addEventListener('change', updateAvatarFromSelects);
     });
 
     // Randomize appearance button
@@ -299,10 +315,34 @@ class TerribleGame {
       this.randomizeName();
     });
 
+    // Country selection change
+    this.dom.selCountry.addEventListener('change', (e) => {
+      const code = e.target.value;
+      this.creatorState.countryCode = code;
+      const country = window.COUNTRIES_DATA[code];
+      
+      this.updateCityOptions(code);
+      this.updateMoneySliderLimits(code);
+      this.randomizeName();
+    });
+
+    // City selection change
+    this.dom.selCity.addEventListener('change', (e) => {
+      this.creatorState.city = e.target.value;
+    });
+
     // Randomize entire soul
     this.dom.btnCreatorRandomizeAll.addEventListener('click', () => {
       window.soundEngine.playClick();
       this.creatorState.avatar = window.generateRandomAvatar();
+      
+      const countryKeys = Object.keys(window.COUNTRIES_DATA);
+      const randomCode = window.getRandomElement(countryKeys);
+      this.creatorState.countryCode = randomCode;
+      this.dom.selCountry.value = randomCode;
+      
+      this.updateCityOptions(randomCode);
+      this.updateMoneySliderLimits(randomCode);
       this.randomizeName();
       this.syncCreatorUI();
       this.renderCreatorAvatar();
@@ -317,14 +357,11 @@ class TerribleGame {
 
     // Sliders Live Number Updates
     const bindSlider = (slider, label, key, suffix = '%') => {
+      if (!slider || !label) return;
       slider.addEventListener('input', (e) => {
         const val = parseInt(e.target.value);
         label.textContent = `${val}${suffix}`;
-        if (key === 'coin') {
-          this.creatorState.coin = val;
-        } else {
-          this.creatorState.stats[key] = val;
-        }
+        this.creatorState.stats[key] = val;
       });
     };
 
@@ -335,11 +372,23 @@ class TerribleGame {
     bindSlider(this.dom.sliderSanity, this.dom.labelSanity, 'sanity');
     bindSlider(this.dom.sliderOccult, this.dom.labelOccult, 'occult');
     bindSlider(this.dom.sliderHumanity, this.dom.labelHumanity, 'humanity');
-    bindSlider(this.dom.sliderCoin, this.dom.labelCoin, 'coin', ' s.');
+
+    // Dual Currency Sliders (Creator)
+    this.dom.sliderMoney.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      this.creatorState.money = val;
+      this.dom.labelMoney.textContent = window.formatMoney(val, this.creatorState.countryCode);
+    });
+
+    this.dom.sliderShillings.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      this.creatorState.shillings = val;
+      this.dom.labelShillings.textContent = `${val} s.`;
+    });
 
     // Trait change description
     this.dom.selTrait.addEventListener('change', (e) => {
-      const trait = window.GOTHIC_DATA.traits.find(t => t.id === e.target.value);
+      const trait = window.MODERN_TRAITS.find(t => t.id === e.target.value);
       if (trait) {
         this.creatorState.trait = trait;
         this.dom.traitDesc.textContent = trait.desc;
@@ -349,17 +398,19 @@ class TerribleGame {
     // Embark Button
     this.dom.btnEmbark.addEventListener('click', () => {
       window.soundEngine.playTick();
-      const first = this.dom.inputFirstName.value.trim() || "Silas";
-      const last = this.dom.inputSurname.value.trim() || "Marrow";
+      const first = this.dom.inputFirstName.value.trim() || "Alex";
+      const last = this.dom.inputSurname.value.trim() || "Mercer";
       const config = {
         name: `${first} ${last}`,
         gender: this.dom.selGender.value,
-        birthplace: this.dom.selBirthplace.value,
+        countryCode: this.creatorState.countryCode,
+        city: this.dom.selCity.value || this.creatorState.city,
         trait: this.creatorState.trait,
         avatar: this.creatorState.avatar,
         isGodMode: this.creatorState.isGodMode,
         stats: { ...this.creatorState.stats },
-        coin: this.creatorState.coin
+        money: this.creatorState.money,
+        shillings: this.creatorState.shillings
       };
       this.startNewLife(config);
     });
@@ -367,10 +418,36 @@ class TerribleGame {
     // Gameplay Controls
     this.dom.btnEndure.addEventListener('click', () => this.endureYear());
 
+    // Careers Modal Controls
+    this.dom.btnTabCareers.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.openCareersModal();
+    });
+
+    this.dom.btnCloseCareers.addEventListener('click', () => {
+      this.dom.careersModal.classList.add('hidden');
+      this.dom.careersModal.style.display = 'none';
+    });
+
+    this.dom.tabCareerMundane.addEventListener('click', () => {
+      this.activeCareerTab = 'mundane';
+      this.renderCareersList();
+    });
+
+    this.dom.tabCareerParanormal.addEventListener('click', () => {
+      this.activeCareerTab = 'paranormal';
+      this.renderCareersList();
+    });
+
+    this.dom.btnQuitMundane.addEventListener('click', () => {
+      this.quitMundaneJob();
+    });
+
     // Live God Mode Inspector In-Game
     this.dom.btnGameGodmode.addEventListener('click', () => this.openLiveGodmodeInspector());
     this.dom.btnCloseGodmodeModal.addEventListener('click', () => {
       this.dom.godmodeModal.classList.add('hidden');
+      this.dom.godmodeModal.style.display = 'none';
     });
     this.dom.btnApplyLiveGodmode.addEventListener('click', () => this.applyLiveGodmodeTweaks());
 
@@ -386,7 +463,7 @@ class TerribleGame {
 
     // Crypt clear
     this.dom.btnClearCrypt.addEventListener('click', () => {
-      if (confirm("Scatter the ashes of all deceased souls in the Crypt?")) {
+      if (confirm("Clear all deceased records from the City Morgue?")) {
         this.crypt = [];
         localStorage.removeItem('TLL_CRYPT');
         this.renderCrypt();
@@ -395,30 +472,79 @@ class TerribleGame {
   }
 
   populateCreatorDropdowns() {
-    this.dom.selBirthplace.innerHTML = '';
-    window.GOTHIC_DATA.birthplaces.forEach(bp => {
+    // Populate Countries
+    this.dom.selCountry.innerHTML = '';
+    for (const [code, cData] of Object.entries(window.COUNTRIES_DATA)) {
       const opt = document.createElement('option');
-      opt.value = bp;
-      opt.textContent = bp;
-      this.dom.selBirthplace.appendChild(opt);
-    });
+      opt.value = code;
+      opt.textContent = `${cData.flag} ${cData.name} (${cData.currency.symbol} ${cData.currency.code})`;
+      this.dom.selCountry.appendChild(opt);
+    }
+    this.dom.selCountry.value = this.creatorState.countryCode;
 
+    // Populate Cities for initial country
+    this.updateCityOptions(this.creatorState.countryCode);
+
+    // Populate Traits
     this.dom.selTrait.innerHTML = '';
-    window.GOTHIC_DATA.traits.forEach(tr => {
+    window.MODERN_TRAITS.forEach(tr => {
       const opt = document.createElement('option');
       opt.value = tr.id;
       opt.textContent = tr.name;
       this.dom.selTrait.appendChild(opt);
     });
-    this.dom.traitDesc.textContent = window.GOTHIC_DATA.traits[0].desc;
+    this.dom.traitDesc.textContent = window.MODERN_TRAITS[0].desc;
+
+    // Set Money Limits
+    this.updateMoneySliderLimits(this.creatorState.countryCode);
+  }
+
+  updateCityOptions(countryCode) {
+    const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
+    this.dom.selCity.innerHTML = '';
+    country.cities.forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city;
+      opt.textContent = city;
+      this.dom.selCity.appendChild(opt);
+    });
+    this.creatorState.city = country.cities[0];
+    this.dom.selCity.value = country.cities[0];
+  }
+
+  updateMoneySliderLimits(countryCode) {
+    const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
+    const rate = country.currency.rate;
+    
+    let maxMoney = 50000;
+    let step = 500;
+
+    if (rate >= 10000) {
+      maxMoney = 500000000;
+      step = 5000000;
+    } else if (rate >= 100) {
+      maxMoney = 5000000;
+      step = 50000;
+    }
+
+    const defaultBalance = Math.round(1500 * rate);
+    this.creatorState.money = defaultBalance;
+
+    this.dom.sliderMoney.min = "0";
+    this.dom.sliderMoney.max = `${maxMoney}`;
+    this.dom.sliderMoney.step = `${step}`;
+    this.dom.sliderMoney.value = `${defaultBalance}`;
+    this.dom.labelMoney.textContent = window.formatMoney(defaultBalance, countryCode);
   }
 
   randomizeName() {
+    const country = window.COUNTRIES_DATA[this.creatorState.countryCode] || window.COUNTRIES_DATA.USA;
     const isMale = this.dom.selGender.value === 'Male';
     const first = isMale 
-      ? window.getRandomElement(window.GOTHIC_DATA.firstNamesMale)
-      : window.getRandomElement(window.GOTHIC_DATA.firstNamesFemale);
-    const surname = window.getRandomElement(window.GOTHIC_DATA.surnames);
+      ? window.getRandomElement(country.firstNamesMale)
+      : window.getRandomElement(country.firstNamesFemale);
+    const surname = window.getRandomElement(country.surnames);
+    
     this.dom.inputFirstName.value = first;
     this.dom.inputSurname.value = surname;
     this.creatorState.name = { first, surname };
@@ -486,7 +612,7 @@ class TerribleGame {
           this.character = data.character;
           this.logs = data.logs || [];
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
-          this.dom.labelResumeLife.textContent = `RESUME LIFE: ${this.character.name.toUpperCase()} (AGE ${this.character.age})`;
+          this.dom.labelResumeLife.textContent = `RESUME: ${this.character.name.toUpperCase()} (AGE ${this.character.age})`;
           this.dom.btnLandingResume.classList.remove('hidden');
           this.dom.btnLandingResume.style.display = 'flex';
           return;
@@ -500,14 +626,19 @@ class TerribleGame {
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
     this.usedDilemmaIds.clear();
+
+    const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+
     this.logs = [
       {
         age: 0,
         year: this.character.year,
         entries: [
-          `Born at ${this.character.birthplace}.`,
+          `Born in ${this.character.city}, ${country.name} (${country.flag}).`,
           this.character.origin,
-          `Omen Trait: ${this.character.trait.name} - ${this.character.trait.desc}`
+          `Inherent Trait: ${this.character.trait.name} - ${this.character.trait.desc}`,
+          `Starting Fiat Balance: ${window.formatMoney(this.character.money, this.character.countryCode)}.`,
+          `Secret Paranormal Shillings: ${this.character.shillings} s.`
         ]
       }
     ];
@@ -527,13 +658,14 @@ class TerribleGame {
     this.character.age += 1;
     this.character.year += 1;
 
+    // Status titles by age
     if (this.character.age <= 2) this.character.statusTitle = "Infant";
     else if (this.character.age <= 6) this.character.statusTitle = "Toddler";
     else if (this.character.age <= 12) this.character.statusTitle = "Child";
     else if (this.character.age <= 17) this.character.statusTitle = "Adolescent";
-    else this.character.statusTitle = "Young Adult";
-
-    this.modifyStat('vitality', (Math.random() > 0.65 ? -1 : 0));
+    else if (this.character.age <= 30) this.character.statusTitle = "Young Adult";
+    else if (this.character.age <= 60) this.character.statusTitle = "Adult";
+    else this.character.statusTitle = "Elder";
 
     const currentYearLog = {
       age: this.character.age,
@@ -541,13 +673,55 @@ class TerribleGame {
       entries: []
     };
 
-    const availableDilemmas = window.GAME_DATA.INTERACTIVE_DILEMMAS.filter(d => 
+    // 1. Economic Updates (Mundane Salary)
+    if (this.character.job) {
+      const salary = window.getAdjustedSalary(this.character.job.baseSalaryUSD, this.character.countryCode);
+      this.character.money += salary;
+      currentYearLog.entries.push(`Deposited salary: +${window.formatMoney(salary, this.character.countryCode)} working as a ${this.character.job.title}.`);
+      
+      if (this.character.job.stress > 20 && Math.random() < 0.4) {
+        this.modifyStat('vitality', -1);
+      }
+    }
+
+    // 2. Paranormal Gig Payout & Sanity Toll
+    if (this.character.paranormalGig) {
+      const gig = this.character.paranormalGig;
+      this.character.shillings += gig.payoutShillings;
+      this.modifyStat('sanity', -gig.sanityCost);
+      currentYearLog.entries.push(`Collected +${gig.payoutShillings} s. from occult contract (${gig.title}). The ordeal drained -${gig.sanityCost}% Sanity.`);
+    }
+
+    // 3. Modern Living Expenses (Rent, Groceries, Utilities)
+    if (this.character.age >= 18) {
+      const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+      const annualRentCost = Math.round(14000 * country.currency.rate);
+
+      if (this.character.money >= annualRentCost) {
+        this.character.money -= annualRentCost;
+        if (this.character.age === 18) {
+          currentYearLog.entries.push(`Paid first annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
+        }
+      } else {
+        // Poverty strain
+        this.character.money = 0;
+        this.modifyStat('happiness', -10);
+        this.modifyStat('vitality', -2);
+        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety took a toll on health.`);
+      }
+    }
+
+    // Natural vitality erosion
+    this.modifyStat('vitality', (Math.random() > 0.7 ? -1 : 0));
+
+    // 4. Check for Interactive Dilemmas
+    const availableDilemmas = window.INTERACTIVE_DILEMMAS.filter(d => 
       this.character.age >= d.minAge && 
       this.character.age <= d.maxAge && 
       !this.usedDilemmaIds.has(d.id)
     );
 
-    if (availableDilemmas.length > 0 && Math.random() < 0.55) {
+    if (availableDilemmas.length > 0 && Math.random() < 0.6) {
       const chosen = availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
       this.usedDilemmaIds.add(chosen.id);
       this.activeDilemma = chosen;
@@ -559,7 +733,8 @@ class TerribleGame {
       return;
     }
 
-    const ambientPool = window.GAME_DATA.AMBIENT_YEAR_EVENTS.filter(e =>
+    // 5. Ambient Atmospheric Events
+    const ambientPool = window.AMBIENT_YEAR_EVENTS.filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
     );
 
@@ -567,16 +742,17 @@ class TerribleGame {
       const ambient = ambientPool[Math.floor(Math.random() * ambientPool.length)];
       currentYearLog.entries.push(ambient.text);
     } else {
-      currentYearLog.entries.push("Another cold winter passed in uneventful stillness. The house settled deeper into the damp earth.");
+      currentYearLog.entries.push("Another restless year went by under neon billboard glare and rain-slicked asphalt.");
     }
 
-    if (this.character.stats.sanity < 30 && Math.random() < 0.6) {
-      const whispers = [
-        "You woke up with dry mud under your fingernails and the cellar padlock broken from the inside.",
-        "You heard a woman singing backwards hymns from inside the chimney flue at 4 AM.",
-        "Your shadow detached from your feet for three seconds when you crossed the vestibule."
+    // 6. Low Sanity Hallucinations
+    if (this.character.stats.sanity < 30 && Math.random() < 0.65) {
+      const modernWhispers = [
+        "Your phone face-unlock triggered at 3:14 AM while the screen pointed at an empty closet.",
+        "You woke up with black grit under your fingernails and your browser history opened to deleted surveillance footage.",
+        "Your smart TV booted into a static test pattern transmitting the sound of wet footsteps approaching."
       ];
-      currentYearLog.entries.push(whispers[Math.floor(Math.random() * whispers.length)]);
+      currentYearLog.entries.push(modernWhispers[Math.floor(Math.random() * modernWhispers.length)]);
       this.modifyStat('sanity', -3);
     }
 
@@ -635,8 +811,10 @@ class TerribleGame {
 
     if (choice.effects) {
       for (const [stat, delta] of Object.entries(choice.effects)) {
-        if (stat === 'coin') {
-          this.character.coin = Math.max(0, this.character.coin + delta);
+        if (stat === 'money') {
+          this.character.money = Math.max(0, this.character.money + delta);
+        } else if (stat === 'coin' || stat === 'shillings') {
+          this.character.shillings = Math.max(0, this.character.shillings + delta);
         } else {
           this.modifyStat(stat, delta);
         }
@@ -646,6 +824,197 @@ class TerribleGame {
     this.activeDilemma = null;
     this.hideModals();
     this.checkMortality();
+    this.renderAll();
+    this.saveGame();
+  }
+
+  // Careers Modal Logic
+  openCareersModal() {
+    this.dom.careersModal.classList.remove('hidden');
+    this.dom.careersModal.style.display = 'flex';
+    this.renderCareersList();
+  }
+
+  renderCareersList() {
+    // Tab active states
+    if (this.activeCareerTab === 'mundane') {
+      this.dom.tabCareerMundane.className = "py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
+      this.dom.tabCareerParanormal.className = "py-1.5 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
+    } else {
+      this.dom.tabCareerMundane.className = "py-1.5 rounded-lg text-dust hover:text-emerald-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
+      this.dom.tabCareerParanormal.className = "py-1.5 rounded-lg bg-slatecard text-amber-300 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
+    }
+
+    // Update current employment banner
+    if (this.character.job) {
+      const sal = window.getAdjustedSalary(this.character.job.baseSalaryUSD, this.character.countryCode);
+      this.dom.currentMundaneJob.textContent = `${this.character.job.title} (${window.formatMoney(sal, this.character.countryCode)}/yr)`;
+      this.dom.btnQuitMundane.classList.remove('hidden');
+      this.dom.btnQuitMundane.style.display = 'inline-block';
+    } else {
+      this.dom.currentMundaneJob.textContent = "Unemployed (No Income)";
+      this.dom.btnQuitMundane.classList.add('hidden');
+      this.dom.btnQuitMundane.style.display = 'none';
+    }
+
+    this.dom.careersList.innerHTML = '';
+
+    if (this.activeCareerTab === 'mundane') {
+      window.MUNDANE_CAREERS.forEach(job => {
+        const isEmployed = this.character.job && this.character.job.id === job.id;
+        const meetsAge = this.character.age >= job.minAge;
+        const meetsSmarts = this.character.stats.smarts >= job.minSmarts;
+        const isEligible = meetsAge && meetsSmarts;
+        const salary = window.getAdjustedSalary(job.baseSalaryUSD, this.character.countryCode);
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border ${isEmployed ? 'bg-emerald-950/20 border-emerald-700/60' : 'bg-[#121419] border-leadborder'} space-y-2`;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-serif font-bold text-xs text-parchment">${job.title}</h4>
+              <span class="text-[10px] font-mono text-emerald-400 font-bold">${window.formatMoney(salary, this.character.countryCode)} / year</span>
+            </div>
+            <span class="text-[9px] font-mono px-2 py-0.5 rounded ${meetsAge ? 'bg-[#1c202a] text-dust' : 'bg-red-950 text-red-400'}">
+              Min Age: ${job.minAge}
+            </span>
+          </div>
+          <p class="text-[11px] text-dust leading-relaxed">${job.desc}</p>
+          <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
+            <span class="text-dust font-mono">Req: Smarts ${job.minSmarts}%</span>
+            ${isEmployed 
+              ? `<span class="text-emerald-400 font-serif font-bold">Currently Employed</span>`
+              : `<button class="btn-apply-job px-3 py-1 rounded bg-slatecard hover:bg-emerald-900/60 border border-leadborder text-parchment font-serif font-bold disabled:opacity-40 disabled:cursor-not-allowed" ${!isEligible ? 'disabled' : ''}>
+                  ${!meetsAge ? 'Too Young' : (!meetsSmarts ? 'Smarts Required' : 'Apply')}
+                </button>`
+            }
+          </div>
+        `;
+
+        const applyBtn = card.querySelector('.btn-apply-job');
+        if (applyBtn && isEligible) {
+          applyBtn.addEventListener('click', () => {
+            this.applyMundaneJob(job);
+          });
+        }
+
+        this.dom.careersList.appendChild(card);
+      });
+    } else {
+      // Paranormal contracts
+      window.PARANORMAL_CAREERS.forEach(gig => {
+        const isContracted = this.character.paranormalGig && this.character.paranormalGig.id === gig.id;
+        const meetsAge = this.character.age >= gig.minAge;
+        const meetsOccult = this.character.stats.occult >= gig.minOccult;
+        const isEligible = meetsAge && meetsOccult;
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border ${isContracted ? 'bg-amber-950/20 border-amber-600/60' : 'bg-[#121419] border-leadborder'} space-y-2`;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-serif font-bold text-xs text-parchment flex items-center gap-1">
+                <i data-lucide="moon" class="w-3 h-3 text-amber-400"></i>
+                <span>${gig.title}</span>
+              </h4>
+              <span class="text-[10px] font-mono text-amber-400 font-bold">${gig.payoutShillings} s. / contract</span>
+            </div>
+            <span class="text-[9px] font-mono px-2 py-0.5 rounded text-red-400 bg-red-950/40 border border-red-900/50">
+              -${gig.sanityCost}% Sanity/yr
+            </span>
+          </div>
+          <p class="text-[11px] text-dust leading-relaxed">${gig.desc}</p>
+          <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
+            <span class="text-dust font-mono">Req: Occult ${gig.minOccult}%, Age ${gig.minAge}</span>
+            ${isContracted
+              ? `<button class="btn-quit-gig px-2.5 py-1 rounded bg-red-950/80 border border-red-800 text-red-300 font-mono">Cut Ties</button>`
+              : `<button class="btn-apply-gig px-3 py-1 rounded bg-slatecard hover:bg-amber-950/60 border border-leadborder text-amber-300 font-serif font-bold disabled:opacity-40 disabled:cursor-not-allowed" ${!isEligible ? 'disabled' : ''}>
+                  ${!meetsAge ? 'Too Young' : (!meetsOccult ? 'Occult Knowledge Required' : 'Accept Contract')}
+                </button>`
+            }
+          </div>
+        `;
+
+        const applyBtn = card.querySelector('.btn-apply-gig');
+        if (applyBtn && isEligible) {
+          applyBtn.addEventListener('click', () => {
+            this.applyParanormalGig(gig);
+          });
+        }
+
+        const quitBtn = card.querySelector('.btn-quit-gig');
+        if (quitBtn) {
+          quitBtn.addEventListener('click', () => {
+            this.quitParanormalGig();
+          });
+        }
+
+        this.dom.careersList.appendChild(card);
+      });
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  applyMundaneJob(job) {
+    this.character.job = job;
+    window.soundEngine.playClick();
+    const salary = window.getAdjustedSalary(job.baseSalaryUSD, this.character.countryCode);
+    
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`Hired as ${job.title}. Annual salary: ${window.formatMoney(salary, this.character.countryCode)}.`);
+    }
+
+    this.renderCareersList();
+    this.renderAll();
+    this.saveGame();
+  }
+
+  quitMundaneJob() {
+    if (!this.character.job) return;
+    const oldTitle = this.character.job.title;
+    this.character.job = null;
+    window.soundEngine.playClick();
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`Resigned from position as ${oldTitle}.`);
+    }
+
+    this.renderCareersList();
+    this.renderAll();
+    this.saveGame();
+  }
+
+  applyParanormalGig(gig) {
+    this.character.paranormalGig = gig;
+    window.soundEngine.playDread();
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`Signed an occult contract: ${gig.title} (+${gig.payoutShillings} s. / yr).`);
+    }
+
+    this.renderCareersList();
+    this.renderAll();
+    this.saveGame();
+  }
+
+  quitParanormalGig() {
+    if (!this.character.paranormalGig) return;
+    const oldTitle = this.character.paranormalGig.title;
+    this.character.paranormalGig = null;
+    window.soundEngine.playClick();
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`Severed ties with occult handlers (${oldTitle}).`);
+    }
+
+    this.renderCareersList();
     this.renderAll();
     this.saveGame();
   }
@@ -661,11 +1030,11 @@ class TerribleGame {
 
   checkMortality() {
     if (this.character.stats.vitality <= 0) {
-      this.die("Physical Collapse", "Succumbed to fever, bodily injury, and the biting cold. Laid to rest in an unmarked plot behind the stone chapel.");
+      this.die("Physical Collapse", `Succumbed to bodily injury and extreme hypothermia. Pronounced dead at ${this.character.city} General Hospital.`);
     } else if (this.character.stats.sanity <= 0) {
-      this.die("Mind Shattered", "Lost all tether to waking reality. Committed to the subterranean wards of Coldwater Sanitarium, murmuring backwards prayers until the end of your days.");
+      this.die("Mind Shattered", "Total psychological dissolution. Found repeating unrendered unicode strings in a locked room; committed to the state psychiatric ward.");
     } else if (this.character.stats.humanity <= 0) {
-      this.die("Transcendence Beyond Flesh", "Your human soul withered away completely. One dusk, you walked into the black mire and took your place among the unnamable things.");
+      this.die("Transcendence Beyond Flesh", "Humanity expired completely. Walked into the underground subway tunnels at midnight and never returned to the physical world.");
     }
   }
 
@@ -687,7 +1056,7 @@ class TerribleGame {
     this.dom.deathName.textContent = this.character.name;
     this.dom.deathAge.textContent = `Age ${this.character.age} (${this.character.year})`;
     this.dom.deathCause.textContent = this.character.deathCause;
-    this.dom.deathEpitaph.textContent = this.character.epitaph;
+    this.dom.deathEpitaph.textContent = `"${this.character.epitaph}"`;
 
     window.drawGothicAvatar(this.dom.deathAvatarCanvas, {
       ...this.character.avatar,
@@ -699,14 +1068,20 @@ class TerribleGame {
   }
 
   hideModals() {
-    this.dom.dilemmaModal.classList.add('hidden');
-    this.dom.dilemmaModal.style.display = 'none';
-    this.dom.dilemmaBackdrop.classList.add('hidden');
-    this.dom.dilemmaBackdrop.style.display = 'none';
-    this.dom.deathModal.classList.add('hidden');
-    this.dom.deathModal.style.display = 'none';
-    this.dom.godmodeModal.classList.add('hidden');
-    this.dom.godmodeModal.style.display = 'none';
+    const modals = [
+      this.dom.dilemmaModal,
+      this.dom.dilemmaBackdrop,
+      this.dom.deathModal,
+      this.dom.godmodeModal,
+      this.dom.careersModal
+    ];
+
+    modals.forEach(m => {
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    });
   }
 
   renderAll() {
@@ -718,9 +1093,18 @@ class TerribleGame {
     });
 
     this.dom.charName.textContent = this.character.name;
-    this.dom.charTitle.textContent = this.character.statusTitle;
+    
+    // Header job or status title
+    const activeTitle = this.character.job 
+      ? this.character.job.title 
+      : (this.character.paranormalGig ? this.character.paranormalGig.title : this.character.statusTitle);
+    this.dom.charJobTitle.textContent = activeTitle;
+
     this.dom.charAgeYear.textContent = `Age: ${this.character.age} | ${this.character.year}`;
-    this.dom.charCoin.textContent = `${this.character.coin} s.`;
+    
+    // Dual currency display
+    this.dom.charMoney.textContent = window.formatMoney(this.character.money, this.character.countryCode);
+    this.dom.charShillings.textContent = `${this.character.shillings} s.`;
 
     if (this.character.isGodMode) {
       this.dom.btnGameGodmode.classList.remove('hidden');
@@ -763,6 +1147,7 @@ class TerribleGame {
   }
 
   updateStatBar(barEl, valEl, value) {
+    if (!barEl || !valEl) return;
     const clamped = Math.max(0, Math.min(100, Math.round(value || 0)));
     barEl.style.width = `${clamped}%`;
     valEl.textContent = `${clamped}%`;
@@ -784,7 +1169,7 @@ class TerribleGame {
 
       const yearText = document.createElement('span');
       yearText.className = "text-[10px] text-dust font-mono";
-      yearText.textContent = `A.D. ${yearLog.year}`;
+      yearText.textContent = `${yearLog.year}`;
 
       header.appendChild(badge);
       header.appendChild(yearText);
@@ -799,6 +1184,10 @@ class TerribleGame {
         
         if (entry.startsWith('[')) {
           p.className = "relative pl-3 text-red-400 font-medium before:content-['✦'] before:absolute before:left-0 before:text-red-400";
+        } else if (entry.startsWith('Deposited salary') || entry.startsWith('Starting Fiat Balance')) {
+          p.className = "relative pl-3 text-emerald-400 font-medium before:content-['$'] before:absolute before:left-0 before:text-emerald-400";
+        } else if (entry.startsWith('Collected') || entry.startsWith('Secret Paranormal Shillings') || entry.startsWith('Signed an occult contract')) {
+          p.className = "relative pl-3 text-amber-300 font-medium before:content-['🪙'] before:absolute before:left-0 before:text-amber-300";
         }
         
         p.textContent = entry;
@@ -842,9 +1231,25 @@ class TerribleGame {
     this.dom.lblLiveHumanity.textContent = `${stats.humanity}%`;
     this.dom.slideLiveHumanity.oninput = (e) => this.dom.lblLiveHumanity.textContent = `${e.target.value}%`;
 
-    this.dom.slideLiveCoin.value = this.character.coin;
-    this.dom.lblLiveCoin.textContent = `${this.character.coin} s.`;
-    this.dom.slideLiveCoin.oninput = (e) => this.dom.lblLiveCoin.textContent = `${e.target.value} s.`;
+    // Dynamic scale for live money slider
+    const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+    const rate = country.currency.rate;
+    const maxMoney = rate >= 10000 ? 500000000 : (rate >= 100 ? 5000000 : 100000);
+    const step = rate >= 10000 ? 5000000 : (rate >= 100 ? 50000 : 500);
+
+    this.dom.slideLiveMoney.max = `${maxMoney}`;
+    this.dom.slideLiveMoney.step = `${step}`;
+    this.dom.slideLiveMoney.value = this.character.money;
+    this.dom.lblLiveMoney.textContent = window.formatMoney(this.character.money, this.character.countryCode);
+    this.dom.slideLiveMoney.oninput = (e) => {
+      this.dom.lblLiveMoney.textContent = window.formatMoney(parseInt(e.target.value), this.character.countryCode);
+    };
+
+    this.dom.slideLiveShillings.value = this.character.shillings;
+    this.dom.lblLiveShillings.textContent = `${this.character.shillings} s.`;
+    this.dom.slideLiveShillings.oninput = (e) => {
+      this.dom.lblLiveShillings.textContent = `${e.target.value} s.`;
+    };
 
     this.dom.godmodeModal.classList.remove('hidden');
     this.dom.godmodeModal.style.display = 'flex';
@@ -858,7 +1263,8 @@ class TerribleGame {
     this.character.stats.smarts = parseInt(this.dom.slideLiveSmarts.value);
     this.character.stats.occult = parseInt(this.dom.slideLiveOccult.value);
     this.character.stats.humanity = parseInt(this.dom.slideLiveHumanity.value);
-    this.character.coin = parseInt(this.dom.slideLiveCoin.value);
+    this.character.money = parseInt(this.dom.slideLiveMoney.value);
+    this.character.shillings = parseInt(this.dom.slideLiveShillings.value);
 
     this.dom.godmodeModal.classList.add('hidden');
     this.dom.godmodeModal.style.display = 'none';
@@ -896,7 +1302,7 @@ class TerribleGame {
       this.dom.cryptList.innerHTML = `
         <div class="text-center py-12 text-dust">
           <i data-lucide="cross" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-          <p class="font-serif text-sm">The crypt is quiet.</p>
+          <p class="font-serif text-sm">The morgue is quiet.</p>
           <p class="text-[11px] text-dust/70 mt-1">No souls have met their demise in this lineage yet.</p>
         </div>
       `;
@@ -954,7 +1360,7 @@ function initGame() {
   if (!window.game) {
     try {
       window.game = new TerribleGame();
-      console.log('TerribleGame initialized successfully!');
+      console.log('TerribleGame modern engine initialized successfully!');
     } catch (e) {
       console.error('TerribleGame initialization failed:', e);
     }
