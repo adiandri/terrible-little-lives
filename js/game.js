@@ -823,14 +823,14 @@ class TerribleGame {
 
     dilemma.choices.forEach((choice, idx) => {
       const btn = document.createElement('button');
-      btn.className = "w-full text-left p-3.5 rounded-lg bg-[#20232a] hover:bg-[#282c35] active:scale-[0.98] border border-[#2d313b] text-[#e2ded4] text-xs transition-all flex items-start space-x-3";
+      btn.className = "w-full text-left p-3.5 rounded-xl bg-inputbg hover:bg-cardhover active:scale-[0.98] border border-leadborder text-parchment text-xs transition-all flex items-start space-x-3 shadow-xs";
       
       const badge = document.createElement('span');
-      badge.className = "px-2 py-0.5 rounded text-[10px] bg-[#121316] text-[#8c8f9a] font-mono shrink-0";
+      badge.className = "px-2 py-0.5 rounded-md text-[10px] bg-slatecard border border-leadborder text-dust font-mono font-bold shrink-0";
       badge.textContent = `${idx + 1}`;
 
       const textSpan = document.createElement('span');
-      textSpan.className = "leading-relaxed";
+      textSpan.className = "leading-relaxed text-parchment";
       textSpan.textContent = choice.text;
 
       btn.appendChild(badge);
@@ -917,10 +917,14 @@ class TerribleGame {
         const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border ${isEmployed ? 'bg-emerald-950/25 border-emerald-600/70' : 'bg-[#121419] border-leadborder'} space-y-2`;
+        card.className = `p-3.5 rounded-xl border transition-all ${
+          isEmployed 
+            ? 'bg-fiatbg border-fiat/60 ring-1 ring-fiat/40 shadow-sm' 
+            : 'bg-inputbg hover:bg-cardhover border-leadborder shadow-xs'
+        } space-y-2.5`;
 
         const badgesHtml = check.badges.map(b => `
-          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${b.met ? 'bg-[#142018] border-emerald-800/60 text-emerald-300' : 'bg-[#221417] border-red-900/60 text-red-400'}">
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-md font-semibold ${b.met ? 'badge-stat-met' : 'badge-stat-unmet'}">
             ${b.label}
           </span>
         `).join('');
@@ -929,18 +933,20 @@ class TerribleGame {
           <div class="flex justify-between items-start">
             <div class="min-w-0 flex-1 pr-2">
               <h4 class="font-serif font-bold text-xs text-parchment">${job.title}</h4>
-              <span class="text-[10px] font-mono text-emerald-400 font-bold">${window.formatMoney(salary, this.character.countryCode)} / year</span>
+              <span class="text-[11px] font-mono text-fiat font-bold">${window.formatMoney(salary, this.character.countryCode)} / year</span>
             </div>
             <div class="flex flex-wrap justify-end gap-1 shrink-0">
               ${badgesHtml}
             </div>
           </div>
           <p class="text-[11px] text-dust leading-relaxed">${job.desc}</p>
-          <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
-            <span class="text-dust/70 italic">${job.stress > 25 ? '⚠️ High Stress' : 'Standard Routine'}</span>
+          <div class="flex items-center justify-between pt-2 border-t border-leadborder/60 text-[10px]">
+            <span class="text-dust/80 font-mono italic">${job.stress > 25 ? '⚠️ High Stress' : 'Standard Routine'}</span>
             ${isEmployed 
-              ? `<span class="text-emerald-400 font-serif font-bold text-xs">Currently Employed</span>`
-              : `<button class="btn-apply-job px-3 py-1 rounded ${check.eligible ? 'bg-slatecard hover:bg-emerald-900/60 border border-leadborder text-parchment font-serif font-bold active:scale-95' : 'bg-[#15171c] border border-leadborder/30 text-dust/50 cursor-not-allowed'}" ${!check.eligible ? 'disabled' : ''}>
+              ? `<span class="text-fiat font-serif font-bold text-xs">✓ Currently Employed</span>`
+              : `<button class="btn-apply-job px-3 py-1.5 rounded-lg text-xs font-serif font-bold active:scale-95 transition-all ${
+                  check.eligible ? 'btn-apply-active shadow-xs' : 'btn-apply-locked cursor-not-allowed'
+                }" ${!check.eligible ? 'disabled' : ''}>
                   ${check.eligible ? 'Apply' : check.reason}
                 </button>`
             }
@@ -963,10 +969,14 @@ class TerribleGame {
         const check = window.checkJobEligibility(this.character, gig);
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border ${isContracted ? 'bg-amber-950/25 border-amber-600/70' : 'bg-[#121419] border-leadborder'} space-y-2`;
+        card.className = `p-3.5 rounded-xl border transition-all ${
+          isContracted 
+            ? 'bg-shillingbg border-shilling/60 ring-1 ring-shilling/40 shadow-sm' 
+            : 'bg-inputbg hover:bg-cardhover border-leadborder shadow-xs'
+        } space-y-2.5`;
 
         const badgesHtml = check.badges.map(b => `
-          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${b.met ? 'bg-[#201c14] border-amber-800/60 text-amber-300' : 'bg-[#221417] border-red-900/60 text-red-400'}">
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-md font-semibold ${b.met ? 'badge-occult-met' : 'badge-stat-unmet'}">
             ${b.label}
           </span>
         `).join('');
@@ -975,21 +985,23 @@ class TerribleGame {
           <div class="flex justify-between items-start">
             <div class="min-w-0 flex-1 pr-2">
               <h4 class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
-                <i data-lucide="moon" class="w-3 h-3 text-amber-400 shrink-0"></i>
+                <i data-lucide="moon" class="w-3.5 h-3.5 text-shilling shrink-0"></i>
                 <span class="truncate">${gig.title}</span>
               </h4>
-              <span class="text-[10px] font-mono text-amber-400 font-bold">${gig.payoutShillings} s. / contract</span>
+              <span class="text-[11px] font-mono text-shilling font-bold">${gig.payoutShillings} s. / contract</span>
             </div>
             <div class="flex flex-wrap justify-end gap-1 shrink-0">
               ${badgesHtml}
             </div>
           </div>
           <p class="text-[11px] text-dust leading-relaxed">${gig.desc}</p>
-          <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
-            <span class="text-red-400/90 font-mono">-${gig.sanityCost}% Sanity/yr</span>
+          <div class="flex items-center justify-between pt-2 border-t border-leadborder/60 text-[10px]">
+            <span class="text-crimson font-mono font-medium">-${gig.sanityCost}% Sanity/yr</span>
             ${isContracted
-              ? `<button class="btn-quit-gig px-2.5 py-1 rounded bg-red-950/80 border border-red-800 text-red-300 font-mono text-[10px]">Cut Ties</button>`
-              : `<button class="btn-apply-gig px-3 py-1 rounded ${check.eligible ? 'bg-slatecard hover:bg-amber-950/60 border border-leadborder text-amber-300 font-serif font-bold active:scale-95' : 'bg-[#15171c] border border-leadborder/30 text-dust/50 cursor-not-allowed'}" ${!check.eligible ? 'disabled' : ''}>
+              ? `<button class="btn-quit-gig px-2.5 py-1 rounded-md border border-red-500/40 bg-red-500/10 text-red-600 hover:bg-red-500/20 dark:text-red-300 font-mono text-[10px] transition-colors">Cut Ties</button>`
+              : `<button class="btn-apply-gig px-3 py-1.5 rounded-lg text-xs font-serif font-bold active:scale-95 transition-all text-shilling ${
+                  check.eligible ? 'btn-apply-active shadow-xs' : 'btn-apply-locked cursor-not-allowed'
+                }" ${!check.eligible ? 'disabled' : ''}>
                   ${check.eligible ? 'Accept Contract' : check.reason}
                 </button>`
             }
@@ -1225,7 +1237,7 @@ class TerribleGame {
       header.className = "flex items-center justify-between border-b border-leadborder/70 pb-1.5 mb-2";
 
       const badge = document.createElement('span');
-      badge.className = "text-[10px] font-serif font-bold text-parchment tracking-wider uppercase bg-[#0f1013] px-2 py-0.5 rounded border border-leadborder";
+      badge.className = "text-[10px] font-serif font-bold text-parchment tracking-wider uppercase bg-inputbg px-2 py-0.5 rounded-md border border-leadborder shadow-xs";
       badge.textContent = `AGE ${yearLog.age}`;
 
       const yearText = document.createElement('span');
@@ -1237,18 +1249,18 @@ class TerribleGame {
       card.appendChild(header);
 
       const list = document.createElement('div');
-      list.className = "space-y-1.5 text-xs text-[#d3cec4] leading-relaxed";
+      list.className = "space-y-1.5 text-xs text-parchment leading-relaxed";
 
       yearLog.entries.forEach(entry => {
         const p = document.createElement('p');
-        p.className = "relative pl-3 before:content-['•'] before:absolute before:left-0 before:text-[#7c6396]";
+        p.className = "relative pl-3 before:content-['•'] before:absolute before:left-0 before:text-dust/70";
         
         if (entry.startsWith('[')) {
-          p.className = "relative pl-3 text-red-400 font-medium before:content-['✦'] before:absolute before:left-0 before:text-red-400";
+          p.className = "relative pl-3 text-crimson font-medium before:content-['✦'] before:absolute before:left-0 before:text-crimson";
         } else if (entry.startsWith('Deposited salary') || entry.startsWith('Starting Fiat Balance')) {
-          p.className = "relative pl-3 text-emerald-400 font-medium before:content-['$'] before:absolute before:left-0 before:text-emerald-400";
+          p.className = "relative pl-3 text-fiat font-semibold before:content-['$'] before:absolute before:left-0 before:text-fiat";
         } else if (entry.startsWith('Collected') || entry.startsWith('Secret Paranormal Shillings') || entry.startsWith('Signed an occult contract')) {
-          p.className = "relative pl-3 text-amber-300 font-medium before:content-['🪙'] before:absolute before:left-0 before:text-amber-300";
+          p.className = "relative pl-3 text-shilling font-semibold before:content-['🪙'] before:absolute before:left-0 before:text-shilling";
         }
         
         p.textContent = entry;
@@ -1385,7 +1397,7 @@ class TerribleGame {
       card.className = "bg-slatecard border border-leadborder rounded-xl p-3 flex items-start space-x-3";
 
       const canvasBox = document.createElement('div');
-      canvasBox.className = "w-12 h-12 rounded-lg overflow-hidden border border-[#85754e] shrink-0 bg-[#0f1013]";
+      canvasBox.className = "w-12 h-12 rounded-lg overflow-hidden border border-[#85754e] shrink-0 bg-inputbg";
       const canvas = document.createElement('canvas');
       canvas.width = 72;
       canvas.height = 72;
@@ -1400,7 +1412,7 @@ class TerribleGame {
           <h4 class="font-serif font-bold text-xs text-parchment truncate">${item.name}</h4>
           <span class="text-[10px] text-crimson font-mono font-bold">Age ${item.age}</span>
         </div>
-        <p class="text-[11px] text-red-400/90 font-medium mt-0.5">${item.cause}</p>
+        <p class="text-[11px] text-crimson font-medium mt-0.5">${item.cause}</p>
         <p class="text-[10px] text-dust italic line-clamp-2 mt-1 leading-snug">"${item.epitaph}"</p>
       `;
       card.appendChild(info);
@@ -1497,7 +1509,7 @@ class TerribleGame {
         </div>
         <div class="shrink-0 pl-1">
           ${isActive 
-            ? `<span class="p-1 rounded-full bg-emerald-950/60 border border-emerald-700 text-emerald-400 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
+            ? `<span class="p-1 rounded-full bg-emerald-500/20 border border-emerald-600/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
             : `<span class="text-[10px] font-mono text-dust/60">Select</span>`
           }
         </div>

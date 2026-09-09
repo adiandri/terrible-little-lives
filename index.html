@@ -122,6 +122,57 @@
     input[type=range] {
       accent-color: var(--accent-primary);
     }
+
+    /* Adaptive Badges & Cards for Light & Dark Modes */
+    .badge-stat-met {
+      background-color: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #047857;
+    }
+    [data-mode="dark"] .badge-stat-met {
+      background-color: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .badge-stat-unmet {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #b91c1c;
+    }
+    [data-mode="dark"] .badge-stat-unmet {
+      background-color: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .badge-occult-met {
+      background-color: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #b45309;
+    }
+    [data-mode="dark"] .badge-occult-met {
+      background-color: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    .btn-apply-active {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-main);
+      color: var(--text-primary);
+    }
+    .btn-apply-active:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-apply-locked {
+      background-color: var(--bg-track);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      opacity: 0.65;
+    }
   </style>
 </head>
 
@@ -525,21 +576,21 @@
         <!-- Row 2: Dual Currency Display (Spacious, Uncramped Ledger) -->
         <div class="grid grid-cols-2 gap-2">
           <!-- Mundane Fiat Badge -->
-          <div class="px-2.5 py-1.5 rounded-lg bg-fiatbg border border-emerald-700/50 flex items-center justify-between shadow-xs" title="Mundane Fiat Currency">
+          <div class="px-2.5 py-1.5 rounded-lg bg-fiatbg border border-fiat/40 flex items-center justify-between shadow-xs" title="Mundane Fiat Currency">
             <div class="flex items-center space-x-1.5 min-w-0">
-              <i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+              <i data-lucide="banknote" class="w-3.5 h-3.5 text-fiat shrink-0"></i>
               <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Mundane</span>
             </div>
-            <span id="char-money" class="text-xs font-mono font-bold text-emerald-400 truncate pl-1">$0</span>
+            <span id="char-money" class="text-xs font-mono font-bold text-fiat truncate pl-1">$0</span>
           </div>
 
           <!-- Paranormal Shillings Badge -->
-          <div class="px-2.5 py-1.5 rounded-lg bg-shillingbg border border-amber-700/50 flex items-center justify-between shadow-xs" title="Paranormal Shillings">
+          <div class="px-2.5 py-1.5 rounded-lg bg-shillingbg border border-shilling/40 flex items-center justify-between shadow-xs" title="Paranormal Shillings">
             <div class="flex items-center space-x-1.5 min-w-0">
-              <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+              <i data-lucide="coins" class="w-3.5 h-3.5 text-shilling shrink-0"></i>
               <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Shillings</span>
             </div>
-            <span id="char-shillings" class="text-xs font-mono font-bold text-amber-400 truncate pl-1">0 s.</span>
+            <span id="char-shillings" class="text-xs font-mono font-bold text-shilling truncate pl-1">0 s.</span>
           </div>
         </div>
       </header>
@@ -716,7 +767,7 @@
             <span class="text-[10px] uppercase text-dust font-mono block">Current Daytime Job:</span>
             <span id="txt-current-mundane-job" class="font-serif font-bold text-parchment">Unemployed</span>
           </div>
-          <button id="btn-quit-mundane" class="hidden text-[10px] font-mono px-2 py-1 rounded bg-red-950/60 border border-red-800 text-red-300 hover:bg-red-900">
+          <button id="btn-quit-mundane" class="hidden text-[10px] font-mono px-2 py-1 rounded-md border border-red-500/40 bg-red-500/10 text-red-600 hover:bg-red-500/20 dark:text-red-300 transition-colors">
             Resign
           </button>
         </div>
@@ -842,7 +893,7 @@
           </div>
         </div>
 
-        <button id="btn-apply-live-godmode" class="w-full py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-black font-serif font-bold text-xs uppercase tracking-wider">
+        <button id="btn-apply-live-godmode" class="w-full py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-stone-950 font-serif font-black text-xs uppercase tracking-wider transition-all">
           Apply Live Tweaks
         </button>
       </div>
@@ -898,10 +949,10 @@
 
         <div class="bg-slatecard border border-leadborder rounded-xl p-4 text-left space-y-2">
           <div class="text-[10px] font-mono text-dust uppercase">Determined Cause:</div>
-          <p id="death-cause" class="text-xs font-semibold text-red-300">Mind Shattered</p>
+          <p id="death-cause" class="text-xs font-bold text-crimson">Mind Shattered</p>
           <div class="h-px bg-leadborder my-2"></div>
           <div class="text-[10px] font-mono text-dust uppercase">Public Police Record:</div>
-          <p id="death-epitaph" class="text-xs text-[#c2beb4] italic leading-relaxed">
+          <p id="death-epitaph" class="text-xs text-parchment/90 italic leading-relaxed">
             "Found in a locked high-rise apartment holding an analog camera, repeating unrendered glyphs until vital signs ceased."
           </p>
         </div>
