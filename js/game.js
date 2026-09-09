@@ -1,4 +1,4 @@
-// Game Engine for Terrible Little Lives
+// Game Engine with Screen Router, Modular Avatar Customizer, God Mode, and Crypt System
 
 class TerribleGame {
   constructor() {
@@ -6,24 +6,116 @@ class TerribleGame {
     this.logs = [];
     this.activeDilemma = null;
     this.usedDilemmaIds = new Set();
+    this.crypt = this.loadCrypt();
+    
+    // Creator draft state
+    this.creatorState = {
+      avatar: window.generateRandomAvatar(),
+      name: { first: "Silas", surname: "Marrow" },
+      gender: "Male",
+      birthplace: window.GOTHIC_DATA.birthplaces[0],
+      trait: window.GOTHIC_DATA.traits[0],
+      isGodMode: true,
+      stats: {
+        happiness: 75,
+        smarts: 80,
+        looks: 65,
+        vitality: 90,
+        sanity: 85,
+        occult: 25,
+        humanity: 90
+      },
+      coin: 150
+    };
+
     this.initElements();
     this.bindEvents();
-    this.loadOrNewGame();
+    this.populateCreatorDropdowns();
+    this.syncCreatorUI();
+    this.checkResumeAvailability();
+    this.showScreen('screen-landing');
   }
 
   initElements() {
     this.dom = {
       phoneScreen: document.getElementById('phone-screen'),
+
+      // Screens
+      screenLanding: document.getElementById('screen-landing'),
+      screenCreator: document.getElementById('screen-creator'),
+      screenGame: document.getElementById('screen-game'),
+      screenCrypt: document.getElementById('screen-crypt'),
+
+      // Landing UI
+      btnLandingResume: document.getElementById('btn-landing-resume'),
+      labelResumeLife: document.getElementById('label-resume-life'),
+      btnToCreator: document.getElementById('btn-to-creator'),
+      btnQuickLife: document.getElementById('btn-quick-life'),
+      btnToCrypt: document.getElementById('btn-to-crypt'),
+      btnLandingMute: document.getElementById('btn-landing-mute'),
+      landingMuteIcon: document.getElementById('landing-mute-icon'),
+
+      // Creator UI
+      creatorAvatarCanvas: document.getElementById('creator-avatar-canvas'),
+      btnRandomAvatar: document.getElementById('btn-random-avatar'),
+      btnCreatorRandomizeAll: document.getElementById('btn-creator-randomize-all'),
+      btnCreatorBack: document.getElementById('btn-creator-back'),
+      tabAppearance: document.getElementById('tab-appearance'),
+      tabIdentity: document.getElementById('tab-identity'),
+      tabGodmode: document.getElementById('tab-godmode'),
+      panelAppearance: document.getElementById('panel-appearance'),
+      panelIdentity: document.getElementById('panel-identity'),
+      panelGodmode: document.getElementById('panel-godmode'),
+
+      // Appearance Selectors
+      selSkin: document.getElementById('sel-skin'),
+      selEyeShape: document.getElementById('sel-eye-shape'),
+      selEyeColor: document.getElementById('sel-eye-color'),
+      selHairStyle: document.getElementById('sel-hair-style'),
+      selHairColor: document.getElementById('sel-hair-color'),
+      selMark: document.getElementById('sel-mark'),
+
+      // Identity Selectors
+      inputFirstName: document.getElementById('input-first-name'),
+      inputSurname: document.getElementById('input-surname'),
+      btnRandomName: document.getElementById('btn-random-name'),
+      selGender: document.getElementById('sel-gender'),
+      selBirthplace: document.getElementById('sel-birthplace'),
+      selTrait: document.getElementById('sel-trait'),
+      traitDesc: document.getElementById('trait-desc'),
+
+      // God Mode Controls
+      chkGodmode: document.getElementById('chk-godmode'),
+      godmodeSliders: document.getElementById('godmode-sliders'),
+      sliderHappiness: document.getElementById('slider-god-happiness'),
+      labelHappiness: document.getElementById('label-god-happiness'),
+      sliderSmarts: document.getElementById('slider-god-smarts'),
+      labelSmarts: document.getElementById('label-god-smarts'),
+      sliderLooks: document.getElementById('slider-god-looks'),
+      labelLooks: document.getElementById('label-god-looks'),
+      sliderVitality: document.getElementById('slider-god-vitality'),
+      labelVitality: document.getElementById('label-god-vitality'),
+      sliderSanity: document.getElementById('slider-god-sanity'),
+      labelSanity: document.getElementById('label-god-sanity'),
+      sliderOccult: document.getElementById('slider-god-occult'),
+      labelOccult: document.getElementById('label-god-occult'),
+      sliderHumanity: document.getElementById('slider-god-humanity'),
+      labelHumanity: document.getElementById('label-god-humanity'),
+      sliderCoin: document.getElementById('slider-god-coin'),
+      labelCoin: document.getElementById('label-god-coin'),
+      btnEmbark: document.getElementById('btn-embark'),
+
+      // Main Game Header
+      gameHeaderAvatar: document.getElementById('game-header-avatar'),
       charName: document.getElementById('char-name'),
       charTitle: document.getElementById('char-title'),
       charAgeYear: document.getElementById('char-age-year'),
       charCoin: document.getElementById('char-coin'),
-      logFeed: document.getElementById('log-feed'),
-      btnEndure: document.getElementById('btn-endure'),
-      btnRestart: document.getElementById('btn-restart'),
+      btnGameGodmode: document.getElementById('btn-game-godmode'),
       btnMute: document.getElementById('btn-mute'),
       muteIcon: document.getElementById('mute-icon'),
-      
+      btnToMenu: document.getElementById('btn-to-menu'),
+
       // Stat bars
       barVitality: document.getElementById('bar-vitality'),
       valVitality: document.getElementById('val-vitality'),
@@ -31,8 +123,21 @@ class TerribleGame {
       valSanity: document.getElementById('val-sanity'),
       barOccult: document.getElementById('bar-occult'),
       valOccult: document.getElementById('val-occult'),
+      barHappiness: document.getElementById('bar-happiness'),
+      valHappiness: document.getElementById('val-happiness'),
+      barSmarts: document.getElementById('bar-smarts'),
+      valSmarts: document.getElementById('val-smarts'),
       barHumanity: document.getElementById('bar-humanity'),
       valHumanity: document.getElementById('val-humanity'),
+
+      // Log feed & Endure button
+      logFeed: document.getElementById('log-feed'),
+      btnEndure: document.getElementById('btn-endure'),
+
+      // Crypt Screen
+      cryptList: document.getElementById('crypt-list'),
+      btnCryptBack: document.getElementById('btn-crypt-back'),
+      btnClearCrypt: document.getElementById('btn-clear-crypt'),
 
       // Dilemma Sheet
       dilemmaModal: document.getElementById('dilemma-modal'),
@@ -43,62 +148,344 @@ class TerribleGame {
 
       // Post-Mortem Modal
       deathModal: document.getElementById('death-modal'),
+      deathAvatarCanvas: document.getElementById('death-avatar-canvas'),
       deathName: document.getElementById('death-name'),
       deathAge: document.getElementById('death-age'),
       deathCause: document.getElementById('death-cause'),
       deathEpitaph: document.getElementById('death-epitaph'),
-      btnNewLife: document.getElementById('btn-new-life')
+      btnNewLife: document.getElementById('btn-new-life'),
+      btnDeathToCrypt: document.getElementById('btn-death-to-crypt'),
+
+      // Live Mid-Game God Mode Inspector
+      godmodeModal: document.getElementById('godmode-modal'),
+      btnCloseGodmodeModal: document.getElementById('btn-close-godmode-modal'),
+      btnApplyLiveGodmode: document.getElementById('btn-apply-live-godmode'),
+      slideLiveVitality: document.getElementById('slide-live-vitality'),
+      lblLiveVitality: document.getElementById('lbl-live-vitality'),
+      slideLiveSanity: document.getElementById('slide-live-sanity'),
+      lblLiveSanity: document.getElementById('lbl-live-sanity'),
+      slideLiveHappiness: document.getElementById('slide-live-happiness'),
+      lblLiveHappiness: document.getElementById('lbl-live-happiness'),
+      slideLiveSmarts: document.getElementById('slide-live-smarts'),
+      lblLiveSmarts: document.getElementById('lbl-live-smarts'),
+      slideLiveOccult: document.getElementById('slide-live-occult'),
+      lblLiveOccult: document.getElementById('lbl-live-occult'),
+      slideLiveHumanity: document.getElementById('slide-live-humanity'),
+      lblLiveHumanity: document.getElementById('lbl-live-humanity'),
+      slideLiveCoin: document.getElementById('slide-live-coin'),
+      lblLiveCoin: document.getElementById('lbl-live-coin')
     };
   }
 
-  bindEvents() {
-    this.dom.btnEndure.addEventListener('click', () => this.endureYear());
-    this.dom.btnRestart.addEventListener('click', () => {
-      if (confirm("Abandon this cursed life and begin anew?")) {
-        this.newGame();
-      }
-    });
-    this.dom.btnNewLife.addEventListener('click', () => this.newGame());
-    this.dom.btnMute.addEventListener('click', () => this.toggleMute());
-  }
+  showScreen(screenId) {
+    const screens = [
+      this.dom.screenLanding,
+      this.dom.screenCreator,
+      this.dom.screenGame,
+      this.dom.screenCrypt
+    ];
+    screens.forEach(s => s.classList.add('hidden'));
 
-  toggleMute() {
-    const isMuted = window.soundEngine.toggleMute();
-    this.dom.muteIcon.setAttribute('data-lucide', isMuted ? 'volume-x' : 'volume-2');
+    const target = document.getElementById(screenId);
+    if (target) {
+      target.classList.remove('hidden');
+    }
+
+    if (screenId === 'screen-creator') {
+      this.renderCreatorAvatar();
+    } else if (screenId === 'screen-game' && this.character) {
+      this.renderAll();
+    } else if (screenId === 'screen-crypt') {
+      this.renderCrypt();
+    } else if (screenId === 'screen-landing') {
+      this.checkResumeAvailability();
+    }
+
     if (window.lucide) window.lucide.createIcons();
   }
 
-  loadOrNewGame() {
+  bindEvents() {
+    // Navigation
+    this.dom.btnToCreator.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.showScreen('screen-creator');
+    });
+
+    this.dom.btnQuickLife.addEventListener('click', () => {
+      window.soundEngine.playTick();
+      this.startNewLife(null);
+    });
+
+    this.dom.btnToCrypt.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.showScreen('screen-crypt');
+    });
+
+    this.dom.btnCreatorBack.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.showScreen('screen-landing');
+    });
+
+    this.dom.btnCryptBack.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.showScreen('screen-landing');
+    });
+
+    this.dom.btnToMenu.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.saveGame();
+      this.showScreen('screen-landing');
+    });
+
+    this.dom.btnLandingResume.addEventListener('click', () => {
+      window.soundEngine.playTick();
+      this.showScreen('screen-game');
+    });
+
+    // Audio Toggles
+    const toggleAudio = () => {
+      const isMuted = window.soundEngine.toggleMute();
+      const iconName = isMuted ? 'volume-x' : 'volume-2';
+      this.dom.muteIcon.setAttribute('data-lucide', iconName);
+      this.dom.landingMuteIcon.setAttribute('data-lucide', iconName);
+      if (window.lucide) window.lucide.createIcons();
+    };
+    this.dom.btnMute.addEventListener('click', toggleAudio);
+    this.dom.btnLandingMute.addEventListener('click', toggleAudio);
+
+    // Creator Tabs
+    this.dom.tabAppearance.addEventListener('click', () => this.switchCreatorTab('appearance'));
+    this.dom.tabIdentity.addEventListener('click', () => this.switchCreatorTab('identity'));
+    this.dom.tabGodmode.addEventListener('click', () => this.switchCreatorTab('godmode'));
+
+    // Modular Appearance Selectors Change
+    const updateAvatarFromSelects = () => {
+      this.creatorState.avatar = {
+        skin: this.dom.selSkin.value,
+        eyeShape: this.dom.selEyeShape.value,
+        eyeColor: this.dom.selEyeColor.value,
+        hairStyle: this.dom.selHairStyle.value,
+        hairColor: this.dom.selHairColor.value,
+        mark: this.dom.selMark.value
+      };
+      this.renderCreatorAvatar();
+    };
+
+    [this.dom.selSkin, this.dom.selEyeShape, this.dom.selEyeColor,
+     this.dom.selHairStyle, this.dom.selHairColor, this.dom.selMark].forEach(sel => {
+      sel.addEventListener('change', updateAvatarFromSelects);
+    });
+
+    // Randomize appearance button
+    this.dom.btnRandomAvatar.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.creatorState.avatar = window.generateRandomAvatar();
+      this.syncCreatorUI();
+      this.renderCreatorAvatar();
+    });
+
+    // Randomize name
+    this.dom.btnRandomName.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.randomizeName();
+    });
+
+    // Randomize entire soul
+    this.dom.btnCreatorRandomizeAll.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.creatorState.avatar = window.generateRandomAvatar();
+      this.randomizeName();
+      this.syncCreatorUI();
+      this.renderCreatorAvatar();
+    });
+
+    // God Mode Toggle
+    this.dom.chkGodmode.addEventListener('change', (e) => {
+      this.creatorState.isGodMode = e.target.checked;
+      this.dom.godmodeSliders.style.opacity = e.target.checked ? '1' : '0.4';
+      this.dom.godmodeSliders.style.pointerEvents = e.target.checked ? 'auto' : 'none';
+    });
+
+    // Sliders Live Number Updates
+    const bindSlider = (slider, label, key, suffix = '%') => {
+      slider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        label.textContent = `${val}${suffix}`;
+        if (key === 'coin') {
+          this.creatorState.coin = val;
+        } else {
+          this.creatorState.stats[key] = val;
+        }
+      });
+    };
+
+    bindSlider(this.dom.sliderHappiness, this.dom.labelHappiness, 'happiness');
+    bindSlider(this.dom.sliderSmarts, this.dom.labelSmarts, 'smarts');
+    bindSlider(this.dom.sliderLooks, this.dom.labelLooks, 'looks');
+    bindSlider(this.dom.sliderVitality, this.dom.labelVitality, 'vitality');
+    bindSlider(this.dom.sliderSanity, this.dom.labelSanity, 'sanity');
+    bindSlider(this.dom.sliderOccult, this.dom.labelOccult, 'occult');
+    bindSlider(this.dom.sliderHumanity, this.dom.labelHumanity, 'humanity');
+    bindSlider(this.dom.sliderCoin, this.dom.labelCoin, 'coin', ' s.');
+
+    // Trait change description
+    this.dom.selTrait.addEventListener('change', (e) => {
+      const trait = window.GOTHIC_DATA.traits.find(t => t.id === e.target.value);
+      if (trait) {
+        this.creatorState.trait = trait;
+        this.dom.traitDesc.textContent = trait.desc;
+      }
+    });
+
+    // Embark Button
+    this.dom.btnEmbark.addEventListener('click', () => {
+      window.soundEngine.playTick();
+      const first = this.dom.inputFirstName.value.trim() || "Silas";
+      const last = this.dom.inputSurname.value.trim() || "Marrow";
+      const config = {
+        name: `${first} ${last}`,
+        gender: this.dom.selGender.value,
+        birthplace: this.dom.selBirthplace.value,
+        trait: this.creatorState.trait,
+        avatar: this.creatorState.avatar,
+        isGodMode: this.creatorState.isGodMode,
+        stats: { ...this.creatorState.stats },
+        coin: this.creatorState.coin
+      };
+      this.startNewLife(config);
+    });
+
+    // Gameplay Controls
+    this.dom.btnEndure.addEventListener('click', () => this.endureYear());
+
+    // Live God Mode Inspector In-Game
+    this.dom.btnGameGodmode.addEventListener('click', () => this.openLiveGodmodeInspector());
+    this.dom.btnCloseGodmodeModal.addEventListener('click', () => {
+      this.dom.godmodeModal.classList.add('hidden');
+    });
+    this.dom.btnApplyLiveGodmode.addEventListener('click', () => this.applyLiveGodmodeTweaks());
+
+    // Death Modal actions
+    this.dom.btnNewLife.addEventListener('click', () => {
+      this.hideModals();
+      this.showScreen('screen-creator');
+    });
+    this.dom.btnDeathToCrypt.addEventListener('click', () => {
+      this.hideModals();
+      this.showScreen('screen-crypt');
+    });
+
+    // Crypt clear
+    this.dom.btnClearCrypt.addEventListener('click', () => {
+      if (confirm("Scatter the ashes of all deceased souls in the Crypt?")) {
+        this.crypt = [];
+        localStorage.removeItem('TLL_CRYPT');
+        this.renderCrypt();
+      }
+    });
+  }
+
+  populateCreatorDropdowns() {
+    // Birthplaces
+    this.dom.selBirthplace.innerHTML = '';
+    window.GOTHIC_DATA.birthplaces.forEach(bp => {
+      const opt = document.createElement('option');
+      opt.value = bp;
+      opt.textContent = bp;
+      this.dom.selBirthplace.appendChild(opt);
+    });
+
+    // Traits
+    this.dom.selTrait.innerHTML = '';
+    window.GOTHIC_DATA.traits.forEach(tr => {
+      const opt = document.createElement('option');
+      opt.value = tr.id;
+      opt.textContent = tr.name;
+      this.dom.selTrait.appendChild(opt);
+    });
+    this.dom.traitDesc.textContent = window.GOTHIC_DATA.traits[0].desc;
+  }
+
+  randomizeName() {
+    const isMale = this.dom.selGender.value === 'Male';
+    const first = isMale 
+      ? window.getRandomElement(window.GOTHIC_DATA.firstNamesMale)
+      : window.getRandomElement(window.GOTHIC_DATA.firstNamesFemale);
+    const surname = window.getRandomElement(window.GOTHIC_DATA.surnames);
+    this.dom.inputFirstName.value = first;
+    this.dom.inputSurname.value = surname;
+    this.creatorState.name = { first, surname };
+  }
+
+  syncCreatorUI() {
+    // Sync Selects
+    this.dom.selSkin.value = this.creatorState.avatar.skin;
+    this.dom.selEyeShape.value = this.creatorState.avatar.eyeShape;
+    this.dom.selEyeColor.value = this.creatorState.avatar.eyeColor;
+    this.dom.selHairStyle.value = this.creatorState.avatar.hairStyle;
+    this.dom.selHairColor.value = this.creatorState.avatar.hairColor;
+    this.dom.selMark.value = this.creatorState.avatar.mark;
+
+    // Names
+    if (!this.dom.inputFirstName.value) {
+      this.randomizeName();
+    }
+  }
+
+  switchCreatorTab(tab) {
+    const tabs = [this.dom.tabAppearance, this.dom.tabIdentity, this.dom.tabGodmode];
+    const panels = [this.dom.panelAppearance, this.dom.panelIdentity, this.dom.panelGodmode];
+
+    tabs.forEach(t => {
+      t.classList.remove('bg-slatecard', 'text-parchment', 'text-amber-300');
+      t.classList.add('text-dust');
+    });
+    panels.forEach(p => p.classList.add('hidden'));
+
+    if (tab === 'appearance') {
+      this.dom.tabAppearance.classList.add('bg-slatecard', 'text-parchment');
+      this.dom.tabAppearance.classList.remove('text-dust');
+      this.dom.panelAppearance.classList.remove('hidden');
+    } else if (tab === 'identity') {
+      this.dom.tabIdentity.classList.add('bg-slatecard', 'text-parchment');
+      this.dom.tabIdentity.classList.remove('text-dust');
+      this.dom.panelIdentity.classList.remove('hidden');
+    } else if (tab === 'godmode') {
+      this.dom.tabGodmode.classList.add('bg-slatecard', 'text-amber-300');
+      this.dom.tabGodmode.classList.remove('text-dust');
+      this.dom.panelGodmode.classList.remove('hidden');
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  renderCreatorAvatar() {
+    window.drawGothicAvatar(this.dom.creatorAvatarCanvas, {
+      ...this.creatorState.avatar,
+      age: 18
+    });
+  }
+
+  checkResumeAvailability() {
     const saved = localStorage.getItem('TLL_SAVE');
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        this.character = data.character;
-        this.logs = data.logs || [];
-        this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
-        this.renderAll();
-        if (!this.character.isAlive) {
-          this.showDeathModal();
+        if (data.character && data.character.isAlive) {
+          this.character = data.character;
+          this.logs = data.logs || [];
+          this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
+          this.dom.labelResumeLife.textContent = `RESUME LIFE: ${this.character.name.toUpperCase()} (AGE ${this.character.age})`;
+          this.dom.btnLandingResume.classList.remove('hidden');
+          return;
         }
-        return;
-      } catch (e) {
-        console.error("Failed to parse save game", e);
-      }
+      } catch (e) {}
     }
-    this.newGame();
+    this.dom.btnLandingResume.classList.add('hidden');
   }
 
-  saveGame() {
-    const data = {
-      character: this.character,
-      logs: this.logs,
-      usedDilemmaIds: Array.from(this.usedDilemmaIds)
-    };
-    localStorage.setItem('TLL_SAVE', JSON.stringify(data));
-  }
-
-  newGame() {
-    this.character = window.generateCharacter();
+  startNewLife(customConfig = null) {
+    this.character = window.generateCharacter(customConfig);
     this.usedDilemmaIds.clear();
     this.logs = [
       {
@@ -106,22 +493,16 @@ class TerribleGame {
         year: this.character.year,
         entries: [
           `Born at ${this.character.birthplace}.`,
-          this.character.origin
+          this.character.origin,
+          `Omen Trait: ${this.character.trait.name} - ${this.character.trait.desc}`
         ]
       }
     ];
 
     this.activeDilemma = null;
     this.hideModals();
-    this.renderAll();
     this.saveGame();
-    window.soundEngine.playTick();
-  }
-
-  hideModals() {
-    this.dom.dilemmaModal.classList.add('hidden');
-    this.dom.dilemmaBackdrop.classList.add('hidden');
-    this.dom.deathModal.classList.add('hidden');
+    this.showScreen('screen-game');
   }
 
   endureYear() {
@@ -134,7 +515,7 @@ class TerribleGame {
     this.character.year += 1;
 
     // Update life stage title
-    if (this.character.age <= 3) this.character.statusTitle = "Infant";
+    if (this.character.age <= 2) this.character.statusTitle = "Infant";
     else if (this.character.age <= 6) this.character.statusTitle = "Toddler";
     else if (this.character.age <= 12) this.character.statusTitle = "Child";
     else if (this.character.age <= 17) this.character.statusTitle = "Adolescent";
@@ -143,21 +524,19 @@ class TerribleGame {
     // Minor baseline metabolic drift
     this.modifyStat('vitality', (Math.random() > 0.65 ? -1 : 0));
 
-    // Annual log bucket
     const currentYearLog = {
       age: this.character.age,
       year: this.character.year,
       entries: []
     };
 
-    // Check for random interactive dilemma
+    // Check for interactive dilemma
     const availableDilemmas = window.GAME_DATA.INTERACTIVE_DILEMMAS.filter(d => 
       this.character.age >= d.minAge && 
       this.character.age <= d.maxAge && 
       !this.usedDilemmaIds.has(d.id)
     );
 
-    // 50% chance of dilemma if available
     if (availableDilemmas.length > 0 && Math.random() < 0.55) {
       const chosen = availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
       this.usedDilemmaIds.add(chosen.id);
@@ -170,7 +549,7 @@ class TerribleGame {
       return;
     }
 
-    // Otherwise, check for ambient flavor entry
+    // Otherwise ambient event
     const ambientPool = window.GAME_DATA.AMBIENT_YEAR_EVENTS.filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
     );
@@ -182,13 +561,12 @@ class TerribleGame {
       currentYearLog.entries.push("Another cold winter passed in uneventful stillness. The house settled deeper into the damp earth.");
     }
 
-    // Low sanity hallucinations in the log
+    // Low sanity whispers
     if (this.character.stats.sanity < 30 && Math.random() < 0.6) {
       const whispers = [
-        "You woke up with dry mud under your fingernails and the front gate unlocked.",
-        "You heard a woman singing hymns from inside the chimney flue at 4 AM.",
-        "Your shadow detached from your feet for a few seconds when you crossed the vestibule.",
-        "A pale hand tapped against the frosted glass of your bedroom window."
+        "You woke up with dry mud under your fingernails and the cellar padlock broken from the inside.",
+        "You heard a woman singing backwards hymns from inside the chimney flue at 4 AM.",
+        "Your shadow detached from your feet for three seconds when you crossed the vestibule."
       ];
       currentYearLog.entries.push(whispers[Math.floor(Math.random() * whispers.length)]);
       this.modifyStat('sanity', -3);
@@ -210,10 +588,10 @@ class TerribleGame {
 
     dilemma.choices.forEach((choice, idx) => {
       const btn = document.createElement('button');
-      btn.className = "w-full text-left p-3.5 rounded-lg bg-[#20232a] hover:bg-[#282c35] active:scale-[0.98] border border-[#2d313b] text-[#e2ded4] text-sm transition-all duration-150 flex items-start space-x-3";
+      btn.className = "w-full text-left p-3.5 rounded-lg bg-[#20232a] hover:bg-[#282c35] active:scale-[0.98] border border-[#2d313b] text-[#e2ded4] text-xs transition-all flex items-start space-x-3";
       
       const badge = document.createElement('span');
-      badge.className = "px-2 py-0.5 rounded text-xs bg-[#121316] text-[#8c8f9a] font-mono shrink-0";
+      badge.className = "px-2 py-0.5 rounded text-[10px] bg-[#121316] text-[#8c8f9a] font-mono shrink-0";
       badge.textContent = `${idx + 1}`;
 
       const textSpan = document.createElement('span');
@@ -245,7 +623,6 @@ class TerribleGame {
       latestLog.entries.push(choice.outcome);
     }
 
-    // Apply stat effects
     if (choice.effects) {
       for (const [stat, delta] of Object.entries(choice.effects)) {
         if (stat === 'coin') {
@@ -264,7 +641,7 @@ class TerribleGame {
   }
 
   modifyStat(stat, delta) {
-    if (!this.character.stats[stat] !== undefined) {
+    if (this.character.stats[stat] !== undefined) {
       this.character.stats[stat] = Math.max(0, Math.min(100, this.character.stats[stat] + delta));
       if (delta < -10) {
         window.soundEngine.playWhisper();
@@ -287,6 +664,9 @@ class TerribleGame {
     this.character.deathCause = cause;
     this.character.epitaph = epitaph;
 
+    // Save to crypt
+    this.addToCrypt(this.character);
+
     window.soundEngine.playDeath();
     if (navigator.vibrate) navigator.vibrate([150, 100, 350]);
 
@@ -299,22 +679,50 @@ class TerribleGame {
     this.dom.deathAge.textContent = `Age ${this.character.age} (${this.character.year})`;
     this.dom.deathCause.textContent = this.character.deathCause;
     this.dom.deathEpitaph.textContent = this.character.epitaph;
+
+    window.drawGothicAvatar(this.dom.deathAvatarCanvas, {
+      ...this.character.avatar,
+      age: this.character.age
+    });
+
     this.dom.deathModal.classList.remove('hidden');
+  }
+
+  hideModals() {
+    this.dom.dilemmaModal.classList.add('hidden');
+    this.dom.dilemmaBackdrop.classList.add('hidden');
+    this.dom.deathModal.classList.add('hidden');
+    this.dom.godmodeModal.classList.add('hidden');
   }
 
   renderAll() {
     if (!this.character) return;
 
+    // Render Avatar in header
+    window.drawGothicAvatar(this.dom.gameHeaderAvatar, {
+      ...this.character.avatar,
+      age: this.character.age
+    });
+
     // Header info
     this.dom.charName.textContent = this.character.name;
     this.dom.charTitle.textContent = this.character.statusTitle;
-    this.dom.charAgeYear.textContent = `Age: ${this.character.age} | Year: ${this.character.year}`;
+    this.dom.charAgeYear.textContent = `Age: ${this.character.age} | ${this.character.year}`;
     this.dom.charCoin.textContent = `${this.character.coin} s.`;
+
+    // God mode inspector toggle button in top bar
+    if (this.character.isGodMode) {
+      this.dom.btnGameGodmode.classList.remove('hidden');
+    } else {
+      this.dom.btnGameGodmode.classList.add('hidden');
+    }
 
     // Stats
     this.updateStatBar(this.dom.barVitality, this.dom.valVitality, this.character.stats.vitality);
     this.updateStatBar(this.dom.barSanity, this.dom.valSanity, this.character.stats.sanity);
     this.updateStatBar(this.dom.barOccult, this.dom.valOccult, this.character.stats.occult);
+    this.updateStatBar(this.dom.barHappiness, this.dom.valHappiness, this.character.stats.happiness);
+    this.updateStatBar(this.dom.barSmarts, this.dom.valSmarts, this.character.stats.smarts);
     this.updateStatBar(this.dom.barHumanity, this.dom.valHumanity, this.character.stats.humanity);
 
     // Sanity visual jitter
@@ -333,21 +741,19 @@ class TerribleGame {
       this.dom.btnEndure.disabled = false;
       this.dom.btnEndure.classList.remove('opacity-40', 'cursor-not-allowed');
       this.dom.btnEndure.innerHTML = `
-        <span class="font-serif tracking-widest text-sm">ENDURE YEAR</span>
-        <span class="text-xs text-[#8c8f9a] font-sans block mt-0.5">[ +1 Year ]</span>
+        <span class="font-serif tracking-widest text-sm font-bold group-hover:text-red-300">ENDURE YEAR</span>
+        <span class="text-[10px] text-dust font-sans block tracking-wider">[ +1 Year ]</span>
       `;
     }
 
-    // Render Log Feed
     this.renderLogs();
-
-    // Recreate lucide icons if present
     if (window.lucide) window.lucide.createIcons();
   }
 
   updateStatBar(barEl, valEl, value) {
-    barEl.style.width = `${value}%`;
-    valEl.textContent = `${Math.round(value)}%`;
+    const clamped = Math.max(0, Math.min(100, Math.round(value || 0)));
+    barEl.style.width = `${clamped}%`;
+    valEl.textContent = `${clamped}%`;
   }
 
   renderLogs() {
@@ -355,17 +761,17 @@ class TerribleGame {
 
     this.logs.forEach(yearLog => {
       const card = document.createElement('div');
-      card.className = "bg-[#181a1f] border border-[#262930] rounded-xl p-3.5 mb-3 shadow-sm transition-all";
+      card.className = "bg-slatecard border border-leadborder rounded-xl p-3 shadow-sm";
 
       const header = document.createElement('div');
-      header.className = "flex items-center justify-between border-b border-[#262930]/80 pb-1.5 mb-2";
+      header.className = "flex items-center justify-between border-b border-leadborder/70 pb-1.5 mb-2";
 
       const badge = document.createElement('span');
-      badge.className = "text-[11px] font-serif font-bold text-[#e2ded4] tracking-wider uppercase bg-[#0f1013] px-2 py-0.5 rounded border border-[#262930]";
+      badge.className = "text-[10px] font-serif font-bold text-parchment tracking-wider uppercase bg-[#0f1013] px-2 py-0.5 rounded border border-leadborder";
       badge.textContent = `AGE ${yearLog.age}`;
 
       const yearText = document.createElement('span');
-      yearText.className = "text-[11px] text-[#8c8f9a] font-mono";
+      yearText.className = "text-[10px] text-dust font-mono";
       yearText.textContent = `A.D. ${yearLog.year}`;
 
       header.appendChild(badge);
@@ -379,9 +785,8 @@ class TerribleGame {
         const p = document.createElement('p');
         p.className = "relative pl-3 before:content-['•'] before:absolute before:left-0 before:text-[#7c6396]";
         
-        // Minor highlight for decisions
         if (entry.startsWith('[')) {
-          p.className = "relative pl-3 text-[#991b1b] font-medium before:content-['✦'] before:absolute before:left-0 before:text-[#991b1b]";
+          p.className = "relative pl-3 text-red-400 font-medium before:content-['✦'] before:absolute before:left-0 before:text-red-400";
         }
         
         p.textContent = entry;
@@ -392,10 +797,145 @@ class TerribleGame {
       this.dom.logFeed.appendChild(card);
     });
 
-    // Auto-scroll to bottom of feed
     setTimeout(() => {
       this.dom.logFeed.scrollTop = this.dom.logFeed.scrollHeight;
     }, 50);
+  }
+
+  // Live Mid-Game God Mode Inspector
+  openLiveGodmodeInspector() {
+    if (!this.character) return;
+    const stats = this.character.stats;
+
+    this.dom.slideLiveVitality.value = stats.vitality;
+    this.dom.lblLiveVitality.textContent = `${stats.vitality}%`;
+    this.dom.slideLiveVitality.oninput = (e) => this.dom.lblLiveVitality.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveSanity.value = stats.sanity;
+    this.dom.lblLiveSanity.textContent = `${stats.sanity}%`;
+    this.dom.slideLiveSanity.oninput = (e) => this.dom.lblLiveSanity.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveHappiness.value = stats.happiness;
+    this.dom.lblLiveHappiness.textContent = `${stats.happiness}%`;
+    this.dom.slideLiveHappiness.oninput = (e) => this.dom.lblLiveHappiness.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveSmarts.value = stats.smarts;
+    this.dom.lblLiveSmarts.textContent = `${stats.smarts}%`;
+    this.dom.slideLiveSmarts.oninput = (e) => this.dom.lblLiveSmarts.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveOccult.value = stats.occult;
+    this.dom.lblLiveOccult.textContent = `${stats.occult}%`;
+    this.dom.slideLiveOccult.oninput = (e) => this.dom.lblLiveOccult.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveHumanity.value = stats.humanity;
+    this.dom.lblLiveHumanity.textContent = `${stats.humanity}%`;
+    this.dom.slideLiveHumanity.oninput = (e) => this.dom.lblLiveHumanity.textContent = `${e.target.value}%`;
+
+    this.dom.slideLiveCoin.value = this.character.coin;
+    this.dom.lblLiveCoin.textContent = `${this.character.coin} s.`;
+    this.dom.slideLiveCoin.oninput = (e) => this.dom.lblLiveCoin.textContent = `${e.target.value} s.`;
+
+    this.dom.godmodeModal.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  applyLiveGodmodeTweaks() {
+    this.character.stats.vitality = parseInt(this.dom.slideLiveVitality.value);
+    this.character.stats.sanity = parseInt(this.dom.slideLiveSanity.value);
+    this.character.stats.happiness = parseInt(this.dom.slideLiveHappiness.value);
+    this.character.stats.smarts = parseInt(this.dom.slideLiveSmarts.value);
+    this.character.stats.occult = parseInt(this.dom.slideLiveOccult.value);
+    this.character.stats.humanity = parseInt(this.dom.slideLiveHumanity.value);
+    this.character.coin = parseInt(this.dom.slideLiveCoin.value);
+
+    this.dom.godmodeModal.classList.add('hidden');
+    this.renderAll();
+    this.saveGame();
+    window.soundEngine.playClick();
+  }
+
+  // Crypt System
+  loadCrypt() {
+    try {
+      return JSON.parse(localStorage.getItem('TLL_CRYPT') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  addToCrypt(character) {
+    const record = {
+      name: character.name,
+      age: character.age,
+      year: character.year,
+      cause: character.deathCause,
+      epitaph: character.epitaph,
+      avatar: character.avatar,
+      timestamp: Date.now()
+    };
+    this.crypt.unshift(record);
+    if (this.crypt.length > 20) this.crypt.pop();
+    localStorage.setItem('TLL_CRYPT', JSON.stringify(this.crypt));
+  }
+
+  renderCrypt() {
+    this.dom.cryptList.innerHTML = '';
+    if (this.crypt.length === 0) {
+      this.dom.cryptList.innerHTML = `
+        <div class="text-center py-12 text-dust">
+          <i data-lucide="cross" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p class="font-serif text-sm">The crypt is quiet.</p>
+          <p class="text-[11px] text-dust/70 mt-1">No souls have met their demise in this lineage yet.</p>
+        </div>
+      `;
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    this.crypt.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = "bg-slatecard border border-leadborder rounded-xl p-3 flex items-start space-x-3";
+
+      const canvasBox = document.createElement('div');
+      canvasBox.className = "w-12 h-12 rounded-lg overflow-hidden border border-[#85754e] shrink-0 bg-[#0f1013]";
+      const canvas = document.createElement('canvas');
+      canvas.width = 72;
+      canvas.height = 72;
+      canvas.className = "w-full h-full";
+      canvasBox.appendChild(canvas);
+      card.appendChild(canvasBox);
+
+      const info = document.createElement('div');
+      info.className = "flex-1 min-w-0";
+      info.innerHTML = `
+        <div class="flex justify-between items-baseline">
+          <h4 class="font-serif font-bold text-xs text-parchment truncate">${item.name}</h4>
+          <span class="text-[10px] text-crimson font-mono font-bold">Age ${item.age}</span>
+        </div>
+        <p class="text-[11px] text-red-400/90 font-medium mt-0.5">${item.cause}</p>
+        <p class="text-[10px] text-dust italic line-clamp-2 mt-1 leading-snug">"${item.epitaph}"</p>
+      `;
+      card.appendChild(info);
+
+      this.dom.cryptList.appendChild(card);
+
+      // Render mini avatar
+      window.drawGothicAvatar(canvas, {
+        ...item.avatar,
+        age: item.age
+      });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  saveGame() {
+    const data = {
+      character: this.character,
+      logs: this.logs,
+      usedDilemmaIds: Array.from(this.usedDilemmaIds)
+    };
+    localStorage.setItem('TLL_SAVE', JSON.stringify(data));
   }
 }
 
