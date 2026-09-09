@@ -225,6 +225,10 @@ class TerribleGame {
       btnCloseKinDetail: document.getElementById('btn-close-kin-detail'),
       kinDetailTitle: document.getElementById('kin-detail-title'),
       kinDetailDossier: document.getElementById('kin-detail-dossier'),
+      btnKinCuddle: document.getElementById('btn-kin-cuddle'),
+      btnKinBabble: document.getElementById('btn-kin-babble'),
+      btnKinFeed: document.getElementById('btn-kin-feed'),
+      btnKinPeekaboo: document.getElementById('btn-kin-peekaboo'),
       btnKinSpendTime: document.getElementById('btn-kin-spend-time'),
       btnKinConverse: document.getElementById('btn-kin-converse'),
       btnKinCompliment: document.getElementById('btn-kin-compliment'),
@@ -563,6 +567,18 @@ class TerribleGame {
     // Kin Detail Modal Controls
     if (this.dom.btnCloseKinDetail) {
       this.dom.btnCloseKinDetail.addEventListener('click', () => this.closeKinDetailModal());
+    }
+    if (this.dom.btnKinCuddle) {
+      this.dom.btnKinCuddle.addEventListener('click', () => this.handleKinAction('cuddle'));
+    }
+    if (this.dom.btnKinBabble) {
+      this.dom.btnKinBabble.addEventListener('click', () => this.handleKinAction('babble'));
+    }
+    if (this.dom.btnKinFeed) {
+      this.dom.btnKinFeed.addEventListener('click', () => this.handleKinAction('feed_milk'));
+    }
+    if (this.dom.btnKinPeekaboo) {
+      this.dom.btnKinPeekaboo.addEventListener('click', () => this.handleKinAction('peekaboo'));
     }
     if (this.dom.btnKinSpendTime) {
       this.dom.btnKinSpendTime.addEventListener('click', () => this.handleKinAction('spend_time'));
@@ -1443,13 +1459,17 @@ class TerribleGame {
   }
 
   getAllKinList() {
-    if (!this.character.kin) return [];
+    if (!this.character || !this.character.kin) return [];
     const { parents = [], siblings = [], grandparents = [], friends = [] } = this.character.kin;
+    parents.forEach(p => { if (!p.category) p.category = 'family'; });
+    siblings.forEach(s => { if (!s.category) s.category = 'family'; });
+    grandparents.forEach(g => { if (!g.category) g.category = 'family'; });
+    friends.forEach(f => { if (!f.category) f.category = 'friend'; });
     return [
-      ...parents.map(p => ({ ...p, category: 'family' })),
-      ...siblings.map(s => ({ ...s, category: 'family' })),
-      ...grandparents.map(g => ({ ...g, category: 'family' })),
-      ...friends.map(f => ({ ...f, category: 'friend' }))
+      ...parents,
+      ...siblings,
+      ...grandparents,
+      ...friends
     ];
   }
 
@@ -1543,10 +1563,11 @@ class TerribleGame {
   }
 
   openKinDetailModal(person) {
-    this.selectedKin = person;
+    const livePerson = this.getAllKinList().find(p => p.id === person.id) || person;
+    this.selectedKin = livePerson;
     this.dom.kinDetailModal.classList.remove('hidden');
     this.dom.kinDetailModal.style.display = 'flex';
-    this.renderKinDetail(person);
+    this.renderKinDetail(livePerson);
   }
 
   closeKinDetailModal() {
@@ -1624,7 +1645,7 @@ class TerribleGame {
 
       if (title) {
         if (!title.dataset.baseTitle) {
-          title.dataset.baseTitle = title.textContent.replace(/\s*\(\d+\/\d+\)$/, '');
+          title.dataset.baseTitle = title.textContent.replace(/\s*\(\d+\/\d+\)$/, '').replace(/🔒\s*/, '').trim();
         }
         title.textContent = `${title.dataset.baseTitle} (${count}/${maxQuota})`;
       }
@@ -1632,27 +1653,121 @@ class TerribleGame {
       if (noEnergy || isCapped) {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.classList.remove('hover:bg-cardhover');
         if (desc) {
           desc.textContent = isCapped ? doneLabel : "Exhausted for this year (0 Energy left).";
         }
       } else {
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('hover:bg-cardhover');
         if (desc) desc.textContent = normalLabel;
       }
     };
 
-    setupBtn(this.dom.btnKinSpendTime, getCount('spentTime'), 6, "Bond through shared moments and build closeness. (1 Action)", "Already spent plenty of time together this year (6/6).");
-    setupBtn(this.dom.btnKinConverse, getCount('talked'), 10, "Exchange thoughts, seek advice, or probe their worldview. (1 Action)", "Give them some space for now (10/10 talks reached).");
-    setupBtn(this.dom.btnKinCompliment, getCount('complimented'), 6, "Praise their character, appearance, or resilience. (1 Action)", "Flattered enough for this year (6/6 compliments).");
-    setupBtn(this.dom.btnKinGift, getCount('gifted'), 6, "Offer a thoughtful gift, treat, or dark relic. (1 Action)", "No more gifts needed for this year (6/6 given).");
-    
-    // Ask money only for parents / grandparents
-    const canAskMoney = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
+    const setupLockedBtn = (btn, baseTitle, lockMsg, unlockAge) => {
+      if (!btn) return;
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+      btn.classList.remove('hover:bg-cardhover');
+      
+      const title = btn.querySelector('.text-xs');
+      const desc = btn.querySelector('.text-\\[10px\\]');
+      if (title) {
+        title.dataset.baseTitle = baseTitle;
+        title.innerHTML = `<span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i> ${baseTitle} <span class="text-[9px] font-mono font-normal text-amber-400/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">Unlocks Age ${unlockAge}</span></span>`;
+      }
+      if (desc) {
+        desc.textContent = lockMsg;
+      }
+    };
+
+    const age = this.character.age;
+    const isInfantToddler = age <= 4;
+    const isFamily = person.category === 'family';
+    const isParentOrGrand = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
+
+    // 1. Cuddle & Be Held (Ages 0 - 4, Family)
+    if (this.dom.btnKinCuddle) {
+      if (isInfantToddler && isFamily) {
+        this.dom.btnKinCuddle.classList.remove('hidden');
+        this.dom.btnKinCuddle.style.display = 'flex';
+        setupBtn(this.dom.btnKinCuddle, getCount('cuddled'), 6, "Nuzzle into their warm embrace for comfort and security. (1 Action)", "Already cuddled plenty this year (6/6).");
+      } else {
+        this.dom.btnKinCuddle.classList.add('hidden');
+        this.dom.btnKinCuddle.style.display = 'none';
+      }
+    }
+
+    // 2. Babble & First Words (Ages 0 - 4, All)
+    if (this.dom.btnKinBabble) {
+      if (isInfantToddler) {
+        this.dom.btnKinBabble.classList.remove('hidden');
+        this.dom.btnKinBabble.style.display = 'flex';
+        setupBtn(this.dom.btnKinBabble, getCount('babbled'), 6, "Point tiny fingers and babble playful sounds, practicing speech. (1 Action)", "Voice needs rest for this year (6/6).");
+      } else {
+        this.dom.btnKinBabble.classList.add('hidden');
+        this.dom.btnKinBabble.style.display = 'none';
+      }
+    }
+
+    // 3. Drink Warm Milk / Bottle (Ages 0 - 3, Parents/Grandparents)
+    if (this.dom.btnKinFeed) {
+      if (age <= 3 && isParentOrGrand) {
+        this.dom.btnKinFeed.classList.remove('hidden');
+        this.dom.btnKinFeed.style.display = 'flex';
+        setupBtn(this.dom.btnKinFeed, getCount('fedMilk'), 6, "Be gently cradle-fed warm milk or formula. (1 Action)", "Tummy full of milk for this year (6/6).");
+      } else {
+        this.dom.btnKinFeed.classList.add('hidden');
+        this.dom.btnKinFeed.style.display = 'none';
+      }
+    }
+
+    // 4. Play Peek-a-Boo & Giggle (Ages 0 - 4, All)
+    if (this.dom.btnKinPeekaboo) {
+      if (isInfantToddler) {
+        this.dom.btnKinPeekaboo.classList.remove('hidden');
+        this.dom.btnKinPeekaboo.style.display = 'flex';
+        setupBtn(this.dom.btnKinPeekaboo, getCount('peekaboo'), 6, "Giggle and clap as they hide behind hands or blankets. (1 Action)", "Giggled enough at peek-a-boo for this year (6/6).");
+      } else {
+        this.dom.btnKinPeekaboo.classList.add('hidden');
+        this.dom.btnKinPeekaboo.style.display = 'none';
+      }
+    }
+
+    // Spend Time Together (Universal)
+    setupBtn(this.dom.btnKinSpendTime, getCount('spentTime'), 6, isInfantToddler ? "Bond through quiet moments together. (1 Action)" : "Bond through shared moments and build closeness. (1 Action)", "Already spent plenty of time together this year (6/6).");
+
+    // Deep Conversation (Requires Age 4)
+    if (age < 4) {
+      setupLockedBtn(this.dom.btnKinConverse, "Deep Conversation", "Too young for complex philosophical dialogue. Babble or play peek-a-boo instead.", 4);
+    } else {
+      setupBtn(this.dom.btnKinConverse, getCount('talked'), 10, "Exchange thoughts, seek advice, or probe their worldview. (1 Action)", "Give them some space for now (10/10 talks reached).");
+    }
+
+    // Pay Compliment (Requires Age 4)
+    if (age < 4) {
+      setupLockedBtn(this.dom.btnKinCompliment, "Pay Compliment", "Too young to formulate articulate compliments (Unlocks at Age 4).", 4);
+    } else {
+      setupBtn(this.dom.btnKinCompliment, getCount('complimented'), 6, "Praise their character, appearance, or resilience. (1 Action)", "Flattered enough for this year (6/6 compliments).");
+    }
+
+    // Give Present / Gift (Requires Age 5)
+    if (age < 5) {
+      setupLockedBtn(this.dom.btnKinGift, "Give Present / Gift", "Too young to purchase or offer gifts (Unlocks at Age 5).", 5);
+    } else {
+      setupBtn(this.dom.btnKinGift, getCount('gifted'), 6, "Offer a thoughtful gift, treat, or dark relic. (1 Action)", "No more gifts needed for this year (6/6 given).");
+    }
+
+    // Ask money only for parents / grandparents (Requires Age 5)
     if (this.dom.btnKinAskMoney) {
-      if (!canAskMoney) {
+      if (!isParentOrGrand) {
         this.dom.btnKinAskMoney.classList.add('hidden');
         this.dom.btnKinAskMoney.style.display = 'none';
+      } else if (age < 5) {
+        this.dom.btnKinAskMoney.classList.remove('hidden');
+        this.dom.btnKinAskMoney.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinAskMoney, "Ask For Money / Allowance", "Too young to understand or ask for pocket money (Unlocks at Age 5).", 5);
       } else {
         this.dom.btnKinAskMoney.classList.remove('hidden');
         this.dom.btnKinAskMoney.style.display = 'flex';
@@ -1684,7 +1799,12 @@ class TerribleGame {
       }
     }
 
-    setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
+    // Argue (Requires Age 5)
+    if (age < 5) {
+      setupLockedBtn(this.dom.btnKinArgue, "Argue / Dispute", "Too young to engage in bitter domestic arguments (Unlocks at Age 5).", 5);
+    } else {
+      setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
+    }
 
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -1702,10 +1822,18 @@ class TerribleGame {
 
     // Modal-based interactive flows
     if (actionType === 'ask_money') {
+      if (this.character.age < 5) {
+        alert("You are too young to ask for pocket money! Unlocks at Age 5.");
+        return;
+      }
       this.openAskMoneyModal(person);
       return;
     }
     if (actionType === 'gift') {
+      if (this.character.age < 5) {
+        alert("You are too young to give gifts! Unlocks at Age 5.");
+        return;
+      }
       this.openGiftModal(person);
       return;
     }
@@ -1715,15 +1843,35 @@ class TerribleGame {
     if (actionType === 'spend_time') {
       result = window.spendTimeToKin(person, this.character);
     } else if (actionType === 'converse') {
+      if (this.character.age < 4) {
+        alert("You are too young for complex conversations. Babble or play peek-a-boo instead!");
+        return;
+      }
       result = window.talkToKin(person, this.character);
     } else if (actionType === 'compliment') {
+      if (this.character.age < 4) {
+        alert("You are too young to give compliments! Unlocks at Age 4.");
+        return;
+      }
       result = window.complimentKin(person, this.character);
     } else if (actionType === 'investigate') {
       result = window.investigateKin(person, this.character);
     } else if (actionType === 'tribute') {
       result = window.offerTributeToEntity(person, this.character);
     } else if (actionType === 'argue') {
+      if (this.character.age < 5) {
+        alert("You are too young to argue! Unlocks at Age 5.");
+        return;
+      }
       result = window.argueWithKin(person, this.character);
+    } else if (actionType === 'cuddle') {
+      result = window.cuddleKin(person, this.character);
+    } else if (actionType === 'babble') {
+      result = window.babbleToKin(person, this.character);
+    } else if (actionType === 'feed_milk') {
+      result = window.feedMilkFromKin(person, this.character);
+    } else if (actionType === 'peekaboo') {
+      result = window.peekabooWithKin(person, this.character);
     }
 
     if (!result || !result.success) {
@@ -1768,6 +1916,7 @@ class TerribleGame {
     }
 
     this.renderKinDetail(person);
+    this.renderKinList(this.activeKinFilter);
 
     // Show interactive feedback dialog modal
     const actionTitles = {
@@ -1776,7 +1925,11 @@ class TerribleGame {
       compliment: 'Warm Flattery',
       investigate: 'Occult Observation',
       tribute: 'Dark Tribute Offered',
-      argue: 'Heated Dispute'
+      argue: 'Heated Dispute',
+      cuddle: 'Nurturing Cuddle',
+      babble: 'Baby First Words',
+      feed_milk: 'Warm Bottle Feeding',
+      peekaboo: 'Playful Peek-a-Boo'
     };
     const actionIcons = {
       spend_time: 'heart-handshake',
@@ -1784,7 +1937,11 @@ class TerribleGame {
       compliment: 'sparkles',
       investigate: 'eye',
       tribute: 'skull',
-      argue: 'flame'
+      argue: 'flame',
+      cuddle: 'heart',
+      babble: 'message-circle',
+      feed_milk: 'cup-soda',
+      peekaboo: 'smile'
     };
     const actionColors = {
       spend_time: 'text-rose-400',
@@ -1792,12 +1949,28 @@ class TerribleGame {
       compliment: 'text-amber-400',
       investigate: 'text-purple-400',
       tribute: 'text-rose-500',
-      argue: 'text-orange-500'
+      argue: 'text-orange-500',
+      cuddle: 'text-rose-400',
+      babble: 'text-sky-400',
+      feed_milk: 'text-amber-400',
+      peekaboo: 'text-emerald-400'
+    };
+    const actionTags = {
+      spend_time: 'FAMILY BOND',
+      converse: 'CONVERSATION',
+      compliment: 'WARM FLATTERY',
+      investigate: 'OBSERVATION',
+      tribute: 'DARK TRIBUTE',
+      argue: 'HEATED DISPUTE',
+      cuddle: 'NURTURING EMBRACE',
+      babble: 'BABY FIRST WORDS',
+      feed_milk: 'BOTTLE FEEDING',
+      peekaboo: 'PLAYFUL GIGGLES'
     };
 
     this.openFeedbackModal({
-      tag: actionType.toUpperCase().replace('_', ' '),
-      title: `${person.name}: ${actionTitles[actionType] || 'Interaction'}`,
+      tag: actionTags[actionType] || actionType.toUpperCase().replace('_', ' '),
+      title: `${person.name} (${actionTitles[actionType] || 'Interaction'})`,
       icon: actionIcons[actionType] || 'message-square',
       iconColor: actionColors[actionType] || 'text-amber-400',
       body: result.message,
@@ -2015,6 +2188,7 @@ class TerribleGame {
     this.renderAll();
     this.saveGame();
     this.renderKinDetail(person);
+    this.renderKinList(this.activeKinFilter);
 
     // Show interactive feedback dialog modal
     this.openFeedbackModal({
@@ -2200,6 +2374,7 @@ class TerribleGame {
     this.renderAll();
     this.saveGame();
     this.renderKinDetail(person);
+    this.renderKinList(this.activeKinFilter);
 
     const giftIcons = {
       nature: "🌿", handmade: "🧶", found: "🪨", creative: "🎨", food: "🥐",

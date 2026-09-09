@@ -59,7 +59,11 @@ function createEmptyActionsDone() {
     askedMoney: 0,
     argued: 0,
     investigated: 0,
-    tribute: 0
+    tribute: 0,
+    cuddled: 0,
+    babbled: 0,
+    fedMilk: 0,
+    peekaboo: 0
   };
 }
 
@@ -84,6 +88,7 @@ function generateFamily(character) {
   const parents = [
     {
       id: 'father_' + Date.now() + '_1',
+      category: 'family',
       role: 'Father',
       name: `${dadFirst} ${surname}`,
       gender: 'Male',
@@ -103,6 +108,7 @@ function generateFamily(character) {
     },
     {
       id: 'mother_' + Date.now() + '_2',
+      category: 'family',
       role: 'Mother',
       name: `${momFirst} ${surname}`,
       gender: 'Female',
@@ -134,6 +140,7 @@ function generateFamily(character) {
 
     siblings.push({
       id: 'sibling_' + Date.now() + '_' + i,
+      category: 'family',
       role,
       name: `${sFirst} ${surname}`,
       gender: isMale ? 'Male' : 'Female',
@@ -160,6 +167,7 @@ function generateFamily(character) {
 
     grandparents.push({
       id: 'grandparent_' + Date.now(),
+      category: 'family',
       role: isGrandpa ? (isMaternal ? 'Maternal Grandfather' : 'Paternal Grandfather') : (isMaternal ? 'Maternal Grandmother' : 'Paternal Grandmother'),
       name: `${gFirst} ${gSurname}`,
       gender: isGrandpa ? 'Male' : 'Female',
@@ -201,6 +209,7 @@ function generateNewFriend(character, context = 'Neighborhood') {
 
   return {
     id: 'friend_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+    category: 'friend',
     role: 'Friend',
     name: `${first} ${surname}`,
     gender: isMale ? 'Male' : 'Female',
@@ -603,6 +612,111 @@ function offerTributeToEntity(person, character) {
   };
 }
 
+function cuddleKin(person, character) {
+  const count = getActionCount(person, 'cuddled');
+  if (count >= 6) {
+    return { success: false, reason: "You have already cuddled plenty this year." };
+  }
+  person.actionsDone.cuddled = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 10) : (count <= 2 ? 6 : 3);
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = "";
+  if (person.role.includes('Mother')) {
+    message = `You curled into your mother's warm embrace. She stroked your hair and rocked you gently until your breathing steadied.`;
+  } else if (person.role.includes('Father')) {
+    message = `Your father hoisted you onto his shoulder, patting your back with his large, calloused hand until you relaxed.`;
+  } else if (person.role.includes('Grand')) {
+    message = `${person.name} held you close in their knitted cardigan, humming a faint antique tune that smelled of lavender and old wool.`;
+  } else {
+    message = `You leaned into ${person.name}'s side. They held your hand gently and let you rest against their arm.`;
+  }
+
+  return {
+    success: true,
+    message,
+    effects: {
+      relationship: relGain,
+      happiness: +8,
+      vitality: +3,
+      sanity: +3
+    }
+  };
+}
+
+function babbleToKin(person, character) {
+  const count = getActionCount(person, 'babbled');
+  if (count >= 6) {
+    return { success: false, reason: "You've babbled enough for now; your tiny voice needs rest." };
+  }
+  person.actionsDone.babbled = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 8) : (count <= 2 ? 5 : 2);
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = "";
+  if (person.entityType && person.entityType !== 'human' && person.isRevealed) {
+    message = `You pointed your tiny finger at ${person.name} and let out rhythmic clicks. Its pupils dilated in cold, amused fascination.`;
+  } else if (person.role.includes('Mother') || person.role.includes('Father')) {
+    const words = ["'Ma-ma'", "'Da-da'", "'Mi-lk'", "'No-no'", "'Up-up'"];
+    const chosen = window.getRandomElement(words);
+    message = `You pointed at ${person.name} and tried to say ${chosen}. Their eyes lit up with pride as they gently coached your syllables.`;
+  } else {
+    message = `You babbled animatedly at ${person.name}, waving your arms. They smiled and repeated silly words back to you.`;
+  }
+
+  return {
+    success: true,
+    message,
+    effects: {
+      relationship: relGain,
+      smarts: +5,
+      happiness: +5
+    }
+  };
+}
+
+function feedMilkFromKin(person, character) {
+  const count = getActionCount(person, 'fedMilk');
+  if (count >= 6) {
+    return { success: false, reason: "Your tummy is completely full of warm milk for now." };
+  }
+  person.actionsDone.fedMilk = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 3) + 7) : (count <= 2 ? 5 : 2);
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = `${person.name} prepared a warm bottle and gently supported your head while you drank, rocking you until you were full and sleepy.`;
+  return {
+    success: true,
+    message,
+    effects: {
+      relationship: relGain,
+      vitality: +6,
+      sanity: +4
+    }
+  };
+}
+
+function peekabooWithKin(person, character) {
+  const count = getActionCount(person, 'peekaboo');
+  if (count >= 6) {
+    return { success: false, reason: "You've giggled yourself tired playing peek-a-boo for now." };
+  }
+  person.actionsDone.peekaboo = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 8) : (count <= 2 ? 5 : 2);
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = `${person.name} covered their face with both hands, waited two seconds, and shouted 'PEEK-A-BOO!' with a funny grin, sending you into fits of giggles.`;
+  return {
+    success: true,
+    message,
+    effects: {
+      relationship: relGain,
+      happiness: +8,
+      vitality: +2
+    }
+  };
+}
+
 // --- Annual Tick Simulation for Kin ---
 
 function tickKinYear(character) {
@@ -718,3 +832,7 @@ window.argueWithKin = argueWithKin;
 window.investigateKin = investigateKin;
 window.offerTributeToEntity = offerTributeToEntity;
 window.tickKinYear = tickKinYear;
+window.cuddleKin = cuddleKin;
+window.babbleToKin = babbleToKin;
+window.feedMilkFromKin = feedMilkFromKin;
+window.peekabooWithKin = peekabooWithKin;
