@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Themes Management Engine (Runs synchronously to prevent FOUC) -->
-  <script src="js/themes.js?v=16"></script>
+  <script src="js/themes.js?v=17"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -123,29 +123,50 @@
       accent-color: var(--accent-primary);
     }
 
-    /* Typography Text Size Scaling */
-    html[data-text-size="small"] {
-      font-size: 14px;
-    }
-    html[data-text-size="normal"] {
+    /* Typography Text Size Scaling (Applies consistently to ALL screens, logs, modals, and lists with zero overlapping) */
+    html {
       font-size: 16px;
     }
-    html[data-text-size="large"] {
-      font-size: 18px;
-    }
-    html[data-text-size="huge"] {
-      font-size: 20px;
+
+    [data-text-size="normal"] body {
+      font-size: 16px;
     }
 
-    html[data-text-size="small"] [class*="text-["] {
-      font-size: 0.88em;
-    }
-    html[data-text-size="large"] [class*="text-["] {
-      font-size: 1.12em;
-    }
-    html[data-text-size="huge"] [class*="text-["] {
-      font-size: 1.25em;
-    }
+    /* SMALL: Uniformly compact reading mode across the entire app (~85-90%) */
+    [data-text-size="small"] body { font-size: 14px; }
+    [data-text-size="small"] .text-\[9px\] { font-size: 8px !important; line-height: 1.25 !important; }
+    [data-text-size="small"] .text-\[10px\] { font-size: 8.5px !important; line-height: 1.3 !important; }
+    [data-text-size="small"] .text-\[11px\] { font-size: 9.5px !important; line-height: 1.35 !important; }
+    [data-text-size="small"] .text-xs { font-size: 10.5px !important; line-height: 1.4 !important; }
+    [data-text-size="small"] .text-sm { font-size: 12.5px !important; line-height: 1.45 !important; }
+    [data-text-size="small"] .text-base { font-size: 14px !important; line-height: 1.5 !important; }
+    [data-text-size="small"] .text-lg { font-size: 16px !important; line-height: 1.35 !important; }
+    [data-text-size="small"] .text-xl { font-size: 17.5px !important; line-height: 1.3 !important; }
+    [data-text-size="small"] .text-2xl { font-size: 20px !important; line-height: 1.25 !important; }
+
+    /* LARGE: Comfortably enlarged typography with clean line-height (~110-115%) */
+    [data-text-size="large"] body { font-size: 17.5px; }
+    [data-text-size="large"] .text-\[9px\] { font-size: 10px !important; line-height: 1.25 !important; }
+    [data-text-size="large"] .text-\[10px\] { font-size: 11px !important; line-height: 1.3 !important; }
+    [data-text-size="large"] .text-\[11px\] { font-size: 12px !important; line-height: 1.4 !important; }
+    [data-text-size="large"] .text-xs { font-size: 13.5px !important; line-height: 1.45 !important; }
+    [data-text-size="large"] .text-sm { font-size: 15.5px !important; line-height: 1.5 !important; }
+    [data-text-size="large"] .text-base { font-size: 17.5px !important; line-height: 1.5 !important; }
+    [data-text-size="large"] .text-lg { font-size: 19.5px !important; line-height: 1.35 !important; }
+    [data-text-size="large"] .text-xl { font-size: 22px !important; line-height: 1.3 !important; }
+    [data-text-size="large"] .text-2xl { font-size: 26px !important; line-height: 1.25 !important; }
+
+    /* HUGE: High-legibility prominent typography with zero overlapping (~120-125%) */
+    [data-text-size="huge"] body { font-size: 19px; }
+    [data-text-size="huge"] .text-\[9px\] { font-size: 10.5px !important; line-height: 1.3 !important; }
+    [data-text-size="huge"] .text-\[10px\] { font-size: 12px !important; line-height: 1.35 !important; }
+    [data-text-size="huge"] .text-\[11px\] { font-size: 13px !important; line-height: 1.45 !important; }
+    [data-text-size="huge"] .text-xs { font-size: 15px !important; line-height: 1.5 !important; }
+    [data-text-size="huge"] .text-sm { font-size: 17px !important; line-height: 1.5 !important; }
+    [data-text-size="huge"] .text-base { font-size: 19.5px !important; line-height: 1.5 !important; }
+    [data-text-size="huge"] .text-lg { font-size: 21.5px !important; line-height: 1.35 !important; }
+    [data-text-size="huge"] .text-xl { font-size: 24px !important; line-height: 1.3 !important; }
+    [data-text-size="huge"] .text-2xl { font-size: 28px !important; line-height: 1.25 !important; }
 
     /* Adaptive Badges & Cards for Light & Dark Modes */
     .badge-stat-met {
@@ -1848,15 +1869,15 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=16"></script>
-  <script src="js/avatar.js?v=16"></script>
-  <script src="js/names.js?v=16"></script>
-  <script src="js/careers.js?v=16"></script>
-  <script src="js/gifts.js?v=16"></script>
-  <script src="js/kin.js?v=16"></script>
-  <script src="js/activities.js?v=16"></script>
-  <script src="js/events.js?v=16"></script>
-  <script src="js/education.js?v=16"></script>
-  <script src="js/game.js?v=16"></script>
+  <script src="js/audio.js?v=17"></script>
+  <script src="js/avatar.js?v=17"></script>
+  <script src="js/names.js?v=17"></script>
+  <script src="js/careers.js?v=17"></script>
+  <script src="js/gifts.js?v=17"></script>
+  <script src="js/kin.js?v=17"></script>
+  <script src="js/activities.js?v=17"></script>
+  <script src="js/events.js?v=17"></script>
+  <script src="js/education.js?v=17"></script>
+  <script src="js/game.js?v=17"></script>
 </body>
 </html>
