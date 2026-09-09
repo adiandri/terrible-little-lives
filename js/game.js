@@ -1094,7 +1094,11 @@ class TerribleGame {
       !this.usedDilemmaIds.has(d.id)
     );
 
-    if (availableDilemmas.length > 0 && Math.random() < 0.7) {
+    const milestoneAges = [1, 2, 3, 4, 5, 7, 9, 11, 14, 16, 18];
+    const isMilestone = milestoneAges.includes(this.character.age);
+    const triggerChance = isMilestone ? 1.0 : 0.85;
+
+    if (availableDilemmas.length > 0 && Math.random() < triggerChance) {
       const chosen = availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
       this.usedDilemmaIds.add(chosen.id);
       this.activeDilemma = chosen;
@@ -1115,6 +1119,7 @@ class TerribleGame {
   }
 
   triggerDilemma(dilemma) {
+    this.activeDilemma = dilemma;
     window.soundEngine.playDread();
     if (navigator.vibrate) navigator.vibrate([50, 40, 80]);
 
@@ -1122,16 +1127,17 @@ class TerribleGame {
     this.dom.dilemmaPrompt.textContent = dilemma.prompt;
     this.dom.dilemmaChoices.innerHTML = '';
 
+    const letters = ['A', 'B', 'C', 'D', 'E'];
     dilemma.choices.forEach((choice, idx) => {
       const btn = document.createElement('button');
-      btn.className = "w-full text-left p-3.5 rounded-xl bg-inputbg hover:bg-cardhover active:scale-[0.98] border border-leadborder text-parchment text-xs transition-all flex items-start space-x-3 shadow-xs";
+      btn.className = "w-full text-left p-3.5 rounded-xl bg-inputbg hover:bg-cardhover active:scale-[0.98] border border-leadborder text-parchment text-xs transition-all flex items-start space-x-3 shadow-xs group";
       
       const badge = document.createElement('span');
-      badge.className = "px-2 py-0.5 rounded-md text-[10px] bg-slatecard border border-leadborder text-dust font-mono font-bold shrink-0";
-      badge.textContent = `${idx + 1}`;
+      badge.className = "px-2.5 py-1 rounded-md text-xs bg-amber-950/40 border border-amber-800/60 text-amber-300 font-mono font-bold shrink-0 group-hover:bg-amber-900/60 transition-colors";
+      badge.textContent = `${letters[idx] || (idx + 1)}`;
 
       const textSpan = document.createElement('span');
-      textSpan.className = "leading-relaxed text-parchment";
+      textSpan.className = "leading-relaxed text-parchment pt-0.5";
       textSpan.textContent = choice.text;
 
       btn.appendChild(badge);
@@ -1153,11 +1159,12 @@ class TerribleGame {
     window.soundEngine.playClick();
     if (navigator.vibrate) navigator.vibrate(30);
 
-    const choice = this.activeDilemma.choices[choiceIdx];
+    const dilemma = this.activeDilemma;
+    const choice = dilemma.choices[choiceIdx];
     const latestLog = this.logs[this.logs.length - 1];
 
     if (latestLog) {
-      latestLog.entries.push(`[${this.activeDilemma.title}] You chose to: ${choice.text}`);
+      latestLog.entries.push(`[${dilemma.title}] You chose: ${choice.text}`);
       latestLog.entries.push(choice.outcome);
     }
 
@@ -1173,11 +1180,25 @@ class TerribleGame {
       }
     }
 
+    const title = dilemma.title;
+    const outcome = choice.outcome;
+    const effects = choice.effects || {};
+
     this.activeDilemma = null;
     this.hideModals();
     this.checkMortality();
     this.renderAll();
     this.saveGame();
+
+    // Show visual consequence feedback modal
+    this.openFeedbackModal({
+      tag: "CONSEQUENCE",
+      title: title,
+      icon: "alert-circle",
+      iconColor: "text-amber-400",
+      body: outcome,
+      effects: effects
+    });
   }
 
   // Careers Modal Logic
@@ -2295,13 +2316,14 @@ class TerribleGame {
   }
 
   renderActivitiesList(category = 'all') {
-    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 12} Actions Left`;
+    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40} Actions Left`;
 
     this.dom.activitiesList.innerHTML = '';
     const list = window.ACTIVITIES_LIST || [];
     const filtered = list.filter(act => {
-      const ageMatches = this.character.age >= act.minAge && this.character.age <= act.maxAge;
-      if (!ageMatches) return false;
+      // If past maxAge (e.g. infant activity for adult character), omit completely
+      if (this.character.age > act.maxAge) return false;
+      // Category filter
       if (category !== 'all' && act.category !== category) return false;
       return true;
     });
@@ -2318,42 +2340,61 @@ class TerribleGame {
     const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
 
     filtered.forEach(act => {
+      const isLockedByAge = this.character.age < act.minAge;
       const card = document.createElement('div');
-      card.className = `p-3.5 rounded-xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2 shadow-xs`;
+      card.dataset.actId = act.id;
+      
+      if (isLockedByAge) {
+        card.className = "p-3.5 rounded-xl border bg-inputbg/30 border-leadborder/40 opacity-55 transition-all space-y-2 shadow-xs";
+      } else {
+        card.className = "p-3.5 rounded-xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2 shadow-xs";
+      }
 
       const catBadgeColor = act.category === 'forbidden' ? 'text-crimson bg-crimson/10 border-crimson/30' :
-        (act.category === 'mind' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' : 
-        (act.category === 'social' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30'));
+        (act.category === 'academics' || act.category === 'mind' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' : 
+        (act.category === 'social' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 
+        (act.category === 'occult' ? 'text-purple-400 bg-purple-500/10 border-purple-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30')));
 
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
-      const maxUses = act.maxPerYear || 3;
+      const maxUses = act.maxPerYear || 10;
       const isCapped = uses >= maxUses;
-      const isDisabled = noEnergy || isCapped;
+      const isDisabled = isLockedByAge || noEnergy || isCapped;
+
+      let btnLabel = 'Engage';
+      if (isLockedByAge) {
+        btnLabel = `Locked (Age ${act.minAge})`;
+      } else if (isCapped) {
+        btnLabel = 'Capped';
+      }
+
+      const ageBadge = isLockedByAge 
+        ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded border font-semibold text-amber-400/80 bg-amber-500/10 border-amber-500/25 flex items-center gap-1"><i data-lucide="lock" class="w-2.5 h-2.5"></i>Unlocks Age ${act.minAge}</span>`
+        : `<span class="text-[10px] font-mono text-dust">Age ${act.minAge}-${act.maxAge}</span>`;
 
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-lg bg-leadborder/30 flex items-center justify-center text-parchment shrink-0">
-              <i data-lucide="${act.icon || 'compass'}" class="w-4 h-4 text-parchment"></i>
+            <div class="w-8 h-8 rounded-lg ${isLockedByAge ? 'bg-leadborder/15 text-dust/50' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+              <i data-lucide="${isLockedByAge ? 'lock' : (act.icon || 'compass')}" class="w-4 h-4"></i>
             </div>
             <div>
-              <h4 class="font-serif font-bold text-xs text-parchment">${act.name}</h4>
+              <h4 class="font-serif font-bold text-xs ${isLockedByAge ? 'text-parchment/60' : 'text-parchment'}">${act.name}</h4>
               <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-semibold ${catBadgeColor}">${act.category}</span>
             </div>
           </div>
-          <span class="text-[10px] font-mono text-dust">Age ${act.minAge}-${act.maxAge}</span>
+          ${ageBadge}
         </div>
 
         <p class="text-[11px] text-dust leading-relaxed">${act.desc}</p>
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
-          <span class="text-[10px] font-mono text-dust/80">Cost: 1 Action · Quota: ${uses}/${maxUses}</span>
+          <span class="text-[10px] font-mono text-dust/80">${isLockedByAge ? `Milestone: Requires Age ${act.minAge}` : `Cost: 1 Action · Quota: ${uses}/${maxUses}`}</span>
           <button class="btn-do-activity px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
             isDisabled 
-              ? 'opacity-50 cursor-not-allowed bg-leadborder/30 text-dust' 
-              : 'bg-slatecard hover:bg-cardhover text-parchment border border-leadborder active:scale-95 shadow-xs'
+              ? 'opacity-50 cursor-not-allowed bg-leadborder/20 text-dust border border-leadborder/30' 
+              : 'bg-slatecard hover:bg-cardhover text-parchment border border-leadborder active:scale-95 shadow-xs cursor-pointer'
           }" ${isDisabled ? 'disabled' : ''}>
-            ${isCapped ? 'Capped' : 'Engage'}
+            ${btnLabel}
           </button>
         </div>
       `;
@@ -2385,7 +2426,7 @@ class TerribleGame {
       return;
     }
 
-    if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'urban_exploration') {
+    if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'urban_exploration' || activityId === 'nursery_lullaby') {
       window.soundEngine.playDread();
     } else {
       window.soundEngine.playTick();
@@ -2399,6 +2440,16 @@ class TerribleGame {
     this.renderAll();
     this.renderActivitiesList(this.activeActivityFilter);
     this.saveGame();
+
+    // Show interactive feedback dialog modal
+    this.openFeedbackModal({
+      tag: "ACTIVITY PURSUED",
+      title: result.title,
+      icon: "sparkles",
+      iconColor: "text-amber-400",
+      body: result.message,
+      effects: result.effects
+    });
   }
 
   modifyStat(stat, delta) {

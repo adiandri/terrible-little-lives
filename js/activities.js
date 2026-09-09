@@ -2,6 +2,176 @@
 // Governs annual energy pool, childhood recreation, exploration & occult encounters
 
 const ACTIVITIES_LIST = [
+  // ==========================================
+  // INFANCY & TODDLERHOOD (AGES 0 - 5)
+  // ==========================================
+  {
+    id: "cuddle_parents",
+    name: "Cuddle with Parents",
+    category: "leisure",
+    icon: "heart",
+    minAge: 0,
+    maxAge: 4,
+    maxPerYear: 10,
+    desc: "Rest your small head against your mother or father's chest, listening to the rhythmic comfort of their breathing.",
+    run: (character, attemptIndex = 0) => {
+      const relGain = attemptIndex === 0 ? 8 : (attemptIndex === 1 ? 4 : 2);
+      const hapGain = attemptIndex === 0 ? 8 : (attemptIndex === 1 ? 4 : 2);
+      character.stats.happiness = Math.min(100, character.stats.happiness + hapGain);
+      character.stats.vitality = Math.min(100, character.stats.vitality + 2);
+      if (character.kin && character.kin.parents) {
+        character.kin.parents.forEach(p => {
+          if (p.alive) p.relationship = Math.min(100, p.relationship + relGain);
+        });
+      }
+      const vignettes = [
+        "Your mother rocked you gently in the wooden armchair while humming a soft melody.",
+        "Your father cradled you against his shoulder, gently patting your back until you burped softly.",
+        "You curled into a warm flannel blanket between your parents, safe from the cold drafts of the house."
+      ];
+      return {
+        success: true,
+        title: "Loving Embrace",
+        message: `${window.getRandomElement(vignettes)} (+Happiness, +Vitality, +Parent Closeness).`,
+        effects: { happiness: hapGain, vitality: 2, relationship: relGain }
+      };
+    }
+  },
+  {
+    id: "drink_milk",
+    name: "Drink Warm Milk Bottle",
+    category: "leisure",
+    icon: "cup-soda",
+    minAge: 0,
+    maxAge: 3,
+    maxPerYear: 10,
+    desc: "Drink sweet warm formula from a glass bottle until your eyelids grow pleasantly heavy.",
+    run: (character, attemptIndex = 0) => {
+      const vitGain = attemptIndex === 0 ? 5 : (attemptIndex === 1 ? 3 : 1);
+      const sanGain = attemptIndex === 0 ? 3 : 1;
+      character.stats.vitality = Math.min(100, character.stats.vitality + vitGain);
+      character.stats.sanity = Math.min(100, character.stats.sanity + sanGain);
+      const vignettes = [
+        "You drank the whole bottle greedily, kicking your little booties in satisfaction.",
+        "The warm formula settled in your stomach; you let out a drowsy sigh and drifted toward sleep.",
+        "You gripped the warm glass bottle with both hands, watching dust motes spin in the yellow lamp light."
+      ];
+      return {
+        success: true,
+        title: "Warm Feeding",
+        message: `${window.getRandomElement(vignettes)} (+Vitality, +Sanity).`,
+        effects: { vitality: vitGain, sanity: sanGain }
+      };
+    }
+  },
+  {
+    id: "learn_walk",
+    name: "Learn to Crawl & Walk",
+    category: "leisure",
+    icon: "footprints",
+    minAge: 0,
+    maxAge: 3,
+    maxPerYear: 10,
+    desc: "Pull yourself up against the radiator and take clumsy, wobbling steps across the rug.",
+    run: (character, attemptIndex = 0) => {
+      const vitGain = attemptIndex === 0 ? 6 : (attemptIndex === 1 ? 3 : 1);
+      const smartsGain = attemptIndex === 0 ? 3 : 1;
+      character.stats.vitality = Math.min(100, character.stats.vitality + vitGain);
+      character.stats.smarts = Math.min(100, character.stats.smarts + smartsGain);
+      const vignettes = [
+        "You pushed off the low coffee table, balancing for three glorious seconds before tumbling safely onto pillows.",
+        "You crawled furiously across the hardwood corridor, chasing after a wandering moth.",
+        "You took four wobbly steps toward your mother's outstretched arms, clapping your tiny hands in glee."
+      ];
+      return {
+        success: true,
+        title: "Motor Milestones",
+        message: `${window.getRandomElement(vignettes)} (+Vitality, +Smarts).`,
+        effects: { vitality: vitGain, smarts: smartsGain }
+      };
+    }
+  },
+  {
+    id: "learn_talk",
+    name: "Babble & Learn to Talk",
+    category: "academics",
+    icon: "message-square",
+    minAge: 1,
+    maxAge: 4,
+    maxPerYear: 10,
+    desc: "Practice vocal syllables, mimic words you overhear, and try to speak your thoughts.",
+    run: (character, attemptIndex = 0) => {
+      const smartsGain = attemptIndex === 0 ? 5 : (attemptIndex === 1 ? 3 : 1);
+      const hapGain = attemptIndex === 0 ? 4 : 2;
+      character.stats.smarts = Math.min(100, character.stats.smarts + smartsGain);
+      character.stats.happiness = Math.min(100, character.stats.happiness + hapGain);
+      const vignettes = [
+        "You pointed at the window and proudly articulated: 'Doggie!' Your parents cheered with delight.",
+        "You babbled a long, impassioned speech made entirely of clicks, whistles, and vowels.",
+        "You repeated the phrase 'No, mine!' with remarkable clarity, giggling at your parents' amused sighs."
+      ];
+      return {
+        success: true,
+        title: "Early Speech",
+        message: `${window.getRandomElement(vignettes)} (+Smarts, +Happiness).`,
+        effects: { smarts: smartsGain, happiness: hapGain }
+      };
+    }
+  },
+  {
+    id: "peekaboo_teething",
+    name: "Play Peek-a-Boo & Teethe",
+    category: "leisure",
+    icon: "smile",
+    minAge: 0,
+    maxAge: 3,
+    maxPerYear: 10,
+    desc: "Chew on a wooden teething ring to soothe your gums, or giggle when hands hide familiar faces.",
+    run: (character, attemptIndex = 0) => {
+      const hapGain = attemptIndex === 0 ? 7 : (attemptIndex === 1 ? 4 : 2);
+      character.stats.happiness = Math.min(100, character.stats.happiness + hapGain);
+      character.stats.vitality = Math.min(100, character.stats.vitality + 2);
+      const vignettes = [
+        "Your sibling hid behind a pillow and shouted 'PEEK-A-BOO!' You burst into uncontrollable toddler giggles.",
+        "You gnawed determinedly on a cold rubber teething ring, easing the throbbing pressure in your tender gums.",
+        "You pulled a tea towel over your face and waited until your father pulled it down with theatrical surprise."
+      ];
+      return {
+        success: true,
+        title: "Childhood Joy",
+        message: `${window.getRandomElement(vignettes)} (+Happiness, +Vitality).`,
+        effects: { happiness: hapGain, vitality: 2 }
+      };
+    }
+  },
+  {
+    id: "nursery_lullaby",
+    name: "Listen to Nursery Lullabies & Static",
+    category: "occult",
+    icon: "music",
+    minAge: 0,
+    maxAge: 5,
+    maxPerYear: 10,
+    desc: "Listen to a wind-up music box, a faint lullaby, or strange rhythmic static over the baby monitor.",
+    run: (character, attemptIndex = 0) => {
+      const occGain = attemptIndex === 0 ? 5 : 2;
+      const sanGain = attemptIndex === 0 ? 3 : 1;
+      character.stats.occult = Math.min(100, character.stats.occult + occGain);
+      character.stats.sanity = Math.min(100, character.stats.sanity + sanGain);
+      const vignettes = [
+        "The tinny melody of the nursery music box played in minor thirds, casting soothing crystalline notes into the dim room.",
+        "Through the speaker of the baby monitor, you listened to a soft, rhythmic breathing that didn't match anyone in the house.",
+        "Your mother hummed an ancient folklore ballad about mountain wolves and black water, rocking you into a deep trance."
+      ];
+      return {
+        success: true,
+        title: "Nocturnal Melody",
+        message: `${window.getRandomElement(vignettes)} (+Occult, +Sanity).`,
+        effects: { occult: occGain, sanity: sanGain }
+      };
+    }
+  },
+
   // --- Category: Play & Leisure ---
   {
     id: "play_toys",
