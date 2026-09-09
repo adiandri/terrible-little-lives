@@ -115,6 +115,90 @@ const THEMES_DATA = [
       '--color-scheme': 'dark'
     }
   },
+  {
+    id: 'dusty-lavender',
+    name: 'Dusty Lavender',
+    mode: 'dark',
+    tag: 'Pastel Twilight',
+    desc: 'Muted twilight amethyst, soft lavender mist, and dreamy lilac.',
+    themeColor: '#1b1724',
+    swatches: ['#131019', '#272134', '#c4b5fd'],
+    cssVars: {
+      '--bg-app': '#131019',
+      '--bg-chassis': '#1b1724',
+      '--bg-header': '#221c2e',
+      '--bg-card': '#272134',
+      '--bg-card-hover': '#312a41',
+      '--bg-input': '#1e1928',
+      '--bg-track': '#322b42',
+      '--border-main': '#423856',
+      '--border-subtle': '#2f273e',
+      '--text-primary': '#f3effa',
+      '--text-muted': '#b8acc9',
+      '--accent-primary': '#c4b5fd',
+      '--accent-fiat': '#86efac',
+      '--accent-fiat-bg': '#18231c',
+      '--accent-shilling': '#fde047',
+      '--accent-shilling-bg': '#232014',
+      '--color-scheme': 'dark'
+    }
+  },
+  {
+    id: 'velvet-sage',
+    name: 'Velvet Sage',
+    mode: 'dark',
+    tag: 'Pastel Meadow',
+    desc: 'Shadowed woodland moss, muted sage velvet, and dusty seafoam.',
+    themeColor: '#141d18',
+    swatches: ['#0d1410', '#202f27', '#6ee7b7'],
+    cssVars: {
+      '--bg-app': '#0d1410',
+      '--bg-chassis': '#141d18',
+      '--bg-header': '#1a2620',
+      '--bg-card': '#202f27',
+      '--bg-card-hover': '#283b32',
+      '--bg-input': '#16221c',
+      '--bg-track': '#293c32',
+      '--border-main': '#385244',
+      '--border-subtle': '#26392f',
+      '--text-primary': '#ecfdf5',
+      '--text-muted': '#a0bfaf',
+      '--accent-primary': '#6ee7b7',
+      '--accent-fiat': '#a7f3d0',
+      '--accent-fiat-bg': '#12241b',
+      '--accent-shilling': '#fde68a',
+      '--accent-shilling-bg': '#242013',
+      '--color-scheme': 'dark'
+    }
+  },
+  {
+    id: 'muted-rose',
+    name: 'Muted Rose',
+    mode: 'dark',
+    tag: 'Pastel Mauve',
+    desc: 'Faded pressed blossoms, dusty mauve velvet, and warm petal haze.',
+    themeColor: '#201518',
+    swatches: ['#140c0f', '#322026', '#f472b6'],
+    cssVars: {
+      '--bg-app': '#140c0f',
+      '--bg-chassis': '#201518',
+      '--bg-header': '#281a1f',
+      '--bg-card': '#322026',
+      '--bg-card-hover': '#3e2830',
+      '--bg-input': '#24161b',
+      '--bg-track': '#3f2730',
+      '--border-main': '#553542',
+      '--border-subtle': '#3d2630',
+      '--text-primary': '#fdf2f8',
+      '--text-muted': '#cdaab7',
+      '--accent-primary': '#f472b6',
+      '--accent-fiat': '#6ee7b7',
+      '--accent-fiat-bg': '#16211c',
+      '--accent-shilling': '#fed7aa',
+      '--accent-shilling-bg': '#241914',
+      '--color-scheme': 'dark'
+    }
+  },
 
   // --- Light Themes ---
   {
@@ -228,6 +312,164 @@ const THEMES_DATA = [
       '--accent-shilling-bg': '#fff7ed',
       '--color-scheme': 'light'
     }
+  },
+  {
+    id: 'blossom-haze',
+    name: 'Blossom Haze',
+    mode: 'light',
+    tag: 'Pastel Sakura',
+    desc: 'Powder blush petals, warm morning ivory, and soft rosewater.',
+    themeColor: '#fdf2f4',
+    swatches: ['#fae8eb', '#ffffff', '#d81b60'],
+    cssVars: {
+      '--bg-app': '#fae8eb',
+      '--bg-chassis': '#fdf2f4',
+      '--bg-header': '#f7e2e6',
+      '--bg-card': '#ffffff',
+      '--bg-card-hover': '#fdf0f2',
+      '--bg-input': '#ffffff',
+      '--bg-track': '#f0d3d8',
+      '--border-main': '#e4bcc5',
+      '--border-subtle': '#eed5db',
+      '--text-primary': '#4a2833',
+      '--text-muted': '#855b68',
+      '--accent-primary': '#d81b60',
+      '--accent-fiat': '#059669',
+      '--accent-fiat-bg': '#ecfdf5',
+      '--accent-shilling': '#d97706',
+      '--accent-shilling-bg': '#fffbeb',
+      '--color-scheme': 'light'
+    }
+  },
+  {
+    id: 'matcha-cream',
+    name: 'Matcha Cream',
+    mode: 'light',
+    tag: 'Pastel Matcha',
+    desc: 'Frothy matcha foam, pale pistachio cream, and bamboo dew.',
+    themeColor: '#f0f7f2',
+    swatches: ['#e3efe6', '#ffffff', '#2e7d32'],
+    cssVars: {
+      '--bg-app': '#e3efe6',
+      '--bg-chassis': '#f0f7f2',
+      '--bg-header': '#e6f0e9',
+      '--bg-card': '#ffffff',
+      '--bg-card-hover': '#eef5f0',
+      '--bg-input': '#ffffff',
+      '--bg-track': '#d3e4d7',
+      '--border-main': '#b6d5bd',
+      '--border-subtle': '#cde2d3',
+      '--text-primary': '#1b3b27',
+      '--text-muted': '#4d6e58',
+      '--accent-primary': '#2e7d32',
+      '--accent-fiat': '#0f766e',
+      '--accent-fiat-bg': '#f0fdf4',
+      '--accent-shilling': '#b45309',
+      '--accent-shilling-bg': '#fef3c7',
+      '--color-scheme': 'light'
+    }
+  },
+  {
+    id: 'celestial-cloud',
+    name: 'Celestial Cloud',
+    mode: 'light',
+    tag: 'Pastel Sky',
+    desc: 'Powder blue sky, whipped marshmallow clouds, and soft cornflower.',
+    themeColor: '#f0f6fc',
+    swatches: ['#e2eef9', '#ffffff', '#0284c7'],
+    cssVars: {
+      '--bg-app': '#e2eef9',
+      '--bg-chassis': '#f0f6fc',
+      '--bg-header': '#e4eef8',
+      '--bg-card': '#ffffff',
+      '--bg-card-hover': '#edf4fc',
+      '--bg-input': '#ffffff',
+      '--bg-track': '#d0e2f2',
+      '--border-main': '#b2d1ec',
+      '--border-subtle': '#cbe0f4',
+      '--text-primary': '#15324d',
+      '--text-muted': '#4a6885',
+      '--accent-primary': '#0284c7',
+      '--accent-fiat': '#0d9488',
+      '--accent-fiat-bg': '#f0fdfa',
+      '--accent-shilling': '#d97706',
+      '--accent-shilling-bg': '#fffbeb',
+      '--color-scheme': 'light'
+    }
+  }
+];
+
+// Curated Typography & Fonts Collection
+const FONTS_DATA = [
+  {
+    id: 'game-gothic',
+    name: 'Game Font',
+    tag: 'Cinzel + Inter',
+    category: 'signature',
+    desc: 'Signature gothic serif headlines with crisp sans reading text.',
+    heading: "'Cinzel', serif",
+    body: "'Inter', sans-serif",
+    sample: "Memento Mori"
+  },
+  {
+    id: 'device-system',
+    name: 'Device Font',
+    tag: 'System Native',
+    category: 'system',
+    desc: 'Clean native system font adapted to your phone or computer.',
+    heading: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    body: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    sample: "Modern & Clean"
+  },
+  {
+    id: 'playfair-display',
+    name: 'Playfair Display',
+    tag: 'Literary Serif',
+    category: 'google',
+    desc: 'Romantic editorial serif headlines paired with elegant Lora body.',
+    heading: "'Playfair Display', Georgia, serif",
+    body: "'Lora', Georgia, serif",
+    sample: "The Faded Chronicles"
+  },
+  {
+    id: 'nunito-soft',
+    name: 'Nunito',
+    tag: 'Soft Pastel Sans',
+    category: 'google',
+    desc: 'Gentle rounded curves that pair harmoniously with pastel themes.',
+    heading: "'Nunito', sans-serif",
+    body: "'Nunito', sans-serif",
+    sample: "Warm & Gentle"
+  },
+  {
+    id: 'outfit-modern',
+    name: 'Outfit',
+    tag: 'Geometric Modern',
+    category: 'google',
+    desc: 'Contemporary geometric sans-serif for sleek, sharp legibility.',
+    heading: "'Outfit', sans-serif",
+    body: "'Outfit', sans-serif",
+    sample: "Geometric Clarity"
+  },
+  {
+    id: 'eb-garamond',
+    name: 'EB Garamond',
+    tag: 'Antique Classical',
+    category: 'google',
+    desc: 'Timeless Renaissance Venetian book serif for classical chronicles.',
+    heading: "'EB Garamond', Garamond, serif",
+    body: "'EB Garamond', Garamond, serif",
+    sample: "Ancient Tome"
+  },
+  {
+    id: 'medieval-sharp',
+    name: 'MedievalSharp',
+    tag: 'Dark Fairytale',
+    category: 'google',
+    desc: 'Gothic calligraphy lettering for grim folklore adventures.',
+    heading: "'MedievalSharp', cursive, serif",
+    body: "'Inter', sans-serif",
+    sample: "Once Upon a Curse"
   }
 ];
 
@@ -282,9 +524,29 @@ function applyTextSize(size) {
   } catch (e) {}
 }
 
-// Auto-run on script load to avoid FOUC & unstyled text scale
+function getSavedFont() {
+  try {
+    const saved = localStorage.getItem('TLL_FONT_FAMILY');
+    if (saved && FONTS_DATA.some(f => f.id === saved)) return saved;
+  } catch (e) {}
+  return 'game-gothic';
+}
+
+function applyFont(fontId) {
+  const font = FONTS_DATA.find(f => f.id === fontId) || FONTS_DATA[0];
+  const root = document.documentElement;
+  root.setAttribute('data-font', font.id);
+  root.style.setProperty('--font-heading', font.heading);
+  root.style.setProperty('--font-body', font.body);
+  try {
+    localStorage.setItem('TLL_FONT_FAMILY', font.id);
+  } catch (e) {}
+}
+
+// Auto-run on script load to avoid FOUC, unstyled text scale & font flash
 initThemeSystem();
 applyTextSize(getTextSize());
+applyFont(getSavedFont());
 
 window.THEMES_DATA = THEMES_DATA;
 window.getActiveThemeId = getActiveThemeId;
@@ -292,3 +554,6 @@ window.applyTheme = applyTheme;
 window.initThemeSystem = initThemeSystem;
 window.getTextSize = getTextSize;
 window.applyTextSize = applyTextSize;
+window.FONTS_DATA = FONTS_DATA;
+window.getSavedFont = getSavedFont;
+window.applyFont = applyFont;

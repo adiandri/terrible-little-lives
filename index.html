@@ -8,13 +8,13 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f1013">
 
-  <!-- Google Fonts: Inter (UI & reading) & Cinzel (Gothic Headers) -->
+  <!-- Google Fonts: Inter (UI & reading) & Cinzel (Gothic Headers) + Extended Curated Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=MedievalSharp&family=Nunito:wght@400;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
 
   <!-- Themes Management Engine (Runs synchronously to prevent FOUC) -->
-  <script src="js/themes.js?v=17"></script>
+  <script src="js/themes.js?v=18"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,8 +23,8 @@
       theme: {
         extend: {
           fontFamily: {
-            serif: ['Cinzel', 'serif'],
-            sans: ['Inter', 'sans-serif'],
+            serif: ['var(--font-heading)', 'Cinzel', 'serif'],
+            sans: ['var(--font-body)', 'Inter', 'sans-serif'],
           },
           colors: {
             app: 'var(--bg-app)',
@@ -55,6 +55,8 @@
 
   <style>
     :root {
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
       --bg-app: #08090b;
       --bg-chassis: #0f1013;
       --bg-header: #14161a;
@@ -90,6 +92,14 @@
       -webkit-user-select: none;
       background-color: var(--bg-app);
       color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    .font-serif {
+      font-family: var(--font-heading) !important;
+    }
+    .font-sans {
+      font-family: var(--font-body) !important;
     }
 
     .custom-scroll::-webkit-scrollbar {
@@ -1696,7 +1706,42 @@
             </div>
           </div>
 
-          <!-- 4. Themes Selection -->
+          <!-- 4. Typeface & Font Selection -->
+          <div class="bg-inputbg p-3 rounded-xl border border-leadborder space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <i data-lucide="spell-check" class="w-4 h-4 text-sky-400"></i>
+                <div>
+                  <div class="font-serif font-bold text-xs text-parchment">Typeface & Font</div>
+                  <div class="text-[10px] text-dust">Toggle device font or Google fonts</div>
+                </div>
+              </div>
+              <span id="settings-font-active-label" class="font-mono text-[10px] text-sky-400 font-bold uppercase">Game Font</span>
+            </div>
+
+            <!-- Quick Mode: Game Font vs Device Font -->
+            <div class="grid grid-cols-2 gap-1.5 bg-trackbg p-1 rounded-lg border border-leadborder text-[11px] font-mono">
+              <button id="btn-font-game" type="button" class="py-1.5 px-2 rounded-md bg-slatecard text-sky-300 border border-sky-500/50 font-bold flex items-center justify-center space-x-1.5 shadow-xs transition-all">
+                <span>✦ Game Font</span>
+              </button>
+              <button id="btn-font-device" type="button" class="py-1.5 px-2 rounded-md text-dust hover:text-parchment flex items-center justify-center space-x-1.5 transition-all">
+                <span>📱 Device Font</span>
+              </button>
+            </div>
+
+            <!-- Google Fonts Selection Grid -->
+            <div class="space-y-1.5 pt-0.5">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="font-mono text-dust uppercase tracking-wider font-semibold">Google Fonts Library</span>
+                <span class="text-[9px] text-dust/70">Tap to apply</span>
+              </div>
+              <div id="fonts-list" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                <!-- Injected dynamically by game.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Themes Selection -->
           <div class="space-y-2 pt-1 border-t border-leadborder/70">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2">
@@ -1869,15 +1914,15 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=17"></script>
-  <script src="js/avatar.js?v=17"></script>
-  <script src="js/names.js?v=17"></script>
-  <script src="js/careers.js?v=17"></script>
-  <script src="js/gifts.js?v=17"></script>
-  <script src="js/kin.js?v=17"></script>
-  <script src="js/activities.js?v=17"></script>
-  <script src="js/events.js?v=17"></script>
-  <script src="js/education.js?v=17"></script>
-  <script src="js/game.js?v=17"></script>
+  <script src="js/audio.js?v=18"></script>
+  <script src="js/avatar.js?v=18"></script>
+  <script src="js/names.js?v=18"></script>
+  <script src="js/careers.js?v=18"></script>
+  <script src="js/gifts.js?v=18"></script>
+  <script src="js/kin.js?v=18"></script>
+  <script src="js/activities.js?v=18"></script>
+  <script src="js/events.js?v=18"></script>
+  <script src="js/education.js?v=18"></script>
+  <script src="js/game.js?v=18"></script>
 </body>
 </html>

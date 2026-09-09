@@ -228,6 +228,10 @@ class TerribleGame {
       btnTextHuge: document.getElementById('btn-text-huge'),
       settingsTextSizeLabel: document.getElementById('settings-text-size-label'),
       settingsTextPreview: document.getElementById('settings-text-preview'),
+      btnFontGame: document.getElementById('btn-font-game'),
+      btnFontDevice: document.getElementById('btn-font-device'),
+      settingsFontActiveLabel: document.getElementById('settings-font-active-label'),
+      fontsListContainer: document.getElementById('fonts-list'),
       themeModal: document.getElementById('settings-modal') || document.getElementById('theme-modal'),
       btnCloseThemeModal: document.getElementById('btn-close-settings') || document.getElementById('btn-close-theme-modal'),
       tabThemeAll: document.getElementById('tab-theme-all'),
@@ -824,6 +828,10 @@ class TerribleGame {
     if (this.dom.btnTextNormal) this.dom.btnTextNormal.addEventListener('click', () => this.setTextSize('normal'));
     if (this.dom.btnTextLarge) this.dom.btnTextLarge.addEventListener('click', () => this.setTextSize('large'));
     if (this.dom.btnTextHuge) this.dom.btnTextHuge.addEventListener('click', () => this.setTextSize('huge'));
+
+    // Font / Typography buttons
+    if (this.dom.btnFontGame) this.dom.btnFontGame.addEventListener('click', () => this.setFont('game-gothic'));
+    if (this.dom.btnFontDevice) this.dom.btnFontDevice.addEventListener('click', () => this.setFont('device-system'));
 
     if (this.dom.tabThemeAll) {
       this.dom.tabThemeAll.addEventListener('click', () => this.filterThemes('all'));
@@ -3137,6 +3145,7 @@ class TerribleGame {
   openSettingsModal() {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.syncSettingsUI();
+    this.renderFontsList();
     this.filterThemes(this.activeThemeFilter || 'all');
     const modal = this.dom.settingsModal || this.dom.themeModal;
     if (modal) {
@@ -3211,6 +3220,60 @@ class TerribleGame {
     this.applyTextSize(size, true);
   }
 
+  setFont(fontId, playSound = true) {
+    if (window.applyFont) {
+      window.applyFont(fontId);
+    } else {
+      document.documentElement.setAttribute('data-font', fontId);
+      try {
+        localStorage.setItem('TLL_FONT_FAMILY', fontId);
+      } catch (e) {}
+    }
+    if (playSound && window.soundEngine && window.soundEngine.playClick) {
+      window.soundEngine.playClick();
+    }
+    this.syncSettingsUI();
+    this.renderFontsList();
+  }
+
+  renderFontsList() {
+    if (!this.dom.fontsListContainer || !window.FONTS_DATA) return;
+    this.dom.fontsListContainer.innerHTML = '';
+    const activeFont = window.getSavedFont ? window.getSavedFont() : 'game-gothic';
+
+    // Show Google Fonts in the library picker
+    const googleFonts = window.FONTS_DATA.filter(f => f.category === 'google');
+    googleFonts.forEach(font => {
+      const isActive = font.id === activeFont;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `p-2 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+        isActive
+          ? 'bg-cardhover border-sky-500 shadow-sm ring-1 ring-sky-500/50'
+          : 'bg-slatecard hover:bg-cardhover border-leadborder'
+      }`;
+      btn.innerHTML = `
+        <div class="flex items-center justify-between w-full mb-1">
+          <span class="text-xs font-bold text-parchment truncate" style="font-family: ${font.heading}">${font.name}</span>
+          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border shrink-0 ${
+            isActive ? 'bg-sky-500/20 text-sky-300 border-sky-500/40' : 'bg-trackbg text-dust border-leadborder'
+          }">${font.tag}</span>
+        </div>
+        <p class="text-[11px] text-dust/90 italic truncate mb-1" style="font-family: ${font.body}">"${font.sample}"</p>
+        <div class="flex items-center justify-between w-full pt-1 border-t border-leadborder/40 text-[9px] font-mono text-dust/70">
+          <span class="truncate mr-1">${font.desc}</span>
+          ${isActive 
+            ? '<span class="text-sky-400 font-bold shrink-0">Active</span>' 
+            : '<span class="text-dust/50 hover:text-dust shrink-0">Apply</span>'}
+        </div>
+      `;
+      btn.addEventListener('click', () => {
+        this.setFont(font.id);
+      });
+      this.dom.fontsListContainer.appendChild(btn);
+    });
+  }
+
   syncSettingsUI() {
     const isMuted = window.soundEngine ? window.soundEngine.isMuted : false;
     const isSoundOn = !isMuted;
@@ -3269,6 +3332,35 @@ class TerribleGame {
 
     if (this.dom.settingsTextSizeLabel) {
       this.dom.settingsTextSizeLabel.textContent = curSize.toUpperCase();
+    }
+
+    // Update font toggle buttons and active label
+    const activeFont = window.getSavedFont ? window.getSavedFont() : 'game-gothic';
+    if (this.dom.btnFontGame && this.dom.btnFontDevice) {
+      if (activeFont === 'game-gothic') {
+        this.dom.btnFontGame.className = "py-1.5 px-2 rounded-md bg-slatecard text-sky-300 border border-sky-500/50 font-bold shadow-xs transition-all flex items-center justify-center space-x-1.5";
+        this.dom.btnFontDevice.className = "py-1.5 px-2 rounded-md text-dust hover:text-parchment transition-all flex items-center justify-center space-x-1.5";
+      } else if (activeFont === 'device-system') {
+        this.dom.btnFontDevice.className = "py-1.5 px-2 rounded-md bg-slatecard text-sky-300 border border-sky-500/50 font-bold shadow-xs transition-all flex items-center justify-center space-x-1.5";
+        this.dom.btnFontGame.className = "py-1.5 px-2 rounded-md text-dust hover:text-parchment transition-all flex items-center justify-center space-x-1.5";
+      } else {
+        this.dom.btnFontGame.className = "py-1.5 px-2 rounded-md text-dust hover:text-parchment transition-all flex items-center justify-center space-x-1.5";
+        this.dom.btnFontDevice.className = "py-1.5 px-2 rounded-md text-dust hover:text-parchment transition-all flex items-center justify-center space-x-1.5";
+      }
+    }
+    if (this.dom.settingsFontActiveLabel && window.FONTS_DATA) {
+      const curFontObj = window.FONTS_DATA.find(f => f.id === activeFont);
+      this.dom.settingsFontActiveLabel.textContent = curFontObj ? curFontObj.name : 'Game Font';
+    }
+
+    // Update theme filter tabs with live counts
+    if (window.THEMES_DATA) {
+      const total = window.THEMES_DATA.length;
+      const darkCount = window.THEMES_DATA.filter(t => t.mode === 'dark').length;
+      const lightCount = window.THEMES_DATA.filter(t => t.mode === 'light').length;
+      if (this.dom.tabThemeAll) this.dom.tabThemeAll.textContent = `All (${total})`;
+      if (this.dom.tabThemeDark) this.dom.tabThemeDark.textContent = `🌙 Dark (${darkCount})`;
+      if (this.dom.tabThemeLight) this.dom.tabThemeLight.textContent = `☀️ Light (${lightCount})`;
     }
 
     if (window.lucide) {
