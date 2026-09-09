@@ -633,6 +633,20 @@ const ACTIVITIES_LIST = [
         message: `You gathered your companions together. Shared stories and late-night laughter warmed the evening (+${relGain}% Relationship with all friends, +${hapGain}% Happiness).`
       };
     }
+  },
+  {
+    id: "dark_altar_activity",
+    name: "The Dark Altar (Paranormal Transgressions)",
+    category: "forbidden",
+    icon: "moon",
+    minAge: 6,
+    maxAge: 120,
+    maxPerYear: 99,
+    desc: "Commune with malevolent forces to weave hexes, curse faculty or kin, rob fresh graves, and traffic in blood.",
+    isDarkAltarTrigger: true,
+    run: (character) => {
+      return { success: true, isDarkAltarTrigger: true };
+    }
   }
 ];
 

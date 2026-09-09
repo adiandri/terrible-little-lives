@@ -260,6 +260,7 @@ class TerribleGame {
       btnKinInvestigate: document.getElementById('btn-kin-investigate'),
       btnKinTribute: document.getElementById('btn-kin-tribute'),
       btnKinArgue: document.getElementById('btn-kin-argue'),
+      btnKinHex: document.getElementById('btn-kin-hex'),
 
       // Activities Modal
       btnTabActivities: document.getElementById('btn-tab-activities'),
@@ -276,6 +277,20 @@ class TerribleGame {
       btnRevelationLoyal: document.getElementById('btn-revelation-loyal'),
       btnRevelationReport: document.getElementById('btn-revelation-report'),
       btnRevelationIgnore: document.getElementById('btn-revelation-ignore'),
+
+      // Dark Altar / Paranormal Crimes Modal
+      darkAltarModal: document.getElementById('dark-altar-modal'),
+      btnCloseDarkAltar: document.getElementById('btn-close-dark-altar'),
+      btnCancelDarkAltar: document.getElementById('btn-cancel-dark-altar'),
+      darkAltarTargetSelect: document.getElementById('dark-altar-target-select'),
+      darkAltarTargetStatus: document.getElementById('dark-altar-target-status'),
+      darkAltarTargetDetails: document.getElementById('dark-altar-target-details'),
+      darkAltarTargetRole: document.getElementById('dark-altar-target-role'),
+      darkAltarTargetCurse: document.getElementById('dark-altar-target-curse'),
+      darkAltarPlayerOccult: document.getElementById('dark-altar-player-occult'),
+      darkAltarPlayerShillings: document.getElementById('dark-altar-player-shillings'),
+      darkAltarPlayerEnergy: document.getElementById('dark-altar-player-energy'),
+      darkAltarCrimesList: document.getElementById('dark-altar-crimes-list'),
 
       // Ask Money Modal
       kinAskMoneyModal: document.getElementById('kin-ask-money-modal'),
@@ -725,6 +740,27 @@ class TerribleGame {
     }
     if (this.dom.btnKinArgue) {
       this.dom.btnKinArgue.addEventListener('click', () => this.handleKinAction('argue'));
+    }
+    if (this.dom.btnKinHex) {
+      this.dom.btnKinHex.addEventListener('click', () => {
+        const target = this.selectedKin;
+        this.closeKinDetailModal();
+        this.closeKinModal();
+        this.openDarkAltarModal(target);
+      });
+    }
+
+    // Dark Altar Modal Controls
+    if (this.dom.btnCloseDarkAltar) {
+      this.dom.btnCloseDarkAltar.addEventListener('click', () => this.closeDarkAltarModal());
+    }
+    if (this.dom.btnCancelDarkAltar) {
+      this.dom.btnCancelDarkAltar.addEventListener('click', () => this.closeDarkAltarModal());
+    }
+    if (this.dom.darkAltarTargetSelect) {
+      this.dom.darkAltarTargetSelect.addEventListener('change', () => {
+        this.onDarkAltarTargetChanged();
+      });
     }
 
     // Ask Money Modal Controls
@@ -1208,6 +1244,12 @@ class TerribleGame {
       currentYearLog.entries.push(window.getRandomElement(kinVignettes));
     }
 
+    // 4b. Paranormal Curses & Hex Progressions
+    if (window.tickAnnualCurses) {
+      const curseLogs = window.tickAnnualCurses(this.character) || [];
+      curseLogs.forEach(cl => currentYearLog.entries.push(cl));
+    }
+
     // 5. Urban Atmosphere & Ambient Lore
     const ambientPool = (window.AMBIENT_YEAR_EVENTS || (window.GAME_DATA && window.GAME_DATA.AMBIENT_YEAR_EVENTS) || []).filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
@@ -1286,16 +1328,43 @@ class TerribleGame {
     this.dom.dilemmaChoices.innerHTML = '';
 
     const letters = ['A', 'B', 'C', 'D', 'E'];
+    const charOccult = (this.character.stats.occult || 0);
+    const charSanity = (this.character.stats.sanity || 0);
+
+    let displayIndex = 0;
     dilemma.choices.forEach((choice, idx) => {
+      // Occult / The Veil Thinning choices
+      if (choice.isOccult) {
+        const minOccult = choice.minOccult || 20;
+        const maxSanity = choice.maxSanity || 45;
+        const qualifies = charOccult >= minOccult || charSanity <= maxSanity;
+        if (!qualifies) {
+          // The veil remains closed for mundane characters
+          return;
+        }
+      }
+
+      const isOccult = !!choice.isOccult;
       const btn = document.createElement('button');
-      btn.className = "w-full text-left p-3.5 rounded-xl bg-inputbg hover:bg-cardhover active:scale-[0.98] border border-leadborder text-parchment text-xs transition-all flex items-start space-x-3 shadow-xs group";
+      if (isOccult) {
+        btn.className = "choice-occult w-full text-left p-3.5 rounded-xl border active:scale-[0.98] text-xs transition-all flex items-start space-x-3 shadow-md group";
+      } else {
+        btn.className = "w-full text-left p-3.5 rounded-xl bg-inputbg hover:bg-cardhover active:scale-[0.98] border border-leadborder text-parchment text-xs transition-all flex items-start space-x-3 shadow-xs group";
+      }
       
       const badge = document.createElement('span');
-      badge.className = "px-2.5 py-1 rounded-md text-xs bg-amber-950/40 border border-amber-800/60 text-amber-300 font-mono font-bold shrink-0 group-hover:bg-amber-900/60 transition-colors";
-      badge.textContent = `${letters[idx] || (idx + 1)}`;
+      if (isOccult) {
+        badge.className = "px-2.5 py-1 rounded-md text-xs bg-purple-900/60 border border-purple-500/70 text-purple-200 font-mono font-bold shrink-0 shadow-sm";
+        badge.innerHTML = "👁️";
+      } else {
+        badge.className = "px-2.5 py-1 rounded-md text-xs bg-amber-950/40 border border-amber-800/60 text-amber-300 font-mono font-bold shrink-0 group-hover:bg-amber-900/60 transition-colors";
+        badge.textContent = `${letters[displayIndex] || (displayIndex + 1)}`;
+      }
 
       const textSpan = document.createElement('span');
-      textSpan.className = "leading-relaxed text-parchment pt-0.5";
+      textSpan.className = isOccult 
+        ? "leading-relaxed text-purple-100 font-medium pt-0.5" 
+        : "leading-relaxed text-parchment pt-0.5";
       textSpan.textContent = choice.text;
 
       btn.appendChild(badge);
@@ -1303,6 +1372,7 @@ class TerribleGame {
 
       btn.addEventListener('click', () => this.selectChoice(idx));
       this.dom.dilemmaChoices.appendChild(btn);
+      displayIndex++;
     });
 
     this.dom.dilemmaModal.classList.remove('hidden');
@@ -1748,6 +1818,19 @@ class TerribleGame {
       `;
     }
 
+    let curseInfo = '';
+    if (person.curse) {
+      curseInfo = `
+        <div class="mt-2 p-2 rounded-lg border flex items-center justify-between text-[11px] font-mono badge-curse-${person.curse.type || 'haunted'} shadow-xs">
+          <span class="font-bold flex items-center gap-1.5">
+            <i data-lucide="skull" class="w-3.5 h-3.5"></i>
+            <span>Afflicted: ${person.curse.name || 'Paranormal Hex'}</span>
+          </span>
+          <span class="text-[9px] opacity-85 font-mono">Inflicted Age ${person.curse.inflictedYear || '?'}</span>
+        </div>
+      `;
+    }
+
     this.dom.kinDetailDossier.innerHTML = `
       <div class="flex items-start justify-between">
         <div>
@@ -1773,6 +1856,7 @@ class TerribleGame {
       </div>
 
       ${entityInfo}
+      ${curseInfo}
     `;
 
     // Button states & quota/diminishing returns display
@@ -1946,6 +2030,17 @@ class TerribleGame {
       setupLockedBtn(this.dom.btnKinArgue, "Argue / Dispute", "Too young to engage in bitter domestic arguments (Unlocks at Age 5).", 5);
     } else {
       setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
+    }
+
+    // Paranormal Hex / Dark Deed Action (Available Age 6+)
+    if (this.dom.btnKinHex) {
+      if (age < 6) {
+        this.dom.btnKinHex.classList.add('hidden');
+        this.dom.btnKinHex.style.display = 'none';
+      } else {
+        this.dom.btnKinHex.classList.remove('hidden');
+        this.dom.btnKinHex.style.display = 'flex';
+      }
     }
 
     if (window.lucide) {
@@ -2733,6 +2828,12 @@ class TerribleGame {
   }
 
   handleActivityClick(activityId) {
+    if (activityId === 'dark_altar_activity') {
+      this.closeActivitiesModal();
+      this.openDarkAltarModal();
+      return;
+    }
+
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
       alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
       return;
@@ -3992,6 +4093,15 @@ class TerribleGame {
       } else {
         this.dom.schoolPersonQuirk.textContent = `Staff member at ${this.character.education ? this.character.education.name : 'the school'}.`;
       }
+
+      if (person.curse) {
+        this.dom.schoolPersonQuirk.innerHTML += `
+          <div class="mt-2 p-1.5 rounded-lg border font-mono text-[10px] font-bold badge-curse-${person.curse.type || 'haunted'} flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i data-lucide="skull" class="w-3.5 h-3.5"></i>Afflicted: ${person.curse.name}</span>
+            <span class="opacity-80 font-normal">Since Age ${person.curse.inflictedYear || '?'}</span>
+          </div>
+        `;
+      }
     }
 
     const rel = Math.max(0, Math.min(100, person.relationship || 50));
@@ -4080,6 +4190,30 @@ class TerribleGame {
 
       this.dom.schoolPersonActionsList.appendChild(btn);
     });
+
+    // Paranormal Hex / Dark Deed Action (Available for all living school personnel & peers age 6+)
+    if (this.character.age >= 6) {
+      const hexBtn = document.createElement('button');
+      hexBtn.className = "w-full p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-800/40 text-left flex items-center justify-between group transition-all mt-2 shadow-xs";
+      hexBtn.innerHTML = `
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-purple-900/50 border border-purple-700/60 flex items-center justify-center text-purple-300 group-hover:scale-105 transition-transform shrink-0">
+            <i data-lucide="moon" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="font-serif font-bold text-xs text-purple-300 group-hover:text-purple-200 transition-colors">🔮 Cast Hex / Dark Deed</div>
+            <div class="text-[10px] text-purple-400/80 font-sans leading-snug">Perform a paranormal rite or curse targeting this individual.</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400/60 group-hover:text-purple-300 transition-colors"></i>
+      `;
+      hexBtn.addEventListener('click', () => {
+        this.closeSchoolPersonModal();
+        this.closeEducationModal();
+        this.openDarkAltarModal(person);
+      });
+      this.dom.schoolPersonActionsList.appendChild(hexBtn);
+    }
   }
 
   handleSchoolAction(actionType, param = null) {
@@ -4210,6 +4344,289 @@ class TerribleGame {
     this.renderEducationModal(this.activeEducationTab);
   }
 
+  // ==========================================
+  // DARK ALTAR & PARANORMAL CRIMES SYSTEM
+  // ==========================================
+
+  openDarkAltarModal(preferredTarget = null) {
+    if (!this.character.isAlive) return;
+    if (!this.dom.darkAltarModal) return;
+
+    this.updateDarkAltarPlayerStats();
+    this.populateDarkAltarTargetSelect(preferredTarget);
+    this.onDarkAltarTargetChanged();
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+
+    this.dom.darkAltarModal.classList.remove('hidden');
+    this.dom.darkAltarModal.style.display = 'flex';
+  }
+
+  closeDarkAltarModal() {
+    if (this.dom.darkAltarModal) {
+      this.dom.darkAltarModal.classList.add('hidden');
+      this.dom.darkAltarModal.style.display = 'none';
+    }
+  }
+
+  updateDarkAltarPlayerStats() {
+    if (this.dom.darkAltarPlayerOccult) {
+      this.dom.darkAltarPlayerOccult.textContent = `${this.character.stats.occult || 0}%`;
+    }
+    if (this.dom.darkAltarPlayerShillings) {
+      this.dom.darkAltarPlayerShillings.textContent = `${this.character.shillings || 0} s.`;
+    }
+    if (this.dom.darkAltarPlayerEnergy) {
+      this.dom.darkAltarPlayerEnergy.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+    }
+  }
+
+  populateDarkAltarTargetSelect(preferredTarget = null) {
+    if (!this.dom.darkAltarTargetSelect) return;
+    const select = this.dom.darkAltarTargetSelect;
+    select.innerHTML = '';
+
+    // 1. None option (for untargeted crimes)
+    const noneOpt = document.createElement('option');
+    noneOpt.value = "__none__";
+    noneOpt.textContent = "— No Individual Target (Untargeted Transgressions) —";
+    select.appendChild(noneOpt);
+
+    const allTargets = window.getAllPotentialTargets ? window.getAllPotentialTargets(this.character) : [];
+
+    // Group targets
+    const groups = {
+      'Family': [],
+      'Friends': [],
+      'School Staff': [],
+      'Classmates': [],
+      'Supernatural': []
+    };
+
+    allTargets.forEach(t => {
+      const g = groups[t.group] || groups['Friends'];
+      g.push(t);
+    });
+
+    let preferredTargetId = null;
+    if (preferredTarget) {
+      preferredTargetId = preferredTarget.id || (preferredTarget.raw && preferredTarget.raw.id);
+    }
+
+    for (const [groupName, targets] of Object.entries(groups)) {
+      if (targets.length === 0) continue;
+      const optGroup = document.createElement('optgroup');
+      optGroup.label = groupName;
+
+      targets.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        const curseTag = t.curse ? ` [Afflicted: ${t.curse.name}]` : '';
+        opt.textContent = `${t.name} (${t.role})${curseTag}`;
+        if (preferredTargetId && t.id === preferredTargetId) {
+          opt.selected = true;
+        }
+        optGroup.appendChild(opt);
+      });
+
+      select.appendChild(optGroup);
+    }
+
+    // If preferred target was set, make sure it is selected
+    if (preferredTargetId) {
+      select.value = preferredTargetId;
+    }
+  }
+
+  onDarkAltarTargetChanged() {
+    if (!this.dom.darkAltarTargetSelect) return;
+    const targetId = this.dom.darkAltarTargetSelect.value;
+    const allTargets = window.getAllPotentialTargets ? window.getAllPotentialTargets(this.character) : [];
+    const selectedTarget = allTargets.find(t => t.id === targetId) || null;
+
+    if (this.dom.darkAltarTargetStatus) {
+      this.dom.darkAltarTargetStatus.textContent = selectedTarget ? selectedTarget.name : "Untargeted Transgressions";
+    }
+
+    if (this.dom.darkAltarTargetDetails) {
+      if (selectedTarget) {
+        this.dom.darkAltarTargetDetails.classList.remove('hidden');
+        if (this.dom.darkAltarTargetRole) {
+          this.dom.darkAltarTargetRole.textContent = `${selectedTarget.group} • ${selectedTarget.role} (Closeness: ${selectedTarget.relationship}%)`;
+        }
+        if (this.dom.darkAltarTargetCurse) {
+          if (selectedTarget.curse) {
+            this.dom.darkAltarTargetCurse.textContent = `Afflicted: ${selectedTarget.curse.name}`;
+            this.dom.darkAltarTargetCurse.className = "text-rose-400 font-bold";
+          } else {
+            this.dom.darkAltarTargetCurse.textContent = "Uncursed";
+            this.dom.darkAltarTargetCurse.className = "text-emerald-400 font-bold";
+          }
+        }
+      } else {
+        this.dom.darkAltarTargetDetails.classList.add('hidden');
+      }
+    }
+
+    this.renderDarkAltarRites(selectedTarget);
+  }
+
+  renderDarkAltarRites(selectedTarget = null) {
+    if (!this.dom.darkAltarCrimesList) return;
+    this.dom.darkAltarCrimesList.innerHTML = '';
+
+    const crimes = window.PARANORMAL_CRIMES_DATA || [];
+    const char = this.character;
+
+    crimes.forEach(crime => {
+      const card = document.createElement('div');
+      
+      const requiresTarget = crime.requiresTarget;
+      const hasTarget = !!selectedTarget;
+      const isCleanse = !!crime.isCleanse;
+      const targetHasCurse = selectedTarget && selectedTarget.curse;
+
+      // Eligibility checks
+      const meetsAge = char.age >= crime.minAge;
+      const meetsOccult = (char.stats.occult || 0) >= crime.minOccult;
+      const meetsShillings = (char.shillings || 0) >= crime.costShillings;
+      const meetsEnergy = (char.actionsLeft || 0) >= crime.energyCost;
+      const targetCondition = requiresTarget ? (hasTarget && (!isCleanse || targetHasCurse)) : true;
+      const canCast = meetsAge && meetsOccult && meetsShillings && meetsEnergy && targetCondition;
+
+      card.className = `p-3 rounded-xl border transition-all space-y-2 ${
+        canCast 
+          ? 'bg-inputbg hover:bg-cardhover border-leadborder shadow-xs' 
+          : 'bg-inputbg/40 border-leadborder/40 opacity-70'
+      }`;
+
+      // Success chance preview
+      let chanceText = '';
+      if (canCast) {
+        const chance = crime.successChance(char, selectedTarget ? selectedTarget.raw : null);
+        const pct = Math.round(chance * 100);
+        chanceText = `<span class="text-[10px] font-mono text-purple-300">Success Chance: ~${pct}%</span>`;
+      }
+
+      // Action button text and state
+      let btnLabel = 'Cast Rite';
+      if (!meetsAge) {
+        btnLabel = `Req. Age ${crime.minAge}`;
+      } else if (!meetsOccult) {
+        btnLabel = `Req. ${crime.minOccult}% Occult`;
+      } else if (requiresTarget && !hasTarget) {
+        btnLabel = 'Select Target';
+      } else if (isCleanse && !targetHasCurse) {
+        btnLabel = 'Target Not Cursed';
+      } else if (!meetsShillings) {
+        btnLabel = `Req. ${crime.costShillings} s.`;
+      } else if (!meetsEnergy) {
+        btnLabel = 'No Energy';
+      }
+
+      const costDesc = [];
+      if (crime.costShillings > 0) costDesc.push(`${crime.costShillings} Shillings`);
+      costDesc.push(`${crime.energyCost} Energy`);
+
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-lg ${canCast ? 'bg-purple-950/60 border border-purple-500/30 text-purple-300' : 'bg-leadborder/20 text-dust'} flex items-center justify-center shrink-0">
+              <i data-lucide="${crime.icon || 'moon'}" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h4 class="font-serif font-bold text-xs ${canCast ? 'text-purple-200' : 'text-parchment/70'}">${crime.name}</h4>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold text-purple-400 bg-purple-950/40 border-purple-800/40">${crime.tag}</span>
+            </div>
+          </div>
+          <div class="text-right text-[10px] font-mono text-dust">
+            ${costDesc.join(' · ')}
+          </div>
+        </div>
+
+        <p class="text-[11px] text-dust leading-relaxed">${crime.desc}</p>
+
+        <div class="flex justify-between items-center pt-2 border-t border-leadborder/50">
+          ${chanceText || `<span class="text-[10px] font-mono text-dust/70">Unlocks at ${crime.minOccult}% Occult</span>`}
+          <button class="btn-execute-rite px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
+            canCast
+              ? 'bg-purple-900/60 hover:bg-purple-800/70 text-purple-200 border border-purple-600/60 active:scale-95 cursor-pointer shadow-md'
+              : 'bg-leadborder/20 text-dust border border-leadborder/30 cursor-not-allowed opacity-60'
+          }" ${canCast ? '' : 'disabled'}>
+            ${btnLabel}
+          </button>
+        </div>
+      `;
+
+      if (canCast) {
+        const btn = card.querySelector('.btn-execute-rite');
+        btn.addEventListener('click', () => {
+          this.executeDarkAltarCrime(crime.id, selectedTarget ? selectedTarget.raw : null);
+        });
+      }
+
+      this.dom.darkAltarCrimesList.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  executeDarkAltarCrime(crimeId, targetRaw) {
+    if (!window.executeParanormalCrime) return;
+
+    const result = window.executeParanormalCrime(crimeId, this.character, targetRaw);
+    if (!result.success) {
+      this.openFeedbackModal({
+        tag: "RITE BLOCKED",
+        title: "Invocation Failed",
+        icon: "alert-circle",
+        iconColor: "text-amber-400",
+        body: result.reason || "The forces refused your rite.",
+        effects: {}
+      });
+      return;
+    }
+
+    this.closeDarkAltarModal();
+
+    if (result.outcome === 'backfire') {
+      window.soundEngine.playDread();
+      this.vibrate([100, 50, 100]);
+    } else if (result.outcome === 'caught') {
+      window.soundEngine.playClick();
+      this.vibrate(60);
+    } else {
+      window.soundEngine.playDread();
+      this.vibrate([40, 30, 70]);
+    }
+
+    // Chronicle logging
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[Dark Altar] ${result.title}: ${result.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+
+    // Show feedback dialog
+    const iconColor = result.outcome === 'success' 
+      ? 'text-purple-400' 
+      : (result.outcome === 'backfire' ? 'text-rose-400' : 'text-amber-400');
+
+    this.openFeedbackModal({
+      tag: result.outcome === 'success' ? "DARK RITE CONCLUDED" : (result.outcome === 'backfire' ? "HEX REFLECTION" : "DISCOVERED"),
+      title: result.title,
+      icon: result.outcome === 'success' ? "moon" : (result.outcome === 'backfire' ? "zap-off" : "alert-triangle"),
+      iconColor: iconColor,
+      body: result.message,
+      effects: {}
+    });
+  }
 
   saveGame() {
     const data = {

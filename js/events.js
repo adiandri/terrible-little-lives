@@ -161,6 +161,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Push the heavy wooden dresser back against the wall to hide it.",
         outcome: "The drawing remains concealed in the dark. Every night, you feel a gentle warm draft radiating from the wooden backing.",
         effects: { smarts: +5, occult: +6 }
+      },
+      {
+        isOccult: true,
+        minOccult: 20,
+        text: "👁️ Prick your fingertip and trace the final occult sigil with fresh blood.",
+        outcome: "The wax sigils flare with ultraviolet luminescence. The wall breathes inward, imparting forbidden subterranean knowledge directly into your child mind.",
+        effects: { occult: +20, sanity: -2, humanity: -2, shillings: +3 }
       }
     ]
   },
@@ -257,6 +264,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Look away immediately and hold your breath.",
         outcome: "The train roars in with screeching brakes. The cold draft smells of sulfur and old hair.",
         effects: { sanity: +3, happiness: +2 }
+      },
+      {
+        isOccult: true,
+        minOccult: 15,
+        text: "👁️ Tap three times on the cold steel rail and hum the resonance tone.",
+        outcome: "The creature freezes, reverently slides your toy back up to the platform lip, and leaves two heavy antique shillings alongside it.",
+        effects: { occult: +15, sanity: -2, shillings: +2, humanity: -1 }
       }
     ]
   },
@@ -281,6 +295,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Turn off Bluetooth and run to your parents' bedroom.",
         outcome: "Your parents search the closet. Nothing is there except your winter coats and a handful of wet salt on the floor.",
         effects: { sanity: -2, happiness: -1 }
+      },
+      {
+        isOccult: true,
+        minOccult: 25,
+        text: "👁️ Transmit back the Ward of Ash glyph through Bluetooth pairing.",
+        outcome: "A piercing psychic shriek rattles through your bedroom ceiling! The rogue device burns out with a puff of ozone, dropping +3 Paranormal Shillings behind your wardrobe.",
+        effects: { occult: +18, sanity: +2, shillings: +3, humanity: -1 }
       }
     ]
   },
@@ -305,6 +326,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Delete Telegram and factory reset your phone.",
         outcome: "You lose all your photos and chat history, but you sleep without the phone buzzing in your drawer.",
         effects: { sanity: +5, money: -50 }
+      },
+      {
+        isOccult: true,
+        minOccult: 30,
+        text: "👁️ Offer them blood harvested from a consecrated cemetery effigy instead.",
+        outcome: "The ledger masters marvel at your cunning rite. They accept the offering without question, transferring a fortune in Paranormal Shillings to your dead-drop.",
+        effects: { shillings: +65, occult: +22, humanity: -2, sanity: -2 }
       }
     ]
   },
@@ -329,6 +357,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Take a flash photo and send it to your building manager.",
         outcome: "The building manager calls you within two minutes, his voice terrified: 'Delete that photo right now and don't speak to anyone about it.'",
         effects: { sanity: -3, occult: +10 }
+      },
+      {
+        isOccult: true,
+        minOccult: 35,
+        text: "👁️ Walk into the dark waters and summon whatever lurks in the sub-basement.",
+        outcome: "A pale, elongated hand emerges from the black reflection, placing an ancient iron key and a pouch of +100 Shillings into your hands. It recognizes your dark affinity.",
+        effects: { occult: +25, shillings: +100, sanity: -2, humanity: -3 }
       }
     ]
   },
@@ -353,6 +388,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Notify the armed security guards at the front desk.",
         outcome: "The guards exchange silent glances, lock the glass doors, and tell you that room 104 is off-limits tonight.",
         effects: { sanity: -3, occult: +12 }
+      },
+      {
+        isOccult: true,
+        minOccult: 40,
+        text: "👁️ Lay hands upon the gurney shroud and siphon the entity's remaining vital spark.",
+        outcome: "A jolt of supernatural electricity surges through your veins. The entity sighs in peace, and the orderly gazes upon you with terrified awe.",
+        effects: { occult: +28, shillings: +45, vitality: +3, sanity: -2, humanity: -3 }
       }
     ]
   },
@@ -377,6 +419,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Pull the blankets over your head and wait for morning.",
         outcome: "You don't sleep a wink until dawn filters through the venetian blinds. The kitchen smells of burnt lard.",
         effects: { sanity: -2, happiness: -2 }
+      },
+      {
+        isOccult: true,
+        minOccult: 20,
+        text: "👁️ Whispering the threshold rite, knock four times in counter-rhythm.",
+        outcome: "The wood stops trembling. A sharp click echoes as the deadbolt turns itself. A token of black tomb-iron slides out to your bare toes.",
+        effects: { occult: +18, sanity: -2, shillings: +5, humanity: -1 }
       }
     ]
   },
@@ -401,6 +450,13 @@ const INTERACTIVE_DILEMMAS = [
         text: "Fight back with all your strength.",
         outcome: "You land a solid punch to his nose, but take a bruised rib in return. The principal suspends both of you for two days.",
         effects: { vitality: -3, happiness: -2, smarts: +2 }
+      },
+      {
+        isOccult: true,
+        minOccult: 20,
+        text: "👁️ Gaze unblinkingly into Trent's pupils and whisper a silent hex of dread.",
+        outcome: "Trent clutches his throat as his breath turns to icy vapor. He drops his lunch tray, sobbing uncontrollably, and scrambles away from you in raw panic.",
+        effects: { occult: +16, happiness: +10, humanity: -2, shillings: +2 }
       }
     ]
   },
