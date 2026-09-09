@@ -441,45 +441,55 @@
     <!-- ========================================== -->
     <section id="screen-game" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
       <!-- Top Status / Notch Bar -->
-      <header class="bg-[#14161a] border-b border-leadborder px-4 py-2 shrink-0 flex items-center justify-between z-10">
-        <div class="flex items-center space-x-2.5">
-          <!-- Modular Miniature Canvas Portrait -->
-          <div class="w-10 h-10 rounded-lg overflow-hidden border border-[#85754e]/80 shadow-inner bg-slatecard shrink-0">
-            <canvas id="game-header-avatar" width="80" height="80" class="w-full h-full"></canvas>
-          </div>
-          <div class="leading-tight">
-            <h1 id="char-name" class="font-serif font-bold text-xs sm:text-sm tracking-wide text-parchment truncate max-w-[140px]">Loading...</h1>
-            <div class="flex items-center space-x-1.5 text-[10px] text-dust">
-              <span id="char-job-title" class="text-sky-400 font-medium truncate max-w-[90px]">Infant</span>
-              <span>•</span>
-              <span id="char-age-year">Age: 0 | 2024</span>
+      <header class="bg-[#14161a] border-b border-leadborder px-4 py-3 shrink-0 space-y-2.5 z-10">
+        <!-- Row 1: Character Identity, Status & Quick Actions -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3 min-w-0">
+            <!-- Miniature Portrait -->
+            <div class="w-11 h-11 rounded-xl overflow-hidden border border-[#85754e]/90 shadow-md bg-slatecard shrink-0">
+              <canvas id="game-header-avatar" width="88" height="88" class="w-full h-full"></canvas>
             </div>
+            <!-- Character Name & Age / Status -->
+            <div class="min-w-0 flex-1 leading-tight">
+              <h1 id="char-name" class="font-serif font-bold text-sm tracking-wide text-parchment truncate">Loading...</h1>
+              <div class="flex items-center space-x-2 text-[11px] text-dust mt-0.5">
+                <span id="char-job-title" class="text-sky-400 font-medium truncate">Infant</span>
+                <span class="text-dust/40">•</span>
+                <span id="char-age-year" class="font-mono text-[10px] text-dust/90">Age 0 | 2024</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top-Right Actions (Godmode & Menu) -->
+          <div class="flex items-center space-x-2 shrink-0 pl-2">
+            <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors" title="Open God Mode Inspector">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+            </button>
+            <button id="btn-to-menu" class="p-1.5 rounded-lg bg-slatecard hover:bg-[#20232a] text-dust hover:text-parchment border border-leadborder transition-colors" title="Return to Title">
+              <i data-lucide="home" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
 
-        <!-- Header Actions (Dual Currency Badges) -->
-        <div class="flex items-center space-x-1.5">
-          <!-- Real World Fiat Badge -->
-          <div class="px-2 py-1 rounded bg-[#121814] border border-emerald-900/60 text-[11px] font-mono text-emerald-400 flex items-center space-x-1" title="Mundane Fiat Currency">
-            <i data-lucide="banknote" class="w-3 h-3"></i>
-            <span id="char-money">$0</span>
+        <!-- Row 2: Dual Currency Display (Spacious, Uncramped Ledger) -->
+        <div class="grid grid-cols-2 gap-2">
+          <!-- Mundane Fiat Badge -->
+          <div class="px-2.5 py-1.5 rounded-lg bg-[#101411] border border-emerald-900/60 flex items-center justify-between shadow-sm" title="Mundane Fiat Currency">
+            <div class="flex items-center space-x-1.5 min-w-0">
+              <i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+              <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Mundane</span>
+            </div>
+            <span id="char-money" class="text-xs font-mono font-bold text-emerald-400 truncate pl-1">$0</span>
           </div>
 
           <!-- Paranormal Shillings Badge -->
-          <div class="px-2 py-1 rounded bg-[#1b1712] border border-amber-900/60 text-[11px] font-mono text-amber-400 flex items-center space-x-1" title="Paranormal Shillings">
-            <i data-lucide="coins" class="w-3 h-3"></i>
-            <span id="char-shillings">0 s.</span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-[#16120d] border border-amber-900/60 flex items-center justify-between shadow-sm" title="Paranormal Shillings">
+            <div class="flex items-center space-x-1.5 min-w-0">
+              <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+              <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Shillings</span>
+            </div>
+            <span id="char-shillings" class="text-xs font-mono font-bold text-amber-400 truncate pl-1">0 s.</span>
           </div>
-
-          <!-- Live God Mode Inspector Button -->
-          <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30" title="Open God Mode Inspector">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-          </button>
-
-          <!-- Back to Menu Button -->
-          <button id="btn-to-menu" class="p-1.5 rounded-lg bg-slatecard hover:bg-[#20232a] text-dust hover:text-parchment border border-leadborder transition-colors" title="Return to Title">
-            <i data-lucide="home" class="w-3.5 h-3.5"></i>
-          </button>
         </div>
       </header>
 
@@ -799,11 +809,11 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=5"></script>
-  <script src="js/avatar.js?v=5"></script>
-  <script src="js/names.js?v=5"></script>
-  <script src="js/careers.js?v=5"></script>
-  <script src="js/events.js?v=5"></script>
-  <script src="js/game.js?v=5"></script>
+  <script src="js/audio.js?v=6"></script>
+  <script src="js/avatar.js?v=6"></script>
+  <script src="js/names.js?v=6"></script>
+  <script src="js/careers.js?v=6"></script>
+  <script src="js/events.js?v=6"></script>
+  <script src="js/game.js?v=6"></script>
 </body>
 </html>

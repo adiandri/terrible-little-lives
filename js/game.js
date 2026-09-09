@@ -610,8 +610,28 @@ class TerribleGame {
         const data = JSON.parse(saved);
         if (data.character && data.character.isAlive) {
           this.character = data.character;
+          
+          // Backwards compatibility for saves across updates
+          if (this.character.money === undefined) {
+            this.character.money = this.character.coin || 1500;
+          }
+          if (this.character.shillings === undefined) {
+            this.character.shillings = 10;
+          }
+          if (!this.character.countryCode) {
+            this.character.countryCode = "USA";
+          }
+          if (!this.character.city) {
+            this.character.city = "Seattle, WA";
+          }
+          if (!this.character.statusTitle) {
+            this.character.statusTitle = "Infant";
+          }
+          
           this.logs = data.logs || [];
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
+          this.activeDilemma = null; // Clear any pending dilemma lock on resume
+          
           this.dom.labelResumeLife.textContent = `RESUME: ${this.character.name.toUpperCase()} (AGE ${this.character.age})`;
           this.dom.btnLandingResume.classList.remove('hidden');
           this.dom.btnLandingResume.style.display = 'flex';
@@ -715,7 +735,8 @@ class TerribleGame {
     this.modifyStat('vitality', (Math.random() > 0.7 ? -1 : 0));
 
     // 4. Check for Interactive Dilemmas
-    const availableDilemmas = window.INTERACTIVE_DILEMMAS.filter(d => 
+    const dilemmaPool = window.INTERACTIVE_DILEMMAS || (window.GAME_DATA && window.GAME_DATA.INTERACTIVE_DILEMMAS) || [];
+    const availableDilemmas = dilemmaPool.filter(d => 
       this.character.age >= d.minAge && 
       this.character.age <= d.maxAge && 
       !this.usedDilemmaIds.has(d.id)
@@ -734,7 +755,7 @@ class TerribleGame {
     }
 
     // 5. Ambient Atmospheric Events
-    const ambientPool = window.AMBIENT_YEAR_EVENTS.filter(e =>
+    const ambientPool = (window.AMBIENT_YEAR_EVENTS || (window.GAME_DATA && window.GAME_DATA.AMBIENT_YEAR_EVENTS) || []).filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
     );
 
