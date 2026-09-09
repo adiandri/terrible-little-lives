@@ -217,17 +217,16 @@ function generateNewFriend(character, context = 'Neighborhood') {
     actionsDone: createEmptyActionsDone()
   };
 }
-
 // --- Kin Interaction Functions ---
 
 function spendTimeToKin(person, character) {
   const count = getActionCount(person, 'spentTime');
-  if (count >= 2) {
-    return { success: false, reason: "You have already spent quality time with them twice this year." };
+  if (count >= 6) {
+    return { success: false, reason: "You have spent plenty of time together this year." };
   }
 
   person.actionsDone.spentTime = count + 1;
-  const relGain = count === 0 ? (Math.floor(Math.random() * 6) + 10) : (Math.floor(Math.random() * 4) + 5); // 10-15% first time, 5-8% second time
+  const relGain = count === 0 ? (Math.floor(Math.random() * 6) + 10) : (count <= 2 ? (Math.floor(Math.random() * 4) + 5) : 3);
   person.relationship = Math.min(100, person.relationship + relGain);
 
   let message = "";
@@ -259,7 +258,7 @@ function spendTimeToKin(person, character) {
       message = `You and ${person.name} explored the damp drainage canal. Their breath didn't fog up once in the chilly wind (+${relGain}% Closeness, +3% Smarts).`;
       effects.smarts = +3;
     } else {
-      message = `You and ${person.name} rode bikes around the block until streetlights flickered on (+${relGain}% Closeness, +5% Happiness).`;
+      message = `You and ${person.name} shared a basket of hot french fries under the flickering neon sign of the corner bowling alley (+${relGain}% Closeness, +5% Happiness).`;
     }
   }
 
@@ -268,23 +267,27 @@ function spendTimeToKin(person, character) {
 
 function talkToKin(person, character) {
   const count = getActionCount(person, 'talked');
-  if (count >= 3) {
-    return { success: false, reason: "You have talked a lot with them this year. Give them some space." };
+  if (count >= 10) {
+    return { success: false, reason: "You have talked so much with them this year. Give them some space." };
   }
 
   person.actionsDone.talked = count + 1;
-  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 5) : (count === 1 ? (Math.floor(Math.random() * 3) + 3) : 1);
+  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 5) : 
+                  (count === 1 ? (Math.floor(Math.random() * 3) + 3) : 
+                  (count < 5 ? 2 : 1));
   person.relationship = Math.min(100, person.relationship + relGain);
 
   let quote = "";
   const effects = { relationship: +relGain };
 
-  if (count === 2) {
-    // 3rd talk of the year is lighter conversation
+  if (count >= 2) {
+    // 3rd+ talk of the year is lighter conversation
     const lightChats = [
       `You and ${person.name} chatted idly about the changing autumn weather and distant sirens.`,
       `You exchanged casual neighborhood rumors about the strange tenant on the third floor.`,
-      `You shared a brief, comfortable silence watching rain pool on the asphalt outside.`
+      `You shared a brief, comfortable silence watching rain pool on the asphalt outside.`,
+      `You discussed recent radio broadcasts and municipal road construction near the harbor.`,
+      `You talked about funny childhood memories and old family recipes.`
     ];
     return {
       success: true,
@@ -323,18 +326,19 @@ function talkToKin(person, character) {
     effects.happiness = +4;
   }
 
-  const message = `You had an earnest conversation with ${person.name} (+${relGain}% Closeness). They shared:\n${quote}`;
+  const message = `You had an earnest conversation with ${person.name} (+${relGain}% Closeness).\n${quote}`;
   return { success: true, message, quote, effects };
 }
 
 function complimentKin(person, character) {
   const count = getActionCount(person, 'complimented');
-  if (count >= 2) {
-    return { success: false, reason: "You have already complimented them twice this year." };
+  if (count >= 6) {
+    return { success: false, reason: "You have already complimented them plenty this year." };
   }
 
   person.actionsDone.complimented = count + 1;
-  const relGain = count === 0 ? (Math.floor(Math.random() * 5) + 8) : (Math.floor(Math.random() * 3) + 4); // 8-12% first time, 4-6% second time
+  const relGain = count === 0 ? (Math.floor(Math.random() * 5) + 8) : 
+                  (count <= 2 ? (Math.floor(Math.random() * 3) + 4) : 2);
   person.relationship = Math.min(100, person.relationship + relGain);
 
   let message = "";
@@ -378,109 +382,142 @@ function complimentKin(person, character) {
   return { success: true, message, effects };
 }
 
-function giveGiftToKin(person, character) {
+function giveGiftToKin(person, character, selectedGift = null) {
   const count = getActionCount(person, 'gifted');
-  if (count >= 2) {
-    return { success: false, reason: "You have already given them gifts twice this year." };
+  if (count >= 6) {
+    return { success: false, reason: "You have already given them plenty of gifts this year." };
   }
 
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
-  person.actionsDone.gifted = count + 1;
-  const relGain = count === 0 ? (Math.floor(Math.random() * 7) + 14) : (Math.floor(Math.random() * 5) + 8); // 14-20% first time, 8-12% second time
-  person.relationship = Math.min(100, person.relationship + relGain);
+  
+  // If specific gift provided from 100-gift catalogue
+  if (selectedGift) {
+    // Check shilling or cash affordability
+    const cost = selectedGift.localPrice || 0;
+    const shillings = selectedGift.shillingsCost || 0;
 
-  let message = "";
-  const effects = { relationship: +relGain, happiness: +4 };
-
-  // If revealed entity
-  if (person.isRevealed && person.entityType !== 'human') {
-    if (character.shillings >= 1) {
-      effects.shillings = -1;
-      message = `You gifted ${person.name} a carved obsidian hex pendant charged with 1 Shilling. Their eyes widened with abyssal hunger as they accepted it (+${relGain}% Closeness, +6% Occult, -1 Shilling).`;
-      effects.occult = +6;
-    } else {
-      message = `You gifted ${person.name} a jar of fresh butcher's bone marrow. They consumed it in the shadows with quiet gratitude (+${relGain}% Closeness, +4% Occult).`;
-      effects.occult = +4;
+    if (shillings > 0 && character.shillings < shillings) {
+      return { success: false, reason: `You need ${shillings} Paranormal Shillings for this relic.` };
     }
-    person.loyalty = 'loyal';
-  } else {
-    // Normal human gift
-    const baseCostUSD = Math.floor(Math.random() * 15) + 10; // $10 - $25
-    const cost = Math.round(baseCostUSD * country.wageMultiplier);
-
-    if (character.money >= cost) {
-      effects.money = -cost;
-
-      const gifts = [
-        `a box of fresh honey buns and hot cinnamon rolls from the corner bakery (-${window.formatMoney(cost, character.countryCode)})`,
-        `a vintage chrome thermos filled with rich roasted coffee (-${window.formatMoney(cost, character.countryCode)})`,
-        `a rare analog cassette tape of melancholic darkwave ballads (-${window.formatMoney(cost, character.countryCode)})`,
-        `a warm hand-woven wool scarf in midnight charcoal (-${window.formatMoney(cost, character.countryCode)})`
-      ];
-      message = `You gifted ${person.name} ${window.getRandomElement(gifts)}. They were deeply moved by your thoughtfulness (+${relGain}% Closeness, +4% Happiness).`;
-    } else {
-      // Free handmade or found gift when low on funds
-      const freeGifts = [
-        `a collection of intricate origami cranes folded from antique newsprint`,
-        `a smooth, water-carved quartz stone you found along the canal banks`,
-        `a pressed dried mountain wildflower preserved between glass slides`
-      ];
-      message = `Though short on cash, you gave ${person.name} ${window.getRandomElement(freeGifts)}. They cherished the heartfelt personal effort (+${relGain}% Closeness, +4% Happiness).`;
+    if (cost > 0 && character.money < cost) {
+      return { success: false, reason: `You need ${window.formatMoney(cost, character.countryCode)} to buy this gift.` };
     }
+
+    person.actionsDone.gifted = count + 1;
+    const reaction = window.calculateGiftReaction(selectedGift, person, character);
+    if (reaction && typeof reaction.relGain === 'number') {
+      person.relationship = Math.min(100, Math.max(0, person.relationship + reaction.relGain));
+    }
+    
+    // Add cost deductions to reaction effects
+    reaction.effects = reaction.effects || {};
+    if (cost > 0) reaction.effects.money = -cost;
+    if (shillings > 0) reaction.effects.shillings = -shillings;
+
+    return reaction;
   }
 
-  return { success: true, message, effects };
+  // Fallback random gift
+  person.actionsDone.gifted = count + 1;
+  const gifts = window.getRandomGiftSelection ? window.getRandomGiftSelection(character, 1) : [];
+  const gift = gifts[0] || { name: "Handmade Origami Crane", tier: "free", localPrice: 0 };
+  const reaction = window.calculateGiftReaction ? window.calculateGiftReaction(gift, person, character) : {
+    success: true,
+    message: `You gave ${person.name} a gift.`,
+    effects: { relationship: 15, happiness: 4 }
+  };
+  if (reaction && reaction.effects && typeof reaction.effects.relationship === 'number') {
+    person.relationship = Math.min(100, Math.max(0, person.relationship + reaction.effects.relationship));
+  }
+  return reaction;
 }
 
-function askForMoney(person, character) {
+function askForMoney(person, character, requestedAmount = null) {
   if (!person.role.includes('Father') && !person.role.includes('Mother') && !person.role.includes('Grand')) {
     return { success: false, reason: "You can only ask parents or grandparents for pocket money." };
   }
 
   const count = getActionCount(person, 'askedMoney');
-  if (count >= 2) {
-    return { success: false, reason: "You have already asked them for pocket money twice this year." };
+  if (count >= 5) {
+    return { success: false, reason: "You have already asked them for pocket money enough times this year." };
   }
 
   person.actionsDone.askedMoney = count + 1;
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
 
-  // Probability depends on relationship and generosity; 2nd ask in same year is stricter
-  const penalty = count === 1 ? 20 : 0;
-  const score = (person.relationship * 0.6) + (person.generosity * 0.4) - penalty;
-  const success = score > 50;
+  // Determine requested amount
+  let amount = requestedAmount;
+  if (!amount || amount <= 0) {
+    const baseUSD = Math.floor(Math.random() * 30) + 15; // $15 - $45
+    amount = Math.round(baseUSD * mult);
+  }
+
+  const baseUSD = amount / mult;
+  let penalty = 0;
+  if (baseUSD > 300) penalty = 55;
+  else if (baseUSD > 150) penalty = 35;
+  else if (baseUSD > 75) penalty = 20;
+  else if (baseUSD > 35) penalty = 10;
+
+  // Each previous ask this year increases strictness
+  const askPenalty = count * 14;
+
+  // Grandparents are more generous
+  const grandBonus = person.role.includes('Grand') ? 20 : 0;
+
+  const score = (person.relationship * 0.5) + (person.generosity * 0.5) + grandBonus - penalty - askPenalty;
+  const success = score >= 35;
 
   if (success) {
-    let baseUSD = Math.floor(Math.random() * 30) + 15; // $15 - $45
-    if (count === 1) baseUSD = Math.floor(baseUSD * 0.7); // smaller on 2nd ask
-    if (person.role.includes('Grand')) baseUSD = Math.floor(baseUSD * 1.4);
-    const amount = Math.round(baseUSD * country.wageMultiplier);
+    let relChange = -1;
+    if (baseUSD > 150) relChange = -3;
+    person.relationship = Math.max(0, person.relationship + relChange);
 
-    person.relationship = Math.max(0, person.relationship - 2);
-    const message = count === 0
-      ? `${person.name} agreed and slipped ${window.formatMoney(amount, character.countryCode)} into your pocket with a nod.`
-      : `${person.name} sighed, handed you another ${window.formatMoney(amount, character.countryCode)}, and said: 'Don't spend it all in one afternoon.'`;
-    return { success: true, message, amount, effects: { money: amount, happiness: +3 } };
-  } else {
-    person.relationship = Math.max(0, person.relationship - 5);
-    const reasons = [
-      `'Money doesn't grow on copper pipes,' ${person.name} grumbled, showing you the unpaid heating bill.`,
-      `'You already asked recently. You need to learn fiscal restraint,' ${person.name} sighed, refusing to hand over any cash.`,
-      `${person.name} patted your shoulder apologetically: 'Things are tight this month. Wait until winter passes.'`
+    const responses = [
+      `${person.name} reached into their wallet and handed you ${window.formatMoney(amount, character.countryCode)}. "Here. Spend it wisely."`,
+      `${person.name} smiled warmly, slipping ${window.formatMoney(amount, character.countryCode)} into your hands. "Make sure you put some in your savings."`,
+      `Seeing how polite you were, ${person.name} counted out ${window.formatMoney(amount, character.countryCode)} and gave it to you with a gentle nod.`
     ];
-    const message = `${person.name} declined to give you money. ${window.getRandomElement(reasons)}`;
-    return { success: true, message, amount: 0, effects: { happiness: -4 } };
+
+    const message = window.getRandomElement(responses);
+    return {
+      success: true,
+      granted: true,
+      amount,
+      message,
+      effects: { money: amount, happiness: +4, relationship: relChange }
+    };
+  } else {
+    const relLoss = baseUSD > 150 ? 6 : 3;
+    person.relationship = Math.max(0, person.relationship - relLoss);
+
+    const refusals = [
+      `"${person.name} frowned at the request for ${window.formatMoney(amount, character.countryCode)}: 'Money doesn't grow on copper pipes. Absolutely not.'"`,
+      `"${person.name} shook their head: 'You need to learn financial restraint. I cannot give you that much.'"`,
+      `"${person.name} sighed, showing you an unpaid utility bill: 'Times are tight right now. You'll have to manage without.'"`,
+      `"${person.name} crossed their arms: '${window.formatMoney(amount, character.countryCode)}?! Do you think I'm made of cash? Go find chores to do.'"`
+    ];
+
+    const message = window.getRandomElement(refusals);
+    return {
+      success: true,
+      granted: false,
+      amount: 0,
+      message,
+      effects: { happiness: -4, relationship: -relLoss }
+    };
   }
 }
 
 function argueWithKin(person, character) {
   const count = getActionCount(person, 'argued');
-  if (count >= 2) {
-    return { success: false, reason: "You have already quarreled with them twice this year." };
+  if (count >= 5) {
+    return { success: false, reason: "You have already quarreled with them enough this year." };
   }
 
   person.actionsDone.argued = count + 1;
-  const relLoss = Math.floor(Math.random() * 12) + 10; // -10 to -22%
+  const relLoss = Math.floor(Math.random() * 10) + 8; // -8 to -18%
   person.relationship = Math.max(0, person.relationship - relLoss);
 
   const insults = [
@@ -499,8 +536,8 @@ function investigateKin(person, character) {
   }
 
   const count = getActionCount(person, 'investigated');
-  if (count >= 2) {
-    return { success: false, reason: "You have already observed their habits twice this year." };
+  if (count >= 5) {
+    return { success: false, reason: "You have already observed their habits thoroughly this year." };
   }
 
   person.actionsDone.investigated = count + 1;
@@ -541,8 +578,8 @@ function offerTributeToEntity(person, character) {
   }
 
   const count = getActionCount(person, 'tribute');
-  if (count >= 2) {
-    return { success: false, reason: "You have already offered tribute to them twice this year." };
+  if (count >= 5) {
+    return { success: false, reason: "You have already offered tribute to them enough this year." };
   }
 
   person.actionsDone.tribute = count + 1;

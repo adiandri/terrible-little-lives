@@ -248,7 +248,39 @@ class TerribleGame {
       revelationText: document.getElementById('revelation-text'),
       btnRevelationLoyal: document.getElementById('btn-revelation-loyal'),
       btnRevelationReport: document.getElementById('btn-revelation-report'),
-      btnRevelationIgnore: document.getElementById('btn-revelation-ignore')
+      btnRevelationIgnore: document.getElementById('btn-revelation-ignore'),
+
+      // Ask Money Modal
+      kinAskMoneyModal: document.getElementById('kin-ask-money-modal'),
+      btnCloseAskMoney: document.getElementById('btn-close-ask-money'),
+      askMoneyTargetName: document.getElementById('ask-money-target-name'),
+      askMoneyTargetDesc: document.getElementById('ask-money-target-desc'),
+      slideAskMoney: document.getElementById('slide-ask-money'),
+      lblAskMoneyAmount: document.getElementById('lbl-ask-money-amount'),
+      lblAskMoneyMin: document.getElementById('lbl-ask-money-min'),
+      lblAskMoneyMax: document.getElementById('lbl-ask-money-max'),
+      lblAskMoneyHint: document.getElementById('lbl-ask-money-hint'),
+      btnSubmitAskMoney: document.getElementById('btn-submit-ask-money'),
+      btnCancelAskMoney: document.getElementById('btn-cancel-ask-money'),
+
+      // Gift Modal
+      kinGiftModal: document.getElementById('kin-gift-modal'),
+      btnCloseGiftModal: document.getElementById('btn-close-gift-modal'),
+      giftModalTargetName: document.getElementById('gift-modal-target-name'),
+      giftModalTargetHint: document.getElementById('gift-modal-target-hint'),
+      btnShuffleGifts: document.getElementById('btn-shuffle-gifts'),
+      giftCardsList: document.getElementById('gift-cards-list'),
+      btnCancelGift: document.getElementById('btn-cancel-gift'),
+
+      // Feedback Dialog Modal
+      kinFeedbackModal: document.getElementById('kin-feedback-modal'),
+      feedbackIconBox: document.getElementById('feedback-icon-box'),
+      feedbackIcon: document.getElementById('feedback-icon'),
+      feedbackTag: document.getElementById('feedback-tag'),
+      feedbackTitle: document.getElementById('feedback-title'),
+      feedbackBody: document.getElementById('feedback-body'),
+      feedbackPills: document.getElementById('feedback-pills'),
+      btnCloseFeedback: document.getElementById('btn-close-feedback')
     };
   }
 
@@ -557,6 +589,41 @@ class TerribleGame {
       this.dom.btnKinArgue.addEventListener('click', () => this.handleKinAction('argue'));
     }
 
+    // Ask Money Modal Controls
+    if (this.dom.btnCloseAskMoney) {
+      this.dom.btnCloseAskMoney.addEventListener('click', () => this.closeAskMoneyModal());
+    }
+    if (this.dom.btnCancelAskMoney) {
+      this.dom.btnCancelAskMoney.addEventListener('click', () => this.closeAskMoneyModal());
+    }
+    if (this.dom.slideAskMoney) {
+      this.dom.slideAskMoney.addEventListener('input', (e) => {
+        this.updateAskMoneySliderUI(parseInt(e.target.value, 10));
+      });
+    }
+    if (this.dom.btnSubmitAskMoney) {
+      this.dom.btnSubmitAskMoney.addEventListener('click', () => this.submitAskMoney());
+    }
+
+    // Gift Modal Controls
+    if (this.dom.btnCloseGiftModal) {
+      this.dom.btnCloseGiftModal.addEventListener('click', () => this.closeGiftModal());
+    }
+    if (this.dom.btnCancelGift) {
+      this.dom.btnCancelGift.addEventListener('click', () => this.closeGiftModal());
+    }
+    if (this.dom.btnShuffleGifts) {
+      this.dom.btnShuffleGifts.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.renderGiftCardsList();
+      });
+    }
+
+    // Feedback Dialog Modal Controls
+    if (this.dom.btnCloseFeedback) {
+      this.dom.btnCloseFeedback.addEventListener('click', () => this.closeFeedbackModal());
+    }
+
     // Activities Modal Controls
     if (this.dom.btnTabActivities) {
       this.dom.btnTabActivities.addEventListener('click', () => {
@@ -775,9 +842,9 @@ class TerribleGame {
           if (!this.character.kin) {
             this.character.kin = window.generateFamily(this.character);
           }
-          if (this.character.actionsLeft === undefined || this.character.maxActions < 12) {
-            this.character.actionsLeft = 12;
-            this.character.maxActions = 12;
+          if (this.character.actionsLeft === undefined || this.character.maxActions < 40) {
+            this.character.actionsLeft = 40;
+            this.character.maxActions = 40;
           }
           if (!this.character.activityUses) {
             this.character.activityUses = {};
@@ -801,8 +868,8 @@ class TerribleGame {
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
     this.character.kin = window.generateFamily(this.character);
-    this.character.actionsLeft = 12;
-    this.character.maxActions = 12;
+    this.character.actionsLeft = 40;
+    this.character.maxActions = 40;
     this.character.activityUses = {};
     this.usedDilemmaIds.clear();
 
@@ -834,9 +901,11 @@ class TerribleGame {
       }
     ];
 
+    this.character.statusTitle = "Infant";
     this.activeDilemma = null;
     this.hideModals();
     this.saveGame();
+    this.renderAll();
     this.showScreen('screen-game');
   }
 
@@ -850,8 +919,8 @@ class TerribleGame {
     this.character.year += 1;
 
     // Replenish annual energy pool & reset activity quotas
-    this.character.maxActions = 12;
-    this.character.actionsLeft = 12;
+    this.character.maxActions = 40;
+    this.character.actionsLeft = 40;
     this.character.activityUses = {};
 
     // Status titles by age
@@ -1504,7 +1573,7 @@ class TerribleGame {
         </div>
         <div class="text-right">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
-            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 12}
+            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}
           </span>
         </div>
       </div>
@@ -1552,10 +1621,10 @@ class TerribleGame {
       }
     };
 
-    setupBtn(this.dom.btnKinSpendTime, getCount('spentTime'), 2, "Bond through shared moments and build closeness. (1 Action)", "Already spent enough time together this year (2/2).");
-    setupBtn(this.dom.btnKinConverse, getCount('talked'), 3, "Exchange thoughts, seek advice, or probe their worldview. (1 Action)", "Give them some space for now (3/3 talks reached).");
-    setupBtn(this.dom.btnKinCompliment, getCount('complimented'), 2, "Praise their character, appearance, or resilience. (1 Action)", "Flattered enough for this year (2/2 compliments).");
-    setupBtn(this.dom.btnKinGift, getCount('gifted'), 2, "Offer a thoughtful gift, treat, or dark relic. (1 Action)", "No more gifts needed for this year (2/2 given).");
+    setupBtn(this.dom.btnKinSpendTime, getCount('spentTime'), 6, "Bond through shared moments and build closeness. (1 Action)", "Already spent plenty of time together this year (6/6).");
+    setupBtn(this.dom.btnKinConverse, getCount('talked'), 10, "Exchange thoughts, seek advice, or probe their worldview. (1 Action)", "Give them some space for now (10/10 talks reached).");
+    setupBtn(this.dom.btnKinCompliment, getCount('complimented'), 6, "Praise their character, appearance, or resilience. (1 Action)", "Flattered enough for this year (6/6 compliments).");
+    setupBtn(this.dom.btnKinGift, getCount('gifted'), 6, "Offer a thoughtful gift, treat, or dark relic. (1 Action)", "No more gifts needed for this year (6/6 given).");
     
     // Ask money only for parents / grandparents
     const canAskMoney = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
@@ -1566,7 +1635,7 @@ class TerribleGame {
       } else {
         this.dom.btnKinAskMoney.classList.remove('hidden');
         this.dom.btnKinAskMoney.style.display = 'flex';
-        setupBtn(this.dom.btnKinAskMoney, getCount('askedMoney'), 2, "Request financial help based on their generosity and bond. (1 Action)", "Already asked for pocket money twice this year (2/2).");
+        setupBtn(this.dom.btnKinAskMoney, getCount('askedMoney'), 5, "Request financial help based on their generosity and bond. (1 Action)", "Already asked for pocket money enough this year (5/5).");
       }
     }
 
@@ -1578,7 +1647,7 @@ class TerribleGame {
       } else {
         this.dom.btnKinInvestigate.classList.remove('hidden');
         this.dom.btnKinInvestigate.style.display = 'flex';
-        setupBtn(this.dom.btnKinInvestigate, getCount('investigated'), 2, "Shadow their movements or inspect their strange quirks. (1 Action)", "Already observed their habits thoroughly this year (2/2).");
+        setupBtn(this.dom.btnKinInvestigate, getCount('investigated'), 5, "Shadow their movements or inspect their strange quirks. (1 Action)", "Already observed their habits thoroughly this year (5/5).");
       }
     }
 
@@ -1587,14 +1656,14 @@ class TerribleGame {
       if (person.isRevealed && person.entityType !== 'human') {
         this.dom.btnKinTribute.classList.remove('hidden');
         this.dom.btnKinTribute.style.display = 'flex';
-        setupBtn(this.dom.btnKinTribute, getCount('tribute'), 2, "Pledge secrets, flesh, or devotion to an unmasked entity. (1 Action)", "Already offered occult tribute twice this year (2/2).");
+        setupBtn(this.dom.btnKinTribute, getCount('tribute'), 5, "Pledge secrets, flesh, or devotion to an unmasked entity. (1 Action)", "Already offered occult tribute enough this year (5/5).");
       } else {
         this.dom.btnKinTribute.classList.add('hidden');
         this.dom.btnKinTribute.style.display = 'none';
       }
     }
 
-    setupBtn(this.dom.btnKinArgue, getCount('argued'), 2, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (2/2).");
+    setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
 
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -1610,6 +1679,16 @@ class TerribleGame {
       return;
     }
 
+    // Modal-based interactive flows
+    if (actionType === 'ask_money') {
+      this.openAskMoneyModal(person);
+      return;
+    }
+    if (actionType === 'gift') {
+      this.openGiftModal(person);
+      return;
+    }
+
     let result = null;
 
     if (actionType === 'spend_time') {
@@ -1618,10 +1697,6 @@ class TerribleGame {
       result = window.talkToKin(person, this.character);
     } else if (actionType === 'compliment') {
       result = window.complimentKin(person, this.character);
-    } else if (actionType === 'gift') {
-      result = window.giveGiftToKin(person, this.character);
-    } else if (actionType === 'ask_money') {
-      result = window.askForMoney(person, this.character);
     } else if (actionType === 'investigate') {
       result = window.investigateKin(person, this.character);
     } else if (actionType === 'tribute') {
@@ -1650,8 +1725,6 @@ class TerribleGame {
     // Sound effect
     if (actionType === 'tribute' || (result.effects && result.effects.occult)) {
       window.soundEngine.playDread();
-    } else if (actionType === 'ask_money' && result.amount > 0) {
-      window.soundEngine.playCoin();
     } else {
       window.soundEngine.playClick();
     }
@@ -1674,6 +1747,41 @@ class TerribleGame {
     }
 
     this.renderKinDetail(person);
+
+    // Show interactive feedback dialog modal
+    const actionTitles = {
+      spend_time: 'Quality Time',
+      converse: 'Deep Conversation',
+      compliment: 'Warm Flattery',
+      investigate: 'Occult Observation',
+      tribute: 'Dark Tribute Offered',
+      argue: 'Heated Dispute'
+    };
+    const actionIcons = {
+      spend_time: 'heart-handshake',
+      converse: 'message-circle',
+      compliment: 'sparkles',
+      investigate: 'eye',
+      tribute: 'skull',
+      argue: 'flame'
+    };
+    const actionColors = {
+      spend_time: 'text-rose-400',
+      converse: 'text-blue-400',
+      compliment: 'text-amber-400',
+      investigate: 'text-purple-400',
+      tribute: 'text-rose-500',
+      argue: 'text-orange-500'
+    };
+
+    this.openFeedbackModal({
+      tag: actionType.toUpperCase().replace('_', ' '),
+      title: `${person.name}: ${actionTitles[actionType] || 'Interaction'}`,
+      icon: actionIcons[actionType] || 'message-square',
+      iconColor: actionColors[actionType] || 'text-amber-400',
+      body: result.message,
+      effects: result.effects
+    });
   }
 
   openRevelationModal(person) {
@@ -1737,6 +1845,426 @@ class TerribleGame {
     this.dom.revelationModal.style.display = 'none';
     this.renderAll();
     this.saveGame();
+  }
+
+  formatCurrency(amount) {
+    return window.formatMoney(amount, this.character ? this.character.countryCode : 'USA');
+  }
+
+  // ==========================================
+  // ASK FOR MONEY (ALLOWANCE) MODAL METHODS
+  // ==========================================
+
+  openAskMoneyModal(person) {
+    this.askMoneyTarget = person;
+    if (!this.dom.kinAskMoneyModal) return;
+
+    if (this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+
+    const askCount = person.actionsDone ? (person.actionsDone.askedMoney || 0) : 0;
+    if (askCount >= 5) {
+      alert(`You have already asked ${person.name} for pocket money 5 times this year. Give them a break!`);
+      return;
+    }
+
+    const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+    const mult = country.wageMultiplier || 1.0;
+
+    if (this.dom.askMoneyTargetName) {
+      this.dom.askMoneyTargetName.textContent = `${person.name} (${person.role})`;
+    }
+    if (this.dom.askMoneyTargetDesc) {
+      const genStr = person.generosity > 70 ? "Generous & Indulgent" : person.generosity < 30 ? "Frugal & Strict" : "Fair & Balanced";
+      this.dom.askMoneyTargetDesc.textContent = `Generosity: ${genStr} • Closeness: ${person.relationship}%`;
+    }
+
+    // Slider bounds: min $5 USD, max $500 USD in step 5 USD
+    const minUsd = 5;
+    const maxUsd = 500;
+    const defaultUsd = 25;
+
+    if (this.dom.slideAskMoney) {
+      this.dom.slideAskMoney.min = minUsd;
+      this.dom.slideAskMoney.max = maxUsd;
+      this.dom.slideAskMoney.step = 5;
+      this.dom.slideAskMoney.value = defaultUsd;
+    }
+
+    if (this.dom.lblAskMoneyMin) {
+      this.dom.lblAskMoneyMin.textContent = this.formatCurrency(minUsd * mult);
+    }
+    if (this.dom.lblAskMoneyMax) {
+      this.dom.lblAskMoneyMax.textContent = this.formatCurrency(maxUsd * mult);
+    }
+
+    this.updateAskMoneySliderUI(defaultUsd);
+
+    this.dom.kinAskMoneyModal.classList.remove('hidden');
+    this.dom.kinAskMoneyModal.style.display = 'flex';
+  }
+
+  updateAskMoneySliderUI(usdAmount) {
+    const country = window.COUNTRIES_DATA[this.character ? this.character.countryCode : 'USA'] || window.COUNTRIES_DATA.USA;
+    const mult = country.wageMultiplier || 1.0;
+    const localAmount = Math.round(usdAmount * mult);
+
+    if (this.dom.lblAskMoneyAmount) {
+      this.dom.lblAskMoneyAmount.textContent = this.formatCurrency(localAmount);
+    }
+
+    if (this.dom.lblAskMoneyHint) {
+      if (usdAmount <= 25) {
+        this.dom.lblAskMoneyHint.textContent = "Modest Request (High odds)";
+        this.dom.lblAskMoneyHint.className = "text-emerald-400 font-semibold";
+      } else if (usdAmount <= 100) {
+        this.dom.lblAskMoneyHint.textContent = "Reasonable Ask (Fair odds)";
+        this.dom.lblAskMoneyHint.className = "text-amber-400 font-semibold";
+      } else if (usdAmount <= 250) {
+        this.dom.lblAskMoneyHint.textContent = "Substantial Sum (Tough sell)";
+        this.dom.lblAskMoneyHint.className = "text-orange-400 font-semibold";
+      } else {
+        this.dom.lblAskMoneyHint.textContent = "Greedy Request (Risky)";
+        this.dom.lblAskMoneyHint.className = "text-rose-400 font-semibold";
+      }
+    }
+  }
+
+  closeAskMoneyModal() {
+    if (this.dom.kinAskMoneyModal) {
+      this.dom.kinAskMoneyModal.classList.add('hidden');
+      this.dom.kinAskMoneyModal.style.display = 'none';
+    }
+    this.askMoneyTarget = null;
+  }
+
+  submitAskMoney() {
+    const person = this.askMoneyTarget || this.selectedKin;
+    if (!person) {
+      this.closeAskMoneyModal();
+      return;
+    }
+
+    if (this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.closeAskMoneyModal();
+      return;
+    }
+
+    const usdVal = parseInt(this.dom.slideAskMoney ? this.dom.slideAskMoney.value : 25, 10);
+    const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
+    const mult = country.wageMultiplier || 1.0;
+    const localAmount = Math.round(usdVal * mult);
+
+    const result = window.askForMoney(person, this.character, localAmount);
+    this.closeAskMoneyModal();
+
+    if (!result || !result.success) {
+      alert(result ? (result.reason || result.message) : "Could not ask for money.");
+      return;
+    }
+
+    // Deduct 1 action
+    this.character.actionsLeft -= 1;
+
+    // Apply effects
+    if (result.effects) {
+      for (const [stat, val] of Object.entries(result.effects)) {
+        if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
+        else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
+        else if (stat !== 'relationship') this.modifyStat(stat, val);
+      }
+    }
+
+    // Audio
+    if (result.granted && result.amount > 0) {
+      window.soundEngine.playCoin();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    // Append log
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${person.name}] ${result.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+    this.renderKinDetail(person);
+
+    // Show interactive feedback dialog modal
+    this.openFeedbackModal({
+      tag: result.granted ? "ALLOWANCE GRANTED" : "REQUEST DENIED",
+      title: `${person.name}'s Response`,
+      icon: result.granted ? "hand-coins" : "ban",
+      iconColor: result.granted ? "text-amber-400" : "text-rose-400",
+      body: result.message,
+      effects: result.effects
+    });
+  }
+
+  // ==========================================
+  // ROTATING GIFT CATALOG MODAL METHODS
+  // ==========================================
+
+  openGiftModal(person) {
+    this.giftTarget = person;
+    if (!this.dom.kinGiftModal) return;
+
+    if (this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+
+    const giftCount = person.actionsDone ? (person.actionsDone.gifted || 0) : 0;
+    if (giftCount >= 6) {
+      alert(`You have already given ${person.name} 6 gifts this year. Save some for next year!`);
+      return;
+    }
+
+    if (this.dom.giftModalTargetName) {
+      this.dom.giftModalTargetName.textContent = `Gift for: ${person.name} (${person.role})`;
+    }
+
+    if (this.dom.giftModalTargetHint) {
+      if (person.isRevealed && person.entityType !== 'human') {
+        this.dom.giftModalTargetHint.textContent = `Entity Nature: Craves occult relics, dark curios, and shillings.`;
+      } else if (person.role.includes('Friend')) {
+        this.dom.giftModalTargetHint.textContent = `Preferences: Fun snacks, comics, small treats, or macabre tokens.`;
+      } else if (person.role.includes('Mother') || person.role.includes('Father')) {
+        this.dom.giftModalTargetHint.textContent = `Preferences: Handmade crafts, sincere keepsakes, and family treasures.`;
+      } else {
+        this.dom.giftModalTargetHint.textContent = `Preferences: Everyday delights, thoughtful gestures, and curios.`;
+      }
+    }
+
+    this.renderGiftCardsList();
+
+    this.dom.kinGiftModal.classList.remove('hidden');
+    this.dom.kinGiftModal.style.display = 'flex';
+  }
+
+  renderGiftCardsList() {
+    if (!this.dom.giftCardsList) return;
+    this.dom.giftCardsList.innerHTML = '';
+
+    if (!window.getRandomGiftSelection) return;
+    const gifts = window.getRandomGiftSelection(this.character, 7);
+
+    const giftIcons = {
+      nature: "🌿", handmade: "🧶", found: "🪨", creative: "🎨", food: "🥐",
+      media: "📼", leisure: "🎟️", apparel: "🧣", books: "📖", accessories: "💍",
+      home: "🕯️", tech: "📻", jewelry: "💎", relic: "👁️", curio: "💀"
+    };
+
+    gifts.forEach(gift => {
+      const card = document.createElement('div');
+      card.className = "bg-slatecard/80 hover:bg-cardhover border border-leadborder rounded-xl p-3 flex items-center justify-between transition-all group";
+
+      const iconEmoji = gift.icon || giftIcons[gift.category] || "🎁";
+
+      let costStr = "FREE";
+      let canAfford = true;
+      if (gift.shillingsCost && gift.shillingsCost > 0) {
+        costStr = `${gift.shillingsCost} Shillings`;
+        canAfford = (this.character.shillings || 0) >= gift.shillingsCost;
+      } else if (gift.localPrice > 0) {
+        costStr = gift.priceFormatted || this.formatCurrency(gift.localPrice);
+        canAfford = (this.character.money || 0) >= gift.localPrice;
+      }
+
+      const costColor = canAfford ? "text-amber-400" : "text-rose-400";
+      const tierBadgeColor = {
+        free: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+        treat: "bg-teal-500/10 text-teal-400 border-teal-500/30",
+        thoughtful: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+        luxury: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+        occult: "bg-rose-500/10 text-rose-400 border-rose-500/30"
+      }[gift.tier] || "bg-leadborder text-dust";
+
+      card.innerHTML = `
+        <div class="flex items-center space-x-3 min-w-0 pr-2">
+          <div class="text-2xl w-9 h-9 flex items-center justify-center bg-inputbg rounded-lg border border-leadborder/60 shrink-0">
+            ${iconEmoji}
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center space-x-2">
+              <span class="font-serif font-bold text-xs text-parchment truncate">${gift.name}</span>
+              <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded border shrink-0 ${tierBadgeColor}">${gift.tier}</span>
+            </div>
+            <p class="text-[10px] text-dust line-clamp-1 mt-0.5">${gift.desc}</p>
+          </div>
+        </div>
+        <div class="text-right shrink-0 pl-1">
+          <div class="text-[11px] font-mono font-bold ${costColor} mb-1">${costStr}</div>
+          <button class="btn-buy-gift px-3 py-1 rounded-lg text-xs font-serif font-bold transition-all ${canAfford ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 cursor-pointer active:scale-95' : 'bg-inputbg text-dust/40 border border-leadborder cursor-not-allowed'}" ${canAfford ? '' : 'disabled'}>
+            Give
+          </button>
+        </div>
+      `;
+
+      if (canAfford) {
+        const btn = card.querySelector('.btn-buy-gift');
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.submitGift(gift);
+        });
+      }
+
+      this.dom.giftCardsList.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  closeGiftModal() {
+    if (this.dom.kinGiftModal) {
+      this.dom.kinGiftModal.classList.add('hidden');
+      this.dom.kinGiftModal.style.display = 'none';
+    }
+    this.giftTarget = null;
+  }
+
+  submitGift(gift) {
+    const person = this.giftTarget || this.selectedKin;
+    if (!person) {
+      this.closeGiftModal();
+      return;
+    }
+
+    if (this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.closeGiftModal();
+      return;
+    }
+
+    const result = window.giveGiftToKin(person, this.character, gift);
+    this.closeGiftModal();
+
+    if (!result || !result.success) {
+      alert(result ? (result.reason || result.message) : "Could not give gift.");
+      return;
+    }
+
+    // Deduct 1 action
+    this.character.actionsLeft -= 1;
+
+    // Apply stat effects
+    if (result.effects) {
+      for (const [stat, val] of Object.entries(result.effects)) {
+        if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
+        else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
+        else if (stat !== 'relationship') this.modifyStat(stat, val);
+      }
+    }
+
+    // Audio
+    if (gift.tier === 'occult') {
+      window.soundEngine.playDread();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    // Append log
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${person.name}] ${result.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+    this.renderKinDetail(person);
+
+    const giftIcons = {
+      nature: "🌿", handmade: "🧶", found: "🪨", creative: "🎨", food: "🥐",
+      media: "📼", leisure: "🎟️", apparel: "🧣", books: "📖", accessories: "💍",
+      home: "🕯️", tech: "📻", jewelry: "💎", relic: "👁️", curio: "💀"
+    };
+    const iconEmoji = gift.icon || giftIcons[gift.category] || "🎁";
+
+    // Show feedback modal
+    this.openFeedbackModal({
+      tag: "GIFT DELIVERED",
+      title: `${iconEmoji} ${gift.name}`,
+      icon: "gift",
+      iconColor: "text-teal-400",
+      body: result.message,
+      effects: result.effects
+    });
+  }
+
+  // ==========================================
+  // ACTION FEEDBACK DIALOG MODAL METHODS
+  // ==========================================
+
+  openFeedbackModal({ tag, title, icon, iconColor, body, effects }) {
+    if (!this.dom.kinFeedbackModal) return;
+
+    if (this.dom.feedbackTag) {
+      this.dom.feedbackTag.textContent = tag || "INTERACTION OUTCOME";
+    }
+    if (this.dom.feedbackTitle) {
+      this.dom.feedbackTitle.textContent = title || "Outcome";
+    }
+    if (this.dom.feedbackBody) {
+      this.dom.feedbackBody.textContent = body || "";
+    }
+    if (this.dom.feedbackIconBox) {
+      this.dom.feedbackIconBox.className = `w-12 h-12 rounded-full bg-slatecard border border-leadborder mx-auto flex items-center justify-center ${iconColor || 'text-amber-400'} shadow-md`;
+    }
+    if (this.dom.feedbackIcon) {
+      this.dom.feedbackIcon.setAttribute('data-lucide', icon || 'message-square');
+    }
+
+    if (this.dom.feedbackPills) {
+      this.dom.feedbackPills.innerHTML = '';
+      if (effects) {
+        for (const [key, val] of Object.entries(effects)) {
+          if (val === 0) continue;
+          let pillText = '';
+          let colorClass = val > 0 
+            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
+            : 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+          
+          if (key === 'money') {
+            const formatted = this.formatCurrency(Math.abs(val));
+            pillText = val > 0 ? `+${formatted}` : `-${formatted}`;
+          } else if (key === 'shillings') {
+            pillText = val > 0 ? `+${val} Shillings` : `${val} Shillings`;
+            colorClass = val > 0 ? 'bg-purple-500/15 text-purple-400 border-purple-500/30' : 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+          } else if (key === 'relationship') {
+            pillText = val > 0 ? `Closeness +${val}%` : `Closeness ${val}%`;
+          } else {
+            const statName = key.charAt(0).toUpperCase() + key.slice(1);
+            pillText = val > 0 ? `${statName} +${val}%` : `${statName} ${val}%`;
+          }
+
+          const pill = document.createElement('span');
+          pill.className = `px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-bold ${colorClass}`;
+          pill.textContent = pillText;
+          this.dom.feedbackPills.appendChild(pill);
+        }
+      }
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+
+    this.dom.kinFeedbackModal.classList.remove('hidden');
+    this.dom.kinFeedbackModal.style.display = 'flex';
+  }
+
+  closeFeedbackModal() {
+    if (this.dom.kinFeedbackModal) {
+      this.dom.kinFeedbackModal.classList.add('hidden');
+      this.dom.kinFeedbackModal.style.display = 'none';
+    }
   }
 
   // ==========================================
@@ -1931,6 +2459,9 @@ class TerribleGame {
       this.dom.themeModal,
       this.dom.kinModal,
       this.dom.kinDetailModal,
+      this.dom.kinAskMoneyModal,
+      this.dom.kinGiftModal,
+      this.dom.kinFeedbackModal,
       this.dom.activitiesModal,
       this.dom.revelationModal
     ];

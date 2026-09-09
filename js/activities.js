@@ -10,7 +10,7 @@ const ACTIVITIES_LIST = [
     icon: "gamepad-2",
     minAge: 1,
     maxAge: 10,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Build wooden block towers or dress porcelain dolls in your bedroom.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -51,7 +51,7 @@ const ACTIVITIES_LIST = [
     icon: "trees",
     minAge: 4,
     maxAge: 16,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Climb rusty jungle gyms, ride swings, and explore the drainage culvert.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -107,7 +107,7 @@ const ACTIVITIES_LIST = [
     icon: "monitor",
     minAge: 7,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Play pixelated roleplaying games and retro survival horrors on your console.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -155,7 +155,7 @@ const ACTIVITIES_LIST = [
     icon: "dumbbell",
     minAge: 11,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Jog along rainy asphalt, lift iron weights, or do calisthenics.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -196,7 +196,7 @@ const ACTIVITIES_LIST = [
     icon: "book-open",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Browse dusty bookshelves, encyclopedias, and regional municipal archives.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -238,7 +238,7 @@ const ACTIVITIES_LIST = [
     icon: "graduation-cap",
     minAge: 6,
     maxAge: 22,
-    maxPerYear: 3,
+    maxPerYear: 10,
     desc: "Cram textbooks and complete extra credit problem sets late into the night.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -277,7 +277,7 @@ const ACTIVITIES_LIST = [
     icon: "key",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 5,
     desc: "Slip past the padlock on the crawlspace door with a sputtering flashlight.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -328,7 +328,7 @@ const ACTIVITIES_LIST = [
     icon: "radio",
     minAge: 8,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 5,
     desc: "Dial into the unassigned emergency frequencies while the household sleeps.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -366,7 +366,7 @@ const ACTIVITIES_LIST = [
     icon: "flashlight",
     minAge: 13,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 5,
     desc: "Crawl through drainage conduits and bypass fences into forbidden transit tunnels.",
     run: (character, attemptIndex = 0) => {
       if (attemptIndex === 0) {
@@ -405,7 +405,7 @@ const ACTIVITIES_LIST = [
     icon: "user-plus",
     minAge: 5,
     maxAge: 18,
-    maxPerYear: 2,
+    maxPerYear: 5,
     desc: "Spend the afternoon socializing at the community center, skate park, or schoolyard.",
     run: (character, attemptIndex = 0) => {
       if (!character.kin) {
@@ -438,7 +438,7 @@ const ACTIVITIES_LIST = [
     icon: "users",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 5,
     desc: "Gather your companions for pizza, bike rides, and nighttime campfire talks.",
     run: (character, attemptIndex = 0) => {
       if (!character.kin || character.kin.friends.length === 0) {

@@ -138,6 +138,38 @@ class SoundEngine {
     } catch (e) {}
   }
 
+  playCoin() {
+    if (this.isMuted) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+
+      const now = this.ctx.currentTime;
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(987, now);
+      osc1.frequency.setValueAtTime(1318, now + 0.08);
+
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1975, now + 0.08);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now + 0.08);
+      osc1.stop(now + 0.35);
+      osc2.stop(now + 0.35);
+    } catch (e) {}
+  }
+
   playDeath() {
     if (this.isMuted) return;
     try {

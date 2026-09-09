@@ -953,7 +953,7 @@
             <span class="font-mono text-[11px]">Energy / Stamina:</span>
           </div>
           <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-full">
-            12 / 12 Actions Left
+            40 / 40 Actions Left
           </div>
         </div>
 
@@ -1155,6 +1155,117 @@
       </div>
     </div>
 
+    <!-- ASK FOR MONEY / ALLOWANCE SLIDER MODAL -->
+    <div id="kin-ask-money-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-center items-center">
+      <div class="w-full max-w-sm bg-slatecard border border-leadborder rounded-2xl p-5 flex flex-col shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5">
+          <div class="flex items-center space-x-2 text-amber-400">
+            <i data-lucide="coins" class="w-4 h-4"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Ask For Money</h3>
+          </div>
+          <button id="btn-close-ask-money" class="p-1 rounded text-dust hover:text-parchment transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="space-y-1">
+          <h4 id="ask-money-target-name" class="font-serif font-bold text-sm text-parchment">Target Relative</h4>
+          <p id="ask-money-target-desc" class="text-xs text-dust">Request an allowance based on their bond and generosity.</p>
+        </div>
+
+        <!-- Slider Section -->
+        <div class="bg-inputbg p-3.5 rounded-xl border border-leadborder space-y-2.5">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] font-mono text-dust">Requested Amount:</span>
+            <span id="lbl-ask-money-amount" class="text-sm font-mono font-bold text-amber-400">$25</span>
+          </div>
+          <input id="slide-ask-money" type="range" min="5" max="500" step="5" value="25" class="w-full h-1.5 bg-trackbg rounded-lg accent-amber-500 cursor-pointer">
+          <div class="flex justify-between text-[9px] font-mono text-dust/70">
+            <span id="lbl-ask-money-min">$5</span>
+            <span id="lbl-ask-money-hint" class="text-emerald-400 font-semibold">Modest Request</span>
+            <span id="lbl-ask-money-max">$500</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <button id="btn-submit-ask-money" class="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 font-serif font-bold text-xs tracking-wider transition-all flex items-center justify-center space-x-2">
+            <i data-lucide="hand-coins" class="w-4 h-4"></i>
+            <span>Ask for Pocket Money</span>
+          </button>
+          <button id="btn-cancel-ask-money" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors">
+            Nevermind
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GIVE A PRESENT / GIFT ROTATING CATALOG MODAL -->
+    <div id="kin-gift-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
+      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2 shrink-0">
+          <div class="flex items-center space-x-2 text-teal-400">
+            <i data-lucide="gift" class="w-4 h-4"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Gift Catalogue</h3>
+          </div>
+          <button id="btn-close-gift-modal" class="p-1 text-dust hover:text-parchment transition-colors">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Target recipient and affinity hint -->
+        <div class="flex items-center justify-between bg-inputbg border border-leadborder rounded-xl px-3 py-2 mb-2.5 shrink-0">
+          <div>
+            <div id="gift-modal-target-name" class="text-xs font-serif font-bold text-parchment">Recipient Name</div>
+            <div id="gift-modal-target-hint" class="text-[10px] text-dust font-mono">Preferences: Family keepsakes & warm treats</div>
+          </div>
+          <button id="btn-shuffle-gifts" class="px-2.5 py-1 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-teal-400 hover:text-teal-300 text-[10px] font-mono font-bold flex items-center space-x-1 transition-all">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+            <span>Shuffle List</span>
+          </button>
+        </div>
+
+        <!-- Rotating Gift Cards Container -->
+        <div id="gift-cards-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
+          <!-- Injected dynamically by game.js -->
+        </div>
+
+        <!-- Footer / Cancel -->
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-2">
+          <button id="btn-cancel-gift" class="w-full py-1.5 text-center text-xs text-dust hover:text-parchment transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION OUTCOME / FEEDBACK DIALOG MODAL -->
+    <div id="kin-feedback-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-center items-center">
+      <div class="w-full max-w-sm bg-slatecard border border-leadborder rounded-2xl p-5 flex flex-col shadow-2xl text-center space-y-3 animate-in zoom-in-95 duration-150">
+        <div id="feedback-icon-box" class="w-12 h-12 rounded-full bg-slatecard border border-leadborder mx-auto flex items-center justify-center text-amber-400 shadow-md">
+          <i id="feedback-icon" data-lucide="message-square" class="w-6 h-6"></i>
+        </div>
+
+        <div class="space-y-1">
+          <div id="feedback-tag" class="text-[10px] font-mono uppercase tracking-widest text-dust font-bold">INTERACTION OUTCOME</div>
+          <h3 id="feedback-title" class="font-serif font-bold text-base text-parchment">Feedback Title</h3>
+        </div>
+
+        <div id="feedback-body" class="bg-inputbg p-3 rounded-xl border border-leadborder text-xs text-dust leading-relaxed text-left max-h-48 overflow-y-auto custom-scroll whitespace-pre-line font-sans">
+          Message text here.
+        </div>
+
+        <!-- Stat changes pill container -->
+        <div id="feedback-pills" class="flex flex-wrap gap-1.5 justify-center py-1">
+          <!-- Injected dynamically -->
+        </div>
+
+        <button id="btn-close-feedback" class="w-full py-2.5 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-parchment font-serif font-bold text-xs tracking-wider transition-all">
+          Continue
+        </button>
+      </div>
+    </div>
+
     <!-- Post-Mortem / Coroner Inquest Modal (Death Screen) -->
     <div id="death-modal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 p-6 flex flex-col justify-between items-center text-center">
       <div class="my-auto max-w-xs space-y-4">
@@ -1197,7 +1308,8 @@
   <script src="js/avatar.js?v=9"></script>
   <script src="js/names.js?v=9"></script>
   <script src="js/careers.js?v=9"></script>
-  <script src="js/kin.js?v=9"></script>
+  <script src="js/gifts.js?v=10"></script>
+  <script src="js/kin.js?v=10"></script>
   <script src="js/activities.js?v=9"></script>
   <script src="js/events.js?v=9"></script>
   <script src="js/game.js?v=9"></script>
