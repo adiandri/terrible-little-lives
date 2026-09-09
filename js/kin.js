@@ -50,6 +50,27 @@ const NORMAL_FRIEND_QUOTES = [
   "\"Do you want to come over and play video games after the final bell?\""
 ];
 
+function createEmptyActionsDone() {
+  return {
+    talked: 0,
+    complimented: 0,
+    gifted: 0,
+    spentTime: 0,
+    askedMoney: 0,
+    argued: 0,
+    investigated: 0,
+    tribute: 0
+  };
+}
+
+function getActionCount(person, key) {
+  if (!person.actionsDone) person.actionsDone = createEmptyActionsDone();
+  const val = person.actionsDone[key];
+  if (typeof val === 'number') return val;
+  if (typeof val === 'boolean') return val ? 1 : 0;
+  return 0;
+}
+
 function generateFamily(character) {
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
   const surname = character.name.split(' ').slice(1).join(' ') || window.getRandomElement(country.surnames);
@@ -78,7 +99,7 @@ function generateFamily(character) {
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
-      actionsDone: { spentTime: false, talked: false, askedMoney: false, argued: false }
+      actionsDone: createEmptyActionsDone()
     },
     {
       id: 'mother_' + Date.now() + '_2',
@@ -97,7 +118,7 @@ function generateFamily(character) {
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
-      actionsDone: { spentTime: false, talked: false, askedMoney: false, argued: false }
+      actionsDone: createEmptyActionsDone()
     }
   ];
 
@@ -124,7 +145,7 @@ function generateFamily(character) {
       entityType: Math.random() < 0.04 ? 'anomaly' : 'human',
       suspicion: 0,
       isRevealed: false,
-      actionsDone: { spentTime: false, talked: false, argued: false }
+      actionsDone: createEmptyActionsDone()
     });
   }
 
@@ -149,7 +170,7 @@ function generateFamily(character) {
       relationship: Math.floor(Math.random() * 20) + 75,
       generosity: Math.floor(Math.random() * 30) + 60,
       entityType: 'human',
-      actionsDone: { spentTime: false, talked: false, askedMoney: false }
+      actionsDone: createEmptyActionsDone()
     });
   }
 
@@ -193,19 +214,20 @@ function generateNewFriend(character, context = 'Neighborhood') {
     suspicion: 0,
     isRevealed: entityType === 'human', // Humans are already "revealed" as humans
     loyalty: 'neutral', // 'neutral' | 'loyal' | 'reported'
-    actionsDone: { spentTime: false, talked: false, argued: false, investigated: false, tribute: false }
+    actionsDone: createEmptyActionsDone()
   };
 }
 
 // --- Kin Interaction Functions ---
 
 function spendTimeToKin(person, character) {
-  if (person.actionsDone.spentTime) {
-    return { success: false, reason: "You have already spent quality time with them this year." };
+  const count = getActionCount(person, 'spentTime');
+  if (count >= 2) {
+    return { success: false, reason: "You have already spent quality time with them twice this year." };
   }
 
-  person.actionsDone.spentTime = true;
-  const relGain = Math.floor(Math.random() * 8) + 8; // +8 to +15%
+  person.actionsDone.spentTime = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 6) + 10) : (Math.floor(Math.random() * 4) + 5); // 10-15% first time, 5-8% second time
   person.relationship = Math.min(100, person.relationship + relGain);
 
   let message = "";
@@ -218,26 +240,26 @@ function spendTimeToKin(person, character) {
       `sat together listening to rain drum against the living room window while ${person.name} read the paper.`,
       `drove to the municipal supermarket and picked out sweet pastries together.`
     ];
-    message = `You ${window.getRandomElement(activities)} (+${relGain}% Relationship, +5% Happiness).`;
+    message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
   } else if (person.role.includes('Brother') || person.role.includes('Sister')) {
     const activities = [
       `played a marathon session of split-screen arcade games with your ${person.role.toLowerCase()} ${person.name}.`,
       `built a fort out of heavy wool blankets in the hallway with ${person.name}.`,
       `shared secret snacks after midnight while whispering about school rumors with ${person.name}.`
     ];
-    message = `You ${window.getRandomElement(activities)} (+${relGain}% Relationship, +5% Happiness).`;
+    message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
   } else if (person.role.includes('Grand')) {
-    message = `You spent the afternoon having warm tea and ginger biscuits with ${person.name}. They showed you faded black-and-white family portraits (+${relGain}% Relationship).`;
+    message = `You spent the afternoon having warm tea and ginger biscuits with ${person.name}. They showed you faded black-and-white family portraits (+${relGain}% Closeness).`;
   } else {
     // Friend
     if (person.entityType === 'disguised_mimic' && person.loyalty === 'loyal') {
-      message = `You sat behind the abandoned bleachers with ${person.name}. You kept watch while they ate cold marrow bones in peace (+${relGain}% Relationship, +5% Occult).`;
+      message = `You sat behind the abandoned bleachers with ${person.name}. You kept watch while they ate cold marrow bones in peace (+${relGain}% Closeness, +5% Occult).`;
       effects.occult = +5;
     } else if (person.entityType === 'anomaly') {
-      message = `You and ${person.name} explored the damp drainage canal. Their breath didn't fog up once in the chilly wind (+${relGain}% Relationship, +3% Smarts).`;
+      message = `You and ${person.name} explored the damp drainage canal. Their breath didn't fog up once in the chilly wind (+${relGain}% Closeness, +3% Smarts).`;
       effects.smarts = +3;
     } else {
-      message = `You and ${person.name} rode bikes around the block until streetlights flickered on (+${relGain}% Relationship, +5% Happiness).`;
+      message = `You and ${person.name} rode bikes around the block until streetlights flickered on (+${relGain}% Closeness, +5% Happiness).`;
     }
   }
 
@@ -245,16 +267,32 @@ function spendTimeToKin(person, character) {
 }
 
 function talkToKin(person, character) {
-  if (person.actionsDone.talked) {
-    return { success: false, reason: "You already had a deep conversation with them this year." };
+  const count = getActionCount(person, 'talked');
+  if (count >= 3) {
+    return { success: false, reason: "You have talked a lot with them this year. Give them some space." };
   }
 
-  person.actionsDone.talked = true;
-  const relGain = Math.floor(Math.random() * 5) + 4; // +4 to +8%
+  person.actionsDone.talked = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 5) : (count === 1 ? (Math.floor(Math.random() * 3) + 3) : 1);
   person.relationship = Math.min(100, person.relationship + relGain);
 
   let quote = "";
   const effects = { relationship: +relGain };
+
+  if (count === 2) {
+    // 3rd talk of the year is lighter conversation
+    const lightChats = [
+      `You and ${person.name} chatted idly about the changing autumn weather and distant sirens.`,
+      `You exchanged casual neighborhood rumors about the strange tenant on the third floor.`,
+      `You shared a brief, comfortable silence watching rain pool on the asphalt outside.`
+    ];
+    return {
+      success: true,
+      message: `${window.getRandomElement(lightChats)} (+${relGain}% Closeness).`,
+      quote: "",
+      effects
+    };
+  }
 
   if (person.entityType === 'anomaly') {
     quote = window.getRandomElement(ANOMALY_QUOTES);
@@ -285,8 +323,113 @@ function talkToKin(person, character) {
     effects.happiness = +4;
   }
 
-  const message = `You had an earnest conversation with ${person.name}. They shared:\n${quote}`;
+  const message = `You had an earnest conversation with ${person.name} (+${relGain}% Closeness). They shared:\n${quote}`;
   return { success: true, message, quote, effects };
+}
+
+function complimentKin(person, character) {
+  const count = getActionCount(person, 'complimented');
+  if (count >= 2) {
+    return { success: false, reason: "You have already complimented them twice this year." };
+  }
+
+  person.actionsDone.complimented = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 5) + 8) : (Math.floor(Math.random() * 3) + 4); // 8-12% first time, 4-6% second time
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = "";
+  const effects = { relationship: +relGain, happiness: +3 };
+
+  if (person.isRevealed && person.entityType !== 'human') {
+    const entityCompliments = [
+      `You whispered that their true abyssal presence commands quiet awe. They let out a purr of electrostatic resonance (+${relGain}% Closeness, +3% Occult).`,
+      `You admired how seamlessly their disguised joints moved. A flicker of cold satisfaction crossed their eyes (+${relGain}% Closeness).`
+    ];
+    message = window.getRandomElement(entityCompliments);
+    effects.occult = +3;
+  } else if (person.role === 'Father' || person.role === 'Mother') {
+    const parentCompliments = [
+      `You told ${person.name} you admire their unwavering resilience and how hard they work for the family. They looked touched and embraced you warmly (+${relGain}% Closeness, +3% Happiness).`,
+      `You remarked that ${person.name} makes the drafty house feel like a real sanctuary. A gentle smile broke across their tired face (+${relGain}% Closeness).`,
+      `You praised their practical wisdom. ${person.name} chuckled softly and thanked you (+${relGain}% Closeness).`
+    ];
+    message = window.getRandomElement(parentCompliments);
+  } else if (person.role.includes('Brother') || person.role.includes('Sister')) {
+    const siblingCompliments = [
+      `You praised your ${person.role.toLowerCase()}'s quick wit and style. They puffed their chest with pride and smiled (+${relGain}% Closeness).`,
+      `You told ${person.name} that nobody makes you laugh like they do. They grinned from ear to ear (+${relGain}% Closeness).`
+    ];
+    message = window.getRandomElement(siblingCompliments);
+  } else if (person.role.includes('Grand')) {
+    const grandCompliments = [
+      `You told ${person.name} that their ancient stories and heritage mean the world to you. Their eyes misted with fond memories (+${relGain}% Closeness, +3% Happiness).`,
+      `You complimented their timeless elegance. They laughed warmly and offered you an extra sweet (+${relGain}% Closeness).`
+    ];
+    message = window.getRandomElement(grandCompliments);
+  } else {
+    // Friend
+    const friendCompliments = [
+      `You told ${person.name} they are the most dependable friend in this entire city. They gave you a broad grin and bumped fists (+${relGain}% Closeness, +3% Happiness).`,
+      `You complimented their fearless attitude. They laughed and promised they've always got your back (+${relGain}% Closeness).`
+    ];
+    message = window.getRandomElement(friendCompliments);
+  }
+
+  return { success: true, message, effects };
+}
+
+function giveGiftToKin(person, character) {
+  const count = getActionCount(person, 'gifted');
+  if (count >= 2) {
+    return { success: false, reason: "You have already given them gifts twice this year." };
+  }
+
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  person.actionsDone.gifted = count + 1;
+  const relGain = count === 0 ? (Math.floor(Math.random() * 7) + 14) : (Math.floor(Math.random() * 5) + 8); // 14-20% first time, 8-12% second time
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = "";
+  const effects = { relationship: +relGain, happiness: +4 };
+
+  // If revealed entity
+  if (person.isRevealed && person.entityType !== 'human') {
+    if (character.shillings >= 1) {
+      effects.shillings = -1;
+      message = `You gifted ${person.name} a carved obsidian hex pendant charged with 1 Shilling. Their eyes widened with abyssal hunger as they accepted it (+${relGain}% Closeness, +6% Occult, -1 Shilling).`;
+      effects.occult = +6;
+    } else {
+      message = `You gifted ${person.name} a jar of fresh butcher's bone marrow. They consumed it in the shadows with quiet gratitude (+${relGain}% Closeness, +4% Occult).`;
+      effects.occult = +4;
+    }
+    person.loyalty = 'loyal';
+  } else {
+    // Normal human gift
+    const baseCostUSD = Math.floor(Math.random() * 15) + 10; // $10 - $25
+    const cost = Math.round(baseCostUSD * country.wageMultiplier);
+
+    if (character.money >= cost) {
+      effects.money = -cost;
+
+      const gifts = [
+        `a box of fresh honey buns and hot cinnamon rolls from the corner bakery (-${window.formatMoney(cost, character.countryCode)})`,
+        `a vintage chrome thermos filled with rich roasted coffee (-${window.formatMoney(cost, character.countryCode)})`,
+        `a rare analog cassette tape of melancholic darkwave ballads (-${window.formatMoney(cost, character.countryCode)})`,
+        `a warm hand-woven wool scarf in midnight charcoal (-${window.formatMoney(cost, character.countryCode)})`
+      ];
+      message = `You gifted ${person.name} ${window.getRandomElement(gifts)}. They were deeply moved by your thoughtfulness (+${relGain}% Closeness, +4% Happiness).`;
+    } else {
+      // Free handmade or found gift when low on funds
+      const freeGifts = [
+        `a collection of intricate origami cranes folded from antique newsprint`,
+        `a smooth, water-carved quartz stone you found along the canal banks`,
+        `a pressed dried mountain wildflower preserved between glass slides`
+      ];
+      message = `Though short on cash, you gave ${person.name} ${window.getRandomElement(freeGifts)}. They cherished the heartfelt personal effort (+${relGain}% Closeness, +4% Happiness).`;
+    }
+  }
+
+  return { success: true, message, effects };
 }
 
 function askForMoney(person, character) {
@@ -294,31 +437,35 @@ function askForMoney(person, character) {
     return { success: false, reason: "You can only ask parents or grandparents for pocket money." };
   }
 
-  if (person.actionsDone.askedMoney) {
-    return { success: false, reason: "You already asked them for pocket money this year." };
+  const count = getActionCount(person, 'askedMoney');
+  if (count >= 2) {
+    return { success: false, reason: "You have already asked them for pocket money twice this year." };
   }
 
-  person.actionsDone.askedMoney = true;
+  person.actionsDone.askedMoney = count + 1;
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
 
-  // Probability depends on relationship and generosity
-  const score = (person.relationship * 0.6) + (person.generosity * 0.4);
+  // Probability depends on relationship and generosity; 2nd ask in same year is stricter
+  const penalty = count === 1 ? 20 : 0;
+  const score = (person.relationship * 0.6) + (person.generosity * 0.4) - penalty;
   const success = score > 50;
 
   if (success) {
-    // Calculate realistic allowance amount
-    let baseUSD = Math.floor(Math.random() * 35) + 15; // $15 - $50
-    if (person.role.includes('Grand')) baseUSD = Math.floor(baseUSD * 1.5);
+    let baseUSD = Math.floor(Math.random() * 30) + 15; // $15 - $45
+    if (count === 1) baseUSD = Math.floor(baseUSD * 0.7); // smaller on 2nd ask
+    if (person.role.includes('Grand')) baseUSD = Math.floor(baseUSD * 1.4);
     const amount = Math.round(baseUSD * country.wageMultiplier);
 
-    person.relationship = Math.max(0, person.relationship - 2); // asking costs tiny bit of favor
-    const message = `${person.name} agreed and slipped ${window.formatMoney(amount, character.countryCode)} into your pocket with a nod.`;
-    return { success: true, message, amount, effects: { money: amount, happiness: +4 } };
+    person.relationship = Math.max(0, person.relationship - 2);
+    const message = count === 0
+      ? `${person.name} agreed and slipped ${window.formatMoney(amount, character.countryCode)} into your pocket with a nod.`
+      : `${person.name} sighed, handed you another ${window.formatMoney(amount, character.countryCode)}, and said: 'Don't spend it all in one afternoon.'`;
+    return { success: true, message, amount, effects: { money: amount, happiness: +3 } };
   } else {
     person.relationship = Math.max(0, person.relationship - 5);
     const reasons = [
       `'Money doesn't grow on copper pipes,' ${person.name} grumbled, showing you the unpaid heating bill.`,
-      `'You need to learn fiscal restraint,' ${person.name} sighed, refusing to hand over any cash.`,
+      `'You already asked recently. You need to learn fiscal restraint,' ${person.name} sighed, refusing to hand over any cash.`,
       `${person.name} patted your shoulder apologetically: 'Things are tight this month. Wait until winter passes.'`
     ];
     const message = `${person.name} declined to give you money. ${window.getRandomElement(reasons)}`;
@@ -327,12 +474,13 @@ function askForMoney(person, character) {
 }
 
 function argueWithKin(person, character) {
-  if (person.actionsDone.argued) {
-    return { success: false, reason: "You have already quarreled with them this year." };
+  const count = getActionCount(person, 'argued');
+  if (count >= 2) {
+    return { success: false, reason: "You have already quarreled with them twice this year." };
   }
 
-  person.actionsDone.argued = true;
-  const relLoss = Math.floor(Math.random() * 15) + 12; // -12 to -26%
+  person.actionsDone.argued = count + 1;
+  const relLoss = Math.floor(Math.random() * 12) + 10; // -10 to -22%
   person.relationship = Math.max(0, person.relationship - relLoss);
 
   const insults = [
@@ -350,11 +498,12 @@ function investigateKin(person, character) {
     return { success: false, reason: `${person.name} is unquestionably an ordinary human.` };
   }
 
-  if (person.actionsDone.investigated) {
-    return { success: false, reason: "You already observed their habits this year. Waiting for fresh clues." };
+  const count = getActionCount(person, 'investigated');
+  if (count >= 2) {
+    return { success: false, reason: "You have already observed their habits twice this year." };
   }
 
-  person.actionsDone.investigated = true;
+  person.actionsDone.investigated = count + 1;
   const suspicionGain = Math.floor(Math.random() * 25) + 30; // +30 to +55%
   person.suspicion = Math.min(100, person.suspicion + suspicionGain);
 
@@ -391,11 +540,12 @@ function offerTributeToEntity(person, character) {
     return { success: false, reason: "You can only offer tribute to a revealed anomaly or entity." };
   }
 
-  if (person.actionsDone.tribute) {
-    return { success: false, reason: "You have already offered tribute to them this year." };
+  const count = getActionCount(person, 'tribute');
+  if (count >= 2) {
+    return { success: false, reason: "You have already offered tribute to them twice this year." };
   }
 
-  person.actionsDone.tribute = true;
+  person.actionsDone.tribute = count + 1;
   const shillingsGained = Math.floor(Math.random() * 8) + 4; // +4 to +11 Shillings
   person.relationship = Math.min(100, person.relationship + 20);
   person.loyalty = 'loyal';
@@ -428,8 +578,8 @@ function tickKinYear(character) {
   kin.parents.forEach(p => {
     if (!p.alive) return;
     p.age += 1;
-    // Reset actions
-    p.actionsDone = { spentTime: false, talked: false, askedMoney: false, argued: false };
+    // Reset actions to clean counts
+    p.actionsDone = createEmptyActionsDone();
     
     // Natural drift if ignored
     p.relationship = Math.max(10, p.relationship - Math.floor(Math.random() * 3));
@@ -466,7 +616,7 @@ function tickKinYear(character) {
   kin.siblings.forEach(s => {
     if (!s.alive) return;
     s.age += 1;
-    s.actionsDone = { spentTime: false, talked: false, argued: false };
+    s.actionsDone = createEmptyActionsDone();
     s.relationship = Math.max(10, s.relationship - Math.floor(Math.random() * 2));
 
     // Rare sibling tragedy (0.4%)
@@ -484,7 +634,7 @@ function tickKinYear(character) {
   kin.grandparents.forEach(g => {
     if (!g.alive) return;
     g.age += 1;
-    g.actionsDone = { spentTime: false, talked: false, askedMoney: false };
+    g.actionsDone = createEmptyActionsDone();
     
     // Grandparent mortality (high after age 72)
     const deathChance = g.age > 78 ? 0.12 : (g.age > 70 ? 0.06 : 0.02);
@@ -503,7 +653,7 @@ function tickKinYear(character) {
   kin.friends.forEach(f => {
     if (!f.alive) return;
     f.age += 1;
-    f.actionsDone = { spentTime: false, talked: false, argued: false, investigated: false, tribute: false };
+    f.actionsDone = createEmptyActionsDone();
     f.relationship = Math.max(5, f.relationship - Math.floor(Math.random() * 4)); // friends drift faster
   });
 
@@ -524,6 +674,8 @@ window.generateFamily = generateFamily;
 window.generateNewFriend = generateNewFriend;
 window.spendTimeToKin = spendTimeToKin;
 window.talkToKin = talkToKin;
+window.complimentKin = complimentKin;
+window.giveGiftToKin = giveGiftToKin;
 window.askForMoney = askForMoney;
 window.argueWithKin = argueWithKin;
 window.investigateKin = investigateKin;

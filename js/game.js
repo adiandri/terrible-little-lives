@@ -227,6 +227,8 @@ class TerribleGame {
       kinDetailDossier: document.getElementById('kin-detail-dossier'),
       btnKinSpendTime: document.getElementById('btn-kin-spend-time'),
       btnKinConverse: document.getElementById('btn-kin-converse'),
+      btnKinCompliment: document.getElementById('btn-kin-compliment'),
+      btnKinGift: document.getElementById('btn-kin-gift'),
       btnKinAskMoney: document.getElementById('btn-kin-ask-money'),
       btnKinInvestigate: document.getElementById('btn-kin-investigate'),
       btnKinTribute: document.getElementById('btn-kin-tribute'),
@@ -536,6 +538,12 @@ class TerribleGame {
     if (this.dom.btnKinConverse) {
       this.dom.btnKinConverse.addEventListener('click', () => this.handleKinAction('converse'));
     }
+    if (this.dom.btnKinCompliment) {
+      this.dom.btnKinCompliment.addEventListener('click', () => this.handleKinAction('compliment'));
+    }
+    if (this.dom.btnKinGift) {
+      this.dom.btnKinGift.addEventListener('click', () => this.handleKinAction('gift'));
+    }
     if (this.dom.btnKinAskMoney) {
       this.dom.btnKinAskMoney.addEventListener('click', () => this.handleKinAction('ask_money'));
     }
@@ -767,9 +775,12 @@ class TerribleGame {
           if (!this.character.kin) {
             this.character.kin = window.generateFamily(this.character);
           }
-          if (this.character.actionsLeft === undefined) {
-            this.character.actionsLeft = 4;
-            this.character.maxActions = 4;
+          if (this.character.actionsLeft === undefined || this.character.maxActions < 12) {
+            this.character.actionsLeft = 12;
+            this.character.maxActions = 12;
+          }
+          if (!this.character.activityUses) {
+            this.character.activityUses = {};
           }
           
           this.logs = data.logs || [];
@@ -790,8 +801,9 @@ class TerribleGame {
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
     this.character.kin = window.generateFamily(this.character);
-    this.character.actionsLeft = 4;
-    this.character.maxActions = 4;
+    this.character.actionsLeft = 12;
+    this.character.maxActions = 12;
+    this.character.activityUses = {};
     this.usedDilemmaIds.clear();
 
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
@@ -837,8 +849,10 @@ class TerribleGame {
     this.character.age += 1;
     this.character.year += 1;
 
-    // Replenish annual energy pool
-    this.character.actionsLeft = this.character.maxActions || 4;
+    // Replenish annual energy pool & reset activity quotas
+    this.character.maxActions = 12;
+    this.character.actionsLeft = 12;
+    this.character.activityUses = {};
 
     // Status titles by age
     if (this.character.age <= 2) this.character.statusTitle = "Infant";
@@ -1490,7 +1504,7 @@ class TerribleGame {
         </div>
         <div class="text-right">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
-            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 4}
+            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 12}
           </span>
         </div>
       </div>
@@ -1508,27 +1522,40 @@ class TerribleGame {
       ${entityInfo}
     `;
 
-    // Button states & anti-spam disables
-    const actions = person.actionsDone || {};
+    // Button states & quota/diminishing returns display
+    const getCount = (key) => window.getActionCount ? window.getActionCount(person, key) : (person.actionsDone && person.actionsDone[key] ? (typeof person.actionsDone[key] === 'number' ? person.actionsDone[key] : 1) : 0);
     const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
 
-    const setupBtn = (btn, isDone, doneLabel) => {
+    const setupBtn = (btn, count, maxQuota, normalLabel, doneLabel) => {
       if (!btn) return;
-      if (noEnergy || isDone) {
+      const isCapped = count >= maxQuota;
+      const desc = btn.querySelector('.text-\\[10px\\]');
+      const title = btn.querySelector('.text-xs');
+
+      if (title) {
+        if (!title.dataset.baseTitle) {
+          title.dataset.baseTitle = title.textContent.replace(/\s*\(\d+\/\d+\)$/, '');
+        }
+        title.textContent = `${title.dataset.baseTitle} (${count}/${maxQuota})`;
+      }
+
+      if (noEnergy || isCapped) {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
-        if (isDone) {
-          const desc = btn.querySelector('.text-\\[10px\\]');
-          if (desc) desc.textContent = doneLabel;
+        if (desc) {
+          desc.textContent = isCapped ? doneLabel : "Exhausted for this year (0 Energy left).";
         }
       } else {
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        if (desc) desc.textContent = normalLabel;
       }
     };
 
-    setupBtn(this.dom.btnKinSpendTime, actions.spentTime, "Already spent quality time together this year.");
-    setupBtn(this.dom.btnKinConverse, actions.talked, "Already had a deep talk this year.");
+    setupBtn(this.dom.btnKinSpendTime, getCount('spentTime'), 2, "Bond through shared moments and build closeness. (1 Action)", "Already spent enough time together this year (2/2).");
+    setupBtn(this.dom.btnKinConverse, getCount('talked'), 3, "Exchange thoughts, seek advice, or probe their worldview. (1 Action)", "Give them some space for now (3/3 talks reached).");
+    setupBtn(this.dom.btnKinCompliment, getCount('complimented'), 2, "Praise their character, appearance, or resilience. (1 Action)", "Flattered enough for this year (2/2 compliments).");
+    setupBtn(this.dom.btnKinGift, getCount('gifted'), 2, "Offer a thoughtful gift, treat, or dark relic. (1 Action)", "No more gifts needed for this year (2/2 given).");
     
     // Ask money only for parents / grandparents
     const canAskMoney = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
@@ -1539,7 +1566,7 @@ class TerribleGame {
       } else {
         this.dom.btnKinAskMoney.classList.remove('hidden');
         this.dom.btnKinAskMoney.style.display = 'flex';
-        setupBtn(this.dom.btnKinAskMoney, actions.askedMoney, "Already asked for money this year.");
+        setupBtn(this.dom.btnKinAskMoney, getCount('askedMoney'), 2, "Request financial help based on their generosity and bond. (1 Action)", "Already asked for pocket money twice this year (2/2).");
       }
     }
 
@@ -1551,7 +1578,7 @@ class TerribleGame {
       } else {
         this.dom.btnKinInvestigate.classList.remove('hidden');
         this.dom.btnKinInvestigate.style.display = 'flex';
-        setupBtn(this.dom.btnKinInvestigate, actions.investigated, "Already observed their habits this year.");
+        setupBtn(this.dom.btnKinInvestigate, getCount('investigated'), 2, "Shadow their movements or inspect their strange quirks. (1 Action)", "Already observed their habits thoroughly this year (2/2).");
       }
     }
 
@@ -1560,14 +1587,14 @@ class TerribleGame {
       if (person.isRevealed && person.entityType !== 'human') {
         this.dom.btnKinTribute.classList.remove('hidden');
         this.dom.btnKinTribute.style.display = 'flex';
-        setupBtn(this.dom.btnKinTribute, actions.tribute, "Already offered occult tribute this year.");
+        setupBtn(this.dom.btnKinTribute, getCount('tribute'), 2, "Pledge secrets, flesh, or devotion to an unmasked entity. (1 Action)", "Already offered occult tribute twice this year (2/2).");
       } else {
         this.dom.btnKinTribute.classList.add('hidden');
         this.dom.btnKinTribute.style.display = 'none';
       }
     }
 
-    setupBtn(this.dom.btnKinArgue, actions.argued, "Already had a heated argument this year.");
+    setupBtn(this.dom.btnKinArgue, getCount('argued'), 2, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (2/2).");
 
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -1589,6 +1616,10 @@ class TerribleGame {
       result = window.spendTimeToKin(person, this.character);
     } else if (actionType === 'converse') {
       result = window.talkToKin(person, this.character);
+    } else if (actionType === 'compliment') {
+      result = window.complimentKin(person, this.character);
+    } else if (actionType === 'gift') {
+      result = window.giveGiftToKin(person, this.character);
     } else if (actionType === 'ask_money') {
       result = window.askForMoney(person, this.character);
     } else if (actionType === 'investigate') {
@@ -1736,7 +1767,7 @@ class TerribleGame {
   }
 
   renderActivitiesList(category = 'all') {
-    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 4} Actions Left`;
+    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 12} Actions Left`;
 
     this.dom.activitiesList.innerHTML = '';
     const list = window.ACTIVITIES_LIST || [];
@@ -1766,6 +1797,11 @@ class TerribleGame {
         (act.category === 'mind' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' : 
         (act.category === 'social' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30'));
 
+      const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
+      const maxUses = act.maxPerYear || 3;
+      const isCapped = uses >= maxUses;
+      const isDisabled = noEnergy || isCapped;
+
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5">
@@ -1783,19 +1819,19 @@ class TerribleGame {
         <p class="text-[11px] text-dust leading-relaxed">${act.desc}</p>
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
-          <span class="text-[10px] font-mono text-dust/80">Cost: 1 Action</span>
+          <span class="text-[10px] font-mono text-dust/80">Cost: 1 Action · Quota: ${uses}/${maxUses}</span>
           <button class="btn-do-activity px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
-            noEnergy 
+            isDisabled 
               ? 'opacity-50 cursor-not-allowed bg-leadborder/30 text-dust' 
               : 'bg-slatecard hover:bg-cardhover text-parchment border border-leadborder active:scale-95 shadow-xs'
-          }" ${noEnergy ? 'disabled' : ''}>
-            Engage
+          }" ${isDisabled ? 'disabled' : ''}>
+            ${isCapped ? 'Capped' : 'Engage'}
           </button>
         </div>
       `;
 
       const btn = card.querySelector('.btn-do-activity');
-      if (btn && !noEnergy) {
+      if (btn && !isDisabled) {
         btn.addEventListener('click', () => {
           this.handleActivityClick(act.id);
         });
