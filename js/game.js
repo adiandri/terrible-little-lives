@@ -1,4 +1,4 @@
-// Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
+﻿// Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
 
 class TerribleGame {
   constructor() {
@@ -284,7 +284,59 @@ class TerribleGame {
       feedbackTitle: document.getElementById('feedback-title'),
       feedbackBody: document.getElementById('feedback-body'),
       feedbackPills: document.getElementById('feedback-pills'),
-      btnCloseFeedback: document.getElementById('btn-close-feedback')
+      btnCloseFeedback: document.getElementById('btn-close-feedback'),
+
+      // Dynamic Occupation Tab
+      occupationTabIcon: document.getElementById('occupation-tab-icon'),
+      occupationTabLabel: document.getElementById('occupation-tab-label'),
+
+      // Education Main Modal
+      educationModal: document.getElementById('education-modal'),
+      btnCloseEducation: document.getElementById('btn-close-education'),
+      btnEduDone: document.getElementById('btn-edu-done'),
+      eduSchoolName: document.getElementById('edu-school-name'),
+      eduSchoolLevelBadge: document.getElementById('edu-school-level-badge'),
+      eduSchoolGradeLabel: document.getElementById('edu-school-grade-label'),
+      eduValGrades: document.getElementById('edu-val-grades'),
+      eduBarGrades: document.getElementById('edu-bar-grades'),
+      eduValPopularity: document.getElementById('edu-val-popularity'),
+      eduBarPopularity: document.getElementById('edu-bar-popularity'),
+      eduDisciplinaryBanner: document.getElementById('edu-disciplinary-banner'),
+      eduDisciplinaryCount: document.getElementById('edu-disciplinary-count'),
+      btnEduStudyHarder: document.getElementById('btn-edu-study-harder'),
+      btnEduSkipClass: document.getElementById('btn-edu-skip-class'),
+      tabEduOverview: document.getElementById('tab-edu-overview'),
+      tabEduClassmates: document.getElementById('tab-edu-classmates'),
+      tabEduTeachers: document.getElementById('tab-edu-teachers'),
+      tabEduStaff: document.getElementById('tab-edu-staff'),
+      eduPanelOverview: document.getElementById('edu-panel-overview'),
+      eduPanelClassmates: document.getElementById('edu-panel-classmates'),
+      eduPanelTeachers: document.getElementById('edu-panel-teachers'),
+      eduPanelStaff: document.getElementById('edu-panel-staff'),
+      eduClubsList: document.getElementById('edu-clubs-list'),
+      eduClubsCount: document.getElementById('edu-clubs-count'),
+      eduMysteriesList: document.getElementById('edu-mysteries-list'),
+      eduUniversitySection: document.getElementById('edu-university-section'),
+      eduMajorsList: document.getElementById('edu-majors-list'),
+      eduDropoutContainer: document.getElementById('edu-dropout-container'),
+      btnEduDropOut: document.getElementById('btn-edu-drop-out'),
+      eduClassmatesList: document.getElementById('edu-classmates-list'),
+      eduTeachersList: document.getElementById('edu-teachers-list'),
+      eduStaffList: document.getElementById('edu-staff-list'),
+
+      // School Person Dossier Modal
+      schoolPersonModal: document.getElementById('school-person-modal'),
+      btnCloseSchoolPerson: document.getElementById('btn-close-school-person'),
+      btnCancelSchoolPerson: document.getElementById('btn-cancel-school-person'),
+      schoolPersonAvatarBox: document.getElementById('school-person-avatar-box'),
+      schoolPersonIcon: document.getElementById('school-person-icon'),
+      schoolPersonName: document.getElementById('school-person-name'),
+      schoolPersonRoleBadge: document.getElementById('school-person-role-badge'),
+      schoolPersonCliqueBadge: document.getElementById('school-person-clique-badge'),
+      schoolPersonQuirk: document.getElementById('school-person-quirk'),
+      schoolPersonRelVal: document.getElementById('school-person-rel-val'),
+      schoolPersonRelBar: document.getElementById('school-person-rel-bar'),
+      schoolPersonActionsList: document.getElementById('school-person-actions-list')
     };
   }
 
@@ -512,11 +564,55 @@ class TerribleGame {
     // Gameplay Controls
     this.dom.btnEndure.addEventListener('click', () => this.endureYear());
 
-    // Careers Modal Controls
+    // Dynamic Occupation (School / Careers) Tab Controls
     this.dom.btnTabCareers.addEventListener('click', () => {
       window.soundEngine.playClick();
-      this.openCareersModal();
+      if (this.character && this.character.education && this.character.education.enrolled) {
+        this.openEducationModal();
+      } else if (this.character && this.character.age < 18 && (!this.character.education || this.character.education.graduationStatus !== 'expelled')) {
+        if (window.enrollInSchool) window.enrollInSchool(this.character);
+        this.openEducationModal();
+      } else {
+        this.openCareersModal();
+      }
     });
+
+    // Education Modal Controls
+    if (this.dom.btnCloseEducation) {
+      this.dom.btnCloseEducation.addEventListener('click', () => this.closeEducationModal());
+    }
+    if (this.dom.btnEduDone) {
+      this.dom.btnEduDone.addEventListener('click', () => this.closeEducationModal());
+    }
+    if (this.dom.tabEduOverview) {
+      this.dom.tabEduOverview.addEventListener('click', () => this.renderEducationModal('overview'));
+    }
+    if (this.dom.tabEduClassmates) {
+      this.dom.tabEduClassmates.addEventListener('click', () => this.renderEducationModal('classmates'));
+    }
+    if (this.dom.tabEduTeachers) {
+      this.dom.tabEduTeachers.addEventListener('click', () => this.renderEducationModal('teachers'));
+    }
+    if (this.dom.tabEduStaff) {
+      this.dom.tabEduStaff.addEventListener('click', () => this.renderEducationModal('staff'));
+    }
+    if (this.dom.btnEduStudyHarder) {
+      this.dom.btnEduStudyHarder.addEventListener('click', () => this.handleSchoolAction('study_harder'));
+    }
+    if (this.dom.btnEduSkipClass) {
+      this.dom.btnEduSkipClass.addEventListener('click', () => this.handleSchoolAction('skip_class'));
+    }
+    if (this.dom.btnEduDropOut) {
+      this.dom.btnEduDropOut.addEventListener('click', () => this.handleSchoolAction('drop_out'));
+    }
+
+    // School Person Dossier Modal Controls
+    if (this.dom.btnCloseSchoolPerson) {
+      this.dom.btnCloseSchoolPerson.addEventListener('click', () => this.closeSchoolPersonModal());
+    }
+    if (this.dom.btnCancelSchoolPerson) {
+      this.dom.btnCancelSchoolPerson.addEventListener('click', () => this.closeSchoolPersonModal());
+    }
 
     this.dom.btnCloseCareers.addEventListener('click', () => {
       this.dom.careersModal.classList.add('hidden');
@@ -865,6 +961,9 @@ class TerribleGame {
           if (!this.character.activityUses) {
             this.character.activityUses = {};
           }
+          if (this.character.age >= 1 && !this.character.education && window.enrollInSchool) {
+            window.enrollInSchool(this.character);
+          }
           
           this.logs = data.logs || [];
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
@@ -918,6 +1017,9 @@ class TerribleGame {
     ];
 
     this.character.statusTitle = "Infant";
+    if (this.character.age >= 1 && window.enrollInSchool) {
+      window.enrollInSchool(this.character);
+    }
     this.activeDilemma = null;
     this.hideModals();
     this.saveGame();
@@ -1014,13 +1116,18 @@ class TerribleGame {
       ];
       currentYearLog.entries.push(window.getRandomElement(unemploymentVignettes));
     } else {
-      // Minor school life
-      const schoolReports = [
-        "Received annual school report card. Teachers noted quiet behavior and an unusual fascination with local folklore.",
-        "Passed annual academic examinations without issue; your teachers praised your steady focus.",
-        "Sat through mandatory standardized testing under buzzing gymnasium halogen lamps."
-      ];
-      currentYearLog.entries.push(window.getRandomElement(schoolReports));
+      // Educational lifecycle simulation (Report cards, club activities, graduations)
+      if (window.tickEducationYear) {
+        const eduLogs = window.tickEducationYear(this.character) || [];
+        eduLogs.forEach(entry => currentYearLog.entries.push(entry));
+      } else {
+        const schoolReports = [
+          "Received annual school report card. Teachers noted quiet behavior and an unusual fascination with local folklore.",
+          "Passed annual academic examinations without issue; your teachers praised your steady focus.",
+          "Sat through mandatory standardized testing under buzzing gymnasium halogen lamps."
+        ];
+        currentYearLog.entries.push(window.getRandomElement(schoolReports));
+      }
     }
 
     // 3. Living Expenses & Economy
@@ -2689,7 +2796,9 @@ class TerribleGame {
       this.dom.kinGiftModal,
       this.dom.kinFeedbackModal,
       this.dom.activitiesModal,
-      this.dom.revelationModal
+      this.dom.revelationModal,
+      this.dom.educationModal,
+      this.dom.schoolPersonModal
     ];
 
     modals.forEach(m => {
@@ -2757,6 +2866,7 @@ class TerribleGame {
       `;
     }
 
+    this.updateOccupationTab();
     this.renderLogs();
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -3077,6 +3187,738 @@ class TerribleGame {
     }
   }
 
+  // ==========================================
+  // EDUCATION & SCHOOL SYSTEM
+  // ==========================================
+
+  updateOccupationTab() {
+    if (!this.dom.occupationTabIcon || !this.dom.occupationTabLabel) return;
+
+    const isEnrolled = this.character && this.character.education && this.character.education.enrolled;
+    const isSchoolAge = this.character && this.character.age < 18 && (!this.character.education || this.character.education.graduationStatus !== 'expelled');
+
+    if (isEnrolled || isSchoolAge) {
+      this.dom.occupationTabIcon.setAttribute('data-lucide', 'graduation-cap');
+      let label = 'School';
+      if (this.character.education && this.character.education.level === 'daycare') label = 'Daycare';
+      else if (this.character.education && this.character.education.level === 'kindergarten') label = 'Kinder';
+      else if (this.character.education && this.character.education.level === 'university') label = 'University';
+      this.dom.occupationTabLabel.textContent = label;
+    } else {
+      this.dom.occupationTabIcon.setAttribute('data-lucide', 'briefcase');
+      this.dom.occupationTabLabel.textContent = 'Careers';
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  openEducationModal(activeTab = 'overview') {
+    if (!this.character.education) {
+      if (window.enrollInSchool) window.enrollInSchool(this.character);
+    }
+    if (!this.character.education || !this.character.education.enrolled) {
+      if (this.character.age >= 18 && this.character.hasHighSchoolDiploma) {
+        // Can open higher education admissions
+      } else {
+        this.openCareersModal();
+        return;
+      }
+    }
+
+    this.activeEducationTab = activeTab || 'overview';
+    this.renderEducationModal(this.activeEducationTab);
+    this.dom.educationModal.classList.remove('hidden');
+    this.dom.educationModal.style.display = 'flex';
+  }
+
+  closeEducationModal() {
+    if (this.dom.educationModal) {
+      this.dom.educationModal.classList.add('hidden');
+      this.dom.educationModal.style.display = 'none';
+    }
+  }
+
+  renderEducationModal(activeTab = 'overview') {
+    const edu = this.character.education;
+    if (!edu) return;
+
+    this.activeEducationTab = activeTab;
+
+    // Header labels
+    if (this.dom.eduSchoolName) this.dom.eduSchoolName.textContent = edu.name;
+    if (this.dom.eduSchoolLevelBadge) {
+      const levelLabels = {
+        daycare: 'Toddler Daycare',
+        kindergarten: 'Kindergarten',
+        elementary: 'Elementary School',
+        middle: 'Middle School',
+        high: 'High School',
+        university: 'University'
+      };
+      this.dom.eduSchoolLevelBadge.textContent = levelLabels[edu.level] || 'School';
+    }
+    if (this.dom.eduSchoolGradeLabel) {
+      if (edu.level === 'daycare') this.dom.eduSchoolGradeLabel.textContent = `Toddler Room ${edu.gradeYear}`;
+      else if (edu.level === 'kindergarten') this.dom.eduSchoolGradeLabel.textContent = `Kindergarten Year ${edu.gradeYear}`;
+      else if (edu.level === 'university') this.dom.eduSchoolGradeLabel.textContent = `${edu.major || 'Undergraduate'} · Year ${edu.gradeYear}`;
+      else this.dom.eduSchoolGradeLabel.textContent = `Grade ${edu.gradeYear}`;
+    }
+
+    // Performance Bars
+    const grades = Math.max(0, Math.min(100, edu.grades || 75));
+    const popularity = Math.max(0, Math.min(100, edu.popularity || 50));
+    let letter = 'C';
+    if (grades >= 90) letter = 'A+';
+    else if (grades >= 80) letter = 'A';
+    else if (grades >= 70) letter = 'B';
+    else if (grades >= 60) letter = 'C';
+    else if (grades >= 50) letter = 'D';
+    else letter = 'F';
+
+    if (this.dom.eduValGrades) this.dom.eduValGrades.textContent = `${grades}% (${letter})`;
+    if (this.dom.eduBarGrades) this.dom.eduBarGrades.style.width = `${grades}%`;
+    if (this.dom.eduValPopularity) this.dom.eduValPopularity.textContent = `${popularity}%`;
+    if (this.dom.eduBarPopularity) this.dom.eduBarPopularity.style.width = `${popularity}%`;
+
+    // Disciplinary Banner
+    if (edu.disciplinaryRecord && edu.disciplinaryRecord > 0) {
+      if (this.dom.eduDisciplinaryBanner) {
+        this.dom.eduDisciplinaryBanner.classList.remove('hidden');
+        this.dom.eduDisciplinaryBanner.style.display = 'flex';
+      }
+      if (this.dom.eduDisciplinaryCount) this.dom.eduDisciplinaryCount.textContent = edu.disciplinaryRecord;
+    } else {
+      if (this.dom.eduDisciplinaryBanner) {
+        this.dom.eduDisciplinaryBanner.classList.add('hidden');
+        this.dom.eduDisciplinaryBanner.style.display = 'none';
+      }
+    }
+
+    // Drop out container (High school or University only)
+    if (this.dom.eduDropoutContainer) {
+      if (edu.level === 'high' || edu.level === 'university') {
+        this.dom.eduDropoutContainer.classList.remove('hidden');
+      } else {
+        this.dom.eduDropoutContainer.classList.add('hidden');
+      }
+    }
+
+    // Tab buttons active styling
+    const tabs = ['overview', 'classmates', 'teachers', 'staff'];
+    tabs.forEach(t => {
+      const btn = this.dom['tabEdu' + t.charAt(0).toUpperCase() + t.slice(1)];
+      const panel = this.dom['eduPanel' + t.charAt(0).toUpperCase() + t.slice(1)];
+      if (btn) {
+        if (t === activeTab) {
+          btn.className = "py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center border border-leadborder shadow-sm";
+        } else {
+          btn.className = "py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center border border-transparent";
+        }
+      }
+      if (panel) {
+        if (t === activeTab) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      }
+    });
+
+    // Populate active tab panel
+    if (activeTab === 'overview') {
+      this.renderSchoolOverviewTab();
+    } else if (activeTab === 'classmates') {
+      this.renderSchoolClassmatesTab();
+    } else if (activeTab === 'teachers') {
+      this.renderSchoolTeachersTab();
+    } else if (activeTab === 'staff') {
+      this.renderSchoolStaffTab();
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  renderSchoolOverviewTab() {
+    const edu = this.character.education;
+    if (!edu) return;
+
+    // 1. Clubs
+    if (this.dom.eduClubsList) {
+      this.dom.eduClubsList.innerHTML = '';
+      const availableClubs = (window.SCHOOL_CLUBS || []).filter(c => c.reqLevel.includes(edu.level));
+      if (this.dom.eduClubsCount) {
+        this.dom.eduClubsCount.textContent = `${(edu.clubs || []).length} Active`;
+      }
+
+      if (availableClubs.length === 0) {
+        this.dom.eduClubsList.innerHTML = `<div class="text-[11px] text-dust italic p-2 bg-inputbg rounded-lg border border-leadborder">No extracurricular clubs available at this stage of education.</div>`;
+      } else {
+        availableClubs.forEach(club => {
+          const isMember = (edu.clubs || []).includes(club.id);
+          const card = document.createElement('div');
+          card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs";
+          card.innerHTML = `
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
+                <i data-lucide="${club.icon || 'trophy'}" class="w-3.5 h-3.5"></i>
+              </div>
+              <div>
+                <div class="font-serif font-bold text-parchment flex items-center gap-1.5">
+                  <span>${club.name}</span>
+                  ${isMember ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">MEMBER</span>` : ''}
+                </div>
+                <div class="text-[10px] text-dust leading-snug">${club.desc}</div>
+              </div>
+            </div>
+            <button class="btn-club-toggle shrink-0 ml-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
+              isMember 
+                ? 'bg-rose-950/30 hover:bg-rose-900/40 text-rose-400 border border-rose-500/30' 
+                : 'bg-slatecard hover:bg-cardhover text-teal-400 border border-leadborder'
+            }">
+              ${isMember ? 'Quit' : 'Join'}
+            </button>
+          `;
+
+          const toggleBtn = card.querySelector('.btn-club-toggle');
+          toggleBtn.addEventListener('click', () => {
+            if (isMember) {
+              edu.clubs = edu.clubs.filter(id => id !== club.id);
+              this.openFeedbackModal({
+                tag: "CLUB MEMBERSHIP",
+                title: `Left ${club.name}`,
+                icon: "log-out",
+                iconColor: "text-dust",
+                body: `You stepped down from the ${club.name} to free up your extracurricular schedule.`,
+                effects: {}
+              });
+            } else {
+              if (this.character.actionsLeft <= 0) {
+                this.openFeedbackModal({
+                  tag: "ENERGY EXHAUSTED",
+                  title: "Out of Actions",
+                  icon: "battery-charging",
+                  iconColor: "text-amber-400",
+                  body: "You are too fatigued to join a new club this year! Age up via Endure Year to replenish your energy.",
+                  effects: {}
+                });
+                return;
+              }
+              this.character.actionsLeft--;
+              edu.clubs = edu.clubs || [];
+              edu.clubs.push(club.id);
+              this.openFeedbackModal({
+                tag: "CLUB MEMBERSHIP",
+                title: `Joined ${club.name}!`,
+                icon: club.icon || "trophy",
+                iconColor: "text-amber-400",
+                body: `You officially signed the registration sheet for ${club.name}! Active participation will provide annual stat growth.`,
+                effects: { happiness: 5 }
+              });
+            }
+            this.renderAll();
+            this.renderEducationModal('overview');
+          });
+
+          this.dom.eduClubsList.appendChild(card);
+        });
+      }
+    }
+
+    // 2. School Supernatural Mysteries
+    if (this.dom.eduMysteriesList) {
+      this.dom.eduMysteriesList.innerHTML = '';
+      const availableMysteries = (window.SCHOOL_MYSTERIES || []).filter(m => m.reqLevel.includes(edu.level));
+
+      if (availableMysteries.length === 0) {
+        this.dom.eduMysteriesList.innerHTML = `<div class="text-[11px] text-dust italic p-2 bg-inputbg rounded-lg border border-leadborder">No unusual school anomalies documented at this institution yet.</div>`;
+      } else {
+        availableMysteries.forEach(mystery => {
+          const card = document.createElement('div');
+          card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-purple-900/30 text-xs hover:border-purple-500/40 transition-all";
+          card.innerHTML = `
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-lg bg-purple-950/40 border border-purple-800/40 flex items-center justify-center text-purple-400 shrink-0">
+                <i data-lucide="${mystery.icon || 'eye'}" class="w-3.5 h-3.5"></i>
+              </div>
+              <div>
+                <div class="font-serif font-bold text-purple-300">${mystery.title}</div>
+                <div class="text-[10px] text-dust leading-snug">${mystery.desc}</div>
+              </div>
+            </div>
+            <button class="btn-investigate shrink-0 ml-2 px-2.5 py-1 rounded-lg bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/40 text-purple-300 hover:text-purple-200 text-[10px] font-mono font-bold transition-all flex items-center gap-1">
+              <i data-lucide="compass" class="w-3 h-3"></i>
+              <span>Investigate</span>
+            </button>
+          `;
+
+          const invBtn = card.querySelector('.btn-investigate');
+          invBtn.addEventListener('click', () => {
+            this.handleSchoolAction('mystery', mystery.id);
+          });
+
+          this.dom.eduMysteriesList.appendChild(card);
+        });
+      }
+    }
+
+    // 3. University Applications (if adult and high school graduate)
+    if (this.dom.eduUniversitySection) {
+      if (this.character.age >= 18 && this.character.hasHighSchoolDiploma && (!edu || edu.level !== 'university')) {
+        this.dom.eduUniversitySection.classList.remove('hidden');
+        if (this.dom.eduMajorsList) {
+          this.dom.eduMajorsList.innerHTML = '';
+          (window.UNIVERSITY_MAJORS || []).forEach(major => {
+            const card = document.createElement('div');
+            card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs";
+            card.innerHTML = `
+              <div>
+                <div class="font-serif font-bold text-parchment">${major.name}</div>
+                <div class="text-[10px] font-mono text-dust">Tuition: ${window.formatMoney(major.tuition, this.character.countryCode)}/yr · +${major.smartsBonus} Smarts</div>
+              </div>
+              <button class="btn-apply-major shrink-0 px-2.5 py-1 rounded-lg bg-sky-950/40 hover:bg-sky-900/50 border border-sky-500/40 text-sky-300 text-[10px] font-mono font-bold transition-all">
+                Apply
+              </button>
+            `;
+            const applyBtn = card.querySelector('.btn-apply-major');
+            applyBtn.addEventListener('click', () => {
+              this.handleSchoolAction('apply_university', major.id);
+            });
+            this.dom.eduMajorsList.appendChild(card);
+          });
+        }
+      } else {
+        this.dom.eduUniversitySection.classList.add('hidden');
+      }
+    }
+  }
+
+  renderSchoolClassmatesTab() {
+    const edu = this.character.education;
+    if (!edu || !this.dom.eduClassmatesList) return;
+
+    if (!edu.classmates || edu.classmates.length === 0) {
+      if (window.generateClassmates) edu.classmates = window.generateClassmates(this.character, 6);
+    }
+
+    this.dom.eduClassmatesList.innerHTML = '';
+
+    (edu.classmates || []).forEach(peer => {
+      const card = document.createElement('div');
+      card.className = "bg-inputbg border border-leadborder rounded-xl p-3 flex items-center justify-between shadow-xs hover:border-leadborder/90 transition-all";
+      
+      const rel = Math.max(0, Math.min(100, peer.relationship || 50));
+      const pop = Math.max(0, Math.min(100, peer.popularity || 50));
+
+      card.innerHTML = `
+        <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-sky-400 shrink-0">
+            <i data-lucide="${peer.gender === 'Male' ? 'user' : 'user-check'}" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span class="font-serif font-bold text-xs text-parchment truncate">${peer.name}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/15 text-purple-400 border border-purple-500/30 uppercase font-bold shrink-0">${peer.clique}</span>
+              ${peer.isBefriended ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold shrink-0">★ Best Friend</span>` : ''}
+            </div>
+            <!-- Small Closeness & Popularity Bars -->
+            <div class="grid grid-cols-2 gap-2 mt-1.5 text-[9px] font-mono text-dust">
+              <div>
+                <div class="flex justify-between items-center mb-0.5">
+                  <span class="text-purple-400">Closeness</span>
+                  <span>${rel}%</span>
+                </div>
+                <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
+                  <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-0.5">
+                  <span class="text-amber-400">Popularity</span>
+                  <span>${pop}%</span>
+                </div>
+                <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
+                  <div class="bg-amber-500 h-full rounded-full" style="width: ${pop}%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-peer-interact shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-teal-400 hover:text-teal-300 font-mono text-xs font-bold transition-all">
+          Interact
+        </button>
+      `;
+
+      const interactBtn = card.querySelector('.btn-peer-interact');
+      interactBtn.addEventListener('click', () => {
+        this.openSchoolPersonModal(peer, 'classmate');
+      });
+
+      this.dom.eduClassmatesList.appendChild(card);
+    });
+  }
+
+  renderSchoolTeachersTab() {
+    const edu = this.character.education;
+    if (!edu || !this.dom.eduTeachersList) return;
+
+    if (!edu.teachers || edu.teachers.length === 0) {
+      if (window.generateTeachers) edu.teachers = window.generateTeachers(this.character, edu.level);
+    }
+
+    this.dom.eduTeachersList.innerHTML = '';
+
+    (edu.teachers || []).forEach(teacher => {
+      const card = document.createElement('div');
+      card.className = "bg-inputbg border border-leadborder rounded-xl p-3 flex items-center justify-between shadow-xs hover:border-leadborder/90 transition-all";
+      
+      const rel = Math.max(0, Math.min(100, teacher.relationship || 50));
+      const strict = teacher.strictness || 50;
+      let strictBadge = strict > 60 
+        ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold">Strict</span>`
+        : (strict < 40 
+          ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">Lenient</span>`
+          : `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-bold">Moderate</span>`);
+
+      card.innerHTML = `
+        <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-emerald-400 shrink-0">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span class="font-serif font-bold text-xs text-parchment truncate">${teacher.name}</span>
+              ${strictBadge}
+            </div>
+            <div class="text-[10px] text-dust font-mono truncate mt-0.5">${teacher.role}</div>
+            <div class="mt-1 text-[9px] font-mono text-dust">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="text-purple-400">Respect & Standing</span>
+                <span>${rel}%</span>
+              </div>
+              <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
+                <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-teacher-consult shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-emerald-400 hover:text-emerald-300 font-mono text-xs font-bold transition-all">
+          Consult
+        </button>
+      `;
+
+      const consultBtn = card.querySelector('.btn-teacher-consult');
+      consultBtn.addEventListener('click', () => {
+        this.openSchoolPersonModal(teacher, 'teacher');
+      });
+
+      this.dom.eduTeachersList.appendChild(card);
+    });
+  }
+
+  renderSchoolStaffTab() {
+    const edu = this.character.education;
+    if (!edu || !this.dom.eduStaffList) return;
+
+    if (!edu.staff || edu.staff.length === 0) {
+      if (window.generateStaff) edu.staff = window.generateStaff(this.character, edu.level);
+    }
+
+    this.dom.eduStaffList.innerHTML = '';
+
+    (edu.staff || []).forEach(staffMember => {
+      const card = document.createElement('div');
+      card.className = "bg-inputbg border border-leadborder rounded-xl p-3 flex items-center justify-between shadow-xs hover:border-leadborder/90 transition-all";
+      
+      const rel = Math.max(0, Math.min(100, staffMember.relationship || 50));
+      
+      let staffIcon = 'briefcase';
+      let iconColor = 'text-amber-400';
+      if (staffMember.role.includes('Janitor') || staffMember.role.includes('Caretaker')) {
+        staffIcon = 'wrench';
+        iconColor = 'text-amber-400';
+      } else if (staffMember.role.includes('Librarian')) {
+        staffIcon = 'book-open';
+        iconColor = 'text-teal-400';
+      } else if (staffMember.role.includes('Nurse') || staffMember.role.includes('Matron')) {
+        staffIcon = 'heart';
+        iconColor = 'text-rose-400';
+      } else if (staffMember.role.includes('Principal') || staffMember.role.includes('Headmaster') || staffMember.role.includes('Dean')) {
+        staffIcon = 'shield';
+        iconColor = 'text-purple-400';
+      }
+
+      card.innerHTML = `
+        <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center ${iconColor} shrink-0">
+            <i data-lucide="${staffIcon}" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span class="font-serif font-bold text-xs text-parchment truncate">${staffMember.name}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slatecard border border-leadborder text-dust uppercase font-bold shrink-0">${staffMember.role}</span>
+            </div>
+            <div class="text-[10px] text-dust font-sans truncate mt-0.5">${staffMember.quirk || ''}</div>
+            <div class="mt-1 text-[9px] font-mono text-dust">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="text-purple-400">Rapport</span>
+                <span>${rel}%</span>
+              </div>
+              <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
+                <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-staff-approach shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-amber-400 hover:text-amber-300 font-mono text-xs font-bold transition-all">
+          Approach
+        </button>
+      `;
+
+      const approachBtn = card.querySelector('.btn-staff-approach');
+      approachBtn.addEventListener('click', () => {
+        this.openSchoolPersonModal(staffMember, 'staff');
+      });
+
+      this.dom.eduStaffList.appendChild(card);
+    });
+  }
+
+  // --- School Person Dossier Modal ---
+  openSchoolPersonModal(person, category) {
+    if (!person || !this.dom.schoolPersonModal) return;
+
+    this.activeSchoolPerson = person;
+    this.activeSchoolPersonCategory = category;
+
+    if (this.dom.schoolPersonName) this.dom.schoolPersonName.textContent = person.name;
+    if (this.dom.schoolPersonRoleBadge) this.dom.schoolPersonRoleBadge.textContent = person.role || (category === 'classmate' ? 'Classmate' : 'Faculty');
+    
+    if (this.dom.schoolPersonCliqueBadge) {
+      if (person.clique) {
+        this.dom.schoolPersonCliqueBadge.textContent = person.clique;
+        this.dom.schoolPersonCliqueBadge.classList.remove('hidden');
+      } else {
+        this.dom.schoolPersonCliqueBadge.classList.add('hidden');
+      }
+    }
+
+    if (this.dom.schoolPersonQuirk) {
+      if (person.quirk) {
+        this.dom.schoolPersonQuirk.textContent = person.quirk;
+      } else if (category === 'classmate') {
+        this.dom.schoolPersonQuirk.textContent = `A classmate in your year associated with the ${person.clique} clique. Popularity standing: ${person.popularity}%.`;
+      } else if (category === 'teacher') {
+        this.dom.schoolPersonQuirk.textContent = `Faculty member teaching ${person.role}. Strictness rating: ${person.strictness}%.`;
+      } else {
+        this.dom.schoolPersonQuirk.textContent = `Staff member at ${this.character.education ? this.character.education.name : 'the school'}.`;
+      }
+    }
+
+    const rel = Math.max(0, Math.min(100, person.relationship || 50));
+    if (this.dom.schoolPersonRelVal) this.dom.schoolPersonRelVal.textContent = `${rel}%`;
+    if (this.dom.schoolPersonRelBar) this.dom.schoolPersonRelBar.style.width = `${rel}%`;
+
+    this.renderSchoolPersonActions(person, category);
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+
+    this.dom.schoolPersonModal.classList.remove('hidden');
+    this.dom.schoolPersonModal.style.display = 'flex';
+  }
+
+  closeSchoolPersonModal() {
+    if (this.dom.schoolPersonModal) {
+      this.dom.schoolPersonModal.classList.add('hidden');
+      this.dom.schoolPersonModal.style.display = 'none';
+    }
+  }
+
+  renderSchoolPersonActions(person, category) {
+    if (!this.dom.schoolPersonActionsList) return;
+    this.dom.schoolPersonActionsList.innerHTML = '';
+
+    const actions = [];
+
+    if (category === 'classmate') {
+      actions.push({ id: 'chat', label: 'Chat & Whisper', desc: 'Engage in friendly hallway banter.', icon: 'message-square', color: 'text-sky-400' });
+      actions.push({ id: 'study_together', label: 'Study Together', desc: 'Review homework sets and class notes.', icon: 'book-open', color: 'text-emerald-400' });
+      actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-amber-400' });
+      actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-purple-400' });
+      actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-rose-400' });
+      if (!person.isBefriended) {
+        actions.push({ id: 'befriend', label: 'Ask to be Best Friends', desc: 'Invite into your permanent Kin & Friends circle (Req 50%+ Closeness).', icon: 'user-plus', color: 'text-amber-300' });
+      }
+    } else if (category === 'teacher') {
+      actions.push({ id: 'praise', label: 'Praise Teaching', desc: 'Compliment their curriculum and lecture dedication.', icon: 'thumbs-up', color: 'text-emerald-400' });
+      actions.push({ id: 'ask_help', label: 'Request Tutoring', desc: 'Ask for after-school academic assistance.', icon: 'help-circle', color: 'text-sky-400' });
+      actions.push({ id: 'complain', label: 'Dispute Homework Grade', desc: 'Object to an unfair assignment mark.', icon: 'alert-circle', color: 'text-amber-400' });
+      actions.push({ id: 'bribe', label: 'Offer Grade Bribe ($50)', desc: 'Slip cash into their desk for extra credit.', icon: 'dollar-sign', color: 'text-rose-400' });
+    } else if (category === 'staff') {
+      const role = person.role || '';
+      if (role.includes('Janitor') || role.includes('Custodian') || role.includes('Caretaker')) {
+        actions.push({ id: 'help_clean', label: 'Help Sweep Corridors & Classrooms', desc: 'Grab a push-broom and assist with chores. (+Reputation, chance of lost money)', icon: 'sparkles', color: 'text-amber-400' });
+        actions.push({ id: 'ask_boiler_room', label: 'Ask About Locked Boiler Room', desc: 'Inquire regarding subterranean furnace rumors.', icon: 'flame', color: 'text-purple-400' });
+        actions.push({ id: 'search_lost_found', label: 'Search Lost & Found Crate', desc: 'Rummage through forgotten student relics.', icon: 'search', color: 'text-teal-400' });
+      } else if (role.includes('Librarian') || role.includes('Archivist')) {
+        actions.push({ id: 'reorganize_shelves', label: 'Help Reorganize Bookshelves', desc: 'Dust, sort, and catalog the book stacks.', icon: 'book-open', color: 'text-emerald-400' });
+        actions.push({ id: 'catalog_archives', label: 'Catalog Historical Records', desc: 'Examine old municipal microfiche and town records.', icon: 'file-text', color: 'text-sky-400' });
+        actions.push({ id: 'restricted_tomes', label: 'Request Restricted Archive Access', desc: 'Ask to view the locked glass cabinet of occult tomes.', icon: 'lock', color: 'text-purple-400' });
+      } else if (role.includes('Nurse') || role.includes('Matron')) {
+        actions.push({ id: 'rest_cot', label: 'Rest on Clinic Cot', desc: 'Fake a headache and sleep behind privacy curtains. (+Vitality)', icon: 'moon', color: 'text-emerald-400' });
+        actions.push({ id: 'report_anomaly', label: 'Report Strange Symptoms & Chills', desc: 'Consult regarding odd physical sensations and shadows.', icon: 'activity', color: 'text-purple-400' });
+        if (role.includes('Matron') || this.character.age <= 5) {
+          actions.push({ id: 'nurture', label: 'Seek Nurture & Warm Hug', desc: 'Ask for comforting nursery story and attention.', icon: 'heart', color: 'text-rose-400' });
+          actions.push({ id: 'ask_snack', label: 'Ask for Nursery Snack', desc: 'Request sweet apple juice and animal crackers.', icon: 'coffee', color: 'text-amber-400' });
+        }
+      } else if (role.includes('Principal') || role.includes('Headmaster') || role.includes('Dean')) {
+        actions.push({ id: 'appeal_discipline', label: 'Appeal Disciplinary Record', desc: 'Submit a formal petition to clear detention marks.', icon: 'check-square', color: 'text-emerald-400' });
+        actions.push({ id: 'school_pride', label: 'Display Institutional Pride', desc: 'Praise the school heritage and display loyalty.', icon: 'award', color: 'text-amber-400' });
+      }
+    }
+
+    actions.forEach(act => {
+      const btn = document.createElement('button');
+      btn.className = "w-full p-2.5 rounded-xl bg-inputbg hover:bg-slatecard border border-leadborder hover:border-leadborder/90 text-left flex items-center justify-between group transition-all";
+      btn.innerHTML = `
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center ${act.color} group-hover:scale-105 transition-transform shrink-0">
+            <i data-lucide="${act.icon}" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="font-serif font-bold text-xs text-parchment">${act.label}</div>
+            <div class="text-[10px] text-dust font-sans leading-snug">${act.desc}</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors"></i>
+      `;
+
+      btn.addEventListener('click', () => {
+        this.handleSchoolPersonAction(person, act.id);
+      });
+
+      this.dom.schoolPersonActionsList.appendChild(btn);
+    });
+  }
+
+  handleSchoolAction(actionType, param = null) {
+    if (this.character.actionsLeft <= 0) {
+      this.openFeedbackModal({
+        tag: "ENERGY EXHAUSTED",
+        title: "No Actions Left",
+        icon: "battery-charging",
+        iconColor: "text-amber-400",
+        body: "You have completely exhausted your daily action points (0/40)! Click Endure Year to advance to the next year.",
+        effects: {}
+      });
+      return;
+    }
+
+    let result = null;
+    if (actionType === 'study_harder' && window.studyHarder) {
+      result = window.studyHarder(this.character);
+    } else if (actionType === 'skip_class' && window.skipClass) {
+      result = window.skipClass(this.character);
+    } else if (actionType === 'mystery' && window.investigateMystery) {
+      result = window.investigateMystery(this.character, param);
+    } else if (actionType === 'apply_university' && window.applyToUniversity) {
+      result = window.applyToUniversity(this.character, param);
+    } else if (actionType === 'drop_out' && window.dropOutOfSchool) {
+      result = window.dropOutOfSchool(this.character);
+    }
+
+    if (!result) return;
+
+    if (result.success) {
+      this.character.actionsLeft--;
+      this.openFeedbackModal({
+        tag: "SCHOOL PURSUIT",
+        title: result.title,
+        icon: "graduation-cap",
+        iconColor: "text-sky-400",
+        body: result.body,
+        effects: result.effects
+      });
+    } else {
+      this.openFeedbackModal({
+        tag: "NOTICE",
+        title: "Action Denied",
+        icon: "alert-circle",
+        iconColor: "text-amber-400",
+        body: result.reason || "Action could not be completed.",
+        effects: {}
+      });
+    }
+
+    this.renderAll();
+    this.renderEducationModal(this.activeEducationTab);
+  }
+
+  handleSchoolPersonAction(person, actionType) {
+    if (this.character.actionsLeft <= 0) {
+      this.openFeedbackModal({
+        tag: "ENERGY EXHAUSTED",
+        title: "No Actions Left",
+        icon: "battery-charging",
+        iconColor: "text-amber-400",
+        body: "You have completely exhausted your daily action points (0/40)! Click Endure Year to advance to the next year.",
+        effects: {}
+      });
+      return;
+    }
+
+    let result = null;
+    if (person.category === 'classmate' && window.interactWithClassmate) {
+      result = window.interactWithClassmate(person, this.character, actionType);
+    } else if (person.category === 'teacher' && window.interactWithTeacher) {
+      result = window.interactWithTeacher(person, this.character, actionType);
+    } else if (person.category === 'staff' && window.interactWithStaff) {
+      result = window.interactWithStaff(person, this.character, actionType);
+    }
+
+    if (!result) return;
+
+    if (result.success) {
+      this.character.actionsLeft--;
+      this.openFeedbackModal({
+        tag: "INTERACTION OUTCOME",
+        title: result.title,
+        icon: "message-square",
+        iconColor: "text-teal-400",
+        body: result.body,
+        effects: result.effects
+      });
+
+      // Update live closeness bar in open person modal immediately
+      const rel = Math.max(0, Math.min(100, person.relationship || 50));
+      if (this.dom.schoolPersonRelVal) this.dom.schoolPersonRelVal.textContent = `${rel}%`;
+      if (this.dom.schoolPersonRelBar) this.dom.schoolPersonRelBar.style.width = `${rel}%`;
+      
+      // If action was befriend, re-render actions so "Ask to be Best Friends" disappears
+      if (actionType === 'befriend') {
+        this.renderSchoolPersonActions(person, person.category);
+      }
+    } else {
+      this.openFeedbackModal({
+        tag: "ACTION UNAVAILABLE",
+        title: "Interaction Restricted",
+        icon: "alert-circle",
+        iconColor: "text-amber-400",
+        body: result.reason || "Unable to interact right now.",
+        effects: {}
+      });
+    }
+
+    this.renderAll();
+    this.renderEducationModal(this.activeEducationTab);
+  }
+
+
   saveGame() {
     const data = {
       character: this.character,
@@ -3103,3 +3945,4 @@ if (document.readyState === 'loading') {
 } else {
   initGame();
 }
+
