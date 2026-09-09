@@ -184,11 +184,18 @@ class TerribleGame {
       this.dom.screenGame,
       this.dom.screenCrypt
     ];
-    screens.forEach(s => s.classList.add('hidden'));
+
+    screens.forEach(s => {
+      if (s) {
+        s.classList.add('hidden');
+        s.style.display = 'none';
+      }
+    });
 
     const target = document.getElementById(screenId);
     if (target) {
       target.classList.remove('hidden');
+      target.style.display = 'flex';
     }
 
     if (screenId === 'screen-creator') {
@@ -201,11 +208,13 @@ class TerribleGame {
       this.checkResumeAvailability();
     }
 
-    if (window.lucide) window.lucide.createIcons();
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
   bindEvents() {
-    // Navigation
+    // Navigation from Landing
     this.dom.btnToCreator.addEventListener('click', () => {
       window.soundEngine.playClick();
       this.showScreen('screen-creator');
@@ -386,7 +395,6 @@ class TerribleGame {
   }
 
   populateCreatorDropdowns() {
-    // Birthplaces
     this.dom.selBirthplace.innerHTML = '';
     window.GOTHIC_DATA.birthplaces.forEach(bp => {
       const opt = document.createElement('option');
@@ -395,7 +403,6 @@ class TerribleGame {
       this.dom.selBirthplace.appendChild(opt);
     });
 
-    // Traits
     this.dom.selTrait.innerHTML = '';
     window.GOTHIC_DATA.traits.forEach(tr => {
       const opt = document.createElement('option');
@@ -418,7 +425,6 @@ class TerribleGame {
   }
 
   syncCreatorUI() {
-    // Sync Selects
     this.dom.selSkin.value = this.creatorState.avatar.skin;
     this.dom.selEyeShape.value = this.creatorState.avatar.eyeShape;
     this.dom.selEyeColor.value = this.creatorState.avatar.eyeColor;
@@ -426,7 +432,6 @@ class TerribleGame {
     this.dom.selHairColor.value = this.creatorState.avatar.hairColor;
     this.dom.selMark.value = this.creatorState.avatar.mark;
 
-    // Names
     if (!this.dom.inputFirstName.value) {
       this.randomizeName();
     }
@@ -440,20 +445,26 @@ class TerribleGame {
       t.classList.remove('bg-slatecard', 'text-parchment', 'text-amber-300');
       t.classList.add('text-dust');
     });
-    panels.forEach(p => p.classList.add('hidden'));
+    panels.forEach(p => {
+      p.classList.add('hidden');
+      p.style.display = 'none';
+    });
 
     if (tab === 'appearance') {
       this.dom.tabAppearance.classList.add('bg-slatecard', 'text-parchment');
       this.dom.tabAppearance.classList.remove('text-dust');
       this.dom.panelAppearance.classList.remove('hidden');
+      this.dom.panelAppearance.style.display = 'block';
     } else if (tab === 'identity') {
       this.dom.tabIdentity.classList.add('bg-slatecard', 'text-parchment');
       this.dom.tabIdentity.classList.remove('text-dust');
       this.dom.panelIdentity.classList.remove('hidden');
+      this.dom.panelIdentity.style.display = 'block';
     } else if (tab === 'godmode') {
       this.dom.tabGodmode.classList.add('bg-slatecard', 'text-amber-300');
       this.dom.tabGodmode.classList.remove('text-dust');
       this.dom.panelGodmode.classList.remove('hidden');
+      this.dom.panelGodmode.style.display = 'block';
     }
 
     if (window.lucide) window.lucide.createIcons();
@@ -477,11 +488,13 @@ class TerribleGame {
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
           this.dom.labelResumeLife.textContent = `RESUME LIFE: ${this.character.name.toUpperCase()} (AGE ${this.character.age})`;
           this.dom.btnLandingResume.classList.remove('hidden');
+          this.dom.btnLandingResume.style.display = 'flex';
           return;
         }
       } catch (e) {}
     }
     this.dom.btnLandingResume.classList.add('hidden');
+    this.dom.btnLandingResume.style.display = 'none';
   }
 
   startNewLife(customConfig = null) {
@@ -514,14 +527,12 @@ class TerribleGame {
     this.character.age += 1;
     this.character.year += 1;
 
-    // Update life stage title
     if (this.character.age <= 2) this.character.statusTitle = "Infant";
     else if (this.character.age <= 6) this.character.statusTitle = "Toddler";
     else if (this.character.age <= 12) this.character.statusTitle = "Child";
     else if (this.character.age <= 17) this.character.statusTitle = "Adolescent";
     else this.character.statusTitle = "Young Adult";
 
-    // Minor baseline metabolic drift
     this.modifyStat('vitality', (Math.random() > 0.65 ? -1 : 0));
 
     const currentYearLog = {
@@ -530,7 +541,6 @@ class TerribleGame {
       entries: []
     };
 
-    // Check for interactive dilemma
     const availableDilemmas = window.GAME_DATA.INTERACTIVE_DILEMMAS.filter(d => 
       this.character.age >= d.minAge && 
       this.character.age <= d.maxAge && 
@@ -549,7 +559,6 @@ class TerribleGame {
       return;
     }
 
-    // Otherwise ambient event
     const ambientPool = window.GAME_DATA.AMBIENT_YEAR_EVENTS.filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
     );
@@ -561,7 +570,6 @@ class TerribleGame {
       currentYearLog.entries.push("Another cold winter passed in uneventful stillness. The house settled deeper into the damp earth.");
     }
 
-    // Low sanity whispers
     if (this.character.stats.sanity < 30 && Math.random() < 0.6) {
       const whispers = [
         "You woke up with dry mud under your fingernails and the cellar padlock broken from the inside.",
@@ -606,7 +614,9 @@ class TerribleGame {
     });
 
     this.dom.dilemmaModal.classList.remove('hidden');
+    this.dom.dilemmaModal.style.display = 'flex';
     this.dom.dilemmaBackdrop.classList.remove('hidden');
+    this.dom.dilemmaBackdrop.style.display = 'block';
   }
 
   selectChoice(choiceIdx) {
@@ -664,7 +674,6 @@ class TerribleGame {
     this.character.deathCause = cause;
     this.character.epitaph = epitaph;
 
-    // Save to crypt
     this.addToCrypt(this.character);
 
     window.soundEngine.playDeath();
@@ -686,38 +695,41 @@ class TerribleGame {
     });
 
     this.dom.deathModal.classList.remove('hidden');
+    this.dom.deathModal.style.display = 'flex';
   }
 
   hideModals() {
     this.dom.dilemmaModal.classList.add('hidden');
+    this.dom.dilemmaModal.style.display = 'none';
     this.dom.dilemmaBackdrop.classList.add('hidden');
+    this.dom.dilemmaBackdrop.style.display = 'none';
     this.dom.deathModal.classList.add('hidden');
+    this.dom.deathModal.style.display = 'none';
     this.dom.godmodeModal.classList.add('hidden');
+    this.dom.godmodeModal.style.display = 'none';
   }
 
   renderAll() {
     if (!this.character) return;
 
-    // Render Avatar in header
     window.drawGothicAvatar(this.dom.gameHeaderAvatar, {
       ...this.character.avatar,
       age: this.character.age
     });
 
-    // Header info
     this.dom.charName.textContent = this.character.name;
     this.dom.charTitle.textContent = this.character.statusTitle;
     this.dom.charAgeYear.textContent = `Age: ${this.character.age} | ${this.character.year}`;
     this.dom.charCoin.textContent = `${this.character.coin} s.`;
 
-    // God mode inspector toggle button in top bar
     if (this.character.isGodMode) {
       this.dom.btnGameGodmode.classList.remove('hidden');
+      this.dom.btnGameGodmode.style.display = 'inline-flex';
     } else {
       this.dom.btnGameGodmode.classList.add('hidden');
+      this.dom.btnGameGodmode.style.display = 'none';
     }
 
-    // Stats
     this.updateStatBar(this.dom.barVitality, this.dom.valVitality, this.character.stats.vitality);
     this.updateStatBar(this.dom.barSanity, this.dom.valSanity, this.character.stats.sanity);
     this.updateStatBar(this.dom.barOccult, this.dom.valOccult, this.character.stats.occult);
@@ -725,14 +737,12 @@ class TerribleGame {
     this.updateStatBar(this.dom.barSmarts, this.dom.valSmarts, this.character.stats.smarts);
     this.updateStatBar(this.dom.barHumanity, this.dom.valHumanity, this.character.stats.humanity);
 
-    // Sanity visual jitter
     if (this.character.stats.sanity < 25) {
       this.dom.phoneScreen.classList.add('low-sanity-jitter');
     } else {
       this.dom.phoneScreen.classList.remove('low-sanity-jitter');
     }
 
-    // Button states
     if (!this.character.isAlive) {
       this.dom.btnEndure.disabled = true;
       this.dom.btnEndure.classList.add('opacity-40', 'cursor-not-allowed');
@@ -747,7 +757,9 @@ class TerribleGame {
     }
 
     this.renderLogs();
-    if (window.lucide) window.lucide.createIcons();
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
   updateStatBar(barEl, valEl, value) {
@@ -802,7 +814,6 @@ class TerribleGame {
     }, 50);
   }
 
-  // Live Mid-Game God Mode Inspector
   openLiveGodmodeInspector() {
     if (!this.character) return;
     const stats = this.character.stats;
@@ -836,6 +847,7 @@ class TerribleGame {
     this.dom.slideLiveCoin.oninput = (e) => this.dom.lblLiveCoin.textContent = `${e.target.value} s.`;
 
     this.dom.godmodeModal.classList.remove('hidden');
+    this.dom.godmodeModal.style.display = 'flex';
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -849,12 +861,12 @@ class TerribleGame {
     this.character.coin = parseInt(this.dom.slideLiveCoin.value);
 
     this.dom.godmodeModal.classList.add('hidden');
+    this.dom.godmodeModal.style.display = 'none';
     this.renderAll();
     this.saveGame();
     window.soundEngine.playClick();
   }
 
-  // Crypt System
   loadCrypt() {
     try {
       return JSON.parse(localStorage.getItem('TLL_CRYPT') || '[]');
@@ -892,7 +904,7 @@ class TerribleGame {
       return;
     }
 
-    this.crypt.forEach((item, idx) => {
+    this.crypt.forEach((item) => {
       const card = document.createElement('div');
       card.className = "bg-slatecard border border-leadborder rounded-xl p-3 flex items-start space-x-3";
 
@@ -919,7 +931,6 @@ class TerribleGame {
 
       this.dom.cryptList.appendChild(card);
 
-      // Render mini avatar
       window.drawGothicAvatar(canvas, {
         ...item.avatar,
         age: item.age
@@ -939,6 +950,19 @@ class TerribleGame {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  window.game = new TerribleGame();
-});
+function initGame() {
+  if (!window.game) {
+    try {
+      window.game = new TerribleGame();
+      console.log('TerribleGame initialized successfully!');
+    } catch (e) {
+      console.error('TerribleGame initialization failed:', e);
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGame);
+} else {
+  initGame();
+}

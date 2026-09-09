@@ -734,5 +734,8 @@
   <script src="js/names.js?v=4"></script>
   <script src="js/events.js?v=4"></script>
   <script src="js/game.js?v=4"></script>
-</body>
+<script>try { const btn = document.getElementById('btn-to-creator'); const landing = document.getElementById('screen-landing'); const creator = document.getElementById('screen-creator'); const bL = getComputedStyle(landing).display; const bC = getComputedStyle(creator).display; btn.click(); const aL = getComputedStyle(landing).display; const aC = getComputedStyle(creator).display; document.title = 'DEBUG: game=(typeof window.game)  isGame='+ (typeof window.game) +' bL=' + bL + ' bC=' + bC + ' aL=' + aL + ' aC=' + aC; } catch(e) { document.title = 'ERR:' + e.message; }</script></body>
 </html>
+
+
+
