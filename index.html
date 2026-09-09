@@ -493,71 +493,88 @@
         </div>
       </header>
 
-      <!-- Stat Gauges (Jewel-toned) -->
-      <section class="bg-[#121418] border-b border-leadborder px-4 py-2 shrink-0 grid grid-cols-3 gap-x-2 gap-y-1.5 text-[11px]">
-        <!-- Vitality -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-red-400"><i data-lucide="heart" class="w-2.5 h-2.5"></i> Vitality</span>
-            <span id="val-vitality">90%</span>
+      <!-- Stat Gauges (Jewel-toned 7 Stats: 4 Mortal + 3 Esoteric) -->
+      <section class="bg-[#121418] border-b border-leadborder px-4 py-2 shrink-0 space-y-1.5 text-[11px]">
+        <!-- Row 1: Mortal Life Attributes -->
+        <div class="grid grid-cols-4 gap-2">
+          <!-- Vitality -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-red-400"><i data-lucide="heart" class="w-2.5 h-2.5"></i> Health</span>
+              <span id="val-vitality">90%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-vitality" class="bg-[#991b1b] h-full rounded-full transition-all duration-300" style="width: 90%;"></div>
+            </div>
           </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-vitality" class="bg-[#991b1b] h-full rounded-full transition-all duration-300" style="width: 90%;"></div>
+
+          <!-- Smarts -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-emerald-400"><i data-lucide="brain" class="w-2.5 h-2.5"></i> Smarts</span>
+              <span id="val-smarts">80%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-smarts" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <!-- Looks -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-pink-400"><i data-lucide="sparkle" class="w-2.5 h-2.5"></i> Looks</span>
+              <span id="val-looks">70%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-looks" class="bg-pink-500 h-full rounded-full transition-all duration-300" style="width: 70%;"></div>
+            </div>
+          </div>
+
+          <!-- Happiness -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-yellow-400"><i data-lucide="smile" class="w-2.5 h-2.5"></i> Happy</span>
+              <span id="val-happiness">75%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-happiness" class="bg-yellow-500 h-full rounded-full transition-all duration-300" style="width: 75%;"></div>
+            </div>
           </div>
         </div>
 
-        <!-- Sanity -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-sky-400"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Sanity</span>
-            <span id="val-sanity">85%</span>
+        <!-- Row 2: Esoteric Attributes -->
+        <div class="grid grid-cols-3 gap-2">
+          <!-- Sanity -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-sky-400"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Sanity</span>
+              <span id="val-sanity">85%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-sanity" class="bg-[#38bdf8] h-full rounded-full transition-all duration-300" style="width: 85%;"></div>
+            </div>
           </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-sanity" class="bg-[#38bdf8] h-full rounded-full transition-all duration-300" style="width: 85%;"></div>
-          </div>
-        </div>
 
-        <!-- Occult -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-purple-400"><i data-lucide="flame" class="w-2.5 h-2.5"></i> Occult</span>
-            <span id="val-occult">15%</span>
+          <!-- Occult -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-purple-400"><i data-lucide="flame" class="w-2.5 h-2.5"></i> Occult</span>
+              <span id="val-occult">15%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-occult" class="bg-[#8b5cf6] h-full rounded-full transition-all duration-300" style="width: 15%;"></div>
+            </div>
           </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-occult" class="bg-[#8b5cf6] h-full rounded-full transition-all duration-300" style="width: 15%;"></div>
-          </div>
-        </div>
 
-        <!-- Happiness -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-yellow-400"><i data-lucide="smile" class="w-2.5 h-2.5"></i> Happiness</span>
-            <span id="val-happiness">75%</span>
-          </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-happiness" class="bg-yellow-500 h-full rounded-full transition-all duration-300" style="width: 75%;"></div>
-          </div>
-        </div>
-
-        <!-- Intelligence -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-emerald-400"><i data-lucide="brain" class="w-2.5 h-2.5"></i> Smarts</span>
-            <span id="val-smarts">80%</span>
-          </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-smarts" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 80%;"></div>
-          </div>
-        </div>
-
-        <!-- Humanity -->
-        <div>
-          <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
-            <span class="flex items-center gap-1 text-amber-500"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Humanity</span>
-            <span id="val-humanity">95%</span>
-          </div>
-          <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-            <div id="bar-humanity" class="bg-[#d97706] h-full rounded-full transition-all duration-300" style="width: 95%;"></div>
+          <!-- Humanity -->
+          <div>
+            <div class="flex justify-between items-center text-[9px] tracking-wider uppercase text-dust font-mono">
+              <span class="flex items-center gap-1 text-amber-500"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Humanity</span>
+              <span id="val-humanity">95%</span>
+            </div>
+            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-humanity" class="bg-[#d97706] h-full rounded-full transition-all duration-300" style="width: 95%;"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -728,6 +745,15 @@
             <input id="slide-live-smarts" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
           </div>
 
+          <!-- Looks -->
+          <div>
+            <div class="flex justify-between text-dust mb-1">
+              <span>Looks / Attractiveness</span>
+              <span id="lbl-live-looks" class="font-mono text-pink-400 font-bold">70%</span>
+            </div>
+            <input id="slide-live-looks" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
+          </div>
+
           <!-- Occult -->
           <div>
             <div class="flex justify-between text-dust mb-1">
@@ -809,11 +835,11 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=6"></script>
-  <script src="js/avatar.js?v=6"></script>
-  <script src="js/names.js?v=6"></script>
-  <script src="js/careers.js?v=6"></script>
-  <script src="js/events.js?v=6"></script>
-  <script src="js/game.js?v=6"></script>
+  <script src="js/audio.js?v=7"></script>
+  <script src="js/avatar.js?v=7"></script>
+  <script src="js/names.js?v=7"></script>
+  <script src="js/careers.js?v=7"></script>
+  <script src="js/events.js?v=7"></script>
+  <script src="js/game.js?v=7"></script>
 </body>
 </html>

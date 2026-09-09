@@ -6,6 +6,11 @@ const COUNTRIES_DATA = {
     code: "USA",
     flag: "🇺🇸",
     currency: { code: "USD", symbol: "$", rate: 1 },
+    wageMultiplier: 1.0,
+    annualLivingCost: 16000,
+    startingMoney: 1500,
+    maxGodMoney: 100000,
+    godMoneyStep: 1000,
     cities: ["Seattle, WA", "New Orleans, LA", "Detroit, MI", "Salem, MA", "Chicago, IL", "Philadelphia, PA"],
     firstNamesMale: ["Ethan", "Lucas", "Noah", "Caleb", "Julian", "Damian", "Adrian", "Gabriel", "Silas", "Rowan"],
     firstNamesFemale: ["Chloe", "Maya", "Elena", "Sadie", "Vera", "Raven", "Iris", "Piper", "Harper", "Lilith"],
@@ -15,7 +20,12 @@ const COUNTRIES_DATA = {
     name: "United Kingdom",
     code: "GBR",
     flag: "🇬🇧",
-    currency: { code: "GBP", symbol: "£", rate: 0.8 },
+    currency: { code: "GBP", symbol: "£", rate: 0.88 },
+    wageMultiplier: 0.88,
+    annualLivingCost: 14000,
+    startingMoney: 1200,
+    maxGodMoney: 85000,
+    godMoneyStep: 1000,
     cities: ["London", "Edinburgh", "York", "Whitby", "Manchester", "Bristol"],
     firstNamesMale: ["Oliver", "Arthur", "Felix", "Jasper", "Archie", "George", "Theo", "Callum", "Finley", "Harry"],
     firstNamesFemale: ["Eleanor", "Florence", "Freya", "Isla", "Imogen", "Phoebe", "Ophelia", "Beatrice", "Maeve", "Clara"],
@@ -25,7 +35,12 @@ const COUNTRIES_DATA = {
     name: "Japan",
     code: "JPN",
     flag: "🇯🇵",
-    currency: { code: "JPY", symbol: "¥", rate: 150 },
+    currency: { code: "JPY", symbol: "¥", rate: 100 },
+    wageMultiplier: 100,
+    annualLivingCost: 1800000,
+    startingMoney: 180000,
+    maxGodMoney: 15000000,
+    godMoneyStep: 100000,
     cities: ["Tokyo (Shibuya)", "Kyoto (Gion)", "Aomori (Osorezan)", "Osaka", "Sapporo", "Yokohama"],
     firstNamesMale: ["Ren", "Haruto", "Kaito", "Sora", "Ryu", "Taiga", "Kazuki", "Yuto", "Shinji", "Hayato"],
     firstNamesFemale: ["Yuna", "Hina", "Koharu", "Rei", "Aoi", "Mei", "Mio", "Rin", "Kagura", "Sayuri"],
@@ -35,7 +50,12 @@ const COUNTRIES_DATA = {
     name: "Germany",
     code: "DEU",
     flag: "🇩🇪",
-    currency: { code: "EUR", symbol: "€", rate: 0.92 },
+    currency: { code: "EUR", symbol: "€", rate: 0.95 },
+    wageMultiplier: 0.95,
+    annualLivingCost: 14500,
+    startingMoney: 1300,
+    maxGodMoney: 90000,
+    godMoneyStep: 1000,
     cities: ["Berlin", "Freiburg (Black Forest)", "Hamburg", "Munich", "Heidelberg"],
     firstNamesMale: ["Lukas", "Leon", "Jonas", "Niklas", "Felix", "Maximilian", "Finn", "Elias", "Moritz", "Anton"],
     firstNamesFemale: ["Hannah", "Emma", "Mia", "Sophie", "Clara", "Lina", "Laura", "Leonie", "Marie", "Greta"],
@@ -46,6 +66,11 @@ const COUNTRIES_DATA = {
     code: "FRA",
     flag: "🇫🇷",
     currency: { code: "EUR", symbol: "€", rate: 0.92 },
+    wageMultiplier: 0.92,
+    annualLivingCost: 14000,
+    startingMoney: 1300,
+    maxGodMoney: 90000,
+    godMoneyStep: 1000,
     cities: ["Paris (14th Arr.)", "Lyon", "Marseille", "Bordeaux", "Rennes (Brittany)"],
     firstNamesMale: ["Gabriel", "Leo", "Raphael", "Louis", "Arthur", "Jules", "Adam", "Lucas", "Hugo", "Maxime"],
     firstNamesFemale: ["Jade", "Louise", "Ambre", "Alice", "Rose", "Anna", "Emma", "Mia", "Lea", "Chloe"],
@@ -55,7 +80,12 @@ const COUNTRIES_DATA = {
     name: "Canada",
     code: "CAN",
     flag: "🇨🇦",
-    currency: { code: "CAD", symbol: "C$", rate: 1.35 },
+    currency: { code: "CAD", symbol: "C$", rate: 1.25 },
+    wageMultiplier: 1.25,
+    annualLivingCost: 20000,
+    startingMoney: 1800,
+    maxGodMoney: 125000,
+    godMoneyStep: 1000,
     cities: ["Vancouver, BC", "Toronto, ON", "Montreal, QC", "Calgary, AB", "Halifax, NS"],
     firstNamesMale: ["Liam", "Noah", "Jackson", "Lucas", "Benjamin", "Logan", "William", "James", "Oliver", "Jacob"],
     firstNamesFemale: ["Olivia", "Emma", "Charlotte", "Amelia", "Ava", "Sophia", "Chloe", "Ella", "Abigail", "Emily"],
@@ -65,7 +95,12 @@ const COUNTRIES_DATA = {
     name: "Indonesia",
     code: "IDN",
     flag: "🇮🇩",
-    currency: { code: "IDR", symbol: "Rp", rate: 15500 },
+    currency: { code: "IDR", symbol: "Rp", rate: 2000 },
+    wageMultiplier: 2000,
+    annualLivingCost: 30000000,
+    startingMoney: 4000000,
+    maxGodMoney: 250000000,
+    godMoneyStep: 2500000,
     cities: ["Jakarta (Kota Tua)", "Yogyakarta (Merapi slope)", "Bandung", "Surabaya", "Malang"],
     firstNamesMale: ["Arya", "Bima", "Dimas", "Fajar", "Galih", "Bayu", "Rian", "Aditya", "Rizky", "Satria"],
     firstNamesFemale: ["Kirana", "Laras", "Nadia", "Sari", "Tari", "Maya", "Dian", "Citra", "Anggun", "Sekar"],
@@ -75,7 +110,12 @@ const COUNTRIES_DATA = {
     name: "Australia",
     code: "AUS",
     flag: "🇦🇺",
-    currency: { code: "AUD", symbol: "A$", rate: 1.5 },
+    currency: { code: "AUD", symbol: "A$", rate: 1.55 },
+    wageMultiplier: 1.55,
+    annualLivingCost: 25000,
+    startingMoney: 2200,
+    maxGodMoney: 150000,
+    godMoneyStep: 1000,
     cities: ["Melbourne", "Sydney", "Brisbane", "Perth", "Hobart (Tasmania)"],
     firstNamesMale: ["Jack", "William", "Noah", "Thomas", "James", "Lucas", "Henry", "Alexander", "Max", "Cooper"],
     firstNamesFemale: ["Charlotte", "Olivia", "Amelia", "Isla", "Mia", "Ava", "Grace", "Zoe", "Ruby", "Evelyn"],
@@ -126,12 +166,18 @@ function generateRandomAvatar() {
 function formatMoney(amount, countryCode = "USA") {
   const country = COUNTRIES_DATA[countryCode] || COUNTRIES_DATA.USA;
   const sym = country.currency.symbol;
+  const val = Math.round(amount || 0);
+
   if (countryCode === "IDN") {
-    return `${sym} ${Math.round(amount).toLocaleString()}`;
+    return `${sym} ${val.toLocaleString('id-ID')}`;
   } else if (countryCode === "JPN") {
-    return `${sym}${Math.round(amount).toLocaleString()}`;
+    return `${sym}${val.toLocaleString('ja-JP')}`;
+  } else if (countryCode === "GBR") {
+    return `${sym}${val.toLocaleString('en-GB')}`;
+  } else if (countryCode === "DEU" || countryCode === "FRA") {
+    return `${val.toLocaleString('de-DE')} ${sym}`;
   }
-  return `${sym}${Math.round(amount).toLocaleString()}`;
+  return `${sym}${val.toLocaleString('en-US')}`;
 }
 
 function generateCharacter(customConfig = null) {
@@ -153,20 +199,20 @@ function generateCharacter(customConfig = null) {
       year: currentYear,
       
       // Dual Currencies
-      money: customConfig.money !== undefined ? customConfig.money : (country.currency.rate * 250), // Normal Fiat
-      shillings: customConfig.shillings !== undefined ? customConfig.shillings : 10,                 // Paranormal Coin
+      money: customConfig.money !== undefined ? customConfig.money : country.startingMoney,
+      shillings: customConfig.shillings !== undefined ? customConfig.shillings : 10,
       
       avatar: customConfig.avatar || generateRandomAvatar(),
       isGodMode: !!customConfig.isGodMode,
-      job: null,            // Mundane employment
-      paranormalGig: null,  // Paranormal contract
+      job: null,
+      paranormalGig: null,
       
       stats: {
         vitality: customConfig.stats?.vitality ?? 90,
-        sanity: customConfig.stats?.sanity ?? 85,
-        happiness: customConfig.stats?.happiness ?? 80,
         smarts: customConfig.stats?.smarts ?? 75,
         looks: customConfig.stats?.looks ?? 70,
+        happiness: customConfig.stats?.happiness ?? 80,
+        sanity: customConfig.stats?.sanity ?? 85,
         occult: customConfig.stats?.occult ?? 15,
         humanity: customConfig.stats?.humanity ?? 95
       },
@@ -197,7 +243,7 @@ function generateCharacter(customConfig = null) {
     trait,
     age: 0,
     year: currentYear,
-    money: Math.round(country.currency.rate * (Math.floor(Math.random() * 200) + 100)),
+    money: country.startingMoney,
     shillings: Math.floor(Math.random() * 8) + 2,
     avatar: generateRandomAvatar(),
     isGodMode: false,
@@ -205,10 +251,10 @@ function generateCharacter(customConfig = null) {
     paranormalGig: null,
     stats: {
       vitality: Math.floor(Math.random() * 15) + 80,
-      sanity: Math.floor(Math.random() * 20) + 75,
-      happiness: Math.floor(Math.random() * 20) + 75,
       smarts: Math.floor(Math.random() * 25) + 65,
       looks: Math.floor(Math.random() * 25) + 60,
+      happiness: Math.floor(Math.random() * 20) + 75,
+      sanity: Math.floor(Math.random() * 20) + 75,
       occult: Math.floor(Math.random() * 15) + 10,
       humanity: Math.floor(Math.random() * 10) + 85
     },

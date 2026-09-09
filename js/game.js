@@ -124,14 +124,16 @@ class TerribleGame {
       // Stat bars
       barVitality: document.getElementById('bar-vitality'),
       valVitality: document.getElementById('val-vitality'),
+      barSmarts: document.getElementById('bar-smarts'),
+      valSmarts: document.getElementById('val-smarts'),
+      barLooks: document.getElementById('bar-looks'),
+      valLooks: document.getElementById('val-looks'),
+      barHappiness: document.getElementById('bar-happiness'),
+      valHappiness: document.getElementById('val-happiness'),
       barSanity: document.getElementById('bar-sanity'),
       valSanity: document.getElementById('val-sanity'),
       barOccult: document.getElementById('bar-occult'),
       valOccult: document.getElementById('val-occult'),
-      barHappiness: document.getElementById('bar-happiness'),
-      valHappiness: document.getElementById('val-happiness'),
-      barSmarts: document.getElementById('bar-smarts'),
-      valSmarts: document.getElementById('val-smarts'),
       barHumanity: document.getElementById('bar-humanity'),
       valHumanity: document.getElementById('val-humanity'),
 
@@ -183,6 +185,8 @@ class TerribleGame {
       lblLiveHappiness: document.getElementById('lbl-live-happiness'),
       slideLiveSmarts: document.getElementById('slide-live-smarts'),
       lblLiveSmarts: document.getElementById('lbl-live-smarts'),
+      slideLiveLooks: document.getElementById('slide-live-looks'),
+      lblLiveLooks: document.getElementById('lbl-live-looks'),
       slideLiveOccult: document.getElementById('slide-live-occult'),
       lblLiveOccult: document.getElementById('lbl-live-occult'),
       slideLiveHumanity: document.getElementById('slide-live-humanity'),
@@ -514,27 +518,13 @@ class TerribleGame {
 
   updateMoneySliderLimits(countryCode) {
     const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
-    const rate = country.currency.rate;
-    
-    let maxMoney = 50000;
-    let step = 500;
-
-    if (rate >= 10000) {
-      maxMoney = 500000000;
-      step = 5000000;
-    } else if (rate >= 100) {
-      maxMoney = 5000000;
-      step = 50000;
-    }
-
-    const defaultBalance = Math.round(1500 * rate);
-    this.creatorState.money = defaultBalance;
+    this.creatorState.money = country.startingMoney;
 
     this.dom.sliderMoney.min = "0";
-    this.dom.sliderMoney.max = `${maxMoney}`;
-    this.dom.sliderMoney.step = `${step}`;
-    this.dom.sliderMoney.value = `${defaultBalance}`;
-    this.dom.labelMoney.textContent = window.formatMoney(defaultBalance, countryCode);
+    this.dom.sliderMoney.max = `${country.maxGodMoney}`;
+    this.dom.sliderMoney.step = `${country.godMoneyStep}`;
+    this.dom.sliderMoney.value = `${country.startingMoney}`;
+    this.dom.labelMoney.textContent = window.formatMoney(country.startingMoney, countryCode);
   }
 
   randomizeName() {
@@ -627,6 +617,9 @@ class TerribleGame {
           if (!this.character.statusTitle) {
             this.character.statusTitle = "Infant";
           }
+          if (this.character.stats && this.character.stats.looks === undefined) {
+            this.character.stats.looks = 70;
+          }
           
           this.logs = data.logs || [];
           this.usedDilemmaIds = new Set(data.usedDilemmaIds || []);
@@ -695,11 +688,12 @@ class TerribleGame {
 
     // 1. Economic Updates (Mundane Salary)
     if (this.character.job) {
-      const salary = window.getAdjustedSalary(this.character.job.baseSalaryUSD, this.character.countryCode);
+      const base = this.character.job.baseSalary || this.character.job.baseSalaryUSD || 24000;
+      const salary = window.getAdjustedSalary(base, this.character.countryCode);
       this.character.money += salary;
       currentYearLog.entries.push(`Deposited salary: +${window.formatMoney(salary, this.character.countryCode)} working as a ${this.character.job.title}.`);
       
-      if (this.character.job.stress > 20 && Math.random() < 0.4) {
+      if (this.character.job.stress > 25 && Math.random() < 0.4) {
         this.modifyStat('vitality', -1);
       }
     }
@@ -715,7 +709,7 @@ class TerribleGame {
     // 3. Modern Living Expenses (Rent, Groceries, Utilities)
     if (this.character.age >= 18) {
       const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
-      const annualRentCost = Math.round(14000 * country.currency.rate);
+      const annualRentCost = country.annualLivingCost || 16000;
 
       if (this.character.money >= annualRentCost) {
         this.character.money -= annualRentCost;
@@ -731,8 +725,11 @@ class TerribleGame {
       }
     }
 
-    // Natural vitality erosion
+    // Natural vitality & looks age erosion
     this.modifyStat('vitality', (Math.random() > 0.7 ? -1 : 0));
+    if (this.character.age > 35 && Math.random() < 0.35) {
+      this.modifyStat('looks', -1);
+    }
 
     // 4. Check for Interactive Dilemmas
     const dilemmaPool = window.INTERACTIVE_DILEMMAS || (window.GAME_DATA && window.GAME_DATA.INTERACTIVE_DILEMMAS) || [];
@@ -868,7 +865,7 @@ class TerribleGame {
 
     // Update current employment banner
     if (this.character.job) {
-      const sal = window.getAdjustedSalary(this.character.job.baseSalaryUSD, this.character.countryCode);
+      const sal = window.getAdjustedSalary(this.character.job.baseSalary || this.character.job.baseSalaryUSD, this.character.countryCode);
       this.dom.currentMundaneJob.textContent = `${this.character.job.title} (${window.formatMoney(sal, this.character.countryCode)}/yr)`;
       this.dom.btnQuitMundane.classList.remove('hidden');
       this.dom.btnQuitMundane.style.display = 'inline-block';
@@ -883,38 +880,42 @@ class TerribleGame {
     if (this.activeCareerTab === 'mundane') {
       window.MUNDANE_CAREERS.forEach(job => {
         const isEmployed = this.character.job && this.character.job.id === job.id;
-        const meetsAge = this.character.age >= job.minAge;
-        const meetsSmarts = this.character.stats.smarts >= job.minSmarts;
-        const isEligible = meetsAge && meetsSmarts;
-        const salary = window.getAdjustedSalary(job.baseSalaryUSD, this.character.countryCode);
+        const check = window.checkJobEligibility(this.character, job);
+        const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border ${isEmployed ? 'bg-emerald-950/20 border-emerald-700/60' : 'bg-[#121419] border-leadborder'} space-y-2`;
+        card.className = `p-3 rounded-xl border ${isEmployed ? 'bg-emerald-950/25 border-emerald-600/70' : 'bg-[#121419] border-leadborder'} space-y-2`;
+
+        const badgesHtml = check.badges.map(b => `
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${b.met ? 'bg-[#142018] border-emerald-800/60 text-emerald-300' : 'bg-[#221417] border-red-900/60 text-red-400'}">
+            ${b.label}
+          </span>
+        `).join('');
 
         card.innerHTML = `
           <div class="flex justify-between items-start">
-            <div>
+            <div class="min-w-0 flex-1 pr-2">
               <h4 class="font-serif font-bold text-xs text-parchment">${job.title}</h4>
               <span class="text-[10px] font-mono text-emerald-400 font-bold">${window.formatMoney(salary, this.character.countryCode)} / year</span>
             </div>
-            <span class="text-[9px] font-mono px-2 py-0.5 rounded ${meetsAge ? 'bg-[#1c202a] text-dust' : 'bg-red-950 text-red-400'}">
-              Min Age: ${job.minAge}
-            </span>
+            <div class="flex flex-wrap justify-end gap-1 shrink-0">
+              ${badgesHtml}
+            </div>
           </div>
           <p class="text-[11px] text-dust leading-relaxed">${job.desc}</p>
           <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
-            <span class="text-dust font-mono">Req: Smarts ${job.minSmarts}%</span>
+            <span class="text-dust/70 italic">${job.stress > 25 ? '⚠️ High Stress' : 'Standard Routine'}</span>
             ${isEmployed 
-              ? `<span class="text-emerald-400 font-serif font-bold">Currently Employed</span>`
-              : `<button class="btn-apply-job px-3 py-1 rounded bg-slatecard hover:bg-emerald-900/60 border border-leadborder text-parchment font-serif font-bold disabled:opacity-40 disabled:cursor-not-allowed" ${!isEligible ? 'disabled' : ''}>
-                  ${!meetsAge ? 'Too Young' : (!meetsSmarts ? 'Smarts Required' : 'Apply')}
+              ? `<span class="text-emerald-400 font-serif font-bold text-xs">Currently Employed</span>`
+              : `<button class="btn-apply-job px-3 py-1 rounded ${check.eligible ? 'bg-slatecard hover:bg-emerald-900/60 border border-leadborder text-parchment font-serif font-bold active:scale-95' : 'bg-[#15171c] border border-leadborder/30 text-dust/50 cursor-not-allowed'}" ${!check.eligible ? 'disabled' : ''}>
+                  ${check.eligible ? 'Apply' : check.reason}
                 </button>`
             }
           </div>
         `;
 
         const applyBtn = card.querySelector('.btn-apply-job');
-        if (applyBtn && isEligible) {
+        if (applyBtn && check.eligible) {
           applyBtn.addEventListener('click', () => {
             this.applyMundaneJob(job);
           });
@@ -926,40 +927,44 @@ class TerribleGame {
       // Paranormal contracts
       window.PARANORMAL_CAREERS.forEach(gig => {
         const isContracted = this.character.paranormalGig && this.character.paranormalGig.id === gig.id;
-        const meetsAge = this.character.age >= gig.minAge;
-        const meetsOccult = this.character.stats.occult >= gig.minOccult;
-        const isEligible = meetsAge && meetsOccult;
+        const check = window.checkJobEligibility(this.character, gig);
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border ${isContracted ? 'bg-amber-950/20 border-amber-600/60' : 'bg-[#121419] border-leadborder'} space-y-2`;
+        card.className = `p-3 rounded-xl border ${isContracted ? 'bg-amber-950/25 border-amber-600/70' : 'bg-[#121419] border-leadborder'} space-y-2`;
+
+        const badgesHtml = check.badges.map(b => `
+          <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${b.met ? 'bg-[#201c14] border-amber-800/60 text-amber-300' : 'bg-[#221417] border-red-900/60 text-red-400'}">
+            ${b.label}
+          </span>
+        `).join('');
 
         card.innerHTML = `
           <div class="flex justify-between items-start">
-            <div>
-              <h4 class="font-serif font-bold text-xs text-parchment flex items-center gap-1">
-                <i data-lucide="moon" class="w-3 h-3 text-amber-400"></i>
-                <span>${gig.title}</span>
+            <div class="min-w-0 flex-1 pr-2">
+              <h4 class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
+                <i data-lucide="moon" class="w-3 h-3 text-amber-400 shrink-0"></i>
+                <span class="truncate">${gig.title}</span>
               </h4>
               <span class="text-[10px] font-mono text-amber-400 font-bold">${gig.payoutShillings} s. / contract</span>
             </div>
-            <span class="text-[9px] font-mono px-2 py-0.5 rounded text-red-400 bg-red-950/40 border border-red-900/50">
-              -${gig.sanityCost}% Sanity/yr
-            </span>
+            <div class="flex flex-wrap justify-end gap-1 shrink-0">
+              ${badgesHtml}
+            </div>
           </div>
           <p class="text-[11px] text-dust leading-relaxed">${gig.desc}</p>
           <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px]">
-            <span class="text-dust font-mono">Req: Occult ${gig.minOccult}%, Age ${gig.minAge}</span>
+            <span class="text-red-400/90 font-mono">-${gig.sanityCost}% Sanity/yr</span>
             ${isContracted
-              ? `<button class="btn-quit-gig px-2.5 py-1 rounded bg-red-950/80 border border-red-800 text-red-300 font-mono">Cut Ties</button>`
-              : `<button class="btn-apply-gig px-3 py-1 rounded bg-slatecard hover:bg-amber-950/60 border border-leadborder text-amber-300 font-serif font-bold disabled:opacity-40 disabled:cursor-not-allowed" ${!isEligible ? 'disabled' : ''}>
-                  ${!meetsAge ? 'Too Young' : (!meetsOccult ? 'Occult Knowledge Required' : 'Accept Contract')}
+              ? `<button class="btn-quit-gig px-2.5 py-1 rounded bg-red-950/80 border border-red-800 text-red-300 font-mono text-[10px]">Cut Ties</button>`
+              : `<button class="btn-apply-gig px-3 py-1 rounded ${check.eligible ? 'bg-slatecard hover:bg-amber-950/60 border border-leadborder text-amber-300 font-serif font-bold active:scale-95' : 'bg-[#15171c] border border-leadborder/30 text-dust/50 cursor-not-allowed'}" ${!check.eligible ? 'disabled' : ''}>
+                  ${check.eligible ? 'Accept Contract' : check.reason}
                 </button>`
             }
           </div>
         `;
 
         const applyBtn = card.querySelector('.btn-apply-gig');
-        if (applyBtn && isEligible) {
+        if (applyBtn && check.eligible) {
           applyBtn.addEventListener('click', () => {
             this.applyParanormalGig(gig);
           });
@@ -982,7 +987,7 @@ class TerribleGame {
   applyMundaneJob(job) {
     this.character.job = job;
     window.soundEngine.playClick();
-    const salary = window.getAdjustedSalary(job.baseSalaryUSD, this.character.countryCode);
+    const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
     
     const latestLog = this.logs[this.logs.length - 1];
     if (latestLog) {
@@ -1140,6 +1145,7 @@ class TerribleGame {
     this.updateStatBar(this.dom.barOccult, this.dom.valOccult, this.character.stats.occult);
     this.updateStatBar(this.dom.barHappiness, this.dom.valHappiness, this.character.stats.happiness);
     this.updateStatBar(this.dom.barSmarts, this.dom.valSmarts, this.character.stats.smarts);
+    this.updateStatBar(this.dom.barLooks, this.dom.valLooks, this.character.stats.looks);
     this.updateStatBar(this.dom.barHumanity, this.dom.valHumanity, this.character.stats.humanity);
 
     if (this.character.stats.sanity < 25) {
@@ -1244,6 +1250,13 @@ class TerribleGame {
     this.dom.lblLiveSmarts.textContent = `${stats.smarts}%`;
     this.dom.slideLiveSmarts.oninput = (e) => this.dom.lblLiveSmarts.textContent = `${e.target.value}%`;
 
+    if (this.dom.slideLiveLooks && this.dom.lblLiveLooks) {
+      const looksVal = stats.looks !== undefined ? stats.looks : 70;
+      this.dom.slideLiveLooks.value = looksVal;
+      this.dom.lblLiveLooks.textContent = `${looksVal}%`;
+      this.dom.slideLiveLooks.oninput = (e) => this.dom.lblLiveLooks.textContent = `${e.target.value}%`;
+    }
+
     this.dom.slideLiveOccult.value = stats.occult;
     this.dom.lblLiveOccult.textContent = `${stats.occult}%`;
     this.dom.slideLiveOccult.oninput = (e) => this.dom.lblLiveOccult.textContent = `${e.target.value}%`;
@@ -1254,9 +1267,8 @@ class TerribleGame {
 
     // Dynamic scale for live money slider
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
-    const rate = country.currency.rate;
-    const maxMoney = rate >= 10000 ? 500000000 : (rate >= 100 ? 5000000 : 100000);
-    const step = rate >= 10000 ? 5000000 : (rate >= 100 ? 50000 : 500);
+    const maxMoney = country.maxGodMoney || 1000000;
+    const step = country.godMoneyStep || 5000;
 
     this.dom.slideLiveMoney.max = `${maxMoney}`;
     this.dom.slideLiveMoney.step = `${step}`;
@@ -1282,6 +1294,9 @@ class TerribleGame {
     this.character.stats.sanity = parseInt(this.dom.slideLiveSanity.value);
     this.character.stats.happiness = parseInt(this.dom.slideLiveHappiness.value);
     this.character.stats.smarts = parseInt(this.dom.slideLiveSmarts.value);
+    if (this.dom.slideLiveLooks) {
+      this.character.stats.looks = parseInt(this.dom.slideLiveLooks.value);
+    }
     this.character.stats.occult = parseInt(this.dom.slideLiveOccult.value);
     this.character.stats.humanity = parseInt(this.dom.slideLiveHumanity.value);
     this.character.money = parseInt(this.dom.slideLiveMoney.value);
