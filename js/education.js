@@ -541,6 +541,7 @@
     if (!character.education || !character.education.enrolled) {
       return { success: false, reason: "You are not currently enrolled in school." };
     }
+    const edu = character.education;
     edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + Math.floor(Math.random() * 5) + 6); // +6 to +10%
     modStat(character, 'smarts', 2);
     modStat(character, 'happiness', -2);

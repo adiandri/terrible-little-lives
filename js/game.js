@@ -3394,8 +3394,13 @@ class TerribleGame {
 
           const toggleBtn = card.querySelector('.btn-club-toggle');
           toggleBtn.addEventListener('click', () => {
+            const latestLog = this.logs[this.logs.length - 1];
             if (isMember) {
               edu.clubs = edu.clubs.filter(id => id !== club.id);
+              if (latestLog) {
+                latestLog.entries.push(`[Extracurricular] Left ${club.name}.`);
+              }
+              this.saveGame();
               this.openFeedbackModal({
                 tag: "CLUB MEMBERSHIP",
                 title: `Left ${club.name}`,
@@ -3419,6 +3424,10 @@ class TerribleGame {
               this.character.actionsLeft--;
               edu.clubs = edu.clubs || [];
               edu.clubs.push(club.id);
+              if (latestLog) {
+                latestLog.entries.push(`[Extracurricular] Joined ${club.name}!`);
+              }
+              this.saveGame();
               this.openFeedbackModal({
                 tag: "CLUB MEMBERSHIP",
                 title: `Joined ${club.name}!`,
@@ -3829,9 +3838,9 @@ class TerribleGame {
     }
 
     let result = null;
-    if (actionType === 'study_harder' && window.studyHarder) {
+    if ((actionType === 'study' || actionType === 'study_harder') && window.studyHarder) {
       result = window.studyHarder(this.character);
-    } else if (actionType === 'skip_class' && window.skipClass) {
+    } else if ((actionType === 'skip' || actionType === 'skip_class') && window.skipClass) {
       result = window.skipClass(this.character);
     } else if (actionType === 'mystery' && window.investigateMystery) {
       result = window.investigateMystery(this.character, param);
@@ -3845,6 +3854,16 @@ class TerribleGame {
 
     if (result.success) {
       this.character.actionsLeft--;
+      const latestLog = this.logs[this.logs.length - 1];
+      if (latestLog) {
+        latestLog.entries.push(`[${result.title}] ${result.body || result.message || ''}`);
+      }
+      this.saveGame();
+      if (actionType === 'mystery') {
+        window.soundEngine.playDread();
+      } else {
+        window.soundEngine.playClick();
+      }
       this.openFeedbackModal({
         tag: "SCHOOL PURSUIT",
         title: result.title,
@@ -3894,6 +3913,12 @@ class TerribleGame {
 
     if (result.success) {
       this.character.actionsLeft--;
+      const latestLog = this.logs[this.logs.length - 1];
+      if (latestLog) {
+        latestLog.entries.push(`[${person.name}] ${result.body || result.message || ''}`);
+      }
+      this.saveGame();
+      window.soundEngine.playClick();
       this.openFeedbackModal({
         tag: "INTERACTION OUTCOME",
         title: result.title,
