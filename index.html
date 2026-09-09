@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#08090b]">
+<html lang="en" class="h-full bg-app transition-colors duration-300">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Themes Management Engine (Runs synchronously to prevent FOUC) -->
+  <script src="js/themes.js?v=8"></script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -24,12 +27,22 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            morgue: '#0f1013',
-            slatecard: '#181a1f',
-            leadborder: '#262930',
-            parchment: '#e2ded4',
-            dust: '#8c8f9a',
-            crimson: '#991b1b',
+            app: 'var(--bg-app)',
+            morgue: 'var(--bg-chassis)',
+            slatecard: 'var(--bg-card)',
+            cardhover: 'var(--bg-card-hover)',
+            headerbg: 'var(--bg-header)',
+            inputbg: 'var(--bg-input)',
+            trackbg: 'var(--bg-track)',
+            leadborder: 'var(--border-main)',
+            subtleborder: 'var(--border-subtle)',
+            parchment: 'var(--text-primary)',
+            dust: 'var(--text-muted)',
+            crimson: 'var(--accent-primary)',
+            fiat: 'var(--accent-fiat)',
+            fiatbg: 'var(--accent-fiat-bg)',
+            shilling: 'var(--accent-shilling)',
+            shillingbg: 'var(--accent-shilling-bg)',
             bruised: '#7c6396',
           }
         }
@@ -41,6 +54,33 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
+    :root {
+      --bg-app: #08090b;
+      --bg-chassis: #0f1013;
+      --bg-header: #14161a;
+      --bg-card: #181a1f;
+      --bg-card-hover: #20232a;
+      --bg-input: #121418;
+      --bg-track: #1e2128;
+      --border-main: #262930;
+      --border-subtle: #1f2229;
+      --text-primary: #e2ded4;
+      --text-muted: #8c8f9a;
+      --accent-primary: #991b1b;
+      --accent-fiat: #10b981;
+      --accent-fiat-bg: #101411;
+      --accent-shilling: #f59e0b;
+      --accent-shilling-bg: #16120d;
+      --color-scheme: dark;
+    }
+
+    [data-mode="light"] {
+      color-scheme: light;
+    }
+    [data-mode="dark"] {
+      color-scheme: dark;
+    }
+
     html, body {
       height: 100%;
       overflow: hidden;
@@ -48,16 +88,18 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
     }
 
     .custom-scroll::-webkit-scrollbar {
       width: 4px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: #0f1013;
+      background: var(--bg-chassis);
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: #262930;
+      background: var(--border-main);
       border-radius: 4px;
     }
 
@@ -78,15 +120,15 @@
     }
 
     input[type=range] {
-      accent-color: #991b1b;
+      accent-color: var(--accent-primary);
     }
   </style>
 </head>
 
-<body class="h-full flex items-center justify-center bg-[#08090b] font-sans antialiased text-parchment">
+<body class="h-full flex items-center justify-center bg-app font-sans antialiased text-parchment transition-colors duration-300">
 
   <!-- Main Mobile Chassis -->
-  <div id="phone-screen" class="w-full sm:max-w-[420px] h-full sm:h-[94vh] sm:max-h-[890px] bg-morgue sm:rounded-3xl border border-leadborder/60 sm:shadow-[0_20px_60px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
+  <div id="phone-screen" class="w-full sm:max-w-[420px] h-full sm:h-[94vh] sm:max-h-[890px] bg-morgue sm:rounded-3xl border border-leadborder sm:shadow-[0_20px_60px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden transition-colors duration-300">
     
     <!-- ========================================== -->
     <!-- 1. LANDING SCREEN                          -->
@@ -98,14 +140,20 @@
           <i data-lucide="radio" class="w-4 h-4 text-crimson"></i>
           <span>MODERN ERA • 2024</span>
         </div>
-        <button id="btn-landing-mute" class="p-2 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-parchment">
-          <i id="landing-mute-icon" data-lucide="volume-2" class="w-4 h-4"></i>
-        </button>
+        <div class="flex items-center space-x-2">
+          <button id="btn-landing-theme" class="p-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment transition-all flex items-center space-x-1.5" title="Switch Theme">
+            <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
+            <span class="text-[10px] font-mono font-bold hidden sm:inline" id="txt-current-theme-name">THEME</span>
+          </button>
+          <button id="btn-landing-mute" class="p-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment transition-all" title="Toggle Sound">
+            <i id="landing-mute-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Title Area -->
       <div class="text-center my-auto space-y-4">
-        <div class="w-20 h-20 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-crimson shadow-[0_0_30px_rgba(153,27,27,0.25)]">
+        <div class="w-20 h-20 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-crimson shadow-md">
           <i data-lucide="skull" class="w-10 h-10"></i>
         </div>
 
@@ -118,7 +166,7 @@
           </p>
         </div>
 
-        <p class="text-xs text-[#a6a39b] italic max-w-xs mx-auto leading-relaxed pt-2">
+        <p class="text-xs text-dust italic max-w-xs mx-auto leading-relaxed pt-2">
           "Rent is due on the first. The baby monitor whispers backwards at 3 AM. Earn your salary by day, and count your shillings by night."
         </p>
       </div>
@@ -126,19 +174,19 @@
       <!-- Action Buttons -->
       <div class="space-y-2.5 pb-2">
         <!-- Resume Active Life -->
-        <button id="btn-landing-resume" class="hidden w-full py-3.5 px-4 rounded-xl bg-[#232732] hover:bg-[#2d3240] border border-blue-900/60 text-parchment font-serif font-bold text-sm tracking-wider shadow-md active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
+        <button id="btn-landing-resume" class="hidden w-full py-3.5 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-parchment font-serif font-bold text-sm tracking-wider shadow-md active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="play" class="w-4 h-4 text-sky-400"></i>
           <span id="label-resume-life">RESUME LIFE</span>
         </button>
 
         <!-- Forge a Soul (Character Creator + God Mode) -->
-        <button id="btn-to-creator" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-crimson to-red-900 hover:from-red-800 hover:to-red-950 text-parchment font-serif font-bold text-sm tracking-wider shadow-lg active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
+        <button id="btn-to-creator" class="w-full py-3.5 px-4 rounded-xl bg-crimson hover:opacity-90 text-parchment font-serif font-bold text-sm tracking-wider shadow-lg active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
           <span>FORGE A SOUL (CREATOR & GOD MODE)</span>
         </button>
 
         <!-- Quick Life (Random Generation) -->
-        <button id="btn-quick-life" class="w-full py-3 px-4 rounded-xl bg-slatecard hover:bg-[#20232a] border border-leadborder text-parchment font-serif text-xs tracking-wider active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
+        <button id="btn-quick-life" class="w-full py-3 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-parchment font-serif text-xs tracking-wider active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="dice-5" class="w-3.5 h-3.5 text-dust"></i>
           <span>QUICK START (RANDOM LIFE)</span>
         </button>
@@ -156,13 +204,13 @@
     <!-- ========================================== -->
     <section id="screen-creator" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
       <!-- Creator Header -->
-      <header class="bg-[#14161a] border-b border-leadborder px-4 py-3 shrink-0 flex items-center justify-between">
-        <button id="btn-creator-back" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-parchment flex items-center gap-1 text-xs">
+      <header class="bg-headerbg border-b border-leadborder px-4 py-3 shrink-0 flex items-center justify-between">
+        <button id="btn-creator-back" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment flex items-center gap-1 text-xs">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
           <span>Back</span>
         </button>
         <h2 class="font-serif font-bold text-sm tracking-wider text-parchment uppercase">Soul Inquest</h2>
-        <button id="btn-creator-randomize-all" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-amber-400" title="Randomize Entire Soul">
+        <button id="btn-creator-randomize-all" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-amber-400" title="Randomize Entire Soul">
           <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
         </button>
       </header>
@@ -172,7 +220,7 @@
         
         <!-- Interactive Avatar Preview Box -->
         <div class="bg-slatecard border border-leadborder rounded-2xl p-4 flex flex-col items-center">
-          <div class="relative w-36 h-36 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] border border-[#85754e]/50">
+          <div class="relative w-36 h-36 rounded-lg overflow-hidden shadow-md border border-[#85754e]/50">
             <canvas id="creator-avatar-canvas" width="200" height="200" class="w-full h-full"></canvas>
           </div>
           <button id="btn-random-avatar" class="mt-3 text-[11px] text-dust hover:text-amber-300 font-mono flex items-center gap-1.5">
@@ -182,7 +230,7 @@
         </div>
 
         <!-- Creator Mode Tabs -->
-        <div class="grid grid-cols-3 gap-1 bg-[#121418] p-1 rounded-xl border border-leadborder text-xs">
+        <div class="grid grid-cols-3 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-xs">
           <button id="tab-appearance" class="py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center">Appearance</button>
           <button id="tab-identity" class="py-1.5 rounded-lg text-dust hover:text-parchment font-serif transition-all text-center">Identity</button>
           <button id="tab-godmode" class="py-1.5 rounded-lg text-amber-400/80 hover:text-amber-300 font-serif font-bold transition-all text-center flex items-center justify-center gap-1">
@@ -196,7 +244,7 @@
           <!-- Skin Complexion -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust mb-1.5">Skin Complexion</label>
-            <select id="sel-skin" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none focus:border-crimson">
+            <select id="sel-skin" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none focus:border-crimson">
               <option value="porcelain">Porcelain Pale</option>
               <option value="ash">Ashen Gray (Cold)</option>
               <option value="sallow">Sallow (Exhausted)</option>
@@ -212,7 +260,7 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <span class="text-[10px] text-dust block mb-1">Shape</span>
-                <select id="sel-eye-shape" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-eye-shape" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <option value="sunken">Sunken / Hollow (Insomniac)</option>
                   <option value="wide">Wide / Haunted</option>
                   <option value="narrow">Narrow / Calculating</option>
@@ -222,7 +270,7 @@
               </div>
               <div>
                 <span class="text-[10px] text-dust block mb-1">Iris Color</span>
-                <select id="sel-eye-color" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-eye-color" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <option value="coal">Coal Black</option>
                   <option value="ice_blue">Ice Blue</option>
                   <option value="pale_hazel">Pale Hazel</option>
@@ -240,7 +288,7 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <span class="text-[10px] text-dust block mb-1">Style</span>
-                <select id="sel-hair-style" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-hair-style" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <option value="parted">Center Parted</option>
                   <option value="slicked">Slicked Back</option>
                   <option value="unkempt">Unkempt Wild</option>
@@ -250,7 +298,7 @@
               </div>
               <div>
                 <span class="text-[10px] text-dust block mb-1">Hair Color</span>
-                <select id="sel-hair-color" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-hair-color" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <option value="raven">Raven Black</option>
                   <option value="ash_brown">Ash Brown</option>
                   <option value="auburn">Auburn Rust</option>
@@ -264,7 +312,7 @@
           <!-- Distinguishing Horror Marks -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust mb-1.5">Distinguishing Mark / Accessory</label>
-            <select id="sel-mark" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+            <select id="sel-mark" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
               <option value="hollow_circles">Severe Under-Eye Circles</option>
               <option value="spectacles">Round Wire Spectacles</option>
               <option value="scar">Stitched Cheek Scar</option>
@@ -282,13 +330,13 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <span class="text-[10px] text-dust block mb-1">Country</span>
-                <select id="sel-country" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-country" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <!-- Dynamically populated -->
                 </select>
               </div>
               <div>
                 <span class="text-[10px] text-dust block mb-1">City</span>
-                <select id="sel-city" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+                <select id="sel-city" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
                   <!-- Dynamically populated based on country -->
                 </select>
               </div>
@@ -304,20 +352,20 @@
               </button>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <input id="input-first-name" type="text" placeholder="First Name" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
-              <input id="input-surname" type="text" placeholder="Surname" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+              <input id="input-first-name" type="text" placeholder="First Name" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+              <input id="input-surname" type="text" placeholder="Surname" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
             </div>
           </div>
 
           <!-- Gender & Trait -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-2">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Gender & Inherent Trait</label>
-            <select id="sel-gender" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none mb-2">
+            <select id="sel-gender" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none mb-2">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Enigmatic">Enigmatic</option>
             </select>
-            <select id="sel-trait" class="w-full bg-[#121418] border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
+            <select id="sel-trait" class="w-full bg-inputbg border border-leadborder text-parchment text-xs rounded-lg p-2 focus:outline-none">
               <!-- Injected dynamically -->
             </select>
             <p id="trait-desc" class="text-[11px] text-dust italic pt-1 leading-relaxed">Select a trait to read its omen.</p>
@@ -326,7 +374,7 @@
 
         <!-- PANEL C: GOD MODE (PROTOTYPE SLIDERS) -->
         <div id="panel-godmode" class="hidden space-y-3">
-          <div class="bg-[#1b1c24] border border-amber-500/30 rounded-xl p-3.5 flex items-center justify-between">
+          <div class="bg-slatecard border border-amber-500/30 rounded-xl p-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
               <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
                 <i data-lucide="zap" class="w-4 h-4"></i>
@@ -338,7 +386,7 @@
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input id="chk-godmode" type="checkbox" checked class="sr-only peer">
-              <div class="w-9 h-5 bg-[#262930] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
+              <div class="w-9 h-5 bg-trackbg peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
             </label>
           </div>
 
@@ -349,7 +397,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="smile" class="w-3 h-3 text-yellow-400"></i> Happiness</span>
                 <span id="label-god-happiness" class="font-mono text-yellow-400 font-bold">75%</span>
               </div>
-              <input id="slider-god-happiness" type="range" min="0" max="100" value="75" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-happiness" type="range" min="0" max="100" value="75" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Smarts / Intelligence -->
@@ -358,7 +406,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="brain" class="w-3 h-3 text-emerald-400"></i> Intelligence</span>
                 <span id="label-god-smarts" class="font-mono text-emerald-400 font-bold">80%</span>
               </div>
-              <input id="slider-god-smarts" type="range" min="0" max="100" value="80" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-smarts" type="range" min="0" max="100" value="80" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Looks -->
@@ -367,7 +415,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="sparkle" class="w-3 h-3 text-pink-400"></i> Looks</span>
                 <span id="label-god-looks" class="font-mono text-pink-400 font-bold">65%</span>
               </div>
-              <input id="slider-god-looks" type="range" min="0" max="100" value="65" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-looks" type="range" min="0" max="100" value="65" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Vitality -->
@@ -376,7 +424,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3 text-red-400"></i> Vitality (Health)</span>
                 <span id="label-god-vitality" class="font-mono text-red-400 font-bold">90%</span>
               </div>
-              <input id="slider-god-vitality" type="range" min="5" max="100" value="90" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-vitality" type="range" min="5" max="100" value="90" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Sanity -->
@@ -385,7 +433,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3 text-sky-400"></i> Sanity (Mind)</span>
                 <span id="label-god-sanity" class="font-mono text-sky-400 font-bold">85%</span>
               </div>
-              <input id="slider-god-sanity" type="range" min="5" max="100" value="85" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-sanity" type="range" min="5" max="100" value="85" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Occult -->
@@ -394,7 +442,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3 text-purple-400"></i> Occult Knowledge</span>
                 <span id="label-god-occult" class="font-mono text-purple-400 font-bold">25%</span>
               </div>
-              <input id="slider-god-occult" type="range" min="0" max="100" value="25" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-occult" type="range" min="0" max="100" value="25" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Humanity -->
@@ -403,7 +451,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3 text-amber-500"></i> Humanity (Soul)</span>
                 <span id="label-god-humanity" class="font-mono text-amber-500 font-bold">90%</span>
               </div>
-              <input id="slider-god-humanity" type="range" min="5" max="100" value="90" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-humanity" type="range" min="5" max="100" value="90" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Starting Mundane Bank Balance (Fiat) -->
@@ -412,7 +460,7 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="wallet" class="w-3 h-3 text-emerald-400"></i> Mundane Bank Balance</span>
                 <span id="label-god-money" class="font-mono text-emerald-400 font-bold">$1,500</span>
               </div>
-              <input id="slider-god-money" type="range" min="0" max="50000" step="500" value="1500" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-money" type="range" min="0" max="50000" step="500" value="1500" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
 
             <!-- Starting Paranormal Shillings -->
@@ -421,15 +469,15 @@
                 <span class="text-dust flex items-center gap-1"><i data-lucide="coins" class="w-3 h-3 text-amber-400"></i> Paranormal Shillings</span>
                 <span id="label-god-shillings" class="font-mono text-amber-400 font-bold">25 s.</span>
               </div>
-              <input id="slider-god-shillings" type="range" min="0" max="1500" step="10" value="25" class="w-full h-1.5 bg-[#262930] rounded-lg">
+              <input id="slider-god-shillings" type="range" min="0" max="1500" step="10" value="25" class="w-full h-1.5 bg-trackbg rounded-lg">
             </div>
           </div>
         </div>
       </div>
 
       <!-- Creator Bottom Action -->
-      <footer class="bg-[#121417] border-t border-leadborder p-4 shrink-0">
-        <button id="btn-embark" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-crimson to-red-900 hover:from-red-800 hover:to-red-950 text-parchment font-serif font-bold text-sm tracking-widest shadow-xl active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
+      <footer class="bg-headerbg border-t border-leadborder p-4 shrink-0">
+        <button id="btn-embark" class="w-full py-3.5 px-4 rounded-xl bg-crimson hover:opacity-90 text-parchment font-serif font-bold text-sm tracking-widest shadow-xl active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <span>EMBARK ON THIS LIFE</span>
           <i data-lucide="chevron-right" class="w-4 h-4"></i>
         </button>
@@ -441,7 +489,7 @@
     <!-- ========================================== -->
     <section id="screen-game" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
       <!-- Top Status / Notch Bar -->
-      <header class="bg-[#14161a] border-b border-leadborder px-4 py-3 shrink-0 space-y-2.5 z-10">
+      <header class="bg-headerbg border-b border-leadborder px-4 py-3 shrink-0 space-y-2.5 z-10">
         <!-- Row 1: Character Identity, Status & Quick Actions -->
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3 min-w-0">
@@ -460,12 +508,15 @@
             </div>
           </div>
 
-          <!-- Top-Right Actions (Godmode & Menu) -->
-          <div class="flex items-center space-x-2 shrink-0 pl-2">
+          <!-- Top-Right Actions (Theme, Godmode & Menu) -->
+          <div class="flex items-center space-x-1.5 shrink-0 pl-2">
+            <button id="btn-game-theme" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors" title="Switch Theme">
+              <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
+            </button>
             <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors" title="Open God Mode Inspector">
               <i data-lucide="zap" class="w-4 h-4"></i>
             </button>
-            <button id="btn-to-menu" class="p-1.5 rounded-lg bg-slatecard hover:bg-[#20232a] text-dust hover:text-parchment border border-leadborder transition-colors" title="Return to Title">
+            <button id="btn-to-menu" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors" title="Return to Title">
               <i data-lucide="home" class="w-4 h-4"></i>
             </button>
           </div>
@@ -474,7 +525,7 @@
         <!-- Row 2: Dual Currency Display (Spacious, Uncramped Ledger) -->
         <div class="grid grid-cols-2 gap-2">
           <!-- Mundane Fiat Badge -->
-          <div class="px-2.5 py-1.5 rounded-lg bg-[#101411] border border-emerald-900/60 flex items-center justify-between shadow-sm" title="Mundane Fiat Currency">
+          <div class="px-2.5 py-1.5 rounded-lg bg-fiatbg border border-emerald-700/50 flex items-center justify-between shadow-xs" title="Mundane Fiat Currency">
             <div class="flex items-center space-x-1.5 min-w-0">
               <i data-lucide="banknote" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
               <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Mundane</span>
@@ -483,7 +534,7 @@
           </div>
 
           <!-- Paranormal Shillings Badge -->
-          <div class="px-2.5 py-1.5 rounded-lg bg-[#16120d] border border-amber-900/60 flex items-center justify-between shadow-sm" title="Paranormal Shillings">
+          <div class="px-2.5 py-1.5 rounded-lg bg-shillingbg border border-amber-700/50 flex items-center justify-between shadow-xs" title="Paranormal Shillings">
             <div class="flex items-center space-x-1.5 min-w-0">
               <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
               <span class="text-[9px] uppercase font-mono text-dust tracking-wider">Shillings</span>
@@ -494,7 +545,7 @@
       </header>
 
       <!-- Stat Gauges (Jewel-toned 7 Stats: 4 Mortal + 3 Esoteric) -->
-      <section class="bg-[#121418] border-b border-leadborder px-4 py-2 shrink-0 space-y-1.5 text-[11px]">
+      <section class="bg-headerbg border-b border-leadborder px-4 py-2 shrink-0 space-y-1.5 text-[11px]">
         <!-- Row 1: Mortal Life Attributes -->
         <div class="grid grid-cols-4 gap-2">
           <!-- Vitality -->
@@ -503,8 +554,8 @@
               <span class="flex items-center gap-1 text-red-400"><i data-lucide="heart" class="w-2.5 h-2.5"></i> Health</span>
               <span id="val-vitality">90%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-              <div id="bar-vitality" class="bg-[#991b1b] h-full rounded-full transition-all duration-300" style="width: 90%;"></div>
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-vitality" class="bg-red-600 h-full rounded-full transition-all duration-300" style="width: 90%;"></div>
             </div>
           </div>
 
@@ -514,7 +565,7 @@
               <span class="flex items-center gap-1 text-emerald-400"><i data-lucide="brain" class="w-2.5 h-2.5"></i> Smarts</span>
               <span id="val-smarts">80%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
               <div id="bar-smarts" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 80%;"></div>
             </div>
           </div>
@@ -525,7 +576,7 @@
               <span class="flex items-center gap-1 text-pink-400"><i data-lucide="sparkle" class="w-2.5 h-2.5"></i> Looks</span>
               <span id="val-looks">70%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
               <div id="bar-looks" class="bg-pink-500 h-full rounded-full transition-all duration-300" style="width: 70%;"></div>
             </div>
           </div>
@@ -536,7 +587,7 @@
               <span class="flex items-center gap-1 text-yellow-400"><i data-lucide="smile" class="w-2.5 h-2.5"></i> Happy</span>
               <span id="val-happiness">75%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
               <div id="bar-happiness" class="bg-yellow-500 h-full rounded-full transition-all duration-300" style="width: 75%;"></div>
             </div>
           </div>
@@ -550,8 +601,8 @@
               <span class="flex items-center gap-1 text-sky-400"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Sanity</span>
               <span id="val-sanity">85%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-              <div id="bar-sanity" class="bg-[#38bdf8] h-full rounded-full transition-all duration-300" style="width: 85%;"></div>
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-sanity" class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: 85%;"></div>
             </div>
           </div>
 
@@ -561,8 +612,8 @@
               <span class="flex items-center gap-1 text-purple-400"><i data-lucide="flame" class="w-2.5 h-2.5"></i> Occult</span>
               <span id="val-occult">15%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-              <div id="bar-occult" class="bg-[#8b5cf6] h-full rounded-full transition-all duration-300" style="width: 15%;"></div>
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-occult" class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: 15%;"></div>
             </div>
           </div>
 
@@ -572,8 +623,8 @@
               <span class="flex items-center gap-1 text-amber-500"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Humanity</span>
               <span id="val-humanity">95%</span>
             </div>
-            <div class="w-full bg-[#1e2128] rounded-full h-1 overflow-hidden mt-0.5">
-              <div id="bar-humanity" class="bg-[#d97706] h-full rounded-full transition-all duration-300" style="width: 95%;"></div>
+            <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden mt-0.5">
+              <div id="bar-humanity" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 95%;"></div>
             </div>
           </div>
         </div>
@@ -585,16 +636,16 @@
       </main>
 
       <!-- Bottom Navigation -->
-      <footer class="bg-[#121417] border-t border-leadborder px-4 py-2.5 shrink-0 flex flex-col space-y-2 z-10">
+      <footer class="bg-headerbg border-t border-leadborder px-4 py-2.5 shrink-0 flex flex-col space-y-2 z-10">
         <!-- Endure Button -->
-        <button id="btn-endure" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-b from-[#22262f] to-[#171920] border border-leadborder hover:border-crimson/80 active:scale-[0.98] transition-all text-parchment shadow-md flex flex-col items-center justify-center group">
-          <span class="font-serif tracking-widest text-sm font-bold group-hover:text-red-300 transition-colors">ENDURE YEAR</span>
+        <button id="btn-endure" class="w-full py-2.5 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-crimson active:scale-[0.98] transition-all text-parchment shadow-md flex flex-col items-center justify-center group">
+          <span class="font-serif tracking-widest text-sm font-bold group-hover:text-red-400 transition-colors">ENDURE YEAR</span>
           <span class="text-[10px] text-dust font-sans block tracking-wider">[ +1 Year ]</span>
         </button>
 
         <!-- Sub Tabs (Careers Active!) -->
         <div class="grid grid-cols-3 gap-2 text-[10px] text-dust">
-          <button id="btn-tab-careers" class="py-1 px-2 rounded-lg bg-slatecard border border-leadborder text-parchment hover:border-sky-500/60 text-center flex items-center justify-center space-x-1 transition-colors">
+          <button id="btn-tab-careers" class="py-1 px-2 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-parchment hover:border-sky-500/60 text-center flex items-center justify-center space-x-1 transition-colors">
             <i data-lucide="briefcase" class="w-3 h-3 text-sky-400"></i>
             <span>Careers</span>
           </button>
@@ -614,13 +665,13 @@
     <!-- 4. THE CRYPT / MORGUE                      -->
     <!-- ========================================== -->
     <section id="screen-crypt" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
-      <header class="bg-[#14161a] border-b border-leadborder px-4 py-3 shrink-0 flex items-center justify-between">
-        <button id="btn-crypt-back" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-parchment flex items-center gap-1 text-xs">
+      <header class="bg-headerbg border-b border-leadborder px-4 py-3 shrink-0 flex items-center justify-between">
+        <button id="btn-crypt-back" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment flex items-center gap-1 text-xs">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
           <span>Back</span>
         </button>
         <h2 class="font-serif font-bold text-sm tracking-wider text-parchment uppercase">The City Morgue</h2>
-        <button id="btn-clear-crypt" class="p-1.5 rounded-lg bg-slatecard border border-leadborder text-dust hover:text-crimson text-xs" title="Clear Morgue Records">
+        <button id="btn-clear-crypt" class="p-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-crimson text-xs" title="Clear Morgue Records">
           <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
         </button>
       </header>
@@ -636,7 +687,7 @@
 
     <!-- CAREERS MODAL (Mundane vs Paranormal) -->
     <div id="careers-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
-      <div class="bg-[#16181f] border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
+      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
         <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
           <div class="flex items-center space-x-2">
             <i data-lucide="briefcase" class="w-4 h-4 text-sky-400"></i>
@@ -648,7 +699,7 @@
         </div>
 
         <!-- Career Tabs -->
-        <div class="grid grid-cols-2 gap-1 bg-[#101115] p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
+        <div class="grid grid-cols-2 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
           <button id="tab-career-mundane" class="py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
             <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-400"></i>
             <span>Mundane Jobs (Fiat)</span>
@@ -660,7 +711,7 @@
         </div>
 
         <!-- Current Status Banner -->
-        <div id="current-employment-banner" class="bg-[#111317] border border-leadborder/70 rounded-xl p-3 mb-3 shrink-0 text-xs flex justify-between items-center">
+        <div id="current-employment-banner" class="bg-inputbg border border-leadborder/70 rounded-xl p-3 mb-3 shrink-0 text-xs flex justify-between items-center">
           <div>
             <span class="text-[10px] uppercase text-dust font-mono block">Current Daytime Job:</span>
             <span id="txt-current-mundane-job" class="font-serif font-bold text-parchment">Unemployed</span>
@@ -679,7 +730,7 @@
 
     <!-- Interactive Dilemma Bottom Sheet -->
     <div id="dilemma-backdrop" class="hidden absolute inset-0 bg-black/75 backdrop-blur-sm z-30 transition-opacity"></div>
-    <div id="dilemma-modal" class="hidden absolute inset-x-0 bottom-0 bg-[#171920] border-t border-leadborder rounded-t-2xl p-5 z-40 shadow-2xl flex flex-col max-h-[85%] overflow-y-auto animate-in slide-in-from-bottom duration-200">
+    <div id="dilemma-modal" class="hidden absolute inset-x-0 bottom-0 bg-slatecard border-t border-leadborder rounded-t-2xl p-5 z-40 shadow-2xl flex flex-col max-h-[85%] overflow-y-auto animate-in slide-in-from-bottom duration-200">
       <div class="w-10 h-1 bg-leadborder rounded-full mx-auto mb-4 shrink-0"></div>
       
       <div class="flex items-center space-x-2 text-crimson mb-2">
@@ -715,7 +766,7 @@
               <span>Vitality (Health)</span>
               <span id="lbl-live-vitality" class="font-mono text-red-400 font-bold">90%</span>
             </div>
-            <input id="slide-live-vitality" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-vitality" type="range" min="1" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Sanity -->
@@ -724,7 +775,7 @@
               <span>Sanity (Mind)</span>
               <span id="lbl-live-sanity" class="font-mono text-sky-400 font-bold">85%</span>
             </div>
-            <input id="slide-live-sanity" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-sanity" type="range" min="1" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Happiness -->
@@ -733,7 +784,7 @@
               <span>Happiness</span>
               <span id="lbl-live-happiness" class="font-mono text-yellow-400 font-bold">75%</span>
             </div>
-            <input id="slide-live-happiness" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-happiness" type="range" min="0" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Smarts -->
@@ -742,7 +793,7 @@
               <span>Intelligence</span>
               <span id="lbl-live-smarts" class="font-mono text-emerald-400 font-bold">80%</span>
             </div>
-            <input id="slide-live-smarts" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-smarts" type="range" min="0" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Looks -->
@@ -751,7 +802,7 @@
               <span>Looks / Attractiveness</span>
               <span id="lbl-live-looks" class="font-mono text-pink-400 font-bold">70%</span>
             </div>
-            <input id="slide-live-looks" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-looks" type="range" min="0" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Occult -->
@@ -760,7 +811,7 @@
               <span>Occult</span>
               <span id="lbl-live-occult" class="font-mono text-purple-400 font-bold">25%</span>
             </div>
-            <input id="slide-live-occult" type="range" min="0" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-occult" type="range" min="0" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Humanity -->
@@ -769,7 +820,7 @@
               <span>Humanity</span>
               <span id="lbl-live-humanity" class="font-mono text-amber-500 font-bold">90%</span>
             </div>
-            <input id="slide-live-humanity" type="range" min="1" max="100" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-humanity" type="range" min="1" max="100" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Live Fiat Money -->
@@ -778,7 +829,7 @@
               <span>Mundane Bank Balance</span>
               <span id="lbl-live-money" class="font-mono text-emerald-400 font-bold">$1,500</span>
             </div>
-            <input id="slide-live-money" type="range" min="0" max="100000" step="500" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-money" type="range" min="0" max="100000" step="500" class="w-full h-1 bg-trackbg rounded">
           </div>
 
           <!-- Live Shillings -->
@@ -787,7 +838,7 @@
               <span>Paranormal Shillings</span>
               <span id="lbl-live-shillings" class="font-mono text-amber-400 font-bold">50 s.</span>
             </div>
-            <input id="slide-live-shillings" type="range" min="0" max="2500" step="10" class="w-full h-1 bg-[#262930] rounded">
+            <input id="slide-live-shillings" type="range" min="0" max="2500" step="10" class="w-full h-1 bg-trackbg rounded">
           </div>
         </div>
 
@@ -797,8 +848,42 @@
       </div>
     </div>
 
+    <!-- THEME SELECTION MODAL -->
+    <div id="theme-modal" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-center items-center">
+      <div class="w-full max-w-sm bg-slatecard border border-leadborder rounded-2xl p-4 flex flex-col max-h-[85%] shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Aesthetic Themes</h3>
+          </div>
+          <button id="btn-close-theme-modal" class="p-1 rounded text-dust hover:text-parchment">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Filter tabs: All, Dark, Light -->
+        <div class="grid grid-cols-3 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
+          <button id="tab-theme-all" class="py-1 rounded-lg bg-slatecard text-parchment font-serif font-bold text-[11px] transition-all text-center">
+            All (8)
+          </button>
+          <button id="tab-theme-dark" class="py-1 rounded-lg text-dust hover:text-parchment font-serif font-bold text-[11px] transition-all text-center">
+            🌙 Dark
+          </button>
+          <button id="tab-theme-light" class="py-1 rounded-lg text-dust hover:text-parchment font-serif font-bold text-[11px] transition-all text-center">
+            ☀️ Light
+          </button>
+        </div>
+
+        <!-- Theme List Container -->
+        <div id="themes-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
+          <!-- Injected dynamically by game.js -->
+        </div>
+      </div>
+    </div>
+
     <!-- Post-Mortem / Coroner Inquest Modal (Death Screen) -->
-    <div id="death-modal" class="hidden absolute inset-0 bg-[#0c0d10]/95 backdrop-blur-md z-50 p-6 flex flex-col justify-between items-center text-center">
+    <div id="death-modal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 p-6 flex flex-col justify-between items-center text-center">
       <div class="my-auto max-w-xs space-y-4">
         <!-- Portrait in Frame -->
         <div class="w-20 h-20 rounded-lg overflow-hidden border border-[#85754e] shadow-2xl mx-auto">
@@ -823,10 +908,10 @@
       </div>
 
       <div class="w-full space-y-2">
-        <button id="btn-new-life" class="w-full py-3 px-4 rounded-xl bg-crimson hover:bg-red-800 text-parchment font-serif font-bold tracking-widest text-xs shadow-lg active:scale-[0.98] transition-all">
+        <button id="btn-new-life" class="w-full py-3 px-4 rounded-xl bg-crimson hover:opacity-90 text-parchment font-serif font-bold tracking-widest text-xs shadow-lg active:scale-[0.98] transition-all">
           FORGE ANOTHER SOUL
         </button>
-        <button id="btn-death-to-crypt" class="w-full py-2.5 px-4 rounded-xl bg-slatecard hover:bg-[#20232a] border border-leadborder text-dust hover:text-parchment font-serif text-xs tracking-wider transition-all">
+        <button id="btn-death-to-crypt" class="w-full py-2.5 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-dust hover:text-parchment font-serif text-xs tracking-wider transition-all">
           VISIT THE CITY MORGUE
         </button>
       </div>
@@ -835,11 +920,11 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=7"></script>
-  <script src="js/avatar.js?v=7"></script>
-  <script src="js/names.js?v=7"></script>
-  <script src="js/careers.js?v=7"></script>
-  <script src="js/events.js?v=7"></script>
-  <script src="js/game.js?v=7"></script>
+  <script src="js/audio.js?v=8"></script>
+  <script src="js/avatar.js?v=8"></script>
+  <script src="js/names.js?v=8"></script>
+  <script src="js/careers.js?v=8"></script>
+  <script src="js/events.js?v=8"></script>
+  <script src="js/game.js?v=8"></script>
 </body>
 </html>
