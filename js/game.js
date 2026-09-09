@@ -67,8 +67,6 @@ class TerribleGame {
       btnQuickLife: document.getElementById('btn-quick-life'),
       btnToCrypt: document.getElementById('btn-to-crypt'),
       btnLandingSettings: document.getElementById('btn-landing-settings'),
-      btnLandingTheme: document.getElementById('btn-landing-theme'),
-      txtCurrentThemeName: document.getElementById('txt-current-theme-name'),
       btnLandingMute: document.getElementById('btn-landing-mute'),
       landingMuteIcon: document.getElementById('landing-mute-icon'),
 
@@ -134,7 +132,6 @@ class TerribleGame {
       charMoney: document.getElementById('char-money'),
       charShillings: document.getElementById('char-shillings'),
       btnGameSettings: document.getElementById('btn-game-settings'),
-      btnGameTheme: document.getElementById('btn-game-theme'),
       btnGameGodmode: document.getElementById('btn-game-godmode'),
       btnToMenu: document.getElementById('btn-to-menu'),
 
@@ -805,13 +802,11 @@ class TerribleGame {
       this.showScreen('screen-crypt');
     });
 
-    // Settings & Theme Switcher Controls
+    // Settings Switcher Controls
     const openSettings = () => this.openSettingsModal();
     if (this.dom.btnLandingSettings) this.dom.btnLandingSettings.addEventListener('click', openSettings);
     if (this.dom.btnCreatorSettings) this.dom.btnCreatorSettings.addEventListener('click', openSettings);
     if (this.dom.btnGameSettings) this.dom.btnGameSettings.addEventListener('click', openSettings);
-    if (this.dom.btnLandingTheme) this.dom.btnLandingTheme.addEventListener('click', openSettings);
-    if (this.dom.btnGameTheme) this.dom.btnGameTheme.addEventListener('click', openSettings);
     if (this.dom.btnCloseSettings) this.dom.btnCloseSettings.addEventListener('click', () => this.closeSettingsModal());
     if (this.dom.btnCloseThemeModal) this.dom.btnCloseThemeModal.addEventListener('click', () => this.closeSettingsModal());
 
