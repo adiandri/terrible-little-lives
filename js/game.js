@@ -2527,15 +2527,15 @@ class TerribleGame {
           if (val === 0) continue;
           let pillText = '';
           let colorClass = val > 0 
-            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
-            : 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+            ? 'badge-stat-met' 
+            : 'badge-stat-unmet';
           
           if (key === 'money') {
             const formatted = this.formatCurrency(Math.abs(val));
             pillText = val > 0 ? `+${formatted}` : `-${formatted}`;
           } else if (key === 'shillings') {
             pillText = val > 0 ? `+${val} Shillings` : `${val} Shillings`;
-            colorClass = val > 0 ? 'bg-purple-500/15 text-purple-400 border-purple-500/30' : 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+            colorClass = val > 0 ? 'badge-occult-met' : 'badge-stat-unmet';
           } else if (key === 'relationship') {
             pillText = val > 0 ? `Closeness +${val}%` : `Closeness ${val}%`;
           } else {
@@ -3321,9 +3321,9 @@ class TerribleGame {
       const panel = this.dom['eduPanel' + t.charAt(0).toUpperCase() + t.slice(1)];
       if (btn) {
         if (t === activeTab) {
-          btn.className = "py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center border border-leadborder shadow-sm";
+          btn.className = "py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center border border-leadborder shadow-sm edu-tab-active";
         } else {
-          btn.className = "py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center border border-transparent";
+          btn.className = "py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-semibold transition-all text-center flex flex-col items-center justify-center border border-transparent edu-tab-inactive";
         }
       }
       if (panel) {
@@ -3372,21 +3372,21 @@ class TerribleGame {
           card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs";
           card.innerHTML = `
             <div class="flex items-center space-x-2.5">
-              <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
+              <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-edu-amber shrink-0">
                 <i data-lucide="${club.icon || 'trophy'}" class="w-3.5 h-3.5"></i>
               </div>
               <div>
                 <div class="font-serif font-bold text-parchment flex items-center gap-1.5">
                   <span>${club.name}</span>
-                  ${isMember ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">MEMBER</span>` : ''}
+                  ${isMember ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-emerald font-bold">MEMBER</span>` : ''}
                 </div>
                 <div class="text-[10px] text-dust leading-snug">${club.desc}</div>
               </div>
             </div>
             <button class="btn-club-toggle shrink-0 ml-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
               isMember 
-                ? 'bg-rose-950/30 hover:bg-rose-900/40 text-rose-400 border border-rose-500/30' 
-                : 'bg-slatecard hover:bg-cardhover text-teal-400 border border-leadborder'
+                ? 'btn-edu-danger' 
+                : 'bg-slatecard hover:bg-cardhover text-edu-teal border border-leadborder'
             }">
               ${isMember ? 'Quit' : 'Join'}
             </button>
@@ -3456,18 +3456,18 @@ class TerribleGame {
       } else {
         availableMysteries.forEach(mystery => {
           const card = document.createElement('div');
-          card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-purple-900/30 text-xs hover:border-purple-500/40 transition-all";
+          card.className = "flex items-center justify-between p-2.5 rounded-xl edu-mystery-card text-xs transition-all";
           card.innerHTML = `
             <div class="flex items-center space-x-2.5">
-              <div class="w-7 h-7 rounded-lg bg-purple-950/40 border border-purple-800/40 flex items-center justify-center text-purple-400 shrink-0">
+              <div class="w-7 h-7 rounded-lg edu-mystery-icon flex items-center justify-center shrink-0">
                 <i data-lucide="${mystery.icon || 'eye'}" class="w-3.5 h-3.5"></i>
               </div>
               <div>
-                <div class="font-serif font-bold text-purple-300">${mystery.title}</div>
+                <div class="font-serif font-bold text-edu-purple-title">${mystery.title}</div>
                 <div class="text-[10px] text-dust leading-snug">${mystery.desc}</div>
               </div>
             </div>
-            <button class="btn-investigate shrink-0 ml-2 px-2.5 py-1 rounded-lg bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/40 text-purple-300 hover:text-purple-200 text-[10px] font-mono font-bold transition-all flex items-center gap-1">
+            <button class="btn-investigate shrink-0 ml-2 px-2.5 py-1 rounded-lg btn-edu-mystery text-[10px] font-mono font-bold transition-all flex items-center gap-1">
               <i data-lucide="compass" class="w-3 h-3"></i>
               <span>Investigate</span>
             </button>
@@ -3497,7 +3497,7 @@ class TerribleGame {
                 <div class="font-serif font-bold text-parchment">${major.name}</div>
                 <div class="text-[10px] font-mono text-dust">Tuition: ${window.formatMoney(major.tuition, this.character.countryCode)}/yr · +${major.smartsBonus} Smarts</div>
               </div>
-              <button class="btn-apply-major shrink-0 px-2.5 py-1 rounded-lg bg-sky-950/40 hover:bg-sky-900/50 border border-sky-500/40 text-sky-300 text-[10px] font-mono font-bold transition-all">
+              <button class="btn-apply-major shrink-0 px-2.5 py-1 rounded-lg btn-edu-university text-[10px] font-mono font-bold transition-all">
                 Apply
               </button>
             `;
@@ -3533,39 +3533,39 @@ class TerribleGame {
 
       card.innerHTML = `
         <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-sky-400 shrink-0">
+          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-edu-sky shrink-0">
             <i data-lucide="${peer.gender === 'Male' ? 'user' : 'user-check'}" class="w-4 h-4"></i>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5 truncate">
               <span class="font-serif font-bold text-xs text-parchment truncate">${peer.name}</span>
-              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/15 text-purple-400 border border-purple-500/30 uppercase font-bold shrink-0">${peer.clique}</span>
-              ${peer.isBefriended ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold shrink-0">★ Best Friend</span>` : ''}
+              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-purple uppercase font-bold shrink-0">${peer.clique}</span>
+              ${peer.isBefriended ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-amber font-bold shrink-0">★ Best Friend</span>` : ''}
             </div>
             <!-- Small Closeness & Popularity Bars -->
             <div class="grid grid-cols-2 gap-2 mt-1.5 text-[9px] font-mono text-dust">
               <div>
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="text-purple-400">Closeness</span>
+                  <span class="text-edu-purple font-semibold">Closeness</span>
                   <span>${rel}%</span>
                 </div>
-                <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
-                  <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+                <div class="w-full bg-trackbg rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-purple-500 bar-fill-purple h-full rounded-full" style="width: ${rel}%;"></div>
                 </div>
               </div>
               <div>
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="text-amber-400">Popularity</span>
+                  <span class="text-edu-amber font-semibold">Popularity</span>
                   <span>${pop}%</span>
                 </div>
-                <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
-                  <div class="bg-amber-500 h-full rounded-full" style="width: ${pop}%;"></div>
+                <div class="w-full bg-trackbg rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-amber-500 bar-fill-amber h-full rounded-full" style="width: ${pop}%;"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <button class="btn-peer-interact shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-teal-400 hover:text-teal-300 font-mono text-xs font-bold transition-all">
+        <button class="btn-peer-interact shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-edu-teal hover:opacity-80 font-mono text-xs font-bold transition-all">
           Interact
         </button>
       `;
@@ -3596,14 +3596,14 @@ class TerribleGame {
       const rel = Math.max(0, Math.min(100, teacher.relationship || 50));
       const strict = teacher.strictness || 50;
       let strictBadge = strict > 60 
-        ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold">Strict</span>`
+        ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-rose font-bold">Strict</span>`
         : (strict < 40 
-          ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">Lenient</span>`
-          : `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-bold">Moderate</span>`);
+          ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-emerald font-bold">Lenient</span>`
+          : `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-amber font-bold">Moderate</span>`);
 
       card.innerHTML = `
         <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-emerald-400 shrink-0">
+          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-edu-emerald shrink-0">
             <i data-lucide="graduation-cap" class="w-4 h-4"></i>
           </div>
           <div class="min-w-0 flex-1">
@@ -3614,16 +3614,16 @@ class TerribleGame {
             <div class="text-[10px] text-dust font-mono truncate mt-0.5">${teacher.role}</div>
             <div class="mt-1 text-[9px] font-mono text-dust">
               <div class="flex justify-between items-center mb-0.5">
-                <span class="text-purple-400">Respect & Standing</span>
+                <span class="text-edu-purple font-semibold">Respect & Standing</span>
                 <span>${rel}%</span>
               </div>
-              <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
-                <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+              <div class="w-full bg-trackbg rounded-full h-1.5 overflow-hidden">
+                <div class="bg-purple-500 bar-fill-purple h-full rounded-full" style="width: ${rel}%;"></div>
               </div>
             </div>
           </div>
         </div>
-        <button class="btn-teacher-consult shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-emerald-400 hover:text-emerald-300 font-mono text-xs font-bold transition-all">
+        <button class="btn-teacher-consult shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-edu-emerald hover:opacity-80 font-mono text-xs font-bold transition-all">
           Consult
         </button>
       `;
@@ -3654,19 +3654,19 @@ class TerribleGame {
       const rel = Math.max(0, Math.min(100, staffMember.relationship || 50));
       
       let staffIcon = 'briefcase';
-      let iconColor = 'text-amber-400';
+      let iconColor = 'text-edu-amber';
       if (staffMember.role.includes('Janitor') || staffMember.role.includes('Caretaker')) {
         staffIcon = 'wrench';
-        iconColor = 'text-amber-400';
+        iconColor = 'text-edu-amber';
       } else if (staffMember.role.includes('Librarian')) {
         staffIcon = 'book-open';
-        iconColor = 'text-teal-400';
+        iconColor = 'text-edu-teal';
       } else if (staffMember.role.includes('Nurse') || staffMember.role.includes('Matron')) {
         staffIcon = 'heart';
-        iconColor = 'text-rose-400';
+        iconColor = 'text-edu-rose';
       } else if (staffMember.role.includes('Principal') || staffMember.role.includes('Headmaster') || staffMember.role.includes('Dean')) {
         staffIcon = 'shield';
-        iconColor = 'text-purple-400';
+        iconColor = 'text-edu-purple';
       }
 
       card.innerHTML = `
@@ -3682,16 +3682,16 @@ class TerribleGame {
             <div class="text-[10px] text-dust font-sans truncate mt-0.5">${staffMember.quirk || ''}</div>
             <div class="mt-1 text-[9px] font-mono text-dust">
               <div class="flex justify-between items-center mb-0.5">
-                <span class="text-purple-400">Rapport</span>
+                <span class="text-edu-purple font-semibold">Rapport</span>
                 <span>${rel}%</span>
               </div>
-              <div class="w-full bg-trackbg rounded-full h-1 overflow-hidden">
-                <div class="bg-purple-500 h-full rounded-full" style="width: ${rel}%;"></div>
+              <div class="w-full bg-trackbg rounded-full h-1.5 overflow-hidden">
+                <div class="bg-purple-500 bar-fill-purple h-full rounded-full" style="width: ${rel}%;"></div>
               </div>
             </div>
           </div>
         </div>
-        <button class="btn-staff-approach shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-amber-400 hover:text-amber-300 font-mono text-xs font-bold transition-all">
+        <button class="btn-staff-approach shrink-0 px-3 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-edu-amber hover:opacity-80 font-mono text-xs font-bold transition-all">
           Approach
         </button>
       `;
@@ -3764,39 +3764,39 @@ class TerribleGame {
     const actions = [];
 
     if (category === 'classmate') {
-      actions.push({ id: 'chat', label: 'Chat & Whisper', desc: 'Engage in friendly hallway banter.', icon: 'message-square', color: 'text-sky-400' });
-      actions.push({ id: 'study_together', label: 'Study Together', desc: 'Review homework sets and class notes.', icon: 'book-open', color: 'text-emerald-400' });
-      actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-amber-400' });
-      actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-purple-400' });
-      actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-rose-400' });
+      actions.push({ id: 'chat', label: 'Chat & Whisper', desc: 'Engage in friendly hallway banter.', icon: 'message-square', color: 'text-edu-sky' });
+      actions.push({ id: 'study_together', label: 'Study Together', desc: 'Review homework sets and class notes.', icon: 'book-open', color: 'text-edu-emerald' });
+      actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-edu-amber' });
+      actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-edu-purple' });
+      actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-edu-rose' });
       if (!person.isBefriended) {
-        actions.push({ id: 'befriend', label: 'Ask to be Best Friends', desc: 'Invite into your permanent Kin & Friends circle (Req 50%+ Closeness).', icon: 'user-plus', color: 'text-amber-300' });
+        actions.push({ id: 'befriend', label: 'Ask to be Best Friends', desc: 'Invite into your permanent Kin & Friends circle (Req 50%+ Closeness).', icon: 'user-plus', color: 'text-edu-amber' });
       }
     } else if (category === 'teacher') {
-      actions.push({ id: 'praise', label: 'Praise Teaching', desc: 'Compliment their curriculum and lecture dedication.', icon: 'thumbs-up', color: 'text-emerald-400' });
-      actions.push({ id: 'ask_help', label: 'Request Tutoring', desc: 'Ask for after-school academic assistance.', icon: 'help-circle', color: 'text-sky-400' });
-      actions.push({ id: 'complain', label: 'Dispute Homework Grade', desc: 'Object to an unfair assignment mark.', icon: 'alert-circle', color: 'text-amber-400' });
-      actions.push({ id: 'bribe', label: 'Offer Grade Bribe ($50)', desc: 'Slip cash into their desk for extra credit.', icon: 'dollar-sign', color: 'text-rose-400' });
+      actions.push({ id: 'praise', label: 'Praise Teaching', desc: 'Compliment their curriculum and lecture dedication.', icon: 'thumbs-up', color: 'text-edu-emerald' });
+      actions.push({ id: 'ask_help', label: 'Request Tutoring', desc: 'Ask for after-school academic assistance.', icon: 'help-circle', color: 'text-edu-sky' });
+      actions.push({ id: 'complain', label: 'Dispute Homework Grade', desc: 'Object to an unfair assignment mark.', icon: 'alert-circle', color: 'text-edu-amber' });
+      actions.push({ id: 'bribe', label: 'Offer Grade Bribe ($50)', desc: 'Slip cash into their desk for extra credit.', icon: 'dollar-sign', color: 'text-edu-rose' });
     } else if (category === 'staff') {
       const role = person.role || '';
       if (role.includes('Janitor') || role.includes('Custodian') || role.includes('Caretaker')) {
-        actions.push({ id: 'help_clean', label: 'Help Sweep Corridors & Classrooms', desc: 'Grab a push-broom and assist with chores. (+Reputation, chance of lost money)', icon: 'sparkles', color: 'text-amber-400' });
-        actions.push({ id: 'ask_boiler_room', label: 'Ask About Locked Boiler Room', desc: 'Inquire regarding subterranean furnace rumors.', icon: 'flame', color: 'text-purple-400' });
-        actions.push({ id: 'search_lost_found', label: 'Search Lost & Found Crate', desc: 'Rummage through forgotten student relics.', icon: 'search', color: 'text-teal-400' });
+        actions.push({ id: 'help_clean', label: 'Help Sweep Corridors & Classrooms', desc: 'Grab a push-broom and assist with chores. (+Reputation, chance of lost money)', icon: 'sparkles', color: 'text-edu-amber' });
+        actions.push({ id: 'ask_boiler_room', label: 'Ask About Locked Boiler Room', desc: 'Inquire regarding subterranean furnace rumors.', icon: 'flame', color: 'text-edu-purple' });
+        actions.push({ id: 'search_lost_found', label: 'Search Lost & Found Crate', desc: 'Rummage through forgotten student relics.', icon: 'search', color: 'text-edu-teal' });
       } else if (role.includes('Librarian') || role.includes('Archivist')) {
-        actions.push({ id: 'reorganize_shelves', label: 'Help Reorganize Bookshelves', desc: 'Dust, sort, and catalog the book stacks.', icon: 'book-open', color: 'text-emerald-400' });
-        actions.push({ id: 'catalog_archives', label: 'Catalog Historical Records', desc: 'Examine old municipal microfiche and town records.', icon: 'file-text', color: 'text-sky-400' });
-        actions.push({ id: 'restricted_tomes', label: 'Request Restricted Archive Access', desc: 'Ask to view the locked glass cabinet of occult tomes.', icon: 'lock', color: 'text-purple-400' });
+        actions.push({ id: 'reorganize_shelves', label: 'Help Reorganize Bookshelves', desc: 'Dust, sort, and catalog the book stacks.', icon: 'book-open', color: 'text-edu-emerald' });
+        actions.push({ id: 'catalog_archives', label: 'Catalog Historical Records', desc: 'Examine old municipal microfiche and town records.', icon: 'file-text', color: 'text-edu-sky' });
+        actions.push({ id: 'restricted_tomes', label: 'Request Restricted Archive Access', desc: 'Ask to view the locked glass cabinet of occult tomes.', icon: 'lock', color: 'text-edu-purple' });
       } else if (role.includes('Nurse') || role.includes('Matron')) {
-        actions.push({ id: 'rest_cot', label: 'Rest on Clinic Cot', desc: 'Fake a headache and sleep behind privacy curtains. (+Vitality)', icon: 'moon', color: 'text-emerald-400' });
-        actions.push({ id: 'report_anomaly', label: 'Report Strange Symptoms & Chills', desc: 'Consult regarding odd physical sensations and shadows.', icon: 'activity', color: 'text-purple-400' });
+        actions.push({ id: 'rest_cot', label: 'Rest on Clinic Cot', desc: 'Fake a headache and sleep behind privacy curtains. (+Vitality)', icon: 'moon', color: 'text-edu-emerald' });
+        actions.push({ id: 'report_anomaly', label: 'Report Strange Symptoms & Chills', desc: 'Consult regarding odd physical sensations and shadows.', icon: 'activity', color: 'text-edu-purple' });
         if (role.includes('Matron') || this.character.age <= 5) {
-          actions.push({ id: 'nurture', label: 'Seek Nurture & Warm Hug', desc: 'Ask for comforting nursery story and attention.', icon: 'heart', color: 'text-rose-400' });
-          actions.push({ id: 'ask_snack', label: 'Ask for Nursery Snack', desc: 'Request sweet apple juice and animal crackers.', icon: 'coffee', color: 'text-amber-400' });
+          actions.push({ id: 'nurture', label: 'Seek Nurture & Warm Hug', desc: 'Ask for comforting nursery story and attention.', icon: 'heart', color: 'text-edu-rose' });
+          actions.push({ id: 'ask_snack', label: 'Ask for Nursery Snack', desc: 'Request sweet apple juice and animal crackers.', icon: 'coffee', color: 'text-edu-amber' });
         }
       } else if (role.includes('Principal') || role.includes('Headmaster') || role.includes('Dean')) {
-        actions.push({ id: 'appeal_discipline', label: 'Appeal Disciplinary Record', desc: 'Submit a formal petition to clear detention marks.', icon: 'check-square', color: 'text-emerald-400' });
-        actions.push({ id: 'school_pride', label: 'Display Institutional Pride', desc: 'Praise the school heritage and display loyalty.', icon: 'award', color: 'text-amber-400' });
+        actions.push({ id: 'appeal_discipline', label: 'Appeal Disciplinary Record', desc: 'Submit a formal petition to clear detention marks.', icon: 'check-square', color: 'text-edu-emerald' });
+        actions.push({ id: 'school_pride', label: 'Display Institutional Pride', desc: 'Praise the school heritage and display loyalty.', icon: 'award', color: 'text-edu-amber' });
       }
     }
 
