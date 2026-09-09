@@ -58,6 +58,25 @@
     { id: 'av_tech', name: 'A/V & Broadcast Syndicate', icon: 'radio', desc: 'Manage the analog cathode monitors, tape recorders, and static-laced PA system.', stat: 'smarts', reqLevel: ['middle', 'high'] }
   ];
 
+  // Safe helper to read character stats (supporting character.stats.smarts and character.smarts)
+  function getStat(character, stat, defaultVal = 50) {
+    if (!character) return defaultVal;
+    if (character.stats && character.stats[stat] !== undefined) return character.stats[stat];
+    if (character[stat] !== undefined) return character[stat];
+    return defaultVal;
+  }
+
+  // Safe helper to mutate character stats and clamp between 0-100
+  function modStat(character, stat, delta) {
+    if (!character) return 50;
+    if (!character.stats) character.stats = {};
+    const curr = character.stats[stat] !== undefined ? character.stats[stat] : (character[stat] !== undefined ? character[stat] : 50);
+    const updated = Math.max(0, Math.min(100, Math.round(curr + delta)));
+    character.stats[stat] = updated;
+    character[stat] = updated;
+    return updated;
+  }
+
   const SCHOOL_MYSTERIES = [
     {
       id: 'drained_pool',
@@ -361,7 +380,7 @@
   function enrollInSchool(character, targetLevel = null, major = null) {
     let level = targetLevel;
     if (!level) {
-      if (character.age >= 1 && character.age <= 3) level = 'daycare';
+      if (character.age >= 0 && character.age <= 3) level = 'daycare';
       else if (character.age >= 4 && character.age <= 5) level = 'kindergarten';
       else if (character.age >= 6 && character.age <= 10) level = 'elementary';
       else if (character.age >= 11 && character.age <= 13) level = 'middle';
@@ -417,18 +436,21 @@
   // --- Yearly Progression Tick ---
   function tickEducationYear(character) {
     if (!character.education || !character.education.enrolled) {
-      // Check if eligible for automatic enrollment as infant/child
-      if (character.age === 1 && (!character.education || character.education.graduationStatus !== 'expelled')) {
-        enrollInSchool(character, 'daycare');
-        return [`Enrolled in ${character.education.name} (Toddler Daycare). You cried when your parents left you with the caretakers.`];
+      if (character.education && (character.education.graduationStatus === 'expelled' || character.education.graduationStatus === 'dropped_out')) {
+        return [];
       }
-      if (character.age === 4 && (!character.education || character.education.graduationStatus !== 'expelled')) {
-        enrollInSchool(character, 'kindergarten');
-        return [`Started Kindergarten at ${character.education.name}! You were given your own cubby and wax crayons.`];
-      }
-      if (character.age === 6 && (!character.education || character.education.graduationStatus !== 'expelled')) {
-        enrollInSchool(character, 'elementary');
-        return [`Entered primary education at ${character.education.name} (Grade 1). Yellow school buses and chalkboard dust await.`];
+      // If at any school age (0 - 17) and not enrolled, automatically enroll them!
+      if (character.age >= 0 && character.age <= 17) {
+        enrollInSchool(character);
+        const levelLabels = {
+          daycare: 'Toddler Daycare & Nursery',
+          kindergarten: 'Kindergarten',
+          elementary: 'Elementary School',
+          middle: 'Middle School',
+          high: 'High School'
+        };
+        const lvl = levelLabels[character.education.level] || 'School';
+        return [`Enrolled in ${character.education.name} (${lvl}).`];
       }
       return [];
     }
@@ -448,9 +470,10 @@
     }
 
     // Natural grade fluctuation influenced by character smarts
-    const smartsDelta = Math.floor((character.smarts - 50) / 10);
+    const charSmarts = getStat(character, 'smarts');
+    const smartsDelta = Math.floor((charSmarts - 50) / 10);
     const naturalVariance = Math.floor(Math.random() * 9) - 4; // -4 to +4
-    edu.grades = Math.max(5, Math.min(100, edu.grades + smartsDelta + naturalVariance));
+    edu.grades = Math.max(5, Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + smartsDelta + naturalVariance));
 
     // Report card entry
     let gradeLetter = 'C';
@@ -475,9 +498,9 @@
       const clubDef = SCHOOL_CLUBS.find(c => c.id === clubId);
       if (clubDef) {
         logs.push(`Participated actively in the ${clubDef.name}. ${clubDef.desc}`);
-        if (clubDef.stat === 'smarts') character.smarts = Math.min(100, character.smarts + 1);
-        if (clubDef.stat === 'vitality') character.vitality = Math.min(100, character.vitality + 1);
-        if (clubDef.stat === 'occult') character.occult = Math.min(100, character.occult + 2);
+        if (clubDef.stat === 'smarts') modStat(character, 'smarts', 1);
+        if (clubDef.stat === 'vitality') modStat(character, 'vitality', 1);
+        if (clubDef.stat === 'occult') modStat(character, 'occult', 2);
       }
     }
 
@@ -518,10 +541,9 @@
     if (!character.education || !character.education.enrolled) {
       return { success: false, reason: "You are not currently enrolled in school." };
     }
-    const edu = character.education;
-    edu.grades = Math.min(100, edu.grades + Math.floor(Math.random() * 5) + 6); // +6 to +10%
-    character.smarts = Math.min(100, character.smarts + 2);
-    character.happiness = Math.max(0, character.happiness - 2);
+    edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + Math.floor(Math.random() * 5) + 6); // +6 to +10%
+    modStat(character, 'smarts', 2);
+    modStat(character, 'happiness', -2);
 
     return {
       success: true,
@@ -536,8 +558,8 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
-    edu.grades = Math.max(0, edu.grades - Math.floor(Math.random() * 5) - 4);
-    character.happiness = Math.min(100, character.happiness + 5);
+    edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - Math.floor(Math.random() * 5) - 4);
+    modStat(character, 'happiness', 5);
     
     // Disciplinary risk
     const caught = Math.random() < 0.4;
@@ -547,7 +569,7 @@
     if (caught) {
       edu.disciplinaryRecord = (edu.disciplinaryRecord || 0) + 1;
       body += ` However, the hall monitor spotted you and issued an official detention warning! (Disciplinary Marks: ${edu.disciplinaryRecord})`;
-      character.sanity = Math.max(0, character.sanity - 2);
+      modStat(character, 'sanity', -2);
       effects.sanity = -2;
     }
 
@@ -576,8 +598,8 @@
     const effects = {};
 
     if (mystery.id === 'boiler_crawlspace') {
-      character.occult = Math.min(100, character.occult + 6);
-      character.sanity = Math.max(0, character.sanity - 5);
+      modStat(character, 'occult', 6);
+      modStat(character, 'sanity', -5);
       effects.occult = 6;
       effects.sanity = -5;
       body = "You slipped behind the furnace pipes. Amidst spiderwebs and hot asbestos pipes, you discovered charcoal sigils drawn onto the floorboards and a child's silver locket that still ticks faintly.";
@@ -587,22 +609,22 @@
         body += " Inside the locket, you found 2 antique shillings.";
       }
     } else if (mystery.id === 'drained_pool') {
-      character.occult = Math.min(100, character.occult + 5);
-      character.sanity = Math.max(0, character.sanity - 4);
+      modStat(character, 'occult', 5);
+      modStat(character, 'sanity', -4);
       effects.occult = 5;
       effects.sanity = -4;
       body = "You climbed down the rusted brass ladder into the dry deep end. In the center drain, a wet handprint was visible that evaporated under your flashlight beam.";
     } else if (mystery.id === 'sealed_stairwell') {
-      character.smarts = Math.min(100, character.smarts + 2);
-      character.occult = Math.min(100, character.occult + 4);
-      character.sanity = Math.max(0, character.sanity - 3);
+      modStat(character, 'smarts', 2);
+      modStat(character, 'occult', 4);
+      modStat(character, 'sanity', -3);
       effects.smarts = 2;
       effects.occult = 4;
       effects.sanity = -3;
       body = "You managed to slip a brass wire into the padlock. Behind the door lay an architectural blueprint from 1922 indicating an entire subterranean annex erased from modern maps.";
     } else if (mystery.id === 'pa_broadcast') {
-      character.occult = Math.min(100, character.occult + 7);
-      character.sanity = Math.max(0, character.sanity - 6);
+      modStat(character, 'occult', 7);
+      modStat(character, 'sanity', -6);
       effects.occult = 7;
       effects.sanity = -6;
       body = "You waited alone until 5:45 PM. The speakers hissed with white noise, followed by rhythmic whispering in an unearthly cadence that made your teeth hum. When you looked out the window, all the crows on the power lines were facing the transmitter tower.";
@@ -634,7 +656,7 @@
     if (actionType === 'chat') {
       const relGain = Math.floor(Math.random() * 6) + 6;
       classmate.relationship = Math.min(100, classmate.relationship + relGain);
-      character.happiness = Math.min(100, character.happiness + 3);
+      modStat(character, 'happiness', 3);
       effects.relationship = relGain;
       effects.happiness = 3;
       title = `Chatted with ${classmate.name}`;
@@ -642,9 +664,9 @@
     } else if (actionType === 'study_together') {
       const relGain = Math.floor(Math.random() * 5) + 4;
       classmate.relationship = Math.min(100, classmate.relationship + relGain);
-      character.smarts = Math.min(100, character.smarts + 2);
+      modStat(character, 'smarts', 2);
       if (character.education) {
-        character.education.grades = Math.min(100, character.education.grades + 4);
+        character.education.grades = Math.min(100, (character.education.grades !== undefined ? character.education.grades : 75) + 4);
       }
       effects.relationship = relGain;
       effects.smarts = 2;
@@ -655,7 +677,7 @@
       const success = Math.random() < 0.65;
       if (success) {
         if (character.education) character.education.popularity = Math.min(100, (character.education.popularity || 50) + 4);
-        character.happiness = Math.min(100, character.happiness + 4);
+        modStat(character, 'happiness', 4);
         effects.popularity = 4;
         effects.happiness = 4;
         title = "Juicy Rumors";
@@ -670,13 +692,13 @@
       const success = Math.random() < 0.7;
       if (success) {
         if (character.education) character.education.popularity = Math.min(100, (character.education.popularity || 50) + 7);
-        character.happiness = Math.min(100, character.happiness + 5);
+        modStat(character, 'happiness', 5);
         effects.popularity = 7;
         effects.happiness = 5;
         title = "Playground Dare Completed!";
         body = `You dared ${classmate.name} to eat a strange dried mushroom found beneath the gymnasium bleachers. A crowd gathered and cheered!`;
       } else {
-        character.vitality = Math.max(0, character.vitality - 5);
+        modStat(character, 'vitality', -5);
         effects.vitality = -5;
         title = "Dare Gone Wrong";
         body = `The dare resulted in a minor scuffle behind the bicycle shed. You scraped your knee on broken gravel.`;
@@ -684,7 +706,7 @@
     } else if (actionType === 'prank') {
       const success = Math.random() < 0.55;
       if (success) {
-        character.happiness = Math.min(100, character.happiness + 6);
+        modStat(character, 'happiness', 6);
         effects.happiness = 6;
         title = "Prank Successful!";
         body = `You slipped a spring-loaded toy spider inside ${classmate.name}'s locker. Their startled shriek echoed down the entire hall!`;
@@ -731,7 +753,7 @@
       };
 
       character.kin.friends.push(newFriend);
-      character.happiness = Math.min(100, character.happiness + 10);
+      modStat(character, 'happiness', 10);
       effects.relationship = 15;
       effects.happiness = 10;
       title = "New Best Friend!";
@@ -770,8 +792,8 @@
     } else if (actionType === 'ask_help') {
       const relGain = Math.floor(Math.random() * 4) + 3;
       teacher.relationship = Math.min(100, teacher.relationship + relGain);
-      character.smarts = Math.min(100, character.smarts + 2);
-      if (character.education) character.education.grades = Math.min(100, character.education.grades + 5);
+      modStat(character, 'smarts', 2);
+      if (character.education) character.education.grades = Math.min(100, (character.education.grades !== undefined ? character.education.grades : 75) + 5);
       effects.relationship = relGain;
       effects.smarts = 2;
       effects.grades = 5;
@@ -845,7 +867,7 @@
       const relGain = Math.floor(Math.random() * 6) + 8;
       staffMember.relationship = Math.min(100, staffMember.relationship + relGain);
       if (character.education) character.education.popularity = Math.min(100, (character.education.popularity || 50) + 3);
-      character.vitality = Math.min(100, character.vitality + 1);
+      modStat(character, 'vitality', 1);
       effects.relationship = relGain;
       effects.popularity = 3;
       effects.vitality = 1;
@@ -855,13 +877,13 @@
       // Chance to find loose coins or odd relics
       if (Math.random() < 0.35) {
         const foundMoney = Math.floor(Math.random() * 15) + 5;
-        character.money += foundMoney;
+        character.money = (character.money || 0) + foundMoney;
         effects.money = foundMoney;
         body += ` Under a radiator, you found $${foundMoney} in dropped pocket change!`;
       }
     } else if (actionType === 'ask_boiler_room') {
-      character.occult = Math.min(100, character.occult + 5);
-      character.sanity = Math.max(0, character.sanity - 4);
+      modStat(character, 'occult', 5);
+      modStat(character, 'sanity', -4);
       effects.occult = 5;
       effects.sanity = -4;
       title = `Inquired About the Boiler Room`;
@@ -871,12 +893,12 @@
       title = `Searched the Lost & Found Bin`;
       if (roll < 0.4) {
         const found = Math.floor(Math.random() * 20) + 10;
-        character.money += found;
+        character.money = (character.money || 0) + found;
         effects.money = found;
         body = `${staffMember.name} let you rummage through the wooden crate. At the bottom of an abandoned winter coat, you found $${found}!`;
       } else if (roll < 0.7) {
-        character.occult = Math.min(100, character.occult + 4);
-        character.sanity = Math.max(0, character.sanity - 3);
+        modStat(character, 'occult', 4);
+        modStat(character, 'sanity', -3);
         effects.occult = 4;
         effects.sanity = -3;
         body = `You pulled out an old silver signet ring with an engraving of an unblinking eye. It felt strangely warm against your skin. (+4% Occult)`;
@@ -889,29 +911,30 @@
     else if (actionType === 'reorganize_shelves') {
       const relGain = Math.floor(Math.random() * 6) + 8;
       staffMember.relationship = Math.min(100, staffMember.relationship + relGain);
-      character.smarts = Math.min(100, character.smarts + 2);
-      if (character.education) character.education.grades = Math.min(100, character.education.grades + 3);
+      modStat(character, 'smarts', 2);
+      if (character.education) character.education.grades = Math.min(100, (character.education.grades !== undefined ? character.education.grades : 75) + 3);
       effects.relationship = relGain;
       effects.smarts = 2;
       effects.grades = 3;
       title = `Reorganized Library Stacks`;
       body = `You climbed the rolling wooden ladder and helped ${staffMember.name} reshelve hundreds of municipal encyclopedias and leather-bound periodicals. She praised your quiet precision.`;
     } else if (actionType === 'catalog_archives') {
-      character.smarts = Math.min(100, character.smarts + 3);
-      character.occult = Math.min(100, character.occult + 4);
+      modStat(character, 'smarts', 3);
+      modStat(character, 'occult', 4);
       effects.smarts = 3;
       effects.occult = 4;
       title = `Cataloged Historical Archives`;
       body = `Working through damp microfiche reels, you cataloged town tax registers from the 1930s. Several entire family lineages abruptly vanished from records in 1937 without explanation.`;
     } else if (actionType === 'restricted_tomes') {
-      if (staffMember.relationship < 55 && character.smarts < 70) {
+      const charSmarts = getStat(character, 'smarts');
+      if (staffMember.relationship < 55 && charSmarts < 70) {
         return {
           success: false,
           reason: `${staffMember.name} adjusted her glasses and firmly locked the glass cabinet. "The restricted reserve collection is strictly forbidden to general students." (Requires Closeness 55%+ or Smarts 70%+)`
         };
       }
-      character.occult = Math.min(100, character.occult + 10);
-      character.sanity = Math.max(0, character.sanity - 8);
+      modStat(character, 'occult', 10);
+      modStat(character, 'sanity', -8);
       effects.occult = 10;
       effects.sanity = -8;
       title = `The Locked Glass Cabinet`;
@@ -920,14 +943,14 @@
 
     // 3. SCHOOL NURSE ACTIONS
     else if (actionType === 'rest_cot') {
-      character.vitality = Math.min(100, character.vitality + 6);
-      character.sanity = Math.min(100, character.sanity + 3);
+      modStat(character, 'vitality', 6);
+      modStat(character, 'sanity', 3);
       effects.vitality = 6;
       effects.sanity = 3;
       title = `Rested in the Clinic`;
       body = `You told ${staffMember.name} you had a debilitating migraine. She placed a cool lavender compress on your forehead and let you sleep on the cot behind white privacy curtains for two uninterrupted hours.`;
     } else if (actionType === 'report_anomaly') {
-      character.sanity = Math.min(100, character.sanity + 4);
+      modStat(character, 'sanity', 4);
       effects.sanity = 4;
       title = `Consulted the School Nurse`;
       body = `You described the cold static in your ears and lingering shadow illusions. ${staffMember.name} checked your pulse calmly, gave you warm chamomile infusion, and reassured you that adolescent exhaustion plays cruel tricks on perception.`;
@@ -965,14 +988,14 @@
     else if (actionType === 'nurture') {
       const relGain = Math.floor(Math.random() * 6) + 8;
       staffMember.relationship = Math.min(100, staffMember.relationship + relGain);
-      character.happiness = Math.min(100, character.happiness + 5);
+      modStat(character, 'happiness', 5);
       effects.relationship = relGain;
       effects.happiness = 5;
       title = `Nurtured by Caregiver`;
       body = `${staffMember.name} gave you a reassuring hug and read you an illustrated nursery tale. You felt secure and peaceful.`;
     } else if (actionType === 'ask_snack') {
-      character.vitality = Math.min(100, character.vitality + 3);
-      character.happiness = Math.min(100, character.happiness + 3);
+      modStat(character, 'vitality', 3);
+      modStat(character, 'happiness', 3);
       effects.vitality = 3;
       effects.happiness = 3;
       title = `Warm Nursery Snack`;
@@ -998,7 +1021,8 @@
     const major = UNIVERSITY_MAJORS.find(m => m.id === majorId) || UNIVERSITY_MAJORS[0];
     
     // Check acceptance roll based on smarts
-    const accepted = character.smarts >= 40 || Math.random() < 0.75;
+    const charSmarts = getStat(character, 'smarts');
+    const accepted = charSmarts >= 40 || Math.random() < 0.75;
     if (!accepted) {
       return {
         success: false,
@@ -1027,7 +1051,7 @@
 
     character.education.enrolled = false;
     character.education.graduationStatus = 'dropped_out';
-    character.happiness = Math.min(100, character.happiness + 5);
+    modStat(character, 'happiness', 5);
 
     return {
       success: true,

@@ -1,4 +1,4 @@
-﻿// Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
+// Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
 
 class TerribleGame {
   constructor() {
@@ -411,6 +411,9 @@ class TerribleGame {
 
     this.dom.btnLandingResume.addEventListener('click', () => {
       window.soundEngine.playTick();
+      if (this.character && this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled) && window.enrollInSchool) {
+        window.enrollInSchool(this.character);
+      }
       this.showScreen('screen-game');
     });
 
@@ -569,7 +572,7 @@ class TerribleGame {
       window.soundEngine.playClick();
       if (this.character && this.character.education && this.character.education.enrolled) {
         this.openEducationModal();
-      } else if (this.character && this.character.age < 18 && (!this.character.education || this.character.education.graduationStatus !== 'expelled')) {
+      } else if (this.character && this.character.age <= 17 && (!this.character.education || this.character.education.graduationStatus !== 'expelled')) {
         if (window.enrollInSchool) window.enrollInSchool(this.character);
         this.openEducationModal();
       } else {
@@ -961,7 +964,7 @@ class TerribleGame {
           if (!this.character.activityUses) {
             this.character.activityUses = {};
           }
-          if (this.character.age >= 1 && !this.character.education && window.enrollInSchool) {
+          if (this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled) && window.enrollInSchool) {
             window.enrollInSchool(this.character);
           }
           
@@ -1017,7 +1020,7 @@ class TerribleGame {
     ];
 
     this.character.statusTitle = "Infant";
-    if (this.character.age >= 1 && window.enrollInSchool) {
+    if (this.character.age <= 17 && window.enrollInSchool) {
       window.enrollInSchool(this.character);
     }
     this.activeDilemma = null;
@@ -1098,7 +1101,13 @@ class TerribleGame {
       currentYearLog.entries.push(`Turned ${this.character.age}. Watching decades of memories blur together through the fog of ${this.character.city}.`);
     }
 
-    // 2. Career / Vocation / School Performance
+    // 2. School / Education Simulation (Annual report cards, progression, graduations)
+    if (window.tickEducationYear && (this.character.age <= 17 || (this.character.education && this.character.education.enrolled))) {
+      const eduLogs = window.tickEducationYear(this.character) || [];
+      eduLogs.forEach(entry => currentYearLog.entries.push(entry));
+    }
+
+    // 3. Career / Vocation Performance
     if (this.character.job) {
       const base = this.character.job.baseSalary || this.character.job.baseSalaryUSD || 24000;
       const salary = window.getAdjustedSalary(base, this.character.countryCode);
@@ -1108,26 +1117,13 @@ class TerribleGame {
       if (this.character.job.stress > 25 && Math.random() < 0.4) {
         this.modifyStat('vitality', -1);
       }
-    } else if (this.character.age >= 18) {
+    } else if (this.character.age >= 18 && (!this.character.education || !this.character.education.enrolled)) {
       const unemploymentVignettes = [
         "Lacking full-time employment, you scraped together odd cash errands and gig deliveries.",
         "Submitted electronic resumes to indifferent corporate job portals without response.",
         "Struggled to secure steady work; spent afternoons browsing want-ads in the municipal library."
       ];
       currentYearLog.entries.push(window.getRandomElement(unemploymentVignettes));
-    } else {
-      // Educational lifecycle simulation (Report cards, club activities, graduations)
-      if (window.tickEducationYear) {
-        const eduLogs = window.tickEducationYear(this.character) || [];
-        eduLogs.forEach(entry => currentYearLog.entries.push(entry));
-      } else {
-        const schoolReports = [
-          "Received annual school report card. Teachers noted quiet behavior and an unusual fascination with local folklore.",
-          "Passed annual academic examinations without issue; your teachers praised your steady focus.",
-          "Sat through mandatory standardized testing under buzzing gymnasium halogen lamps."
-        ];
-        currentYearLog.entries.push(window.getRandomElement(schoolReports));
-      }
     }
 
     // 3. Living Expenses & Economy
@@ -3194,14 +3190,23 @@ class TerribleGame {
   updateOccupationTab() {
     if (!this.dom.occupationTabIcon || !this.dom.occupationTabLabel) return;
 
+    if (this.character && this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled)) {
+      if (!this.character.education || (this.character.education.graduationStatus !== 'expelled' && this.character.education.graduationStatus !== 'dropped_out')) {
+        if (window.enrollInSchool) window.enrollInSchool(this.character);
+      }
+    }
+
     const isEnrolled = this.character && this.character.education && this.character.education.enrolled;
-    const isSchoolAge = this.character && this.character.age < 18 && (!this.character.education || this.character.education.graduationStatus !== 'expelled');
+    const isSchoolAge = this.character && this.character.age <= 17 && (!this.character.education || this.character.education.graduationStatus !== 'expelled');
 
     if (isEnrolled || isSchoolAge) {
       this.dom.occupationTabIcon.setAttribute('data-lucide', 'graduation-cap');
       let label = 'School';
       if (this.character.education && this.character.education.level === 'daycare') label = 'Daycare';
       else if (this.character.education && this.character.education.level === 'kindergarten') label = 'Kinder';
+      else if (this.character.education && this.character.education.level === 'elementary') label = 'School';
+      else if (this.character.education && this.character.education.level === 'middle') label = 'School';
+      else if (this.character.education && this.character.education.level === 'high') label = 'School';
       else if (this.character.education && this.character.education.level === 'university') label = 'University';
       this.dom.occupationTabLabel.textContent = label;
     } else {
@@ -3215,12 +3220,16 @@ class TerribleGame {
   }
 
   openEducationModal(activeTab = 'overview') {
-    if (!this.character.education) {
-      if (window.enrollInSchool) window.enrollInSchool(this.character);
+    if (this.character && this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled)) {
+      if (!this.character.education || (this.character.education.graduationStatus !== 'expelled' && this.character.education.graduationStatus !== 'dropped_out')) {
+        if (window.enrollInSchool) window.enrollInSchool(this.character);
+      }
     }
     if (!this.character.education || !this.character.education.enrolled) {
       if (this.character.age >= 18 && this.character.hasHighSchoolDiploma) {
         // Can open higher education admissions
+      } else if (this.character.age <= 17) {
+        if (window.enrollInSchool) window.enrollInSchool(this.character);
       } else {
         this.openCareersModal();
         return;
