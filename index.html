@@ -452,6 +452,8 @@
     .badge-curse-doomed {
       background-color: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #fca5a5;
+    }
     /* School Tracks Badges & Track Card Styling */
     .badge-track-homeschool {
       background-color: rgba(217, 119, 6, 0.2);
@@ -487,9 +489,6 @@
       border-color: #9333ea !important;
       background: linear-gradient(135deg, #faf5ff, #f3e8ff) !important;
       box-shadow: 0 2px 10px rgba(147, 51, 234, 0.18);
-    }
-    [data-mode="light"] #school-choice-modal {
-      background-color: rgba(15, 23, 42, 0.55);
     }
   </style>
 </head>
@@ -1064,29 +1063,32 @@
     <!-- ========================================== -->
 
     <!-- EDUCATION MAIN MODAL -->
-    <div id="education-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2.5 shrink-0">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="graduation-cap" class="w-4 h-4 text-edu-sky"></i>
-            <div>
-              <h3 id="edu-school-name" class="font-serif font-bold text-sm text-parchment leading-tight">School Name</h3>
-              <div class="flex items-center space-x-1.5 mt-0.5">
-                <span id="edu-school-track-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-public uppercase font-bold">Public</span>
-                <span id="edu-tuition-status-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust">Free</span>
-                <span id="edu-school-level-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-edu-sky uppercase font-bold">Elementary School</span>
-                <span id="edu-school-grade-label" class="text-[10px] text-dust font-mono">Grade 1</span>
-              </div>
+    <div id="education-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-edu-sky shrink-0">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 id="edu-school-name" class="font-serif font-bold text-sm text-parchment leading-tight truncate">School Name</h3>
+            <div class="flex flex-wrap items-center gap-1 mt-0.5">
+              <span id="edu-school-track-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-public uppercase font-bold shrink-0">Public</span>
+              <span id="edu-tuition-status-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust shrink-0">Free</span>
+              <span id="edu-school-level-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-edu-sky uppercase font-bold shrink-0">Elementary School</span>
+              <span id="edu-school-grade-label" class="text-[10px] text-dust font-mono shrink-0">Grade 1</span>
             </div>
           </div>
-          <button id="btn-close-education" class="p-1 rounded text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
         </div>
+        <button id="btn-close-education" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Academic & Popularity Stats Bars -->
-        <div class="bg-inputbg border border-leadborder rounded-xl p-2.5 mb-2.5 space-y-2 shrink-0">
+        <div class="bg-inputbg border border-leadborder rounded-xl p-2.5 space-y-2 shrink-0">
           <!-- Grades Bar -->
           <div>
             <div class="flex justify-between items-center text-[10px] uppercase text-dust font-mono mb-1">
@@ -1110,7 +1112,7 @@
         </div>
 
         <!-- Disciplinary Notice (hidden by default) -->
-        <div id="edu-disciplinary-banner" class="hidden edu-disciplinary-box rounded-xl px-3 py-1.5 mb-2.5 flex items-center justify-between text-xs shrink-0 font-medium">
+        <div id="edu-disciplinary-banner" class="hidden edu-disciplinary-box rounded-xl px-3 py-1.5 flex items-center justify-between text-xs shrink-0 font-medium">
           <div class="flex items-center space-x-1.5">
             <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-edu-rose"></i>
             <span class="font-mono text-[10px]">Disciplinary Marks: <strong id="edu-disciplinary-count">0</strong> / 5 (Expulsion Risk!)</span>
@@ -1118,35 +1120,35 @@
         </div>
 
         <!-- Top Direct Actions Bar -->
-        <div class="grid grid-cols-2 gap-2 mb-2 shrink-0">
-          <button id="btn-edu-study-harder" class="py-2 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-emerald-500/50 text-xs font-serif font-bold text-parchment flex items-center justify-center space-x-1.5 transition-all">
+        <div class="grid grid-cols-2 gap-2 shrink-0">
+          <button id="btn-edu-study-harder" class="py-2.5 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-emerald-500/50 text-xs font-serif font-bold text-parchment flex items-center justify-center space-x-1.5 transition-all">
             <i data-lucide="book-open" class="w-3.5 h-3.5 text-edu-emerald"></i>
             <span>Study Harder</span>
           </button>
-          <button id="btn-edu-skip-class" class="py-2 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-rose-500/50 text-xs font-serif font-bold text-parchment flex items-center justify-center space-x-1.5 transition-all">
+          <button id="btn-edu-skip-class" class="py-2.5 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-rose-500/50 text-xs font-serif font-bold text-parchment flex items-center justify-center space-x-1.5 transition-all">
             <i data-lucide="footprints" class="w-3.5 h-3.5 text-edu-rose"></i>
             <span>Skip Class</span>
           </button>
         </div>
 
         <!-- Transfer School Track Button -->
-        <button id="btn-edu-transfer-track" class="w-full py-1.5 px-3 rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder hover:border-purple-500/50 text-[11px] font-serif text-parchment flex items-center justify-center gap-1.5 transition-all mb-2.5 shrink-0">
+        <button id="btn-edu-transfer-track" class="w-full py-2 px-3 rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder hover:border-purple-500/50 text-[11px] font-serif text-parchment flex items-center justify-center gap-1.5 transition-all shrink-0">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-purple-400"></i>
           <span>Transfer School / Change Track</span>
         </button>
 
         <!-- Subcategory Navigation Tabs (BitLife style) -->
-        <div class="grid grid-cols-4 gap-1 edu-tabs-nav bg-trackbg/60 p-1 rounded-xl border border-leadborder text-[11px] mb-2.5 shrink-0">
-          <button id="tab-edu-overview" class="py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
+        <div class="grid grid-cols-4 gap-1 edu-tabs-nav bg-trackbg/60 p-1 rounded-xl border border-leadborder text-[11px] shrink-0">
+          <button id="tab-edu-overview" class="py-2 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
             <span>Overview</span>
           </button>
-          <button id="tab-edu-classmates" class="py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
+          <button id="tab-edu-classmates" class="py-2 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
             <span>Classmates</span>
           </button>
-          <button id="tab-edu-teachers" class="py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
+          <button id="tab-edu-teachers" class="py-2 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
             <span>Teachers</span>
           </button>
-          <button id="tab-edu-staff" class="py-1.5 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
+          <button id="tab-edu-staff" class="py-2 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex flex-col items-center justify-center">
             <span>Staff</span>
           </button>
         </div>
@@ -1190,7 +1192,7 @@
 
             <!-- Drop Out Option -->
             <div id="edu-dropout-container" class="hidden pt-2 border-t border-leadborder/60">
-              <button id="btn-edu-drop-out" class="w-full py-1.5 px-3 rounded-lg btn-edu-danger text-[10px] font-mono font-bold transition-all">
+              <button id="btn-edu-drop-out" class="w-full py-2 px-3 rounded-lg btn-edu-danger text-[10px] font-mono font-bold transition-all">
                 Drop Out of School
               </button>
             </div>
@@ -1222,8 +1224,8 @@
         </div>
 
         <!-- Footer / Close -->
-        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-2">
-          <button id="btn-edu-done" class="w-full py-1.5 text-center text-xs text-dust hover:text-parchment transition-colors">
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-auto">
+          <button id="btn-edu-done" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
             Close
           </button>
         </div>
@@ -1231,107 +1233,116 @@
     </div>
 
     <!-- SCHOOL TRACK & ENROLLMENT CHOICE MODAL -->
-    <div id="school-choice-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[92%] flex flex-col overflow-hidden shadow-2xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2.5 shrink-0">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-purple-400">
-              <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <h3 id="school-choice-title" class="font-serif font-bold text-sm text-parchment leading-tight">School Enrollment Pathway</h3>
-              <p id="school-choice-subtitle" class="text-[10px] text-dust font-mono">Select your academic track and funding source</p>
-            </div>
+    <div id="school-choice-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
+      <!-- Sticky Safe Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-purple-400 shrink-0">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-school-choice" class="p-1 rounded text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 id="school-choice-title" class="font-serif font-bold text-sm text-parchment leading-tight truncate">School Enrollment Pathway</h3>
+            <p id="school-choice-subtitle" class="text-[10px] text-dust font-mono truncate">Select your academic track and funding source</p>
+          </div>
         </div>
+        <button id="btn-close-school-choice" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- 4 Track Option Cards List -->
-        <div class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1 mb-3">
+        <div class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-1 mb-2">
           <!-- Homeschool Card -->
-          <div id="card-track-homeschool" data-track="homeschool" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-amber-500/50 transition-all space-y-1.5">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center space-x-2">
-                <span class="text-base">🏡</span>
-                <div>
-                  <div class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
-                    <span>Homeschooling</span>
-                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-homeschool uppercase font-bold">Free</span>
+          <div id="card-track-homeschool" data-track="homeschool" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-amber-500/50 transition-all space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-start space-x-2.5 min-w-0 flex-1">
+                <span class="text-base shrink-0 mt-0.5">🏡</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-serif font-bold text-xs text-parchment">Homeschooling</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-homeschool uppercase font-bold shrink-0">Free</span>
                   </div>
-                  <div class="text-[10px] text-dust">Domestic Tutelage & Independent Study</div>
+                  <div class="text-[10px] text-dust leading-tight mt-0.5">Domestic Tutelage & Independent Study</div>
                 </div>
               </div>
-              <span class="font-mono text-xs text-emerald-400 font-bold">$0 / yr</span>
+              <span class="font-mono text-xs text-emerald-400 font-bold shrink-0">$0 / yr</span>
             </div>
             <p class="text-[10px] text-dust leading-snug">Sheltered from institutional bullying and peer cruelty. Preserves sanity and allows calm esoteric research at home.</p>
-            <div class="flex items-center gap-1.5 text-[9px] font-mono text-amber-400/80">
-              <span>+Sanity preservation</span> · <span>+Domestic safety</span> · <span>Taught by parents & tutors</span>
+            <div class="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-amber-400/80">
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">+Sanity preservation</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">+Domestic safety</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Taught by parents & tutors</span>
             </div>
           </div>
 
           <!-- Public School Card -->
-          <div id="card-track-public" data-track="public" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-sky-500/50 transition-all space-y-1.5">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center space-x-2">
-                <span class="text-base">🏫</span>
-                <div>
-                  <div class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
-                    <span>Public Municipal School</span>
-                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-public uppercase font-bold">Free</span>
+          <div id="card-track-public" data-track="public" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-sky-500/50 transition-all space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-start space-x-2.5 min-w-0 flex-1">
+                <span class="text-base shrink-0 mt-0.5">🏫</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-serif font-bold text-xs text-parchment">Public Municipal School</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-public uppercase font-bold shrink-0">Free</span>
                   </div>
-                  <div class="text-[10px] text-dust">Taxpayer-Funded District Education</div>
+                  <div class="text-[10px] text-dust leading-tight mt-0.5">Taxpayer-Funded District Education</div>
                 </div>
               </div>
-              <span class="font-mono text-xs text-emerald-400 font-bold">$0 / yr</span>
+              <span class="font-mono text-xs text-emerald-400 font-bold shrink-0">$0 / yr</span>
             </div>
             <p class="text-[10px] text-dust leading-snug">The classic gritty municipal experience. Diverse student cliques, sports clubs, bustling hallways, and ambient town mysteries.</p>
-            <div class="flex items-center gap-1.5 text-[9px] font-mono text-sky-400/80">
-              <span>Standard Curriculum</span> · <span>Broad Social Network</span> · <span>School Clubs</span>
+            <div class="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-sky-400/80">
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Standard Curriculum</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Broad Social Network</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">School Clubs</span>
             </div>
           </div>
 
           <!-- Private Preparatory Card -->
-          <div id="card-track-private" data-track="private" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-emerald-500/50 transition-all space-y-1.5">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center space-x-2">
-                <span class="text-base">🏛️</span>
-                <div>
-                  <div class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
-                    <span>Private Preparatory Academy</span>
-                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-private uppercase font-bold">Tuition</span>
+          <div id="card-track-private" data-track="private" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-emerald-500/50 transition-all space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-start space-x-2.5 min-w-0 flex-1">
+                <span class="text-base shrink-0 mt-0.5">🏛️</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-serif font-bold text-xs text-parchment">Private Preparatory Academy</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-private uppercase font-bold shrink-0">Tuition</span>
                   </div>
-                  <div class="text-[10px] text-dust">Rigorous Classical Curriculum & Uniforms</div>
+                  <div class="text-[10px] text-dust leading-tight mt-0.5">Rigorous Classical Curriculum & Uniforms</div>
                 </div>
               </div>
-              <span id="label-tuition-private" class="font-mono text-xs text-emerald-400 font-bold">~$5,000 / yr</span>
+              <span id="label-tuition-private" class="font-mono text-xs text-emerald-400 font-bold shrink-0">~$5,000 / yr</span>
             </div>
             <p class="text-[10px] text-dust leading-snug">High academic standards, tailored mentorship, strict discipline, and ambitious peer networks. Significantly accelerates intelligence.</p>
-            <div class="flex items-center gap-1.5 text-[9px] font-mono text-emerald-400/80">
-              <span>++Smarts Growth</span> · <span>Strict Faculty</span> · <span>Merit Scholarships Available</span>
+            <div class="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-emerald-400/80">
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">++Smarts Growth</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Strict Faculty</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Merit Scholarships</span>
             </div>
           </div>
 
           <!-- Elite Academy Card -->
-          <div id="card-track-elite" data-track="elite" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-purple-500/50 transition-all space-y-1.5">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center space-x-2">
-                <span class="text-base">🏰</span>
-                <div>
-                  <div class="font-serif font-bold text-xs text-parchment flex items-center gap-1.5">
-                    <span>Elite Aristocratic Academy</span>
-                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-elite uppercase font-bold">Exclusive</span>
+          <div id="card-track-elite" data-track="elite" class="school-track-card cursor-pointer p-3 rounded-xl bg-inputbg border-2 border-transparent hover:border-purple-500/50 transition-all space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-start space-x-2.5 min-w-0 flex-1">
+                <span class="text-base shrink-0 mt-0.5">🏰</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-serif font-bold text-xs text-parchment">Elite Aristocratic Academy</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-track-elite uppercase font-bold shrink-0">Exclusive</span>
                   </div>
-                  <div class="text-[10px] text-dust">High Society Dynasties & Secret Societies</div>
+                  <div class="text-[10px] text-dust leading-tight mt-0.5">High Society Dynasties & Secret Societies</div>
                 </div>
               </div>
-              <span id="label-tuition-elite" class="font-mono text-xs text-purple-400 font-bold">~$25,000 / yr</span>
+              <span id="label-tuition-elite" class="font-mono text-xs text-purple-400 font-bold shrink-0 whitespace-nowrap">~$25,000 / yr</span>
             </div>
             <p class="text-[10px] text-dust leading-snug">Gothic stone cloisters, dynastic family crests, and clandestine occult fellowships. Massive prestige boost for universities and vocations.</p>
-            <div class="flex items-center gap-1.5 text-[9px] font-mono text-purple-400/80">
-              <span>+++Smarts & Looks</span> · <span>Ancestral Cabals</span> · <span>Esoteric Fellowships</span>
+            <div class="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-purple-400/80">
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">+++Smarts & Looks</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Ancestral Cabals</span>
+              <span class="bg-slatecard/80 px-1.5 py-0.5 rounded border border-leadborder/60">Esoteric Fellowships</span>
             </div>
           </div>
         </div>
@@ -1347,38 +1358,38 @@
 
           <!-- Action Buttons for Free Tracks -->
           <div id="funding-actions-free" class="hidden">
-            <button id="btn-enroll-free" class="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-serif font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <button id="btn-enroll-free" class="w-full py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-[0.99] text-white font-serif font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
+              <i data-lucide="check" class="w-4 h-4"></i>
               <span>Enroll in This School</span>
             </button>
           </div>
 
           <!-- Action Buttons for Paid Tracks (Private / Elite) -->
           <div id="funding-actions-paid" class="hidden space-y-2">
-            <div class="grid grid-cols-2 gap-2">
-              <button id="btn-ask-parents-tuition" class="py-2 px-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-emerald-500/50 text-[11px] font-serif font-bold text-parchment flex items-center justify-center gap-1.5 transition-all text-center">
-                <i data-lucide="heart-handshake" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button id="btn-ask-parents-tuition" class="py-2.5 px-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-emerald-500/50 active:scale-[0.99] text-[11px] font-serif font-bold text-parchment flex items-center justify-center gap-1.5 transition-all text-center">
+                <i data-lucide="heart-handshake" class="w-4 h-4 text-emerald-400 shrink-0"></i>
                 <span>Ask Parents to Pay</span>
               </button>
-              <button id="btn-apply-scholarship" class="py-2 px-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-purple-500/50 text-[11px] font-serif font-bold text-parchment flex items-center justify-center gap-1.5 transition-all text-center">
-                <i data-lucide="award" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+              <button id="btn-apply-scholarship" class="py-2.5 px-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder hover:border-purple-500/50 active:scale-[0.99] text-[11px] font-serif font-bold text-parchment flex items-center justify-center gap-1.5 transition-all text-center">
+                <i data-lucide="award" class="w-4 h-4 text-purple-400 shrink-0"></i>
                 <span>Apply for Scholarship</span>
               </button>
             </div>
-            <button id="btn-pay-tuition-self" class="w-full py-1.5 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-[10px] font-mono text-dust hover:text-parchment flex items-center justify-center gap-1.5 transition-all">
-              <i data-lucide="wallet" class="w-3 h-3 text-amber-400"></i>
+            <button id="btn-pay-tuition-self" class="w-full py-2 px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder active:scale-[0.99] text-[11px] font-mono text-dust hover:text-parchment flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="wallet" class="w-3.5 h-3.5 text-amber-400"></i>
               <span id="label-pay-self-btn">Pay Out of Pocket (Bank Balance)</span>
             </button>
           </div>
 
           <!-- Status / Feedback Notice -->
-          <div id="school-choice-feedback" class="hidden text-[10px] p-2 rounded-lg bg-slatecard border border-leadborder leading-relaxed font-mono">
+          <div id="school-choice-feedback" class="hidden text-xs p-2.5 rounded-lg bg-slatecard border border-leadborder leading-relaxed font-mono break-words">
             <!-- Dynamic feedback message -->
           </div>
         </div>
 
-        <div class="pt-2">
-          <button id="btn-cancel-school-choice" class="w-full py-1 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
+        <div class="pt-1 mt-auto">
+          <button id="btn-cancel-school-choice" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
             Cancel
           </button>
         </div>
@@ -1386,37 +1397,38 @@
     </div>
 
     <!-- SCHOOL PERSON INTERACTION DOSSIER MODAL -->
-    <div id="school-person-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2.5 shrink-0">
-          <div class="flex items-center space-x-2.5">
-            <div id="school-person-avatar-box" class="w-8 h-8 rounded-full bg-inputbg border border-leadborder flex items-center justify-center text-edu-sky shrink-0">
-              <i id="school-person-icon" data-lucide="user" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <h3 id="school-person-name" class="font-serif font-bold text-sm text-parchment">Person Name</h3>
-              <div class="flex items-center space-x-1.5 mt-0.5">
-                <span id="school-person-role-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard border border-leadborder text-dust uppercase font-bold">Role</span>
-                <span id="school-person-clique-badge" class="hidden text-[9px] font-mono px-1.5 py-0.5 rounded badge-edu-purple font-bold">Clique</span>
-              </div>
+    <div id="school-person-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div id="school-person-avatar-box" class="w-8 h-8 rounded-full bg-inputbg border border-leadborder flex items-center justify-center text-edu-sky shrink-0">
+            <i id="school-person-icon" data-lucide="user" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 id="school-person-name" class="font-serif font-bold text-sm text-parchment truncate">Person Name</h3>
+            <div class="flex items-center space-x-1.5 mt-0.5">
+              <span id="school-person-role-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard border border-leadborder text-dust uppercase font-bold shrink-0">Role</span>
+              <span id="school-person-clique-badge" class="hidden text-[9px] font-mono px-1.5 py-0.5 rounded badge-edu-purple font-bold shrink-0">Clique</span>
             </div>
           </div>
-          <button id="btn-close-school-person" class="p-1 rounded text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
         </div>
+        <button id="btn-close-school-person" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Quirk / Bio Details -->
-        <div class="bg-inputbg border border-leadborder rounded-xl p-2.5 mb-2.5 text-xs text-dust leading-relaxed font-sans shrink-0">
+        <div class="bg-inputbg border border-leadborder rounded-xl p-3 text-xs text-dust leading-relaxed font-sans shrink-0">
           <p id="school-person-quirk">Quirk or description goes here.</p>
         </div>
 
         <!-- Closeness / Relationship Bar -->
-        <div class="bg-inputbg border border-leadborder rounded-xl p-2.5 mb-3 shrink-0">
+        <div class="bg-inputbg border border-leadborder rounded-xl p-3 shrink-0">
           <div class="flex justify-between items-center text-[10px] uppercase text-dust font-mono mb-1">
-            <span class="flex items-center gap-1 text-edu-purple font-semibold"><i data-lucide="heart" class="w-3 h-3"></i> Closeness</span>
-            <span id="school-person-rel-val" class="font-bold text-parchment">50%</span>
+            <span class="flex items-center gap-1 text-edu-purple font-semibold"><i data-lucide="heart" class="w-3.5 h-3.5"></i> Closeness</span>
+            <span id="school-person-rel-val" class="font-bold text-parchment font-mono">50%</span>
           </div>
           <div class="w-full bg-trackbg rounded-full h-1.5 overflow-hidden">
             <div id="school-person-rel-bar" class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: 50%;"></div>
@@ -1424,14 +1436,14 @@
         </div>
 
         <!-- Role-Specific Action Buttons -->
-        <div class="text-[10px] font-mono text-dust uppercase tracking-wider mb-1.5 shrink-0">Available Interactions</div>
+        <div class="text-[10px] font-mono text-dust uppercase tracking-wider shrink-0 font-semibold">Available Interactions</div>
         <div id="school-person-actions-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1">
           <!-- Injected dynamically by game.js based on role (Janitor, Librarian, Teacher, Classmate, Nurse, etc.) -->
         </div>
 
         <!-- Footer / Cancel -->
-        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-2">
-          <button id="btn-cancel-school-person" class="w-full py-1.5 text-center text-xs text-dust hover:text-parchment transition-colors">
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-auto">
+          <button id="btn-cancel-school-person" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
             Nevermind
           </button>
         </div>
@@ -1439,37 +1451,44 @@
     </div>
 
     <!-- CAREERS MODAL (Mundane vs Paranormal) -->
-    <div id="careers-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="briefcase" class="w-4 h-4 text-sky-400"></i>
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Employment & Contracts</h3>
+    <div id="careers-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-sky-400 shrink-0">
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-careers" class="p-1 rounded text-dust hover:text-parchment">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Employment & Contracts</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Labor, vocations, and unholy pacts</p>
+          </div>
         </div>
+        <button id="btn-close-careers" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Career Tabs -->
-        <div class="grid grid-cols-2 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-xs mb-3 shrink-0">
-          <button id="tab-career-mundane" class="py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
+        <div class="grid grid-cols-2 gap-1.5 bg-inputbg p-1 rounded-xl border border-leadborder text-xs shrink-0">
+          <button id="tab-career-mundane" class="py-2 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-xs">
             <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-400"></i>
             <span>Mundane Jobs (Fiat)</span>
           </button>
-          <button id="tab-career-paranormal" class="py-1.5 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
+          <button id="tab-career-paranormal" class="py-2 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
             <i data-lucide="moon" class="w-3.5 h-3.5 text-amber-400"></i>
             <span>Paranormal (Shillings)</span>
           </button>
         </div>
 
         <!-- Current Status Banner -->
-        <div id="current-employment-banner" class="bg-inputbg border border-leadborder/70 rounded-xl p-3 mb-3 shrink-0 text-xs flex justify-between items-center">
+        <div id="current-employment-banner" class="bg-inputbg border border-leadborder/70 rounded-xl p-3 shrink-0 text-xs flex justify-between items-center">
           <div>
             <span class="text-[10px] uppercase text-dust font-mono block">Current Daytime Job:</span>
             <span id="txt-current-mundane-job" class="font-serif font-bold text-parchment">Unemployed</span>
           </div>
-          <button id="btn-quit-mundane" class="hidden text-[10px] font-mono px-2 py-1 rounded-md border border-red-500/40 bg-red-500/10 text-red-600 hover:bg-red-500/20 dark:text-red-300 transition-colors">
+          <button id="btn-quit-mundane" class="hidden text-[10px] font-mono px-2.5 py-1 rounded-md border border-red-500/40 bg-red-500/10 text-red-600 hover:bg-red-500/20 dark:text-red-300 transition-colors">
             Resign
           </button>
         </div>
@@ -1482,23 +1501,30 @@
     </div>
 
     <!-- KIN & ACQUAINTANCES MODAL -->
-    <div id="kin-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Kin & Acquaintances</h3>
+    <div id="kin-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-emerald-400 shrink-0">
+            <i data-lucide="users" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-kin" class="p-1 text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Kin & Acquaintances</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Family bonds & relationships</p>
+          </div>
         </div>
+        <button id="btn-close-kin" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Filter tabs -->
-        <div class="flex space-x-1.5 mb-3 bg-ebon/50 p-1 rounded-lg border border-leadborder shrink-0">
-          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all" data-filter="all">All</button>
-          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-filter="family">Family</button>
-          <button class="kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-filter="friends">Friends</button>
+        <div class="flex space-x-1.5 bg-inputbg p-1 rounded-xl border border-leadborder shrink-0">
+          <button class="kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all" data-filter="all">All</button>
+          <button class="kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all" data-filter="family">Family</button>
+          <button class="kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all" data-filter="friends">Friends</button>
         </div>
 
         <!-- Kin list container -->
@@ -1509,20 +1535,27 @@
     </div>
 
     <!-- KIN DETAIL & INTERACTION MODAL -->
-    <div id="kin-detail-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-3 shrink-0">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
-            <h3 id="kin-detail-title" class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Kin Dossier</h3>
+    <div id="kin-detail-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-emerald-400 shrink-0">
+            <i data-lucide="user" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-kin-detail" class="p-1 text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 id="kin-detail-title" class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Kin Dossier</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Individual dossier & interactions</p>
+          </div>
         </div>
+        <button id="btn-close-kin-detail" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Person Dossier Header -->
-        <div id="kin-detail-dossier" class="bg-ebon/40 border border-leadborder rounded-xl p-3.5 mb-3.5 space-y-2 shrink-0">
+        <div id="kin-detail-dossier" class="bg-inputbg border border-leadborder rounded-xl p-3.5 space-y-2 shrink-0">
           <!-- Injected dynamically -->
         </div>
 
@@ -1700,40 +1733,54 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400/60"></i>
           </button>
         </div>
+
+        <!-- Footer / Back -->
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-auto">
+          <button id="btn-back-kin-detail" onclick="window.game && window.game.closeKinDetailModal ? window.game.closeKinDetailModal() : (document.getElementById('kin-detail-modal').classList.add('hidden'), document.getElementById('kin-detail-modal').style.display='none')" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
+            Back to Kin List
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- LIFE & CHILDHOOD ACTIVITIES MODAL -->
-    <div id="activities-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-40 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[85%] flex flex-col overflow-hidden shadow-2xl">
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2 shrink-0">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="compass" class="w-4 h-4 text-amber-400"></i>
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Activities & Pursuits</h3>
+    <div id="activities-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
+            <i data-lucide="compass" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-activities" class="p-1 text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Activities & Pursuits</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Leisure, studies, dark arts & socializing</p>
+          </div>
         </div>
+        <button id="btn-close-activities" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Action points stamina banner -->
-        <div class="flex items-center justify-between bg-ebon/60 border border-leadborder rounded-xl px-3 py-2 mb-2.5 shrink-0">
+        <div class="flex items-center justify-between bg-inputbg border border-leadborder rounded-xl px-3 py-2.5 shrink-0">
           <div class="flex items-center space-x-1.5 text-xs text-dust">
-            <i data-lucide="battery-charging" class="w-3.5 h-3.5 text-amber-400"></i>
+            <i data-lucide="battery-charging" class="w-4 h-4 text-amber-400"></i>
             <span class="font-mono text-[11px]">Energy / Stamina:</span>
           </div>
-          <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-full">
+          <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 rounded-full">
             40 / 40 Actions Left
           </div>
         </div>
 
         <!-- Filter tabs -->
-        <div class="flex space-x-1 mb-3 bg-ebon/50 p-1 rounded-lg border border-leadborder shrink-0 overflow-x-auto custom-scroll">
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all" data-category="all">All</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="leisure">Play</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="mind">Mind</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="forbidden">Occult</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all" data-category="social">Social</button>
+        <div class="flex space-x-1 bg-inputbg p-1 rounded-xl border border-leadborder shrink-0 overflow-x-auto custom-scroll">
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all" data-category="all">All</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="leisure">Play</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="mind">Mind</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="forbidden">Occult</button>
+          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="social">Social</button>
         </div>
 
         <!-- Activities List Container -->
@@ -1744,55 +1791,56 @@
     </div>
 
     <!-- DARK ALTAR / PARANORMAL CRIMES MODAL -->
-    <div id="dark-altar-modal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2.5 shrink-0">
-          <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-full bg-purple-950/60 border border-purple-600/50 flex items-center justify-center text-purple-300 shrink-0">
-              <i data-lucide="moon" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <h3 class="font-serif font-bold text-sm text-purple-200 uppercase tracking-wider">The Dark Altar</h3>
-              <p class="text-[10px] text-dust font-mono">Paranormal Transgressions & Hexes</p>
-            </div>
+    <div id="dark-altar-modal" class="hidden absolute inset-0 bg-black/95 backdrop-blur-md z-50 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full bg-purple-950/60 border border-purple-600/50 flex items-center justify-center text-purple-300 shrink-0">
+            <i data-lucide="moon" class="w-4 h-4"></i>
           </div>
-          <button id="btn-close-dark-altar" class="p-1 rounded text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 class="font-serif font-bold text-sm text-purple-200 uppercase tracking-wider truncate">The Dark Altar</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Paranormal Transgressions & Hexes</p>
+          </div>
         </div>
+        <button id="btn-close-dark-altar" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Target Selector Section -->
-        <div class="bg-inputbg border border-leadborder rounded-xl p-2.5 mb-2.5 shrink-0 space-y-1.5">
+        <div class="bg-inputbg border border-leadborder rounded-xl p-3 shrink-0 space-y-1.5">
           <div class="flex justify-between items-center text-[10px] font-mono text-dust uppercase">
             <span>Select Focus / Target</span>
             <span id="dark-altar-target-status" class="text-purple-300 font-bold">Universal Focus</span>
           </div>
-          <select id="dark-altar-target-select" class="w-full bg-slatecard border border-leadborder rounded-lg p-2 text-xs text-parchment font-sans focus:outline-none focus:border-purple-500">
+          <select id="dark-altar-target-select" class="w-full bg-slatecard border border-leadborder rounded-lg p-2.5 text-xs text-parchment font-sans focus:outline-none focus:border-purple-500">
             <!-- Dynamically populated with all living Kin, Teachers, Staff, Classmates & Untargeted option -->
           </select>
-          <div id="dark-altar-target-details" class="hidden text-[10px] font-mono text-dust flex justify-between items-center pt-1 border-t border-leadborder/40">
+          <div id="dark-altar-target-details" class="hidden text-[10px] font-mono text-dust flex justify-between items-center pt-1.5 border-t border-leadborder/40">
             <span id="dark-altar-target-role" class="truncate text-dust">Role</span>
             <span id="dark-altar-target-curse" class="text-rose-400 font-bold">Uncursed</span>
           </div>
         </div>
 
         <!-- Player Occult Standing & Shillings -->
-        <div class="flex items-center justify-between px-1 mb-2 text-[10px] font-mono shrink-0">
+        <div class="flex items-center justify-between px-1 text-[10px] font-mono shrink-0">
           <span class="text-dust">Occult Lore: <strong id="dark-altar-player-occult" class="text-purple-300">0%</strong></span>
           <span class="text-dust">Shillings: <strong id="dark-altar-player-shillings" class="text-amber-400">0 s.</strong></span>
           <span class="text-dust">Energy: <strong id="dark-altar-player-energy" class="text-sky-300">0</strong></span>
         </div>
 
         <!-- Available Crimes / Hexes Grid -->
-        <div class="text-[10px] font-mono text-dust uppercase tracking-wider mb-1 shrink-0">Select Dark Rite</div>
+        <div class="text-[10px] font-mono text-dust uppercase tracking-wider shrink-0 font-semibold">Select Dark Rite</div>
         <div id="dark-altar-crimes-list" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1 pb-1">
           <!-- Injected dynamically from PARANORMAL_CRIMES_DATA -->
         </div>
 
         <!-- Footer / Cancel -->
-        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-1">
-          <button id="btn-cancel-dark-altar" class="w-full py-1.5 text-center text-xs text-dust hover:text-parchment transition-colors">
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-auto">
+          <button id="btn-cancel-dark-altar" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
             Step Away From The Altar
           </button>
         </div>
@@ -2124,26 +2172,32 @@
     </div>
 
     <!-- GIVE A PRESENT / GIFT ROTATING CATALOG MODAL -->
-    <div id="kin-gift-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end">
-      <div class="bg-slatecard border border-leadborder rounded-t-2xl p-4 max-h-[90%] flex flex-col overflow-hidden shadow-2xl">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b border-leadborder pb-2.5 mb-2 shrink-0">
-          <div class="flex items-center space-x-2 text-teal-400">
+    <div id="kin-gift-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-teal-400 shrink-0">
             <i data-lucide="gift" class="w-4 h-4"></i>
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider">Gift Catalogue</h3>
           </div>
-          <button id="btn-close-gift-modal" class="p-1 text-dust hover:text-parchment transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+          <div class="min-w-0">
+            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Gift Catalogue</h3>
+            <p class="text-[10px] text-dust font-mono truncate">Offer tokens of affection or eerie relics</p>
+          </div>
         </div>
+        <button id="btn-close-gift-modal" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
 
+      <!-- Main Scrollable Body -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Target recipient and affinity hint -->
-        <div class="flex items-center justify-between bg-inputbg border border-leadborder rounded-xl px-3 py-2 mb-2.5 shrink-0">
-          <div>
-            <div id="gift-modal-target-name" class="text-xs font-serif font-bold text-parchment">Recipient Name</div>
-            <div id="gift-modal-target-hint" class="text-[10px] text-dust font-mono">Preferences: Family keepsakes & warm treats</div>
+        <div class="flex items-center justify-between bg-inputbg border border-leadborder rounded-xl px-3 py-2.5 shrink-0 gap-2">
+          <div class="min-w-0 flex-1">
+            <div id="gift-modal-target-name" class="text-xs font-serif font-bold text-parchment truncate">Recipient Name</div>
+            <div id="gift-modal-target-hint" class="text-[10px] text-dust font-mono truncate">Preferences: Family keepsakes & warm treats</div>
           </div>
-          <button id="btn-shuffle-gifts" class="px-2.5 py-1 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-teal-400 hover:text-teal-300 text-[10px] font-mono font-bold flex items-center space-x-1 transition-all">
+          <button id="btn-shuffle-gifts" class="px-2.5 py-1.5 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-teal-400 hover:text-teal-300 text-[10px] font-mono font-bold flex items-center space-x-1 shrink-0 transition-all">
             <i data-lucide="refresh-cw" class="w-3 h-3"></i>
             <span>Shuffle List</span>
           </button>
@@ -2155,8 +2209,8 @@
         </div>
 
         <!-- Footer / Cancel -->
-        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-2">
-          <button id="btn-cancel-gift" class="w-full py-1.5 text-center text-xs text-dust hover:text-parchment transition-colors">
+        <div class="pt-2 border-t border-leadborder/60 shrink-0 mt-auto">
+          <button id="btn-cancel-gift" class="w-full py-2 text-center text-xs text-dust hover:text-parchment transition-colors font-mono">
             Cancel
           </button>
         </div>
@@ -2228,16 +2282,16 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=21"></script>
-  <script src="js/avatar.js?v=21"></script>
-  <script src="js/names.js?v=21"></script>
-  <script src="js/careers.js?v=21"></script>
-  <script src="js/gifts.js?v=21"></script>
-  <script src="js/kin.js?v=21"></script>
-  <script src="js/activities.js?v=21"></script>
-  <script src="js/crimes.js?v=21"></script>
-  <script src="js/events.js?v=21"></script>
-  <script src="js/education.js?v=21"></script>
-  <script src="js/game.js?v=21"></script>
+  <script src="js/audio.js?v=22"></script>
+  <script src="js/avatar.js?v=22"></script>
+  <script src="js/names.js?v=22"></script>
+  <script src="js/careers.js?v=22"></script>
+  <script src="js/gifts.js?v=22"></script>
+  <script src="js/kin.js?v=22"></script>
+  <script src="js/activities.js?v=22"></script>
+  <script src="js/crimes.js?v=22"></script>
+  <script src="js/events.js?v=22"></script>
+  <script src="js/education.js?v=22"></script>
+  <script src="js/game.js?v=22"></script>
 </body>
 </html>
