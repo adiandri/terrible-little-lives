@@ -34,9 +34,9 @@ const AVATAR_V2_OPTIONS = {
     plum: { label: 'Plum Formalwear', coat: ['#4b293e', '#261420', '#10090e'], accent: '#c4914c' }
   },
   marking: {
-    freckles: { label: 'Freckles', display: true, opacity: 1 },
-    scar: { label: 'Cheek Scar', display: true, opacity: .82 },
-    none: { label: 'Clear', display: false, opacity: 0 }
+    freckles: { label: 'Freckles', kind: 'freckles' },
+    scar: { label: 'Cheek Scar', kind: 'scar' },
+    none: { label: 'Clear', kind: null }
   },
   accessory: {
     cameo: { label: 'Cameo', display: true, color: '#7d1c30' },
@@ -73,8 +73,11 @@ function applyAvatarV2(svg, config = {}) {
   svg.querySelector('#layer-face > path').setAttribute('d', face.path);
   svg.querySelector('#layer-eyes').setAttribute('transform', `translate(256 218) scale(.78 ${eyes.scaleY}) translate(-256 -218)`);
   svg.querySelector('#layer-hair').innerHTML = hair.svg;
-  svg.querySelector('#layer-markings').style.display = marking.display ? '' : 'none';
-  svg.querySelector('#layer-markings').style.opacity = marking.opacity;
+  const markingsLayer = svg.querySelector('#layer-markings');
+  markingsLayer.style.display = marking.kind ? '' : 'none';
+  markingsLayer.querySelectorAll('[data-marking]').forEach(node => {
+    node.style.display = node.dataset.marking === marking.kind ? '' : 'none';
+  });
   svg.querySelector('#layer-neckwear').style.display = accessory.display ? '' : 'none';
   const cameo = svg.querySelector('#layer-neckwear ellipse:nth-of-type(2)');
   if (cameo) cameo.setAttribute('fill', accessory.color);
