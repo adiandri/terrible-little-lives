@@ -5877,10 +5877,10 @@ class TerribleGame {
         if (this.dom.darkAltarTargetCurse) {
           if (selectedTarget.curse) {
             this.dom.darkAltarTargetCurse.textContent = `Afflicted: ${selectedTarget.curse.name}`;
-            this.dom.darkAltarTargetCurse.className = "text-rose-400 font-bold";
+            this.dom.darkAltarTargetCurse.className = "text-rose-600 dark:text-rose-400 font-bold";
           } else {
             this.dom.darkAltarTargetCurse.textContent = "Uncursed";
-            this.dom.darkAltarTargetCurse.className = "text-emerald-400 font-bold";
+            this.dom.darkAltarTargetCurse.className = "text-emerald-600 dark:text-emerald-400 font-bold";
           }
         }
       } else {
@@ -5925,7 +5925,7 @@ class TerribleGame {
       if (canCast) {
         const chance = crime.successChance(char, selectedTarget ? selectedTarget.raw : null);
         const pct = Math.round(chance * 100);
-        chanceText = `<span class="text-[10px] font-mono text-purple-300">Success Chance: ~${pct}%</span>`;
+        chanceText = `<span class="text-[10px] font-mono text-purple-700 dark:text-purple-300 font-semibold">Success Chance: ~${pct}%</span>`;
       }
 
       // Action button text and state
@@ -5951,12 +5951,12 @@ class TerribleGame {
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-lg ${canCast ? 'bg-purple-950/60 border border-purple-500/30 text-purple-300' : 'bg-leadborder/20 text-dust'} flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-lg ${canCast ? 'bg-purple-500/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 dark:bg-purple-950/60 dark:border-purple-500/30' : 'bg-leadborder/20 text-dust'} flex items-center justify-center shrink-0">
               <i data-lucide="${crime.icon || 'moon'}" class="w-4 h-4"></i>
             </div>
             <div>
-              <h4 class="font-serif font-bold text-xs ${canCast ? 'text-purple-200' : 'text-parchment/70'}">${crime.name}</h4>
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold text-purple-400 bg-purple-950/40 border-purple-800/40">${crime.tag}</span>
+              <h4 class="font-serif font-bold text-xs ${canCast ? 'text-purple-900 dark:text-purple-200' : 'text-parchment/70'}">${crime.name}</h4>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-bold text-purple-700 bg-purple-500/10 border-purple-500/30 dark:text-purple-400 dark:bg-purple-950/40 dark:border-purple-800/40">${crime.tag}</span>
             </div>
           </div>
           <div class="text-right text-[10px] font-mono text-dust">
@@ -5970,7 +5970,7 @@ class TerribleGame {
           ${chanceText || `<span class="text-[10px] font-mono text-dust/70">Unlocks at ${crime.minOccult}% Occult</span>`}
           <button class="btn-execute-rite px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
             canCast
-              ? 'bg-purple-900/60 hover:bg-purple-800/70 text-purple-200 border border-purple-600/60 active:scale-95 cursor-pointer shadow-md'
+              ? 'bg-purple-700 text-white hover:bg-purple-800 dark:bg-purple-900/60 dark:hover:bg-purple-800/70 dark:text-purple-200 border border-purple-600/60 active:scale-95 cursor-pointer shadow-md'
               : 'bg-leadborder/20 text-dust border border-leadborder/30 cursor-not-allowed opacity-60'
           }" ${canCast ? '' : 'disabled'}>
             ${btnLabel}

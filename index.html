@@ -409,13 +409,9 @@
     #kin-gift-modal,
     #pets-modal,
     #pet-detail-modal,
-    #action-choice-modal {
-      background-color: var(--bg-card) !important;
-      opacity: 1 !important;
-    }
-
+    #action-choice-modal,
     #dark-altar-modal {
-      background-color: #07060a !important;
+      background-color: var(--bg-card) !important;
       opacity: 1 !important;
     }
 
@@ -2628,15 +2624,15 @@
     </div>
 
     <!-- DARK ALTAR / PARANORMAL CRIMES MODAL -->
-    <div id="dark-altar-modal" class="hidden absolute inset-0 bg-black/95 backdrop-blur-md z-50 flex flex-col overflow-hidden">
+    <div id="dark-altar-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
       <!-- Header -->
       <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
         <div class="flex items-center space-x-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-purple-950/60 border border-purple-600/50 flex items-center justify-center text-purple-300 shrink-0">
+          <div class="w-8 h-8 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 dark:bg-purple-950/60 dark:border-purple-600/50 flex items-center justify-center shrink-0">
             <i data-lucide="moon" class="w-4 h-4"></i>
           </div>
           <div class="min-w-0">
-            <h3 class="font-serif font-bold text-sm text-purple-200 uppercase tracking-wider truncate">The Dark Altar</h3>
+            <h3 class="font-serif font-bold text-sm text-purple-900 dark:text-purple-200 uppercase tracking-wider truncate">The Dark Altar</h3>
             <p class="text-[10px] text-dust font-mono truncate">Paranormal Transgressions & Hexes</p>
           </div>
         </div>
@@ -2651,22 +2647,22 @@
         <div class="bg-inputbg border border-leadborder rounded-xl p-3 shrink-0 space-y-1.5">
           <div class="flex justify-between items-center text-[10px] font-mono text-dust uppercase">
             <span>Select Focus / Target</span>
-            <span id="dark-altar-target-status" class="text-purple-300 font-bold">Universal Focus</span>
+            <span id="dark-altar-target-status" class="text-purple-700 dark:text-purple-300 font-bold">Universal Focus</span>
           </div>
           <select id="dark-altar-target-select" class="w-full bg-slatecard border border-leadborder rounded-lg p-2.5 text-xs text-parchment font-sans focus:outline-none focus:border-purple-500">
             <!-- Dynamically populated with all living Kin, Teachers, Staff, Classmates & Untargeted option -->
           </select>
           <div id="dark-altar-target-details" class="hidden text-[10px] font-mono text-dust flex justify-between items-center pt-1.5 border-t border-leadborder/40">
             <span id="dark-altar-target-role" class="truncate text-dust">Role</span>
-            <span id="dark-altar-target-curse" class="text-rose-400 font-bold">Uncursed</span>
+            <span id="dark-altar-target-curse" class="text-rose-600 dark:text-rose-400 font-bold">Uncursed</span>
           </div>
         </div>
 
         <!-- Player Occult Standing & Shillings -->
         <div class="flex items-center justify-between px-1 text-[10px] font-mono shrink-0">
-          <span class="text-dust">Occult Lore: <strong id="dark-altar-player-occult" class="text-purple-300">0%</strong></span>
-          <span class="text-dust">Shillings: <strong id="dark-altar-player-shillings" class="text-amber-400">0 s.</strong></span>
-          <span class="text-dust">Energy: <strong id="dark-altar-player-energy" class="text-sky-300">0</strong></span>
+          <span class="text-dust">Occult Lore: <strong id="dark-altar-player-occult" class="text-purple-700 dark:text-purple-300">0%</strong></span>
+          <span class="text-dust">Shillings: <strong id="dark-altar-player-shillings" class="text-amber-600 dark:text-amber-400">0 s.</strong></span>
+          <span class="text-dust">Energy: <strong id="dark-altar-player-energy" class="text-sky-600 dark:text-sky-300">0</strong></span>
         </div>
 
         <!-- Available Crimes / Hexes Grid -->
