@@ -93,20 +93,27 @@
   </g>
 
   <g id="layer-eyes" transform="translate(256 218) scale(.78 .84) translate(-256 -218)">
-    <path d="M177 217c18-24 48-25 69-3-17 24-51 27-69 3Z" fill="#eee8df"/>
-    <path d="M266 214c21-22 51-21 69 3-18 24-52 21-69-3Z" fill="#eee8df"/>
-    <ellipse cx="213" cy="216" rx="15" ry="18" fill="url(#iris)"/>
-    <ellipse cx="299" cy="216" rx="15" ry="18" fill="url(#iris)"/>
-    <ellipse cx="213" cy="218" rx="7" ry="11" fill="#0a0d09"/>
-    <ellipse cx="299" cy="218" rx="7" ry="11" fill="#0a0d09"/>
-    <circle cx="208" cy="210" r="4" fill="#fff" opacity=".92"/>
-    <circle cx="294" cy="210" r="4" fill="#fff" opacity=".92"/>
-    <path d="M176 216c19-24 49-27 72-2M264 214c22-25 53-23 72 3" fill="none" stroke="#332128" stroke-width="8" stroke-linecap="round"/>
-    <path d="M180 229c18 10 44 10 63-4M269 225c19 14 45 14 63 4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
+    <g transform="translate(-13 0)">
+      <path d="M177 217c18-24 48-25 69-3-17 24-51 27-69 3Z" fill="#eee8df"/>
+      <ellipse cx="213" cy="216" rx="15" ry="18" fill="url(#iris)"/>
+      <ellipse cx="213" cy="218" rx="7" ry="11" fill="#0a0d09"/>
+      <circle cx="208" cy="210" r="4" fill="#fff" opacity=".92"/>
+      <path d="M176 216c19-24 49-27 72-2" fill="none" stroke="#332128" stroke-width="8" stroke-linecap="round"/>
+      <path d="M180 229c18 10 44 10 63-4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
+    </g>
+    <g transform="translate(13 0)">
+      <path d="M266 214c21-22 51-21 69 3-18 24-52 21-69-3Z" fill="#eee8df"/>
+      <ellipse cx="299" cy="216" rx="15" ry="18" fill="url(#iris)"/>
+      <ellipse cx="299" cy="218" rx="7" ry="11" fill="#0a0d09"/>
+      <circle cx="294" cy="210" r="4" fill="#fff" opacity=".92"/>
+      <path d="M264 214c22-25 53-23 72 3" fill="none" stroke="#332128" stroke-width="8" stroke-linecap="round"/>
+      <path d="M269 225c19 14 45 14 63 4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
+    </g>
   </g>
 
   <g id="layer-brows" transform="translate(256 188) scale(.9 .92) translate(-256 -188)">
-    <path d="M173 185c23-15 52-17 75-3-27-4-49 0-72 12Zm166 1c-23-15-52-17-75-3 27-4 49 0 72 12Z" fill="#241920"/>
+    <path d="M173 185c23-15 52-17 75-3-27-4-49 0-72 12Z" fill="#241920" transform="translate(-11 0)"/>
+    <path d="M339 186c-23-15-52-17-75-3 27-4 49 0 72 12Z" fill="#241920" transform="translate(11 0)"/>
   </g>
 
   <g id="layer-nose">
