@@ -713,17 +713,29 @@
     const avgGen = totalGen / parents.length;
 
     let economicScore = 50;
-    const highIncomeKeywords = ["Doctor", "Surgeon", "Lawyer", "Executive", "Director", "Professor", "Architect", "Specialist"];
-    const lowIncomeKeywords = ["Forklift", "Cleaner", "Courier", "Morgue", "Meat Processing", "Clerk", "Technician"];
+    if (character.kin && character.kin.wealthTier === 'affluent') {
+      economicScore = 90;
+    } else if (character.kin && character.kin.wealthTier === 'comfortable') {
+      economicScore = 65;
+    } else if (character.kin && character.kin.wealthTier === 'modest') {
+      economicScore = 25;
+    } else {
+      const highIncomeKeywords = ["Doctor", "Surgeon", "Attorney", "Lawyer", "Executive", "Director", "Professor", "Architect", "Specialist", "Engineer"];
+      const lowIncomeKeywords = ["Forklift", "Cleaner", "Courier", "Morgue", "Meat Processing", "Clerk", "Technician"];
 
-    parents.forEach(p => {
-      const occ = p.occupation || "";
-      if (highIncomeKeywords.some(kw => occ.includes(kw))) {
-        economicScore += 25;
-      } else if (lowIncomeKeywords.some(kw => occ.includes(kw))) {
-        economicScore -= 15;
-      }
-    });
+      parents.forEach(p => {
+        const occ = p.occupation || "";
+        if (p.salaryUSD && p.salaryUSD >= 100000) {
+          economicScore += 30;
+        } else if (p.salaryUSD && p.salaryUSD <= 35000) {
+          economicScore -= 20;
+        } else if (highIncomeKeywords.some(kw => occ.includes(kw))) {
+          economicScore += 25;
+        } else if (lowIncomeKeywords.some(kw => occ.includes(kw))) {
+          economicScore -= 15;
+        }
+      });
+    }
 
     const smarts = getStat(character, 'smarts');
     let smartsBonus = 0;

@@ -1,54 +1,59 @@
 // Family, Kin, Friends & Entities Engine for Terrible Little Lives
 // BitLife-style relationships with modern gothic & paranormal horror dynamics
 
-const PARENT_OCCUPATIONS = [
-  "Municipal Water Inspector",
-  "Night Shift ER Nurse",
-  "Subway Electrical Technician",
-  "Middle School Biology Teacher",
-  "High-Rise Window Cleaner",
-  "Postal Delivery Courier",
-  "City Morgue Assistant",
-  "Commercial HVAC Repairman",
-  "Warehouse Forklift Operator",
-  "Antique Book Restorer",
-  "Emergency Dispatch Operator",
-  "Railroad Signal Operator",
-  "Dental Hygienist",
-  "Meat Processing Plant Worker",
-  "Surveillance Camera Monitor",
-  "Local Pharmacy Clerk"
+// Detailed Parent Careers with Baseline Salaries (USD) and Socioeconomic Classes
+const PARENT_OCCUPATIONS_DATA = [
+  // Working Class / Modest ($24,000 - $45,000)
+  { title: "City Morgue Assistant", salaryUSD: 28000, tier: "modest" },
+  { title: "Warehouse Forklift Operator", salaryUSD: 34000, tier: "modest" },
+  { title: "Postal Delivery Courier", salaryUSD: 36000, tier: "modest" },
+  { title: "Meat Processing Plant Worker", salaryUSD: 30000, tier: "modest" },
+  { title: "Local Pharmacy Clerk", salaryUSD: 25000, tier: "modest" },
+  { title: "High-Rise Window Cleaner", salaryUSD: 42000, tier: "modest" },
+  { title: "Subway Electrical Technician", salaryUSD: 48000, tier: "comfortable" },
+  
+  // Comfortable / Middle Class ($50,000 - $85,000)
+  { title: "Municipal Water Inspector", salaryUSD: 56000, tier: "comfortable" },
+  { title: "Night Shift ER Nurse", salaryUSD: 72000, tier: "comfortable" },
+  { title: "Middle School Biology Teacher", salaryUSD: 54000, tier: "comfortable" },
+  { title: "Commercial HVAC Repairman", salaryUSD: 62000, tier: "comfortable" },
+  { title: "Antique Book Restorer", salaryUSD: 50000, tier: "comfortable" },
+  { title: "Emergency Dispatch Operator", salaryUSD: 49000, tier: "comfortable" },
+  { title: "Railroad Signal Operator", salaryUSD: 58000, tier: "comfortable" },
+  { title: "Dental Hygienist", salaryUSD: 74000, tier: "comfortable" },
+  { title: "Surveillance Camera Monitor", salaryUSD: 38000, tier: "modest" },
+
+  // Affluent / Upper Professional ($110,000 - $210,000)
+  { title: "Cardiothoracic Surgeon", salaryUSD: 210000, tier: "affluent" },
+  { title: "Corporate Patent Attorney", salaryUSD: 165000, tier: "affluent" },
+  { title: "University Department Chair", salaryUSD: 125000, tier: "affluent" },
+  { title: "Chief Architectural Engineer", salaryUSD: 140000, tier: "affluent" }
 ];
 
-const ANOMALY_QUOTES = [
-  "\"Do you ever feel your skull humming when the streetlights buzz at twilight?\"",
-  "\"I looked in the bathroom mirror this morning. My reflection blinked three seconds after I did.\"",
-  "\"Why do grown-ups pretend the people under the storm drains are just stray dogs?\"",
-  "\"Hold my wrist. Feel that? No rhythm at all. Isn't that neat?\"",
-  "\"If you say your own name backwards forty times, the ceiling fan stops spinning.\""
-];
+const PARENT_OCCUPATIONS = PARENT_OCCUPATIONS_DATA.map(p => p.title);
 
-const MIMIC_QUOTES = [
-  "\"I brought fresh chicken livers from the butcher's dumpster behind the garage. Want half? They're still warm.\"",
-  "\"That boy from third grade was mean to you yesterday. Don't worry. He won't be at school tomorrow.\"",
-  "\"My jaw unhinges when nobody is watching. Do you want to see?\"",
-  "\"Humans make so much noise with their water and salt when they cry.\"",
-  "\"Don't tell your mom about the scratching behind my wallpaper. She wouldn't understand our friendship.\""
-];
-
-const ENTITY_QUOTES = [
-  "\"The floorboards breathe slower in winter, little mortal.\"",
-  "\"Bring me something with iron on it, and I will show you where the coins fell in 1928.\"",
-  "\"They think you're alone in this bedroom. We know better.\"",
-  "\"A tooth for an omen. That is the fair exchange between the flesh and the hollow.\""
-];
-
-const NORMAL_FRIEND_QUOTES = [
-  "\"Did you finish the math worksheet? The teacher said she'll call our parents if we fail.\"",
-  "\"Let's ride our bikes down to the old railroad trestle before it gets pitch dark.\"",
-  "\"My older brother said he heard screaming near the abandoned quarry last weekend.\"",
-  "\"Do you want to come over and play video games after the final bell?\""
-];
+// Household Living Residences Catalog
+const HOUSEHOLD_RESIDENCES = {
+  modest: [
+    { name: "3rd-Floor Walk-up Flat", type: "apartment", desc: "A cramped brick tenement with whistling copper steam radiators and narrow stairwells." },
+    { name: "Basement Garden Apartment", type: "apartment", desc: "A cool semi-subterranean flat where you hear street shoes passing on the sidewalk above." },
+    { name: "Rented Rowhouse Duplex", type: "house", desc: "A narrow weathered clapboard home with a small patch of crabgrass out back." }
+  ],
+  comfortable: [
+    { name: "Two-Story Suburban Craftsman", type: "house", desc: "A cozy timber home with an attic dormer window overlooking foggy pine yards." },
+    { name: "Split-Level Family Bungalow", type: "house", desc: "A sturdy home with a brick fireplace and a sunporch filled with potted ferns." },
+    { name: "Downtown Brick Brownstone", type: "townhouse", desc: "A four-story brownstone with high plaster ceilings and creaking parquet floors." }
+  ],
+  affluent: [
+    { name: "Ancestral Victorian Gothic Manor", type: "manor", desc: "A towering stone residence with wrought iron widow's walks, gables, and extensive cellars." },
+    { name: "Gilded Penthouse Suite", type: "penthouse", desc: "A sweeping high-rise redoubt above the municipal haze with brass elevators." },
+    { name: "Lakeside Gated Estate", type: "estate", desc: "A secluded estate with tall iron gates, weeping willows, and quiet gravel carriage paths." }
+  ],
+  grandparents: [
+    { name: "Grandparents' Heritage Rowhouse", type: "heritage", desc: "A warm multi-generational home smelling of lavender, cedar chests, and antique rugs." },
+    { name: "Grandparents' Country Farmhouse", type: "farmhouse", desc: "An old farmhouse on the edge of town bordering ancient timberlands." }
+  ]
+};
 
 function createEmptyActionsDone() {
   return {
@@ -63,7 +68,14 @@ function createEmptyActionsDone() {
     cuddled: 0,
     babbled: 0,
     fedMilk: 0,
-    peekaboo: 0
+    peekaboo: 0,
+    askedAdvice: 0,
+    bickered: 0,
+    sharedSecret: 0,
+    pranked: 0,
+    listenedFolktale: 0,
+    askedGrandMoney: 0,
+    inheritedKeepsake: 0
   };
 }
 
@@ -78,12 +90,19 @@ function getActionCount(person, key) {
 function generateFamily(character) {
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
   const surname = character.name.split(' ').slice(1).join(' ') || window.getRandomElement(country.surnames);
+  const mult = country.wageMultiplier || 1.0;
 
   const dadFirst = window.getRandomElement(country.firstNamesMale);
   const momFirst = window.getRandomElement(country.firstNamesFemale);
 
   const dadAge = Math.floor(Math.random() * 12) + 26; // 26-37
   const momAge = Math.floor(Math.random() * 10) + 24; // 24-33
+
+  const dadJobObj = window.getRandomElement(PARENT_OCCUPATIONS_DATA);
+  const momJobObj = window.getRandomElement(PARENT_OCCUPATIONS_DATA);
+
+  const dadSalary = Math.round(dadJobObj.salaryUSD * mult);
+  const momSalary = Math.round(momJobObj.salaryUSD * mult);
 
   const parents = [
     {
@@ -96,7 +115,10 @@ function generateFamily(character) {
       alive: true,
       deathYear: null,
       deathCause: null,
-      occupation: window.getRandomElement(PARENT_OCCUPATIONS),
+      occupation: dadJobObj.title,
+      salary: dadSalary,
+      salaryUSD: dadJobObj.salaryUSD,
+      incomeTier: dadJobObj.tier,
       relationship: Math.floor(Math.random() * 25) + 70, // 70-95%
       generosity: Math.floor(Math.random() * 50) + 40,   // 40-90%
       strictness: Math.floor(Math.random() * 50) + 30,
@@ -116,7 +138,10 @@ function generateFamily(character) {
       alive: true,
       deathYear: null,
       deathCause: null,
-      occupation: window.getRandomElement(PARENT_OCCUPATIONS),
+      occupation: momJobObj.title,
+      salary: momSalary,
+      salaryUSD: momJobObj.salaryUSD,
+      incomeTier: momJobObj.tier,
       relationship: Math.floor(Math.random() * 20) + 75, // 75-95%
       generosity: Math.floor(Math.random() * 45) + 45,   // 45-90%
       strictness: Math.floor(Math.random() * 45) + 35,
@@ -134,7 +159,6 @@ function generateFamily(character) {
   for (let i = 0; i < siblingCount; i++) {
     const isMale = Math.random() > 0.5;
     const sFirst = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
-    // age difference relative to player (starts at birth, so older sibling)
     const ageDiff = Math.floor(Math.random() * 6) + 1; // 1 to 6 years older
     const role = isMale ? (ageDiff > 0 ? 'Older Brother' : 'Younger Brother') : (ageDiff > 0 ? 'Older Sister' : 'Younger Sister');
 
@@ -156,9 +180,10 @@ function generateFamily(character) {
     });
   }
 
-  // Grandparents generation (1 living grandparent)
+  // Grandparents generation (1 living grandparent with 75% probability)
   const grandparents = [];
-  if (Math.random() < 0.75) {
+  const hasGrandparent = Math.random() < 0.75;
+  if (hasGrandparent) {
     const isMaternal = Math.random() > 0.5;
     const isGrandpa = Math.random() > 0.5;
     const gFirst = isGrandpa ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
@@ -176,19 +201,48 @@ function generateFamily(character) {
       deathYear: null,
       deathCause: null,
       relationship: Math.floor(Math.random() * 20) + 75,
-      generosity: Math.floor(Math.random() * 30) + 60,
+      generosity: Math.floor(Math.random() * 30) + 65,
+      pensionUSD: Math.floor(Math.random() * 15000) + 20000,
       entityType: 'human',
       actionsDone: createEmptyActionsDone()
     });
+  }
+
+  // Calculate Combined Household Income & Wealth Tier
+  const totalCombinedIncomeUSD = (dadJobObj.salaryUSD || 0) + (momJobObj.salaryUSD || 0);
+  const totalCombinedIncome = Math.round(totalCombinedIncomeUSD * mult);
+  
+  let wealthTier = "modest";
+  if (totalCombinedIncomeUSD >= 160000) {
+    wealthTier = "affluent";
+  } else if (totalCombinedIncomeUSD >= 75000) {
+    wealthTier = "comfortable";
+  }
+
+  // Living Residence Selection
+  let residence = null;
+  const livesWithGrandparents = hasGrandparent && Math.random() < 0.35;
+  if (livesWithGrandparents) {
+    residence = window.getRandomElement(HOUSEHOLD_RESIDENCES.grandparents);
+    residence.livesWithGrandparents = true;
+  } else {
+    const list = HOUSEHOLD_RESIDENCES[wealthTier] || HOUSEHOLD_RESIDENCES.comfortable;
+    residence = { ...window.getRandomElement(list), livesWithGrandparents: false };
   }
 
   return {
     parents,
     siblings,
     grandparents,
-    friends: [] // Starts empty at age 0
+    friends: [], // Starts empty at age 0
+    householdIncome: totalCombinedIncome,
+    householdIncomeUSD: totalCombinedIncomeUSD,
+    wealthTier,
+    residence
   };
 }
+
+
 
 function generateNewFriend(character, context = 'Neighborhood') {
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
@@ -472,10 +526,19 @@ function askForMoney(person, character, requestedAmount = null) {
   // Each previous ask this year increases strictness
   const askPenalty = count * 14;
 
-  // Grandparents are more generous
-  const grandBonus = person.role.includes('Grand') ? 20 : 0;
+  // Grandparents are naturally much more generous
+  const grandBonus = person.role.includes('Grand') ? 25 : 0;
 
-  const score = (person.relationship * 0.5) + (person.generosity * 0.5) + grandBonus - penalty - askPenalty;
+  // Factor in Parent's Income / Socioeconomic Wealth
+  let wealthBonus = 0;
+  const kinWealth = (character.kin && character.kin.wealthTier) || 'comfortable';
+  if (kinWealth === 'affluent' || (person.salaryUSD && person.salaryUSD >= 120000)) {
+    wealthBonus = 25;
+  } else if (kinWealth === 'modest' || (person.salaryUSD && person.salaryUSD <= 35000)) {
+    wealthBonus = -20;
+  }
+
+  const score = (person.relationship * 0.45) + (person.generosity * 0.45) + grandBonus + wealthBonus - penalty - askPenalty;
   const success = score >= 35;
 
   if (success) {
@@ -483,11 +546,24 @@ function askForMoney(person, character, requestedAmount = null) {
     if (baseUSD > 150) relChange = -3;
     person.relationship = Math.max(0, person.relationship + relChange);
 
-    const responses = [
-      `${person.name} reached into their wallet and handed you ${window.formatMoney(amount, character.countryCode)}. "Here. Spend it wisely."`,
-      `${person.name} smiled warmly, slipping ${window.formatMoney(amount, character.countryCode)} into your hands. "Make sure you put some in your savings."`,
-      `Seeing how polite you were, ${person.name} counted out ${window.formatMoney(amount, character.countryCode)} and gave it to you with a gentle nod.`
-    ];
+    let responses = [];
+    if (wealthBonus >= 20) {
+      responses = [
+        `${person.name} pulled out a crisp leather billfold and gave you ${window.formatMoney(amount, character.countryCode)}. "Here, dear. Buy yourself something proper."`,
+        `${person.name} nodded smoothly, writing out an immediate allowance of ${window.formatMoney(amount, character.countryCode)}. "Never let anyone see you without walking-around money."`
+      ];
+    } else if (person.role.includes('Grand')) {
+      responses = [
+        `${person.name} looked around conspiratorially, winking as they slipped ${window.formatMoney(amount, character.countryCode)} into your pocket: "Don't tell your parents I gave you this, sweet child."`,
+        `${person.name} chuckled warmly, patting your hand and passing you ${window.formatMoney(amount, character.countryCode)}: "A grandchild of mine should never have empty pockets."`
+      ];
+    } else {
+      responses = [
+        `${person.name} counted out ${window.formatMoney(amount, character.countryCode)} from their weekly wage: "Here. Spend it carefully, money doesn't come easily."`,
+        `${person.name} smiled gently, handing you ${window.formatMoney(amount, character.countryCode)}: "Make sure you save a little of it."`,
+        `Seeing how polite you were, ${person.name} handed you ${window.formatMoney(amount, character.countryCode)} with a nod.`
+      ];
+    }
 
     const message = window.getRandomElement(responses);
     return {
@@ -501,12 +577,18 @@ function askForMoney(person, character, requestedAmount = null) {
     const relLoss = baseUSD > 150 ? 6 : 3;
     person.relationship = Math.max(0, person.relationship - relLoss);
 
-    const refusals = [
-      `"${person.name} frowned at the request for ${window.formatMoney(amount, character.countryCode)}: 'Money doesn't grow on copper pipes. Absolutely not.'"`,
-      `"${person.name} shook their head: 'You need to learn financial restraint. I cannot give you that much.'"`,
-      `"${person.name} sighed, showing you an unpaid utility bill: 'Times are tight right now. You'll have to manage without.'"`,
-      `"${person.name} crossed their arms: '${window.formatMoney(amount, character.countryCode)}?! Do you think I'm made of cash? Go find chores to do.'"`
-    ];
+    let refusals = [];
+    if (kinWealth === 'modest' || (person.salaryUSD && person.salaryUSD <= 35000)) {
+      refusals = [
+        `"${person.name} showed you the envelope of unpaid rent: 'On my ${person.occupation} wage, we barely cover the heating oil this month. I don't have ${window.formatMoney(amount, character.countryCode)} to spare.'"`
+      ];
+    } else {
+      refusals = [
+        `"${person.name} frowned at the request for ${window.formatMoney(amount, character.countryCode)}: 'Money doesn't grow on copper pipes. Absolutely not.'"`,
+        `"${person.name} shook their head: 'You need to learn financial restraint. I cannot give you that much.'"`,
+        `"${person.name} crossed their arms: '${window.formatMoney(amount, character.countryCode)}?! Do you think I'm made of cash? Go find chores to do.'"`
+      ];
+    }
 
     const message = window.getRandomElement(refusals);
     return {
@@ -518,6 +600,147 @@ function askForMoney(person, character, requestedAmount = null) {
     };
   }
 }
+
+// --- Differentiated Relationship Actions ---
+
+function applyKinStatEffect(character, stat, amount) {
+  if (!character) return;
+  if (character.stats) {
+    character.stats[stat] = Math.max(0, Math.min(100, (character.stats[stat] || 50) + amount));
+  }
+  if (typeof character[stat] === 'number') {
+    character[stat] = Math.max(0, Math.min(100, character[stat] + amount));
+  }
+}
+
+// 1. PARENTS: Ask for Life Advice & Moral Guidance
+function askAdviceFromParent(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only ask life advice from a parent." };
+  }
+  const count = getActionCount(person, 'askedAdvice');
+  if (count >= 5) {
+    return { success: false, reason: "Your parent has given you all the advice they can for this year!" };
+  }
+  person.actionsDone.askedAdvice = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 6;
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  const adviceList = [
+    `"${person.name} took a sip of black coffee and advised: 'In this city, never sign a document you haven't read thrice by daylight. And stay clear of the old aqueducts after sundown.' (+Smarts, +Sanity)"`,
+    `"${person.name} placed a comforting hand on your shoulder: 'People will test your boundaries. Keep your ledger balanced and your door bolted.' (+Smarts, +Closeness)"`,
+    `"${person.name} looked into the dim street outside: 'Trust is hard-won and easily shattered. Stand tall, no matter what shadows whisper.' (+Sanity, +Closeness)"`
+  ];
+
+  applyKinStatEffect(character, 'smarts', 3);
+  applyKinStatEffect(character, 'sanity', 3);
+
+  return {
+    success: true,
+    title: `Parental Advice from ${person.name}`,
+    message: window.getRandomElement(adviceList),
+    effects: { relationship: relGain, smarts: 3, sanity: 3 }
+  };
+}
+
+// 2. SIBLINGS: Play & Bicker / Friendly Rivalry
+function bickerWithSibling(person, character) {
+  if (!person.role.includes('Brother') && !person.role.includes('Sister')) {
+    return { success: false, reason: "You can only roughhouse or bicker with your siblings." };
+  }
+  const count = getActionCount(person, 'bickered');
+  if (count >= 5) {
+    return { success: false, reason: "You've exhausted yourselves bickering for this year!" };
+  }
+  person.actionsDone.bickered = count + 1;
+
+  const roll = Math.random();
+  if (roll < 0.65) {
+    // Playful tussle
+    const relGain = Math.floor(Math.random() * 4) + 4;
+    person.relationship = Math.min(100, person.relationship + relGain);
+    applyKinStatEffect(character, 'vitality', 2);
+    applyKinStatEffect(character, 'happiness', 4);
+    return {
+      success: true,
+      title: `Wrestled with ${person.name}`,
+      message: `You and your ${person.role.toLowerCase()} ${person.name} got into an energetic pillow fight in the hallway, laughing breathlessly (+${relGain}% Closeness, +Vitality, +Happiness).`,
+      effects: { relationship: relGain, vitality: 2, happiness: 4 }
+    };
+  } else {
+    // Minor argument
+    const relLoss = Math.floor(Math.random() * 4) + 4;
+    person.relationship = Math.max(0, person.relationship - relLoss);
+    return {
+      success: true,
+      title: `Sibling Spat`,
+      message: `You and ${person.name} fought over who got the bigger slice of pie, sulking in separate corners for an hour (-${relLoss}% Closeness).`,
+      effects: { relationship: -relLoss, happiness: -2 }
+    };
+  }
+}
+
+// 2b. SIBLINGS: Share a Dark Secret
+function shareSecretWithSibling(person, character) {
+  if (!person.role.includes('Brother') && !person.role.includes('Sister')) {
+    return { success: false, reason: "You can only share clandestine childhood secrets with siblings." };
+  }
+  const count = getActionCount(person, 'sharedSecret');
+  if (count >= 4) {
+    return { success: false, reason: "You've whispered all your darkest secrets to each other for now." };
+  }
+  person.actionsDone.sharedSecret = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  let message = "";
+  const effects = { relationship: relGain, happiness: 4 };
+
+  if (person.entityType !== 'human') {
+    applyKinStatEffect(character, 'occult', 5);
+    effects.occult = 5;
+    message = `Under the blankets with a flashlight, your ${person.role.toLowerCase()} ${person.name} whispered: 'Promise not to tell mom, but I can hear what the crows say when they roost on the chimney.' (+${relGain}% Closeness, +Occult).`;
+  } else {
+    message = `Under the covers with a flashlight, you and ${person.name} confessed your deepest childhood fears and swore a solemn pact of loyalty (+${relGain}% Closeness, +Happiness).`;
+  }
+
+  return {
+    success: true,
+    title: `Shared Secret with ${person.name}`,
+    message,
+    effects
+  };
+}
+
+// 3. GRANDPARENTS: Listen to Grim Folktales & Family Lore
+function listenGrandparentFolktale(person, character) {
+  if (!person.role.includes('Grand')) {
+    return { success: false, reason: "Only grandparents possess centuries of ancestral lore and grim folktales." };
+  }
+  const count = getActionCount(person, 'listenedFolktale');
+  if (count >= 5) {
+    return { success: false, reason: `${person.name} has grown drowsy by the fire and needs to rest.` };
+  }
+  person.actionsDone.listenedFolktale = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'occult', 5);
+  applyKinStatEffect(character, 'sanity', 2);
+
+  const tales = [
+    `"${person.name} stoked the hearth and recounted the Great Fog of 1952: 'The street lamps went green, and those who answered the midnight knocks were never heard from again.' (+Occult, +Closeness)"`,
+    `"${person.name} drew an ancient protective sigil in flour on the tabletop: 'Our ancestors carried this mark across the sea. It keeps the hollow entities from crossing the door frame.' (+Occult, +Sanity)"`,
+    `"${person.name} unlatched an antique cedar music box: 'Listen closely to the third chime. That melody was taught to our great-grandmother by a woman who walked out of the lake.' (+Occult, +Closeness)"`
+  ];
+
+  return {
+    success: true,
+    title: `Ancient Lore from ${person.name}`,
+    message: window.getRandomElement(tales),
+    effects: { relationship: relGain, occult: 5, sanity: 2 }
+  };
+}
+
 
 function argueWithKin(person, character) {
   const count = getActionCount(person, 'argued');
@@ -836,3 +1059,9 @@ window.cuddleKin = cuddleKin;
 window.babbleToKin = babbleToKin;
 window.feedMilkFromKin = feedMilkFromKin;
 window.peekabooWithKin = peekabooWithKin;
+window.askAdviceFromParent = askAdviceFromParent;
+window.bickerWithSibling = bickerWithSibling;
+window.shareSecretWithSibling = shareSecretWithSibling;
+window.listenGrandparentFolktale = listenGrandparentFolktale;
+window.PARENT_OCCUPATIONS_DATA = PARENT_OCCUPATIONS_DATA;
+window.HOUSEHOLD_RESIDENCES = HOUSEHOLD_RESIDENCES;

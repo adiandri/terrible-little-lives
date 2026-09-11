@@ -634,6 +634,176 @@ const ACTIVITIES_LIST = [
       };
     }
   },
+  // ==========================================
+  // COMPANIONS & PET ADOPTION / SUMMONING
+  // ==========================================
+  {
+    id: "manage_pets_activity",
+    name: "Pet Shelter & Familiar Circle",
+    category: "leisure",
+    icon: "paw-print",
+    minAge: 4,
+    maxAge: 120,
+    maxPerYear: 99,
+    desc: "Adopt a loyal shelter companion, or summon an otherworldly familiar from the shadow veil.",
+    isPetTrigger: true,
+    run: (character) => {
+      return { success: true, isPetTrigger: true };
+    }
+  },
+  // ==========================================
+  // EXPANDED SUPERNATURAL & OCCULT ACTIVITIES
+  // ==========================================
+  {
+    id: "radio_static_listening",
+    name: "Stare into Radio Static & White Noise",
+    category: "forbidden",
+    icon: "radio",
+    minAge: 3,
+    maxAge: 120,
+    maxPerYear: 5,
+    desc: "Tune an analog vacuum-tube radio between AM frequencies late at night, listening for rhythmic whispers.",
+    run: (character, attemptIndex = 0) => {
+      const occGain = attemptIndex === 0 ? 5 : 3;
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + occGain);
+      character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 2);
+
+      const snippets = [
+        "Through the hiss of cosmic static, a distorted voice read out three coordinates that match your municipal reservoir.",
+        "The green tuning eye tube flared bright violet. A low voice spoke your middle name three times backwards.",
+        "Static resolved into the faint, melancholy singing of a choir recorded seventy years ago."
+      ];
+
+      return {
+        success: true,
+        title: "Voices in the White Noise",
+        message: `${window.getRandomElement(snippets)} (+${occGain}% Occult, -2% Sanity).`,
+        effects: { occult: occGain, sanity: -2 }
+      };
+    }
+  },
+  {
+    id: "explore_crawlspace",
+    name: "Explore Basement Crawlspace & Floorboards",
+    category: "forbidden",
+    icon: "eye",
+    minAge: 4,
+    maxAge: 16,
+    maxPerYear: 4,
+    desc: "Squeeze with a flashlight into the dark dirt crawlspace beneath the foundation.",
+    run: (character, attemptIndex = 0) => {
+      const occGain = 4;
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + occGain);
+      const effects = { occult: occGain };
+
+      const roll = Math.random();
+      let body = "";
+      if (roll < 0.35) {
+        const foundMoney = Math.floor(Math.random() * 20) + 10;
+        character.money = (character.money || 0) + foundMoney;
+        effects.money = foundMoney;
+        body = `In an old glass canning jar hidden behind a brick pier, you found $${foundMoney} in forgotten currency!`;
+      } else if (roll < 0.65) {
+        character.shillings = (character.shillings || 0) + 2;
+        effects.shillings = 2;
+        body = `Wedged between the copper water pipe and dry-rot timbers, you pried loose 2 antique silver shillings stamped with an unblinking eye!`;
+      } else {
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 3);
+        effects.sanity = -3;
+        body = `You found strange geometric chalk carvings on the joists directly beneath your parents' bedroom. When you touched them, they felt warm as feverish skin.`;
+      }
+
+      return {
+        success: true,
+        title: "Foundation Secrets",
+        message: `${body} (+${occGain}% Occult).`,
+        effects
+      };
+    }
+  },
+  {
+    id: "graveyard_moth_hunt",
+    name: "Hunt Crypt Moths at Cemetery Gates",
+    category: "forbidden",
+    icon: "sparkles",
+    minAge: 6,
+    maxAge: 120,
+    maxPerYear: 4,
+    desc: "Creep to the iron gates of the municipal graveyard at dusk to capture glowing violet moths.",
+    run: (character, attemptIndex = 0) => {
+      const occGain = 4;
+      const hapGain = 3;
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + occGain);
+      character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + hapGain);
+
+      let body = "You chased luminescent moths fluttering among damp gravestones, trapping two iridescent specimens inside a punctured mason jar.";
+      const effects = { occult: occGain, happiness: hapGain };
+
+      if (Math.random() < 0.3 && (!character.pets || character.pets.length < 3)) {
+        // Chance to attract a Gloom Moth pet!
+        character.pets = character.pets || [];
+        const mothPet = {
+          id: 'pet_moth_' + Date.now(),
+          name: "Vesper",
+          species: "Gloom Moth Swarm in a Jar",
+          category: "supernatural",
+          icon: "sparkles",
+          age: 0,
+          maxAge: 25,
+          alive: true,
+          health: 90,
+          affection: 80,
+          hunger: 10,
+          supernaturalBond: 70,
+          costLocal: 0,
+          costShillings: 0,
+          annualCostLocal: 10,
+          desc: "A cluster of iridescent violet moths trapped within an antique apothecary jar.",
+          quirk: "Glows with soft violet luminescence when someone lies in the room.",
+          omen: "The moths arranged themselves into an eye silhouette against the curved glass.",
+          actionsDone: { fed: 0, petted: 0, walked: 0, communed: 0, vet: 0 }
+        };
+        character.pets.push(mothPet);
+        body += " The moths chose to remain with you as a bonded supernatural familiar!";
+      }
+
+      return {
+        success: true,
+        title: "Graveyard Catch",
+        message: `${body} (+${occGain}% Occult, +${hapGain}% Happiness).`,
+        effects
+      };
+    }
+  },
+  {
+    id: "midnight_seance",
+    name: "Hold a Midnight Candlelight Séance",
+    category: "forbidden",
+    icon: "flame",
+    minAge: 10,
+    maxAge: 120,
+    maxPerYear: 3,
+    desc: "Drape a table in dark velvet, light black tallow tapers, and invoke the names of past residents.",
+    run: (character, attemptIndex = 0) => {
+      const occGain = attemptIndex === 0 ? 8 : 4;
+      const sanLoss = attemptIndex === 0 ? 4 : 2;
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + occGain);
+      character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - sanLoss);
+
+      const manifestations = [
+        "The candle flames flattened into cold blue needles. The glass planchette moved smoothly, spelling out the year your town will drown.",
+        "A sudden frost coated the window panes. A knocking pattern resonated from inside the chimney flue.",
+        "Your shadow detached from your feet for three seconds, bowing to the empty fireplace before snapping back."
+      ];
+
+      return {
+        success: true,
+        title: "Séance Manifestation",
+        message: `${window.getRandomElement(manifestations)} (+${occGain}% Occult, -${sanLoss}% Sanity).`,
+        effects: { occult: occGain, sanity: -sanLoss }
+      };
+    }
+  },
   {
     id: "dark_altar_activity",
     name: "The Dark Altar (Paranormal Transgressions)",
@@ -649,6 +819,7 @@ const ACTIVITIES_LIST = [
     }
   }
 ];
+
 
 function performActivity(activityId, character) {
   if (!character.actionsLeft || character.actionsLeft <= 0) {

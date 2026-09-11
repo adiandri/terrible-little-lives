@@ -261,6 +261,10 @@ class TerribleGame {
       btnKinTribute: document.getElementById('btn-kin-tribute'),
       btnKinArgue: document.getElementById('btn-kin-argue'),
       btnKinHex: document.getElementById('btn-kin-hex'),
+      btnKinAdvice: document.getElementById('btn-kin-advice'),
+      btnKinBicker: document.getElementById('btn-kin-bicker'),
+      btnKinSecret: document.getElementById('btn-kin-secret'),
+      btnKinFolktale: document.getElementById('btn-kin-folktale'),
 
       // Activities Modal
       btnTabActivities: document.getElementById('btn-tab-activities'),
@@ -323,6 +327,23 @@ class TerribleGame {
       feedbackBody: document.getElementById('feedback-body'),
       feedbackPills: document.getElementById('feedback-pills'),
       btnCloseFeedback: document.getElementById('btn-close-feedback'),
+
+      // Action Choice Modal
+      actionChoiceModal: document.getElementById('action-choice-modal'),
+      btnCancelActionChoice: document.getElementById('btn-cancel-action-choice'),
+
+      // Pets Modals
+      petsModal: document.getElementById('pets-modal'),
+      btnClosePetsModal: document.getElementById('btn-close-pets-modal'),
+      btnCancelPets: document.getElementById('btn-cancel-pets'),
+      petDetailModal: document.getElementById('pet-detail-modal'),
+      btnClosePetDetail: document.getElementById('btn-close-pet-detail'),
+      btnBackPetDetail: document.getElementById('btn-back-pet-detail'),
+      btnPetFeed: document.getElementById('btn-pet-feed'),
+      btnPetCuddle: document.getElementById('btn-pet-cuddle'),
+      btnPetStroll: document.getElementById('btn-pet-stroll'),
+      btnPetCommune: document.getElementById('btn-pet-commune'),
+      btnPetVet: document.getElementById('btn-pet-vet'),
 
       // Dynamic Occupation Tab
       occupationTabIcon: document.getElementById('occupation-tab-icon'),
@@ -820,8 +841,58 @@ class TerribleGame {
         this.openDarkAltarModal(target);
       });
     }
+    if (this.dom.btnKinAdvice) {
+      this.dom.btnKinAdvice.addEventListener('click', () => this.handleKinAction('parent_advice'));
+    }
+    if (this.dom.btnKinBicker) {
+      this.dom.btnKinBicker.addEventListener('click', () => this.handleKinAction('sibling_bicker'));
+    }
+    if (this.dom.btnKinSecret) {
+      this.dom.btnKinSecret.addEventListener('click', () => this.handleKinAction('sibling_secret'));
+    }
+    if (this.dom.btnKinFolktale) {
+      this.dom.btnKinFolktale.addEventListener('click', () => this.handleKinAction('grandparent_folktale'));
+    }
 
-    // Dark Altar Modal Controls
+    // Action Choice Modal Controls
+    if (this.dom.btnCancelActionChoice) {
+      this.dom.btnCancelActionChoice.addEventListener('click', () => this.closeActionChoiceModal());
+    }
+
+    // Pet Modal & Pet Interaction Controls
+    if (this.dom.btnClosePetsModal) {
+      this.dom.btnClosePetsModal.addEventListener('click', () => this.closePetsModal());
+    }
+    if (this.dom.btnCancelPets) {
+      this.dom.btnCancelPets.addEventListener('click', () => this.closePetsModal());
+    }
+    if (this.dom.btnClosePetDetail) {
+      this.dom.btnClosePetDetail.addEventListener('click', () => this.closePetDetailModal());
+    }
+    if (this.dom.btnBackPetDetail) {
+      this.dom.btnBackPetDetail.addEventListener('click', () => this.closePetDetailModal());
+    }
+    if (this.dom.btnPetFeed) {
+      this.dom.btnPetFeed.addEventListener('click', () => this.handlePetAction('feed'));
+    }
+    if (this.dom.btnPetCuddle) {
+      this.dom.btnPetCuddle.addEventListener('click', () => this.handlePetAction('cuddle'));
+    }
+    if (this.dom.btnPetStroll) {
+      this.dom.btnPetStroll.addEventListener('click', () => this.handlePetAction('stroll'));
+    }
+    if (this.dom.btnPetCommune) {
+      this.dom.btnPetCommune.addEventListener('click', () => this.handlePetAction('commune'));
+    }
+    if (this.dom.btnPetVet) {
+      this.dom.btnPetVet.addEventListener('click', () => this.handlePetAction('vet'));
+    }
+    document.querySelectorAll('.pet-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = e.currentTarget.dataset.tab || 'mundane';
+        this.filterPetAdoptions(tab);
+      });
+    });
     if (this.dom.btnCloseDarkAltar) {
       this.dom.btnCloseDarkAltar.addEventListener('click', () => this.closeDarkAltarModal());
     }
@@ -1315,6 +1386,12 @@ class TerribleGame {
       currentYearLog.entries.push(window.getRandomElement(kinVignettes));
     }
 
+    // 4a. Pets & Companions Simulation (Aging, upkeep, hunger, illness, eerie omens)
+    if (window.tickPetsYear) {
+      const petLogs = window.tickPetsYear(this.character) || [];
+      petLogs.forEach(pl => currentYearLog.entries.push(pl));
+    }
+
     // 4b. Paranormal Curses & Hex Progressions
     if (window.tickAnnualCurses) {
       const curseLogs = window.tickAnnualCurses(this.character) || [];
@@ -1720,9 +1797,33 @@ class TerribleGame {
     if (!this.character.kin) {
       this.character.kin = window.generateFamily(this.character);
     }
+    this.updateFamilyResidenceUI();
     this.dom.kinModal.classList.remove('hidden');
     this.dom.kinModal.style.display = 'flex';
     this.renderKinList(this.activeKinFilter);
+  }
+
+  updateFamilyResidenceUI() {
+    const kin = this.character.kin;
+    if (!kin) return;
+    const res = kin.residence;
+    const wealthBadge = document.getElementById('family-wealth-badge');
+    const resName = document.getElementById('residence-name');
+    const resDesc = document.getElementById('residence-desc');
+    const famIncome = document.getElementById('family-income-val');
+    
+    if (wealthBadge && kin.wealthTier) {
+      wealthBadge.textContent = kin.wealthTier.replace('_', ' ').toUpperCase();
+    }
+    if (res && resName) {
+      resName.textContent = res.name || 'Family Home';
+    }
+    if (res && resDesc) {
+      resDesc.textContent = res.desc || '';
+    }
+    if (famIncome && kin.householdIncomeUSD !== undefined) {
+      famIncome.textContent = `~$${kin.householdIncomeUSD.toLocaleString()} / yr`;
+    }
   }
 
   closeKinModal() {
@@ -1734,9 +1835,9 @@ class TerribleGame {
     this.activeKinFilter = filter;
     this.dom.kinFilterBtns.forEach(btn => {
       if (btn.dataset.filter === filter) {
-        btn.className = "kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all";
+        btn.className = "kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all";
       } else {
-        btn.className = "kin-filter-btn flex-1 py-1 text-[11px] font-mono rounded-md text-dust hover:text-parchment transition-all";
+        btn.className = "kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all";
       }
     });
     this.renderKinList(filter);
@@ -1759,6 +1860,10 @@ class TerribleGame {
 
   renderKinList(filter = 'all') {
     this.dom.kinList.innerHTML = '';
+    if (filter === 'pets') {
+      this.renderPetsList();
+      return;
+    }
     const all = this.getAllKinList();
     const filtered = all.filter(p => {
       if (filter === 'family') return p.category === 'family';
@@ -1908,7 +2013,7 @@ class TerribleGame {
         <div>
           <h4 class="font-serif font-bold text-sm text-parchment">${person.name}</h4>
           <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age}</p>
-          ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5">Employed: ${person.occupation}</p>` : ''}
+          ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5">Employed: ${person.occupation} ${person.salaryUSD ? `<span class="text-emerald-400 font-bold not-italic">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
         </div>
         <div class="text-right">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
@@ -1983,7 +2088,10 @@ class TerribleGame {
     const age = this.character.age;
     const isInfantToddler = age <= 4;
     const isFamily = person.category === 'family';
-    const isParentOrGrand = person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Grand');
+    const isParent = person.role.includes('Father') || person.role.includes('Mother');
+    const isSibling = person.role.includes('Brother') || person.role.includes('Sister') || person.role.includes('Sibling');
+    const isGrand = person.role.includes('Grand');
+    const isParentOrGrand = isParent || isGrand;
 
     // 1. Cuddle & Be Held (Ages 0 - 4, Family)
     if (this.dom.btnKinCuddle) {
@@ -2104,6 +2212,71 @@ class TerribleGame {
       setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
     }
 
+    // Differentiated Actions:
+    // 1. Parent Only: Ask Life Advice
+    if (this.dom.btnKinAdvice) {
+      if (!isParent) {
+        this.dom.btnKinAdvice.classList.add('hidden');
+        this.dom.btnKinAdvice.style.display = 'none';
+      } else if (age < 5) {
+        this.dom.btnKinAdvice.classList.remove('hidden');
+        this.dom.btnKinAdvice.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinAdvice, "Ask Life Advice", "Too young to seek worldly counsel (Unlocks at Age 5).", 5);
+      } else {
+        this.dom.btnKinAdvice.classList.remove('hidden');
+        this.dom.btnKinAdvice.style.display = 'flex';
+        setupBtn(this.dom.btnKinAdvice, getCount('askedAdvice'), 5, "Seek guidance on morals, careers, or strange household rules. (1 Action)", "Sufficient advice received for this year (5/5).");
+      }
+    }
+
+    // 2. Sibling Only: Play & Bicker
+    if (this.dom.btnKinBicker) {
+      if (!isSibling) {
+        this.dom.btnKinBicker.classList.add('hidden');
+        this.dom.btnKinBicker.style.display = 'none';
+      } else if (age < 3) {
+        this.dom.btnKinBicker.classList.remove('hidden');
+        this.dom.btnKinBicker.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinBicker, "Play Games & Bicker", "Too young to play competitive games (Unlocks at Age 3).", 3);
+      } else {
+        this.dom.btnKinBicker.classList.remove('hidden');
+        this.dom.btnKinBicker.style.display = 'flex';
+        setupBtn(this.dom.btnKinBicker, getCount('bickered'), 6, "Wrestle over toys, race in the corridor, or trade petty barbs. (1 Action)", "Tired of sibling bickering for this year (6/6).");
+      }
+    }
+
+    // 3. Sibling Only: Share Dark Secret
+    if (this.dom.btnKinSecret) {
+      if (!isSibling) {
+        this.dom.btnKinSecret.classList.add('hidden');
+        this.dom.btnKinSecret.style.display = 'none';
+      } else if (age < 5) {
+        this.dom.btnKinSecret.classList.remove('hidden');
+        this.dom.btnKinSecret.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinSecret, "Share Dark Secret", "Too young to harbor or whisper dark secrets (Unlocks at Age 5).", 5);
+      } else {
+        this.dom.btnKinSecret.classList.remove('hidden');
+        this.dom.btnKinSecret.style.display = 'flex';
+        setupBtn(this.dom.btnKinSecret, getCount('sharedSecret'), 4, "Whisper a forbidden confession or occult sighting under blankets. (1 Action)", "No more secrets left to share this year (4/4).");
+      }
+    }
+
+    // 4. Grandparents Only: Listen to Grim Folktale
+    if (this.dom.btnKinFolktale) {
+      if (!isGrand) {
+        this.dom.btnKinFolktale.classList.add('hidden');
+        this.dom.btnKinFolktale.style.display = 'none';
+      } else if (age < 4) {
+        this.dom.btnKinFolktale.classList.remove('hidden');
+        this.dom.btnKinFolktale.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinFolktale, "Listen to Grim Folktale", "Too young to comprehend ancient folk allegories (Unlocks at Age 4).", 4);
+      } else {
+        this.dom.btnKinFolktale.classList.remove('hidden');
+        this.dom.btnKinFolktale.style.display = 'flex';
+        setupBtn(this.dom.btnKinFolktale, getCount('folktale'), 5, "Huddle close as they recount unsettling ancestral warnings and lore. (1 Action)", "Listened to enough grim folktales for this year (5/5).");
+      }
+    }
+
     // Paranormal Hex / Dark Deed Action (Available Age 6+)
     if (this.dom.btnKinHex) {
       if (age < 6) {
@@ -2178,9 +2351,18 @@ class TerribleGame {
     } else if (actionType === 'babble') {
       result = window.babbleToKin(person, this.character);
     } else if (actionType === 'feed_milk') {
-      result = window.feedMilkFromKin(person, this.character);
+      this.triggerFeedMilkChoice(person);
+      return;
     } else if (actionType === 'peekaboo') {
       result = window.peekabooWithKin(person, this.character);
+    } else if (actionType === 'parent_advice') {
+      result = window.askAdviceFromParent ? window.askAdviceFromParent(person, this.character) : null;
+    } else if (actionType === 'sibling_bicker') {
+      result = window.bickerWithSibling ? window.bickerWithSibling(person, this.character) : null;
+    } else if (actionType === 'sibling_secret') {
+      result = window.shareSecretWithSibling ? window.shareSecretWithSibling(person, this.character) : null;
+    } else if (actionType === 'grandparent_folktale') {
+      result = window.listenGrandparentFolktale ? window.listenGrandparentFolktale(person, this.character) : null;
     }
 
     if (!result || !result.success) {
@@ -2772,6 +2954,590 @@ class TerribleGame {
       this.dom.kinFeedbackModal.style.display = 'none';
     }
     this.checkPendingSchoolChoice();
+  }
+
+  // ==========================================
+  // ACTION CHOICE INTERACTIVE POPUP MODAL
+  // ==========================================
+
+  openActionChoiceModal(config) {
+    const modal = this.dom.actionChoiceModal || document.getElementById('action-choice-modal');
+    if (!modal) return;
+
+    const iconEl = document.getElementById('action-choice-icon');
+    const titleEl = document.getElementById('action-choice-title');
+    const promptEl = document.getElementById('action-choice-prompt');
+    const optionsContainer = document.getElementById('action-choice-options');
+
+    if (iconEl && config.icon) {
+      iconEl.setAttribute('data-lucide', config.icon);
+    }
+    if (titleEl) titleEl.textContent = config.title || 'Decision';
+    if (promptEl) promptEl.textContent = config.prompt || '';
+
+    if (optionsContainer) {
+      optionsContainer.innerHTML = '';
+      (config.choices || []).forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3 rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all';
+        btn.innerHTML = `
+          <div class="min-w-0 pr-2">
+            <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">${choice.label}</div>
+            <div class="text-[10px] text-dust">${choice.desc || ''}</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 shrink-0"></i>
+        `;
+        btn.addEventListener('click', () => {
+          this.closeActionChoiceModal();
+          if (choice.action) choice.action();
+        });
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  closeActionChoiceModal() {
+    const modal = this.dom.actionChoiceModal || document.getElementById('action-choice-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
+  }
+
+  triggerFeedMilkChoice(person) {
+    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+    this.openActionChoiceModal({
+      icon: 'cup-soda',
+      title: 'Warm Milk Formula',
+      prompt: `${person.name} tilts a warm bottle toward your cradle with a quiet, watchful gaze. How do you feed?`,
+      choices: [
+        {
+          label: 'Drink Sweet Honey Milk',
+          desc: 'Drink contentedly and burp with satisfaction. (+Happiness, +Health, +Bond)',
+          action: () => {
+            this.handleDirectCustomAction(person, {
+              name: 'Drank Sweet Milk',
+              message: `You greedily suckled the warm sweet milk formula from ${person.name}. Comfort spreads through your small limbs.`,
+              effects: { happiness: 10, health: 5, relationship: 8 }
+            });
+          }
+        },
+        {
+          label: 'Sip Bitter Valerian Herb Blend',
+          desc: 'A calming medicinal brew that quiets night terrors. (+Sanity, +Health)',
+          action: () => {
+            this.handleDirectCustomAction(person, {
+              name: 'Drank Bitter Valerian',
+              message: `You grimaced at the earthy valerian root tea, but the herbal draught stills your racing pulse and soothes bad dreams.`,
+              effects: { sanity: 12, health: 6, relationship: 4 }
+            });
+          }
+        },
+        {
+          label: 'Whisper Backwards into the Bottle',
+          desc: 'Blow unholy bubbles and chant into the teat. (+Occult, -Sanity, -Bond)',
+          action: () => {
+            this.handleDirectCustomAction(person, {
+              name: 'Occult Milk Bubbles',
+              message: `You blew rhythmic air bubbles backward into the glass bottle, murmuring in reverse cadence. The milk turned faintly violet for a second.`,
+              effects: { occult: 8, sanity: -6, relationship: -3 }
+            });
+          }
+        }
+      ]
+    });
+  }
+
+  handleDirectCustomAction(person, actionDef) {
+    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+    this.character.actionsLeft -= 1;
+
+    if (!person.actionCounts) person.actionCounts = {};
+    person.actionCounts.fedMilk = (person.actionCounts.fedMilk || 0) + 1;
+
+    if (actionDef.effects) {
+      for (const [stat, val] of Object.entries(actionDef.effects)) {
+        if (stat === 'relationship') {
+          person.relationship = Math.max(0, Math.min(100, person.relationship + val));
+        } else if (stat === 'money') {
+          this.character.money = Math.max(0, this.character.money + val);
+        } else if (stat === 'shillings') {
+          this.character.shillings = Math.max(0, this.character.shillings + val);
+        } else {
+          this.modifyStat(stat, val);
+        }
+      }
+    }
+
+    if (actionDef.effects && actionDef.effects.occult) {
+      window.soundEngine.playDread();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${person.name}] ${actionDef.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+    this.renderKinDetail(person);
+    this.renderKinList(this.activeKinFilter);
+
+    this.openFeedbackModal({
+      tag: "FEEDING MOMENT",
+      title: actionDef.name,
+      icon: "cup-soda",
+      iconColor: actionDef.effects && actionDef.effects.occult ? "text-purple-400" : "text-amber-400",
+      body: actionDef.message,
+      effects: actionDef.effects
+    });
+  }
+
+  // ==========================================
+  // PETS & FAMILIARS SYSTEM
+  // ==========================================
+
+  renderPetsList() {
+    this.dom.kinList.innerHTML = '';
+    const pets = this.character.pets || [];
+
+    // Header Action to Adopt or Summon
+    const adoptBanner = document.createElement('button');
+    adoptBanner.className = 'w-full text-left p-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all mb-2';
+    adoptBanner.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+          <i data-lucide="paw-print" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Adopt or Summon Companion</div>
+          <div class="text-[10px] text-dust">Visit municipal shelter or bind an occult familiar entity.</div>
+        </div>
+      </div>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+    `;
+    adoptBanner.addEventListener('click', () => {
+      window.soundEngine.playClick();
+      this.openPetsModal();
+    });
+    this.dom.kinList.appendChild(adoptBanner);
+
+    if (pets.length === 0) {
+      const emptyCard = document.createElement('div');
+      emptyCard.className = 'text-center py-8 text-dust/70 text-xs italic font-serif bg-inputbg rounded-xl border border-leadborder p-4';
+      emptyCard.innerHTML = `
+        <i data-lucide="ghost" class="w-8 h-8 mx-auto mb-2 text-dust/40"></i>
+        <p>You have no domestic pets or supernatural familiars in your keeping.</p>
+        <p class="text-[10px] text-dust/60 mt-1 font-mono">Click above to visit the shelter or summon a familiar.</p>
+      `;
+      this.dom.kinList.appendChild(emptyCard);
+      if (window.lucide) {
+        try { window.lucide.createIcons(); } catch (e) {}
+      }
+      return;
+    }
+
+    pets.forEach(pet => {
+      const card = document.createElement('div');
+      const isAlive = pet.alive !== false;
+      card.className = `p-3 rounded-xl border transition-all ${
+        isAlive 
+          ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
+          : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
+      }`;
+
+      const typeBadge = pet.type === 'supernatural'
+        ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">🔮 Familiar</span>`
+        : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard text-dust border border-leadborder">Mundane</span>`;
+
+      const healthColor = pet.health > 70 ? 'bg-emerald-500' : (pet.health > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const affColor = pet.affection > 70 ? 'bg-rose-500' : (pet.affection > 35 ? 'bg-amber-500' : 'bg-red-500');
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg ${pet.type === 'supernatural' ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+              <i data-lucide="${pet.icon || 'paw-print'}" class="w-4 h-4"></i>
+            </div>
+            <div class="truncate">
+              <h4 class="font-serif font-bold text-xs text-parchment truncate">${pet.name}</h4>
+              <p class="text-[10px] text-dust font-mono">${pet.species} • Age ${pet.age}</p>
+            </div>
+          </div>
+          <div class="shrink-0 flex items-center space-x-1.5">
+            ${isAlive ? typeBadge : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-500/30">Deceased</span>`}
+            ${isAlive ? `<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-dust/60"></i>` : ''}
+          </div>
+        </div>
+
+        ${isAlive ? `
+          <div class="grid grid-cols-2 gap-2 mt-2 pt-1 border-t border-leadborder/30">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[8px] font-mono text-dust">
+                <span>Health</span>
+                <span class="font-bold text-parchment">${pet.health}%</span>
+              </div>
+              <div class="w-full h-1 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${healthColor} rounded-full" style="width: ${pet.health}%"></div>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[8px] font-mono text-dust">
+                <span>Affection</span>
+                <span class="font-bold text-parchment">${pet.affection}%</span>
+              </div>
+              <div class="w-full h-1 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${affColor} rounded-full" style="width: ${pet.affection}%"></div>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <p class="text-[10px] italic text-dust/80 mt-1">${pet.deathCause || 'Perished.'}</p>
+        `}
+      `;
+
+      if (isAlive) {
+        card.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          this.openPetDetailModal(pet);
+        });
+      }
+
+      this.dom.kinList.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  openPetsModal() {
+    if (!this.character.petsCandidates) {
+      this.refreshPetCandidates();
+    }
+    this.filterPetAdoptions('mundane');
+    this.dom.petsModal.classList.remove('hidden');
+    this.dom.petsModal.style.display = 'flex';
+  }
+
+  closePetsModal() {
+    this.dom.petsModal.classList.add('hidden');
+    this.dom.petsModal.style.display = 'none';
+  }
+
+  refreshPetCandidates() {
+    this.character.petsCandidates = {
+      mundane: [
+        window.generateRandomPet('mundane'),
+        window.generateRandomPet('mundane'),
+        window.generateRandomPet('mundane')
+      ],
+      supernatural: [
+        window.generateRandomPet('supernatural'),
+        window.generateRandomPet('supernatural'),
+        window.generateRandomPet('supernatural')
+      ]
+    };
+  }
+
+  filterPetAdoptions(tab = 'mundane') {
+    const tabs = document.querySelectorAll('.pet-tab-btn');
+    tabs.forEach(btn => {
+      if (btn.dataset.tab === tab) {
+        btn.className = 'pet-tab-btn flex-1 py-1.5 text-xs font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all';
+      } else {
+        btn.className = 'pet-tab-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all';
+      }
+    });
+
+    const listEl = document.getElementById('pets-available-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    if (!this.character.petsCandidates) {
+      this.refreshPetCandidates();
+    }
+
+    const candidates = this.character.petsCandidates[tab] || [];
+
+    candidates.forEach((pet, idx) => {
+      const card = document.createElement('div');
+      card.className = 'p-3.5 rounded-xl bg-inputbg border border-leadborder space-y-2';
+
+      const isOccult = pet.type === 'supernatural';
+      const costText = isOccult ? (pet.costShillings ? `${pet.costShillings} Shillings` : 'Blood Rite / Sanity Toll') : (pet.costUSD ? `$${pet.costUSD} Adoption Fee` : 'Free Adoption');
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-xl ${isOccult ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+              <i data-lucide="${pet.icon || 'paw-print'}" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="font-serif font-bold text-xs text-parchment">${pet.name}</h4>
+              <p class="text-[10px] text-dust font-mono">${pet.species} • Age ${pet.age}</p>
+            </div>
+          </div>
+          <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${isOccult ? 'bg-purple-950/40 text-purple-300 border border-purple-500/30' : 'bg-slatecard text-dust border border-leadborder'}">
+            ${costText}
+          </span>
+        </div>
+
+        <p class="text-[10px] text-dust/90 italic leading-snug">${pet.quirk || ''}</p>
+        ${pet.omen ? `<div class="p-2 rounded bg-ebon/40 border border-leadborder/40 text-[9px] text-purple-300/90 font-mono">👁️ Omen: ${pet.omen}</div>` : ''}
+
+        <button class="btn-adopt-candidate w-full py-2 px-3 rounded-lg ${isOccult ? 'bg-purple-950/60 hover:bg-purple-900/80 border border-purple-700/50 text-purple-200' : 'bg-slatecard hover:bg-cardhover border border-leadborder text-parchment'} font-serif font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]">
+          <i data-lucide="${isOccult ? 'flame' : 'heart'}" class="w-3.5 h-3.5"></i>
+          <span>${isOccult ? 'Bind Familiar' : 'Adopt Companion'}</span>
+        </button>
+      `;
+
+      const adoptBtn = card.querySelector('.btn-adopt-candidate');
+      if (adoptBtn) {
+        adoptBtn.addEventListener('click', () => {
+          this.adoptPet(pet, tab, idx);
+        });
+      }
+
+      listEl.appendChild(card);
+    });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  adoptPet(pet, tab, idx) {
+    if (pet.costUSD && this.character.money < pet.costUSD) {
+      alert(`You do not have enough money ($${pet.costUSD}) to pay this adoption fee!`);
+      return;
+    }
+    if (pet.costShillings && this.character.shillings < pet.costShillings) {
+      alert(`You lack the ${pet.costShillings} Shillings required for this occult binding!`);
+      return;
+    }
+    if (pet.type === 'supernatural' && this.character.occult < 12) {
+      alert(`Your Occult affinity (${this.character.occult}%) is too weak to bind this familiar without losing your mind! (Requires 12% Occult)`);
+      return;
+    }
+
+    if (pet.costUSD) this.character.money -= pet.costUSD;
+    if (pet.costShillings) this.character.shillings -= pet.costShillings;
+
+    if (!this.character.pets) this.character.pets = [];
+    this.character.pets.push(pet);
+
+    // Remove from candidates
+    if (this.character.petsCandidates && this.character.petsCandidates[tab]) {
+      this.character.petsCandidates[tab].splice(idx, 1);
+    }
+
+    if (pet.type === 'supernatural') {
+      window.soundEngine.playDread();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[Companion] Welcomed ${pet.name} (${pet.species}) into your household.`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+    this.closePetsModal();
+    this.renderPetsList();
+
+    this.openFeedbackModal({
+      tag: pet.type === 'supernatural' ? "FAMILIAR BOUND" : "PET ADOPTED",
+      title: `Welcome, ${pet.name}`,
+      icon: pet.icon || 'paw-print',
+      iconColor: pet.type === 'supernatural' ? "text-purple-400" : "text-emerald-400",
+      body: `You brought home ${pet.name} the ${pet.species}. ${pet.quirk || ''}`,
+      effects: { happiness: 8, sanity: pet.type === 'supernatural' ? -3 : 5 }
+    });
+  }
+
+  openPetDetailModal(pet) {
+    this.selectedPet = pet;
+    const modal = this.dom.petDetailModal;
+    if (!modal) return;
+
+    const titleEl = document.getElementById('pet-detail-title');
+    const subtitleEl = document.getElementById('pet-detail-subtitle');
+    const cardEl = document.getElementById('pet-detail-card');
+
+    if (titleEl) titleEl.textContent = pet.name;
+    if (subtitleEl) subtitleEl.textContent = `${pet.species} • Age ${pet.age} • ${pet.type === 'supernatural' ? '🔮 Occult Familiar' : 'Domestic Companion'}`;
+
+    if (cardEl) {
+      const isAlive = pet.alive !== false;
+      const healthColor = pet.health > 70 ? 'bg-emerald-500' : (pet.health > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const affColor = pet.affection > 70 ? 'bg-rose-500' : (pet.affection > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const hungerColor = pet.hunger < 40 ? 'bg-emerald-500' : (pet.hunger < 75 ? 'bg-amber-500' : 'bg-red-500');
+
+      cardEl.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl ${pet.type === 'supernatural' ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+            <i data-lucide="${pet.icon || 'paw-print'}" class="w-6 h-6"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h4 class="font-serif font-bold text-sm text-parchment truncate">${pet.name}</h4>
+            <p class="text-[10px] text-dust font-mono">${pet.species} • ${isAlive ? 'Alive & In Service' : 'Deceased'}</p>
+          </div>
+        </div>
+
+        <p class="text-[10px] text-dust/90 italic pt-1">${pet.quirk || ''}</p>
+        ${pet.omen ? `<div class="p-2 rounded bg-ebon/40 border border-leadborder/40 text-[9px] text-purple-300/90 font-mono">👁️ Supernatural Omen: ${pet.omen}</div>` : ''}
+
+        ${isAlive ? `
+          <div class="space-y-2 pt-2 border-t border-leadborder/40">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] font-mono text-dust">
+                <span>Vital Health</span>
+                <span class="font-bold text-parchment">${pet.health}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${healthColor} rounded-full" style="width: ${pet.health}%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] font-mono text-dust">
+                <span>Affection / Bond</span>
+                <span class="font-bold text-parchment">${pet.affection}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${affColor} rounded-full" style="width: ${pet.affection}%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[9px] font-mono text-dust">
+                <span>Hunger (Lower is Fed)</span>
+                <span class="font-bold text-parchment">${pet.hunger}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${hungerColor} rounded-full" style="width: ${pet.hunger}%"></div>
+              </div>
+            </div>
+
+            ${pet.type === 'supernatural' ? `
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-[9px] font-mono text-purple-300">
+                  <span>Supernatural Resonance</span>
+                  <span class="font-bold">${pet.supernaturalBond || 50}%</span>
+                </div>
+                <div class="w-full h-1.5 bg-purple-950/60 rounded-full overflow-hidden border border-purple-800/30">
+                  <div class="h-full bg-purple-500 rounded-full" style="width: ${pet.supernaturalBond || 50}%"></div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+      `;
+    }
+
+    // Toggle commune button if supernatural
+    if (this.dom.btnPetCommune) {
+      if (pet.type === 'supernatural') {
+        this.dom.btnPetCommune.classList.remove('hidden');
+        this.dom.btnPetCommune.style.display = 'flex';
+      } else {
+        this.dom.btnPetCommune.classList.add('hidden');
+        this.dom.btnPetCommune.style.display = 'none';
+      }
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  closePetDetailModal() {
+    if (this.dom.petDetailModal) {
+      this.dom.petDetailModal.classList.add('hidden');
+      this.dom.petDetailModal.style.display = 'none';
+    }
+    this.renderPetsList();
+  }
+
+  handlePetAction(actionType) {
+    if (!this.selectedPet) return;
+    const pet = this.selectedPet;
+
+    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
+      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      return;
+    }
+
+    let result = null;
+    if (actionType === 'feed') {
+      result = window.feedPet(pet, this.character);
+    } else if (actionType === 'cuddle') {
+      result = window.cuddlePet(pet, this.character);
+    } else if (actionType === 'stroll') {
+      result = window.strollPet(pet, this.character);
+    } else if (actionType === 'commune') {
+      result = window.communeWithPet(pet, this.character);
+    } else if (actionType === 'vet') {
+      result = window.takePetToVet(pet, this.character);
+    }
+
+    if (!result || !result.success) {
+      alert(result ? (result.reason || result.message) : "Could not complete pet action.");
+      return;
+    }
+
+    this.character.actionsLeft -= 1;
+
+    if (result.effects) {
+      for (const [stat, val] of Object.entries(result.effects)) {
+        if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
+        else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
+        else this.modifyStat(stat, val);
+      }
+    }
+
+    if (pet.type === 'supernatural' || actionType === 'commune') {
+      window.soundEngine.playDread();
+    } else {
+      window.soundEngine.playClick();
+    }
+
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[${pet.name}] ${result.message}`);
+    }
+
+    this.renderAll();
+    this.saveGame();
+    this.openPetDetailModal(pet);
+
+    this.openFeedbackModal({
+      tag: "PET CARE OUTCOME",
+      title: `${pet.name}'s Response`,
+      icon: pet.icon || 'paw-print',
+      iconColor: pet.type === 'supernatural' ? 'text-purple-400' : 'text-amber-400',
+      body: result.message,
+      effects: result.effects
+    });
   }
 
   // ==========================================
