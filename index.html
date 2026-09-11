@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=MedievalSharp&family=Nunito:wght@400;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
 
   <!-- Themes Management Engine (Runs synchronously to prevent FOUC) -->
-  <script src="js/themes.js?v=20"></script>
+  <script src="js/themes.js?v=23"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -398,11 +398,22 @@
     [data-mode="light"] .bar-fill-purple { background-color: #7e22ce !important; }
     [data-mode="light"] .bar-fill-amber { background-color: #d97706 !important; }
 
-    /* Light mode modal backdrop softening */
-    [data-mode="light"] #education-modal,
-    [data-mode="light"] #school-person-modal,
-    [data-mode="light"] #dark-altar-modal {
-      background-color: rgba(15, 23, 42, 0.55);
+    /* Full-Screen Modals Solid Opaque Themed Backgrounds (Zero Transparency) */
+    #education-modal,
+    #school-choice-modal,
+    #school-person-modal,
+    #careers-modal,
+    #kin-modal,
+    #kin-detail-modal,
+    #activities-modal,
+    #kin-gift-modal {
+      background-color: var(--bg-card) !important;
+      opacity: 1 !important;
+    }
+
+    #dark-altar-modal {
+      background-color: #07060a !important;
+      opacity: 1 !important;
     }
 
     /* Purple Occult Dilemma Choice & Glyphs */
@@ -2282,16 +2293,16 @@
   </div>
 
   <!-- Scripts with Cache Busting -->
-  <script src="js/audio.js?v=22"></script>
-  <script src="js/avatar.js?v=22"></script>
-  <script src="js/names.js?v=22"></script>
-  <script src="js/careers.js?v=22"></script>
-  <script src="js/gifts.js?v=22"></script>
-  <script src="js/kin.js?v=22"></script>
-  <script src="js/activities.js?v=22"></script>
-  <script src="js/crimes.js?v=22"></script>
-  <script src="js/events.js?v=22"></script>
-  <script src="js/education.js?v=22"></script>
-  <script src="js/game.js?v=22"></script>
+  <script src="js/audio.js?v=23"></script>
+  <script src="js/avatar.js?v=23"></script>
+  <script src="js/names.js?v=23"></script>
+  <script src="js/careers.js?v=23"></script>
+  <script src="js/gifts.js?v=23"></script>
+  <script src="js/kin.js?v=23"></script>
+  <script src="js/activities.js?v=23"></script>
+  <script src="js/crimes.js?v=23"></script>
+  <script src="js/events.js?v=23"></script>
+  <script src="js/education.js?v=23"></script>
+  <script src="js/game.js?v=23"></script>
 </body>
 </html>
