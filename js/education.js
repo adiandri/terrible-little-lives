@@ -12,7 +12,19 @@
       elementary: ["Blackwood Municipal Elementary", "Providence Public Elementary", "Willow Creek Primary", "Hawthorne Grammar School", "St. Jude Elementary"],
       middle: ["Blackwood Middle School", "Arkham Central Junior High", "Dunwich Valley Middle", "Providence Middle School"],
       high: ["Blackwood High School", "Arkham Heights High", "Providence Central High", "Kingsport Regional High"],
-      university: ["Miskatonic Metropolitan University", "Providence State University", "Arkham Technical Institute", "Blackwood College of Fine Arts"]
+      university: ["Miskatonic Metropolitan University", "Providence State University", "Arkham Technical Institute", "Blackwood College of Fine Arts"],
+      private: {
+        kindergarten: ["St. Jude Early Preparatory", "Providence Day School", "Montessori of the Red Valley"],
+        elementary: ["St. Jude Preparatory School", "Providence Latin Grammar", "Briarwood Hall Elementary", "Arkham Country Day School"],
+        middle: ["Briarwood Hall Preparatory", "Providence Collegiate Middle", "St. Jude Classical Academy"],
+        high: ["Briarwood Hall Preparatory", "Kingsport Latin School", "St. Jude Senior Academy", "Arkham Country Day High"]
+      },
+      elite: {
+        kindergarten: ["Vanguard Infant Foundation", "Kingsport Aristocratic Early Academy"],
+        elementary: ["Kingsport Aristocratic Academy", "Vanguard Primary Collegiate", "Founders Hall Preparatory"],
+        middle: ["Kingsport Aristocratic Junior College", "Arkham Vanguard Institute", "The Gilded Spire Academy"],
+        high: ["Kingsport Aristocratic Academy", "Arkham Vanguard Institute", "Miskatonic Fellows Senior Collegiate", "The Gilded Spire Upper School"]
+      }
     },
     IDN: {
       daycare: ["PAUD Kasih Bunda", "Penitipan Anak Bintang Kecil", "Daycare Melati Suci"],
@@ -20,7 +32,19 @@
       elementary: ["SD Negeri 01 Menteng", "SD Swasta Bhakti Pertiwi", "SD Kristen Kasih Mulia", "SD Negeri 04 Pagi"],
       middle: ["SMP Negeri 02 Nusantara", "SMP Swasta Taruna Bakti", "SMP Negeri 15 Pagi"],
       high: ["SMA Negeri 01 Jakarta", "SMA Swasta Tunas Bangsa", "SMK Karya Utama"],
-      university: ["Universitas Negeri Nusantara", "Institut Teknologi Harapan", "Universitas Merdeka Persada"]
+      university: ["Universitas Negeri Nusantara", "Institut Teknologi Harapan", "Universitas Merdeka Persada"],
+      private: {
+        kindergarten: ["TK Islam Al-Azhar", "TK Santo Bellarminus", "TK Kristen Pelita", "Montessori Bintang Cemerlang"],
+        elementary: ["SD Santa Ursula", "SD Islam Terpadu Nurul Fikri", "SD Pelita Harapan", "SD Kanisius"],
+        middle: ["SMP Santa Ursula", "SMP Tarakanita", "SMP Islam Al-Azhar", "SMP Pelita Harapan"],
+        high: ["SMA Kolese Kanisius", "SMA Santa Ursula", "SMA Tarakanita 1", "SMA Labschool"]
+      },
+      elite: {
+        kindergarten: ["Jakarta Intercultural Early Years", "British School Infant Campus", "Menteng Elite Kindergarten"],
+        elementary: ["Jakarta Intercultural Primary", "British School Jakarta Elementary", "Menteng Heritage Academy"],
+        middle: ["Jakarta Intercultural Middle School", "British International Middle", "The Dynasty Academy"],
+        high: ["Jakarta Intercultural Upper School", "British School Jakarta High", "Menteng Aristocratic Institute"]
+      }
     },
     GBR: {
       daycare: ["St. Bartholomew's Creche", "Little Lambs Nursery", "Briarwood Early Years"],
@@ -28,7 +52,19 @@
       elementary: ["Blackfriars Primary School", "St. Jude Church of England School", "Eldritch Green Grammar"],
       middle: ["Wormwood Scrubs Preparatory", "Blackfriars Lower Collegiate", "St. Jude Middle Academy"],
       high: ["Blackfriars Senior Collegiate", "Miskatonic Overseas Academy", "Dunwich Grammar School"],
-      university: ["London Metropolitan Collegiate", "Blackwood Crown University", "St. Jude Medical Institute"]
+      university: ["London Metropolitan Collegiate", "Blackwood Crown University", "St. Jude Medical Institute"],
+      private: {
+        kindergarten: ["St. Dunstan's Preparatory Nursery", "Kensington Day Foundation"],
+        elementary: ["St. Jude Preparatory School", "Kensington Court Grammar", "Westminster Hall Primary"],
+        middle: ["Kensington Preparatory College", "Briarwood Hall Junior Collegiate", "St. Jude Classical School"],
+        high: ["Briarwood Hall Senior Collegiate", "Kensington Grammar College", "St. Dunstan's Senior Hall"]
+      },
+      elite: {
+        kindergarten: ["Eton Heritage Nursery", "The Crown Early Foundation"],
+        elementary: ["Eton Court Primary", "Harrow Heritage Academy", "The Royal Vanguard Preparatory"],
+        middle: ["Harrow Heritage Junior College", "The Royal Vanguard Collegiate", "Eton Crown Academy"],
+        high: ["Eton Crown College", "Harrow Heritage Senior Academy", "The Royal Vanguard Collegiate"]
+      }
     },
     DEFAULT: {
       daycare: ["Little Blossoms Daycare", "St. Jude's Nursery", "Morning Mist Infant Care"],
@@ -36,7 +72,66 @@
       elementary: ["Municipal Primary School", "St. Jude Elementary", "Blackwood Public School"],
       middle: ["District Central Middle School", "Miskatonic Junior Academy"],
       high: ["Metropolitan Senior High", "Blackwood High School", "Arkham Regional High"],
-      university: ["Metropolitan State University", "Miskatonic University", "Central Institute of Arts & Sciences"]
+      university: ["Metropolitan State University", "Miskatonic University", "Central Institute of Arts & Sciences"],
+      private: {
+        kindergarten: ["St. Jude Preparatory Nursery", "Cloverleaf Day Academy"],
+        elementary: ["St. Jude Preparatory School", "Providence Latin School", "Briarwood Academy"],
+        middle: ["Briarwood Junior Collegiate", "Providence Latin Middle School"],
+        high: ["Briarwood Preparatory High", "Providence Latin Academy", "St. Jude Senior Collegiate"]
+      },
+      elite: {
+        kindergarten: ["The Vanguard Foundation", "Aristocratic Early Academy"],
+        elementary: ["The Gilded Spire Primary", "Vanguard Aristocratic Academy"],
+        middle: ["The Gilded Spire Junior College", "Arkham Vanguard Institute"],
+        high: ["The Gilded Spire Senior Academy", "Arkham Vanguard Institute", "Miskatonic Fellows Collegiate"]
+      }
+    }
+  };
+
+  const SCHOOL_TRACKS = {
+    homeschool: {
+      id: 'homeschool',
+      name: 'Homeschooling',
+      icon: 'home',
+      baseCost: 0,
+      badgeClass: 'badge-track-homeschool',
+      badgeColor: 'text-amber-300 bg-amber-950/40 border border-amber-600/30',
+      desc: 'Domestic tutelage and independent study. Sheltered from peer cruelty, preserving sanity and fostering focused esoteric contemplation.',
+      statsBonus: { sanity: 1, occult: 1 },
+      allowedLevels: ['kindergarten', 'elementary', 'middle', 'high']
+    },
+    public: {
+      id: 'public',
+      name: 'Public School',
+      icon: 'school',
+      baseCost: 0,
+      badgeClass: 'badge-track-public',
+      badgeColor: 'text-sky-300 bg-sky-950/40 border border-sky-600/30',
+      desc: 'Free taxpayer-funded municipal education. Diverse student cliques, sports clubs, bustling hallways, and ambient town mysteries.',
+      statsBonus: {},
+      allowedLevels: ['kindergarten', 'elementary', 'middle', 'high']
+    },
+    private: {
+      id: 'private',
+      name: 'Private Preparatory Academy',
+      icon: 'landmark',
+      baseCost: 5000,
+      badgeClass: 'badge-track-private',
+      badgeColor: 'text-emerald-300 bg-emerald-950/40 border border-emerald-600/30',
+      desc: 'Exclusive tuition-funded institution with strict uniforms, disciplined faculty, and high academic expectations.',
+      statsBonus: { smarts: 2 },
+      allowedLevels: ['kindergarten', 'elementary', 'middle', 'high']
+    },
+    elite: {
+      id: 'elite',
+      name: 'Elite Aristocratic Academy',
+      icon: 'castle',
+      baseCost: 25000,
+      badgeClass: 'badge-track-elite',
+      badgeColor: 'text-purple-300 bg-purple-950/40 border border-purple-600/30',
+      desc: 'Prestigious boarding institute populated by high society dynasties and secret esoteric societies.',
+      statsBonus: { smarts: 3, looks: 1, occult: 2 },
+      allowedLevels: ['kindergarten', 'elementary', 'middle', 'high']
     }
   };
 
@@ -133,15 +228,42 @@
   window.getRandomLastName = getRandomLastName;
 
   // --- School Generation ---
-  function getInstitutionName(level, countryCode) {
-    const table = SCHOOL_NAMES[countryCode] || SCHOOL_NAMES.USA || SCHOOL_NAMES.DEFAULT;
-    const list = table[level] || SCHOOL_NAMES.DEFAULT[level] || ["St. Jude Academy"];
+  function getInstitutionName(level, countryCode, schoolType = 'public', character = null) {
+    if (schoolType === 'homeschool') {
+      const familyName = (character && (character.lastName || character.surname)) || "Family";
+      const homeschoolNames = [
+        `${familyName} Home Academy`,
+        `${familyName} Household Tutelage`,
+        `${familyName} Domestic Study Studio`,
+        `Autonomous Classical Home Study`
+      ];
+      return getRandomItem(homeschoolNames);
+    }
+
+    const countryData = SCHOOL_NAMES[countryCode] || SCHOOL_NAMES.USA || SCHOOL_NAMES.DEFAULT;
+    if (schoolType === 'private' && countryData.private) {
+      const privList = countryData.private[level] || countryData.private.elementary || ["St. Jude Preparatory Academy"];
+      return getRandomItem(privList);
+    }
+    if (schoolType === 'elite' && countryData.elite) {
+      const eliteList = countryData.elite[level] || countryData.elite.high || ["Kingsport Aristocratic Academy"];
+      return getRandomItem(eliteList);
+    }
+
+    const list = countryData[level] || SCHOOL_NAMES.DEFAULT[level] || ["St. Jude Academy"];
     return getRandomItem(list);
   }
 
-  function generateClassmates(character, count = 6) {
+  function generateClassmates(character, count = 6, schoolType = 'public') {
     const classmates = [];
-    const cliques = ['Nerds', 'Jocks', 'Goths', 'Loners', 'Populars', 'Oddballs', 'Artists'];
+    let cliques = ['Nerds', 'Jocks', 'Goths', 'Loners', 'Populars', 'Oddballs', 'Artists'];
+    if (schoolType === 'homeschool') {
+      cliques = ['Homeschool Co-Op', 'Neighborhood Friends', 'Bookworms', 'Astronomy Hobbyists', 'Solitary Thinkers'];
+    } else if (schoolType === 'private') {
+      cliques = ['Prep Scions', 'Honor Society', 'Debate Troupe', 'Equestrians', 'Prefects', 'Academic Overachievers'];
+    } else if (schoolType === 'elite') {
+      cliques = ['Old Money Dynasties', 'Secret Fraternities', 'Equestrian Elites', 'Occult Cabalists', 'Aristocrats'];
+    }
 
     for (let i = 0; i < count; i++) {
       const isMale = Math.random() < 0.5;
@@ -173,9 +295,91 @@
     return classmates;
   }
 
-  function generateTeachers(character, level) {
+  function generateTeachers(character, level, schoolType = 'public') {
     const teachers = [];
     const country = character.countryCode;
+
+    if (schoolType === 'homeschool') {
+      const parentList = (character.kin && character.kin.parents) ? character.kin.parents.filter(p => p.alive !== false) : [];
+      let parentName = "Parent-Educator";
+      let parentRel = 75;
+      let parentStrict = 35;
+      if (parentList.length > 0) {
+        const p = parentList[0];
+        parentName = p.name ? `${p.name} (${p.role || 'Parent'})` : "Primary Parent-Tutor";
+        parentRel = p.relationship || 75;
+        parentStrict = p.strictness || 35;
+      }
+      teachers.push({
+        id: 'teach_home_parent',
+        category: 'teacher',
+        role: 'Primary Home Educator',
+        name: parentName,
+        gender: 'Female',
+        strictness: parentStrict,
+        relationship: parentRel,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      teachers.push({
+        id: 'teach_home_tutor',
+        category: 'teacher',
+        role: 'Visiting Subject Tutor',
+        name: `Mr. ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        strictness: Math.floor(Math.random() * 25) + 20,
+        relationship: 55,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      return teachers;
+    }
+
+    if (schoolType === 'private') {
+      teachers.push({
+        id: 'teach_priv_head',
+        category: 'teacher',
+        role: 'Head of Classical Studies',
+        name: `Dr. ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        strictness: Math.floor(Math.random() * 30) + 55,
+        relationship: 50,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      teachers.push({
+        id: 'teach_priv_latin',
+        category: 'teacher',
+        role: 'Latin & Rhetoric Faculty',
+        name: `Prof. ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        strictness: Math.floor(Math.random() * 30) + 50,
+        relationship: 48,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      return teachers;
+    }
+
+    if (schoolType === 'elite') {
+      teachers.push({
+        id: 'teach_elite_rector',
+        category: 'teacher',
+        role: 'Senior Academic Proctor',
+        name: `Arch-Preceptor ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        strictness: Math.floor(Math.random() * 25) + 65,
+        relationship: 45,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      teachers.push({
+        id: 'teach_elite_antiquities',
+        category: 'teacher',
+        role: 'Master of Antiquities & Arcana',
+        name: `Lady ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        strictness: Math.floor(Math.random() * 30) + 50,
+        relationship: 45,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      return teachers;
+    }
 
     if (level === 'daycare') {
       teachers.push({
@@ -297,9 +501,104 @@
     return teachers;
   }
 
-  function generateStaff(character, level) {
+  function generateStaff(character, level, schoolType = 'public') {
     const staff = [];
     const country = character.countryCode;
+
+    if (schoolType === 'homeschool') {
+      staff.push({
+        id: 'staff_home_courier',
+        category: 'staff',
+        role: 'Curriculum Mail Courier',
+        name: `Mr. ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        quirk: 'Delivers heavy packages of classical textbooks and chemistry kits right to your door.',
+        relationship: 55,
+        actionsDone: { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0 }
+      });
+      staff.push({
+        id: 'staff_home_inspector',
+        category: 'staff',
+        role: 'County Education Inspector',
+        name: `Inspector ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        quirk: 'Inspects your home study portfolio annually with a stern expression and brass clipboard.',
+        relationship: 45,
+        actionsDone: { reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0 }
+      });
+      staff.push({
+        id: 'staff_home_librarian',
+        category: 'staff',
+        role: 'Municipal Reference Librarian',
+        name: `Ms. ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        quirk: 'Reserves rare history encyclopedias and ancient folklore books for your home essays.',
+        relationship: 60,
+        actionsDone: { rest_cot: 0, report_anomaly: 0 }
+      });
+      staff.push({
+        id: 'staff_home_doctor',
+        category: 'staff',
+        role: 'Visiting Family Doctor',
+        name: `Dr. ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        quirk: 'Conducts routine medical examinations and prescribes restorative botanical elixirs.',
+        relationship: 55,
+        actionsDone: { appeal_discipline: 0, school_pride: 0 }
+      });
+      return staff;
+    }
+
+    if (schoolType === 'private' || schoolType === 'elite') {
+      const isElite = schoolType === 'elite';
+      staff.push({
+        id: 'staff_priv_grounds',
+        category: 'staff',
+        role: isElite ? 'Grand Estate Groundskeeper' : 'Academy Groundskeeper',
+        name: `Mr. ${window.getRandomLastName(country)}`,
+        gender: 'Male',
+        quirk: isElite 
+          ? 'Quietly prunes ancestral labyrinth hedges and patrols the wrought-iron cemetery gates.'
+          : 'Manicures the expansive stone courtyard and cleans the antique bronze statues.',
+        relationship: 50,
+        actionsDone: { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0 }
+      });
+      staff.push({
+        id: 'staff_priv_archivist',
+        category: 'staff',
+        role: isElite ? 'Grand Antiquarian & Archivist' : 'Chief Academy Librarian',
+        name: `Ms. ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        quirk: isElite
+          ? 'Guards first-edition centuries-old genealogies and velvet-bound institutional charters.'
+          : 'Enforces pin-drop silence in the vaulted library and preserves rare academic monographs.',
+        relationship: 50,
+        actionsDone: { reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0 }
+      });
+      staff.push({
+        id: 'staff_priv_matron',
+        category: 'staff',
+        role: isElite ? 'Academy High Physician' : 'Infirmary Matron',
+        name: `Matron ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        quirk: 'Attends to student fainting spells with cold silver compresses and lavender tonics.',
+        relationship: 55,
+        actionsDone: { rest_cot: 0, report_anomaly: 0 }
+      });
+      staff.push({
+        id: 'staff_priv_chancellor',
+        category: 'staff',
+        role: isElite ? 'High Chancellor' : 'Headmaster',
+        name: `${isElite ? 'Chancellor' : 'Headmaster'} ${window.getRandomLastName(country)}`,
+        gender: Math.random() < 0.5 ? 'Male' : 'Female',
+        quirk: isElite
+          ? 'Oversees the student body from a mahogany dais adorned with heraldic tapestries.'
+          : 'Walks the halls with an ebony cane and enforces institutional perfection.',
+        relationship: 40,
+        actionsDone: { appeal_discipline: 0, school_pride: 0 }
+      });
+      return staff;
+    }
 
     if (level === 'daycare' || level === 'kindergarten') {
       staff.push({
@@ -378,8 +677,182 @@
     return staff;
   }
 
+  // --- Tuition & Funding Mechanics ---
+  function getTuitionCost(character, schoolType = 'public', level = 'elementary') {
+    const track = SCHOOL_TRACKS[schoolType] || SCHOOL_TRACKS.public;
+    if (!track || track.baseCost === 0) return 0;
+    const country = (window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode]) || (window.COUNTRIES_DATA && window.COUNTRIES_DATA.USA) || { wageMultiplier: 1.0 };
+    const mult = country.wageMultiplier || 1.0;
+    const levelFactor = (level === 'kindergarten') ? 0.6 : (level === 'elementary' ? 0.8 : 1.0);
+    return Math.round(track.baseCost * mult * levelFactor);
+  }
+
+  function askParentsForTuition(character, schoolType, level) {
+    if (schoolType === 'homeschool' || schoolType === 'public') {
+      return {
+        granted: true,
+        message: "No tuition is required for this track. Education is completely cost-free."
+      };
+    }
+
+    const parents = (character.kin && character.kin.parents) ? character.kin.parents.filter(p => p.alive !== false) : [];
+    if (parents.length === 0) {
+      return {
+        granted: false,
+        reason: "You have no living parents or legal guardians to cover your tuition fees."
+      };
+    }
+
+    let totalRel = 0;
+    let totalGen = 0;
+    parents.forEach(p => {
+      totalRel += (p.relationship !== undefined ? p.relationship : 50);
+      totalGen += (p.generosity !== undefined ? p.generosity : 50);
+    });
+    const avgRel = totalRel / parents.length;
+    const avgGen = totalGen / parents.length;
+
+    let economicScore = 50;
+    const highIncomeKeywords = ["Doctor", "Surgeon", "Lawyer", "Executive", "Director", "Professor", "Architect", "Specialist"];
+    const lowIncomeKeywords = ["Forklift", "Cleaner", "Courier", "Morgue", "Meat Processing", "Clerk", "Technician"];
+
+    parents.forEach(p => {
+      const occ = p.occupation || "";
+      if (highIncomeKeywords.some(kw => occ.includes(kw))) {
+        economicScore += 25;
+      } else if (lowIncomeKeywords.some(kw => occ.includes(kw))) {
+        economicScore -= 15;
+      }
+    });
+
+    const smarts = getStat(character, 'smarts');
+    let smartsBonus = 0;
+    if (smarts >= 80) smartsBonus = 25;
+    else if (smarts >= 65) smartsBonus = 12;
+    else if (smarts < 40) smartsBonus = -15;
+
+    const totalScore = (avgRel * 0.35) + (avgGen * 0.35) + (economicScore * 0.3) + smartsBonus;
+
+    if (schoolType === 'private') {
+      if (totalScore >= 45) {
+        parents.forEach(p => {
+          if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 4);
+        });
+        return {
+          granted: true,
+          message: smarts >= 70
+            ? "Your parents were overjoyed by your intellectual aptitude and proudly agreed to fund your private preparatory tuition!"
+            : "After carefully reviewing household savings, your parents agreed to finance your private preparatory tuition."
+        };
+      } else {
+        return {
+          granted: false,
+          reason: economicScore < 40
+            ? "Your parents explained with heavy hearts that the household budget cannot stretch to cover private school tuition on their current wages."
+            : "Your parents declined: they feel private academy tuition is an unnecessary extravagance and insist you attend public school."
+        };
+      }
+    } else if (schoolType === 'elite') {
+      if (totalScore >= 75) {
+        parents.forEach(p => {
+          if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 5);
+        });
+        return {
+          granted: true,
+          message: economicScore >= 70
+            ? "Your aristocratic family beamed with pride and immediately wired the extensive tuition deposit to the Elite Academy bursar."
+            : "Astonished by your intellectual gifts, your parents took out a secondary loan on the house to fund your Elite Academy enrollment!"
+        };
+      } else {
+        return {
+          granted: false,
+          reason: economicScore < 60
+            ? "Your parents gasped at the exorbitant tuition figure: 'Twenty-five thousand dollars a year?! That is more than half our annual take-home pay!'"
+            : "Your parents firmly refused to pay for the elite academy, citing the institution's haughty reputation and astronomical costs."
+        };
+      }
+    }
+
+    return { granted: false, reason: "Admissions inquiry could not be completed." };
+  }
+
+  function applyForScholarship(character, schoolType, level) {
+    if (schoolType === 'homeschool' || schoolType === 'public') {
+      return { granted: true, message: "No scholarship needed; education is already cost-free." };
+    }
+
+    const smarts = getStat(character, 'smarts');
+    const occult = getStat(character, 'occult');
+
+    if (schoolType === 'private') {
+      if (smarts >= 80) {
+        return {
+          granted: true,
+          type: "Merit Academic Honors Scholarship",
+          message: `You placed in the 98th percentile on the preparatory admissions examination (${smarts}% Smarts). The admissions board awarded you a 100% full-tuition merit scholarship!`
+        };
+      } else if (smarts >= 65) {
+        const roll = Math.random() * 100;
+        const passChance = (smarts - 60) * 4;
+        if (roll < passChance) {
+          return {
+            granted: true,
+            type: "Academic Tuition Waiver",
+            message: `Following a rigorous standardized testing session, you secured the final available academic tuition scholarship for this term!`
+          };
+        } else {
+          return {
+            granted: false,
+            reason: `Your test score (${smarts}% Smarts) fell just short of the competitive scholarship quota. All scholarship allocations were awarded to higher-scoring candidates.`
+          };
+        }
+      } else {
+        return {
+          granted: false,
+          reason: `Your entrance examination score (${smarts}% Smarts) was below the minimum 65% threshold required for academic scholarship consideration.`
+        };
+      }
+    } else if (schoolType === 'elite') {
+      if (occult >= 60) {
+        return {
+          granted: true,
+          type: "Founder's Esoteric Fellowship",
+          message: `During the cryptic admissions interview, you effortlessly deciphered the antique sigils engraved on the academy's founder charter. The cloaked committee inducted you under the secret Founder's Fellowship with full tuition coverage!`
+        };
+      }
+      if (smarts >= 85) {
+        return {
+          granted: true,
+          type: "Aristocratic Academic Prodigy Scholarship",
+          message: `Your flawless score on the classical Latin and analytical mathematics exam set a multi-year academy record (${smarts}% Smarts). The Board granted you the prestigious Aristocratic Honors Scholarship with all tuition waived!`
+        };
+      } else if (smarts >= 75) {
+        const roll = Math.random() * 100;
+        if (roll < 35) {
+          return {
+            granted: true,
+            type: "Civic Endowment Fellowship",
+            message: `A prominent alumnus endowment selected your application for full tuition sponsorship based on your exceptional aptitude (${smarts}% Smarts)!`
+          };
+        } else {
+          return {
+            granted: false,
+            reason: `Elite Academy scholarship competition was ruthless. Despite strong marks (${smarts}% Smarts), the remaining endowed seats went to candidates with dynastic legacy connections.`
+          };
+        }
+      } else {
+        return {
+          granted: false,
+          reason: `The Elite Academy admissions board rejected your scholarship petition. Candidates must demonstrate prodigy-level intellect (85+ Smarts) or rare esoteric credentials.`
+        };
+      }
+    }
+
+    return { granted: false, reason: "Admissions board did not accept application." };
+  }
+
   // --- Initial Enrollment Factory ---
-  function enrollInSchool(character, targetLevel = null, major = null) {
+  function enrollInSchool(character, targetLevel = null, major = null, schoolType = null, tuitionPayer = null) {
     let level = targetLevel;
     if (!level) {
       if (character.age >= 0 && character.age <= 3) level = 'daycare';
@@ -391,6 +864,9 @@
     }
 
     if (!level) return null;
+
+    const chosenTrack = schoolType || (character.education && character.education.schoolType) || 'public';
+    const chosenPayer = tuitionPayer || (chosenTrack === 'homeschool' || chosenTrack === 'public' ? 'free' : ((character.education && character.education.tuitionPayer) || 'parents'));
 
     let gradeYear = 1;
     let maxGradeYears = 5;
@@ -417,17 +893,20 @@
     const schoolObj = {
       enrolled: true,
       level,
-      name: getInstitutionName(level, character.countryCode),
+      schoolType: chosenTrack,
+      tuitionPayer: chosenPayer,
+      tuitionCost: getTuitionCost(character, chosenTrack, level),
+      name: getInstitutionName(level, character.countryCode, chosenTrack, character),
       major: major || (level === 'university' ? UNIVERSITY_MAJORS[0].name : null),
       gradeYear,
       maxGradeYears,
       grades: Math.floor(Math.random() * 30) + 60, // 60 - 90%
-      popularity: Math.floor(Math.random() * 30) + 40, // 40 - 70%
+      popularity: chosenTrack === 'homeschool' ? 50 : Math.floor(Math.random() * 30) + 40, // 40 - 70%
       disciplinaryRecord: 0,
       clubs: [],
-      classmates: generateClassmates(character, 6),
-      teachers: generateTeachers(character, level),
-      staff: generateStaff(character, level),
+      classmates: generateClassmates(character, 6, chosenTrack),
+      teachers: generateTeachers(character, level, chosenTrack),
+      staff: generateStaff(character, level, chosenTrack),
       graduationStatus: 'enrolled'
     };
 
@@ -471,6 +950,29 @@
       edu.staff.forEach(s => { s.actionsDone = { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0, reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0, rest_cot: 0, report_anomaly: 0, appeal_discipline: 0, school_pride: 0, nurture: 0, ask_snack: 0 }; });
     }
 
+    // Process annual tuition payment
+    const cost = edu.tuitionCost !== undefined ? edu.tuitionCost : getTuitionCost(character, edu.schoolType, edu.level);
+    if (cost > 0) {
+      if (edu.tuitionPayer === 'self') {
+        if (character.money >= cost) {
+          character.money -= cost;
+          logs.push(`Paid annual tuition fee of ${window.formatMoney ? window.formatMoney(cost, character.countryCode) : '$' + cost} for ${edu.name}.`);
+        } else {
+          logs.push(`TUITION ARREARS: You were unable to cover ${window.formatMoney ? window.formatMoney(cost, character.countryCode) : '$' + cost} tuition at ${edu.name}. Forced to transfer to a public municipal school.`);
+          enrollInSchool(character, edu.level, edu.major, 'public', 'free');
+          return logs;
+        }
+      } else if (edu.tuitionPayer === 'parents') {
+        logs.push(`Your parents paid the annual tuition of ${window.formatMoney ? window.formatMoney(cost, character.countryCode) : '$' + cost} for ${edu.name}.`);
+      } else if (edu.tuitionPayer === 'scholarship') {
+        if (edu.grades < 60) {
+          logs.push(`SCHOLARSHIP PROBATION: Your grades dropped below 60% at ${edu.name}. The board issued a strict academic probation warning!`);
+        } else {
+          logs.push(`Your full scholarship at ${edu.name} was successfully renewed for your academic standing.`);
+        }
+      }
+    }
+
     // Natural grade fluctuation influenced by character smarts
     const charSmarts = getStat(character, 'smarts');
     const smartsDelta = Math.floor((charSmarts - 50) / 10);
@@ -494,6 +996,36 @@
     }
     logs.push(reportVignette);
 
+    // Track atmosphere and bonuses
+    if (edu.schoolType === 'homeschool') {
+      modStat(character, 'sanity', 1);
+      modStat(character, 'happiness', 1);
+      const homeLogs = [
+        "Completed independent astronomy and history modules at the kitchen table, undisturbed by classroom chaos.",
+        "Your home educator guided you through classical botany specimens in the quiet backyard garden.",
+        "Studied literature curled in the living room armchair while rain tapped against the windowpanes."
+      ];
+      logs.push(getRandomItem(homeLogs));
+    } else if (edu.schoolType === 'private') {
+      modStat(character, 'smarts', 1);
+      const privLogs = [
+        "Wore your crisp academy blazer and completed extensive preparatory coursework under strict faculty oversight.",
+        "Competed in the preparatory inter-school forensics and debate symposium; your analytical skills sharpened.",
+        "Faculty inspected your student uniform and commended your disciplined academic demeanor."
+      ];
+      logs.push(getRandomItem(privLogs));
+    } else if (edu.schoolType === 'elite') {
+      modStat(character, 'smarts', 2);
+      modStat(character, 'looks', 1);
+      if (Math.random() < 0.5) modStat(character, 'occult', 1);
+      const eliteLogs = [
+        "Dined in the high-ceilinged Great Hall beneath portraits of the academy's 18th-century founders.",
+        "Attended a candlelight symposium in the cloisters with fellow scions of prominent families.",
+        "Overheard seniors whispering secretive passwords before an iron gate leading beneath the chapel."
+      ];
+      logs.push(getRandomItem(eliteLogs));
+    }
+
     // Club activities log
     if (edu.clubs && edu.clubs.length > 0) {
       const clubId = getRandomItem(edu.clubs);
@@ -511,17 +1043,21 @@
 
     // Check level graduations & transitions
     if (edu.level === 'daycare' && character.age >= 4) {
-      logs.push(`Graduated from Daycare at ${edu.name}! You are now ready for Kindergarten.`);
-      enrollInSchool(character, 'kindergarten');
+      logs.push(`Graduated from Daycare at ${edu.name}! You are now ready to choose your Kindergarten education pathway.`);
+      character.pendingSchoolChoice = { targetLevel: 'kindergarten', reason: 'graduation' };
+      enrollInSchool(character, 'kindergarten', null, edu.schoolType === 'homeschool' ? 'homeschool' : 'public', 'free');
     } else if (edu.level === 'kindergarten' && character.age >= 6) {
-      logs.push(`Graduated from Kindergarten at ${edu.name}! You waved goodbye to the sandboxes and entered Elementary School.`);
-      enrollInSchool(character, 'elementary');
+      logs.push(`Graduated from Kindergarten at ${edu.name}! You completed early childhood education and are ready for Elementary School.`);
+      character.pendingSchoolChoice = { targetLevel: 'elementary', reason: 'graduation' };
+      enrollInSchool(character, 'elementary', null, edu.schoolType || 'public', edu.tuitionPayer || 'free');
     } else if (edu.level === 'elementary' && character.age >= 11) {
-      logs.push(`Graduated from Elementary School at ${edu.name}! You completed Grade 5 and advanced to Middle School.`);
-      enrollInSchool(character, 'middle');
+      logs.push(`Graduated from Elementary School at ${edu.name}! You completed Grade 5 and are eligible for Middle School.`);
+      character.pendingSchoolChoice = { targetLevel: 'middle', reason: 'graduation' };
+      enrollInSchool(character, 'middle', null, edu.schoolType || 'public', edu.tuitionPayer || 'free');
     } else if (edu.level === 'middle' && character.age >= 14) {
-      logs.push(`Graduated from Middle School at ${edu.name}! You survived early adolescence and entered High School.`);
-      enrollInSchool(character, 'high');
+      logs.push(`Graduated from Middle School at ${edu.name}! You survived early adolescence and are ready to enter High School.`);
+      character.pendingSchoolChoice = { targetLevel: 'high', reason: 'graduation' };
+      enrollInSchool(character, 'high', null, edu.schoolType || 'public', edu.tuitionPayer || 'free');
     } else if (edu.level === 'high' && character.age >= 18) {
       edu.enrolled = false;
       edu.graduationStatus = 'graduated';
@@ -1068,7 +1604,11 @@
   // --- Export to Global Scope ---
   window.SCHOOL_CLUBS = SCHOOL_CLUBS;
   window.SCHOOL_MYSTERIES = SCHOOL_MYSTERIES;
+  window.SCHOOL_TRACKS = SCHOOL_TRACKS;
   window.UNIVERSITY_MAJORS = UNIVERSITY_MAJORS;
+  window.getTuitionCost = getTuitionCost;
+  window.askParentsForTuition = askParentsForTuition;
+  window.applyForScholarship = applyForScholarship;
   window.enrollInSchool = enrollInSchool;
   window.tickEducationYear = tickEducationYear;
   window.studyHarder = studyHarder;

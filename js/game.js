@@ -333,6 +333,9 @@ class TerribleGame {
       btnCloseEducation: document.getElementById('btn-close-education'),
       btnEduDone: document.getElementById('btn-edu-done'),
       eduSchoolName: document.getElementById('edu-school-name'),
+      eduSchoolTrackBadge: document.getElementById('edu-school-track-badge'),
+      eduTuitionStatusBadge: document.getElementById('edu-tuition-status-badge'),
+      btnEduTransferTrack: document.getElementById('btn-edu-transfer-track'),
       eduSchoolLevelBadge: document.getElementById('edu-school-level-badge'),
       eduSchoolGradeLabel: document.getElementById('edu-school-grade-label'),
       eduValGrades: document.getElementById('edu-val-grades'),
@@ -361,6 +364,26 @@ class TerribleGame {
       eduClassmatesList: document.getElementById('edu-classmates-list'),
       eduTeachersList: document.getElementById('edu-teachers-list'),
       eduStaffList: document.getElementById('edu-staff-list'),
+
+      // School Choice & Track Selection Modal
+      schoolChoiceModal: document.getElementById('school-choice-modal'),
+      schoolChoiceTitle: document.getElementById('school-choice-title'),
+      schoolChoiceSubtitle: document.getElementById('school-choice-subtitle'),
+      btnCloseSchoolChoice: document.getElementById('btn-close-school-choice'),
+      btnCancelSchoolChoice: document.getElementById('btn-cancel-school-choice'),
+      schoolTrackCards: document.querySelectorAll('.school-track-card'),
+      selectedTrackName: document.getElementById('selected-track-name'),
+      selectedTrackCost: document.getElementById('selected-track-cost'),
+      fundingActionsFree: document.getElementById('funding-actions-free'),
+      fundingActionsPaid: document.getElementById('funding-actions-paid'),
+      btnEnrollFree: document.getElementById('btn-enroll-free'),
+      btnAskParentsTuition: document.getElementById('btn-ask-parents-tuition'),
+      btnApplyScholarship: document.getElementById('btn-apply-scholarship'),
+      btnPayTuitionSelf: document.getElementById('btn-pay-tuition-self'),
+      labelPaySelfBtn: document.getElementById('label-pay-self-btn'),
+      labelTuitionPrivate: document.getElementById('label-tuition-private'),
+      labelTuitionElite: document.getElementById('label-tuition-elite'),
+      schoolChoiceFeedback: document.getElementById('school-choice-feedback'),
 
       // School Person Dossier Modal
       schoolPersonModal: document.getElementById('school-person-modal'),
@@ -645,6 +668,54 @@ class TerribleGame {
     }
     if (this.dom.btnEduDropOut) {
       this.dom.btnEduDropOut.addEventListener('click', () => this.handleSchoolAction('drop_out'));
+    }
+    if (this.dom.btnEduTransferTrack) {
+      this.dom.btnEduTransferTrack.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        const currLevel = (this.character && this.character.education && this.character.education.level) || 'elementary';
+        this.openSchoolChoiceModal(currLevel, true);
+      });
+    }
+
+    // School Choice & Track Selection Modal Controls
+    if (this.dom.btnCloseSchoolChoice) {
+      this.dom.btnCloseSchoolChoice.addEventListener('click', () => this.closeSchoolChoiceModal());
+    }
+    if (this.dom.btnCancelSchoolChoice) {
+      this.dom.btnCancelSchoolChoice.addEventListener('click', () => this.closeSchoolChoiceModal());
+    }
+    if (this.dom.schoolTrackCards) {
+      this.dom.schoolTrackCards.forEach(card => {
+        card.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          const trackId = card.dataset.track;
+          if (trackId) this.selectSchoolChoiceTrack(trackId);
+        });
+      });
+    }
+    if (this.dom.btnEnrollFree) {
+      this.dom.btnEnrollFree.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.handleEnrollInTrack('free');
+      });
+    }
+    if (this.dom.btnAskParentsTuition) {
+      this.dom.btnAskParentsTuition.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.handleAskParentsTuition();
+      });
+    }
+    if (this.dom.btnApplyScholarship) {
+      this.dom.btnApplyScholarship.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.handleApplyScholarship();
+      });
+    }
+    if (this.dom.btnPayTuitionSelf) {
+      this.dom.btnPayTuitionSelf.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.handleEnrollInTrack('self');
+      });
     }
 
     // School Person Dossier Modal Controls
@@ -1316,6 +1387,7 @@ class TerribleGame {
     this.checkMortality();
     this.renderAll();
     this.saveGame();
+    this.checkPendingSchoolChoice();
   }
 
   triggerDilemma(dilemma) {
@@ -2699,6 +2771,7 @@ class TerribleGame {
       this.dom.kinFeedbackModal.classList.add('hidden');
       this.dom.kinFeedbackModal.style.display = 'none';
     }
+    this.checkPendingSchoolChoice();
   }
 
   // ==========================================
@@ -2938,6 +3011,7 @@ class TerribleGame {
       this.dom.activitiesModal,
       this.dom.revelationModal,
       this.dom.educationModal,
+      this.dom.schoolChoiceModal,
       this.dom.schoolPersonModal
     ];
 
@@ -3578,6 +3652,206 @@ class TerribleGame {
     }
   }
 
+  // ==========================================
+  // SCHOOL CHOICE & TRACK SYSTEM
+  // ==========================================
+
+  checkPendingSchoolChoice() {
+    if (this.character && this.character.pendingSchoolChoice && !this.character.isDead) {
+      const pending = this.character.pendingSchoolChoice;
+      this.character.pendingSchoolChoice = null;
+      this.openSchoolChoiceModal(pending.targetLevel || 'elementary', false);
+      return true;
+    }
+    return false;
+  }
+
+  openSchoolChoiceModal(targetLevel = 'kindergarten', isTransfer = false) {
+    if (!this.character || this.character.isDead) return;
+    this.pendingSchoolChoiceTargetLevel = targetLevel;
+    this.isSchoolTransfer = isTransfer;
+    this.selectedSchoolTrack = (this.character.education && this.character.education.schoolType) || 'public';
+
+    const levelLabels = {
+      kindergarten: 'Kindergarten (Ages 4-5)',
+      elementary: 'Elementary School (Ages 6-10)',
+      middle: 'Middle School (Ages 11-13)',
+      high: 'High School (Ages 14-17)'
+    };
+
+    if (this.dom.schoolChoiceTitle) {
+      this.dom.schoolChoiceTitle.textContent = isTransfer
+        ? `Transfer Educational Track`
+        : `Educational Pathway (${levelLabels[targetLevel] || 'School'})`;
+    }
+
+    if (this.dom.schoolChoiceSubtitle) {
+      this.dom.schoolChoiceSubtitle.textContent = isTransfer
+        ? `Request mid-tier transfer to a different institutional environment or home study`
+        : `Select your educational pathway and secure required tuition financing`;
+    }
+
+    // Update tuition display labels for paid tracks
+    if (this.dom.labelTuitionPrivate && window.getTuitionCost) {
+      const privCost = window.getTuitionCost(this.character, 'private', targetLevel);
+      this.dom.labelTuitionPrivate.textContent = `${window.formatMoney ? window.formatMoney(privCost, this.character.countryCode) : '$' + privCost} / yr`;
+    }
+    if (this.dom.labelTuitionElite && window.getTuitionCost) {
+      const eliteCost = window.getTuitionCost(this.character, 'elite', targetLevel);
+      this.dom.labelTuitionElite.textContent = `${window.formatMoney ? window.formatMoney(eliteCost, this.character.countryCode) : '$' + eliteCost} / yr`;
+    }
+
+    if (this.dom.schoolChoiceFeedback) {
+      this.dom.schoolChoiceFeedback.classList.add('hidden');
+      this.dom.schoolChoiceFeedback.innerHTML = '';
+    }
+
+    this.selectSchoolChoiceTrack(this.selectedSchoolTrack);
+
+    if (this.dom.schoolChoiceModal) {
+      this.dom.schoolChoiceModal.classList.remove('hidden');
+      this.dom.schoolChoiceModal.style.display = 'flex';
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  closeSchoolChoiceModal() {
+    if (this.dom.schoolChoiceModal) {
+      this.dom.schoolChoiceModal.classList.add('hidden');
+      this.dom.schoolChoiceModal.style.display = 'none';
+    }
+  }
+
+  selectSchoolChoiceTrack(trackId) {
+    this.selectedSchoolTrack = trackId;
+    const track = (window.SCHOOL_TRACKS && window.SCHOOL_TRACKS[trackId]) || (window.SCHOOL_TRACKS && window.SCHOOL_TRACKS.public) || { name: 'Public School', baseCost: 0 };
+
+    if (this.dom.schoolTrackCards) {
+      this.dom.schoolTrackCards.forEach(card => {
+        if (card.dataset.track === trackId) {
+          card.classList.add('active-track');
+        } else {
+          card.classList.remove('active-track');
+        }
+      });
+    }
+
+    const cost = window.getTuitionCost ? window.getTuitionCost(this.character, trackId, this.pendingSchoolChoiceTargetLevel || 'elementary') : 0;
+
+    if (this.dom.selectedTrackName) {
+      this.dom.selectedTrackName.textContent = track.name;
+    }
+    if (this.dom.selectedTrackCost) {
+      this.dom.selectedTrackCost.textContent = cost > 0 
+        ? `${window.formatMoney ? window.formatMoney(cost, this.character.countryCode) : '$' + cost} Annual Tuition`
+        : 'Free / Zero Tuition';
+    }
+
+    if (cost === 0) {
+      if (this.dom.fundingActionsFree) this.dom.fundingActionsFree.classList.remove('hidden');
+      if (this.dom.fundingActionsPaid) this.dom.fundingActionsPaid.classList.add('hidden');
+    } else {
+      if (this.dom.fundingActionsFree) this.dom.fundingActionsFree.classList.add('hidden');
+      if (this.dom.fundingActionsPaid) this.dom.fundingActionsPaid.classList.remove('hidden');
+
+      if (this.dom.labelPaySelfBtn) {
+        const canAfford = (this.character.money || 0) >= cost;
+        this.dom.labelPaySelfBtn.textContent = `Pay Tuition Myself (${window.formatMoney ? window.formatMoney(this.character.money || 0, this.character.countryCode) : '$' + (this.character.money || 0)} available)${canAfford ? '' : ' - Insufficient'}`;
+      }
+    }
+
+    if (this.dom.schoolChoiceFeedback) {
+      this.dom.schoolChoiceFeedback.classList.add('hidden');
+    }
+  }
+
+  handleEnrollInTrack(tuitionPayer) {
+    const trackId = this.selectedSchoolTrack || 'public';
+    const targetLevel = this.pendingSchoolChoiceTargetLevel || (this.character.education ? this.character.education.level : 'elementary');
+
+    if (tuitionPayer === 'self') {
+      const cost = window.getTuitionCost ? window.getTuitionCost(this.character, trackId, targetLevel) : 0;
+      if ((this.character.money || 0) < cost) {
+        this.showSchoolChoiceFeedback("You do not have enough funds in your personal savings to pay the tuition fee.", "text-rose-400");
+        return;
+      }
+      this.character.money -= cost;
+    }
+
+    const newSchool = window.enrollInSchool(this.character, targetLevel, null, trackId, tuitionPayer);
+
+    const latestLog = this.logs[this.logs.length - 1];
+    const payerLabels = {
+      free: "cost-free",
+      parents: "financed by parents",
+      scholarship: "on 100% scholarship",
+      self: "paid personally"
+    };
+    const desc = this.isSchoolTransfer
+      ? `Transferred to ${newSchool.name} (${newSchool.schoolType}, ${payerLabels[tuitionPayer] || 'enrolled'}).`
+      : `Enrolled in ${newSchool.name} (${newSchool.schoolType}, ${payerLabels[tuitionPayer] || 'enrolled'}).`;
+
+    if (latestLog) {
+      latestLog.entries.push(desc);
+    }
+
+    this.closeSchoolChoiceModal();
+    this.renderAll();
+    if (this.dom.educationModal && !this.dom.educationModal.classList.contains('hidden')) {
+      this.renderEducationModal('overview');
+    }
+    this.saveGame();
+
+    this.openFeedbackModal({
+      tag: "ACADEMIC ADMISSIONS",
+      title: this.isSchoolTransfer ? "Transfer Approved!" : "Enrolled Successfully!",
+      icon: "graduation-cap",
+      iconColor: "text-purple-400",
+      body: `You are now officially matriculated at ${newSchool.name} (${newSchool.schoolType.toUpperCase()}) with tuition ${payerLabels[tuitionPayer] || 'settled'}.`,
+      effects: {}
+    });
+  }
+
+  handleAskParentsTuition() {
+    const trackId = this.selectedSchoolTrack;
+    const targetLevel = this.pendingSchoolChoiceTargetLevel || (this.character.education ? this.character.education.level : 'elementary');
+
+    if (!window.askParentsForTuition) return;
+    const res = window.askParentsForTuition(this.character, trackId, targetLevel);
+
+    if (res.granted) {
+      this.handleEnrollInTrack('parents');
+    } else {
+      this.showSchoolChoiceFeedback(res.reason || "Your parents refused to cover this school tuition.", "text-rose-400");
+      window.soundEngine.playDread();
+    }
+  }
+
+  handleApplyScholarship() {
+    const trackId = this.selectedSchoolTrack;
+    const targetLevel = this.pendingSchoolChoiceTargetLevel || (this.character.education ? this.character.education.level : 'elementary');
+
+    if (!window.applyForScholarship) return;
+    const res = window.applyForScholarship(this.character, trackId, targetLevel);
+
+    if (res.granted) {
+      this.handleEnrollInTrack('scholarship');
+    } else {
+      this.showSchoolChoiceFeedback(res.reason || "Admissions scholarship examination was unsuccessful.", "text-rose-400");
+      window.soundEngine.playDread();
+    }
+  }
+
+  showSchoolChoiceFeedback(msg, colorClass = "text-parchment") {
+    if (this.dom.schoolChoiceFeedback) {
+      this.dom.schoolChoiceFeedback.innerHTML = `<span class="${colorClass}">${msg}</span>`;
+      this.dom.schoolChoiceFeedback.classList.remove('hidden');
+    }
+  }
+
   openEducationModal(activeTab = 'overview') {
     if (this.character && this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled)) {
       if (!this.character.education || (this.character.education.graduationStatus !== 'expelled' && this.character.education.graduationStatus !== 'dropped_out')) {
@@ -3616,6 +3890,36 @@ class TerribleGame {
 
     // Header labels
     if (this.dom.eduSchoolName) this.dom.eduSchoolName.textContent = edu.name;
+    if (this.dom.eduSchoolTrackBadge) {
+      const track = (window.SCHOOL_TRACKS && window.SCHOOL_TRACKS[edu.schoolType]) || (window.SCHOOL_TRACKS && window.SCHOOL_TRACKS.public) || { name: 'Public School', badgeClass: 'badge-track-public' };
+      this.dom.eduSchoolTrackBadge.textContent = track.name;
+      this.dom.eduSchoolTrackBadge.className = `text-[9px] font-mono px-1.5 py-0.5 rounded ${track.badgeClass} uppercase font-bold`;
+    }
+    if (this.dom.eduTuitionStatusBadge) {
+      if (edu.schoolType === 'homeschool' || edu.schoolType === 'public') {
+        this.dom.eduTuitionStatusBadge.textContent = 'Free';
+        this.dom.eduTuitionStatusBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust';
+      } else if (edu.tuitionPayer === 'scholarship') {
+        this.dom.eduTuitionStatusBadge.textContent = '100% Scholarship';
+        this.dom.eduTuitionStatusBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/40 border border-purple-500/40 text-purple-300 font-bold';
+      } else if (edu.tuitionPayer === 'parents') {
+        this.dom.eduTuitionStatusBadge.textContent = 'Parent-Funded';
+        this.dom.eduTuitionStatusBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-bold';
+      } else if (edu.tuitionPayer === 'self') {
+        this.dom.eduTuitionStatusBadge.textContent = 'Self-Funded';
+        this.dom.eduTuitionStatusBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-500/40 text-amber-300 font-bold';
+      } else {
+        this.dom.eduTuitionStatusBadge.textContent = 'Enrolled';
+        this.dom.eduTuitionStatusBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust';
+      }
+    }
+    if (this.dom.btnEduTransferTrack) {
+      if (edu.level === 'daycare' || edu.level === 'university') {
+        this.dom.btnEduTransferTrack.classList.add('hidden');
+      } else {
+        this.dom.btnEduTransferTrack.classList.remove('hidden');
+      }
+    }
     if (this.dom.eduSchoolLevelBadge) {
       const levelLabels = {
         daycare: 'Toddler Daycare',
@@ -3647,7 +3951,9 @@ class TerribleGame {
 
     if (this.dom.eduValGrades) this.dom.eduValGrades.textContent = `${grades}% (${letter})`;
     if (this.dom.eduBarGrades) this.dom.eduBarGrades.style.width = `${grades}%`;
-    if (this.dom.eduValPopularity) this.dom.eduValPopularity.textContent = `${popularity}%`;
+    if (this.dom.eduValPopularity) {
+      this.dom.eduValPopularity.textContent = edu.schoolType === 'homeschool' ? `Autonomy` : `${popularity}%`;
+    }
     if (this.dom.eduBarPopularity) this.dom.eduBarPopularity.style.width = `${popularity}%`;
 
     // Disciplinary Banner
