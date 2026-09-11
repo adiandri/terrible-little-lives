@@ -9,6 +9,8 @@ mouth, hair, markings, accessories, and frame. The game can keep its current
 randomization, aging, and genetic-inheritance data while replacing only the
 primitive Canvas drawing backend.
 
-Expansion should happen only after the canonical portrait is approved. The
-first production slice should cover three skin tones, two face shapes, two eye
-shapes, three hairstyles, two outfits, and a small markings/accessories set.
+The approved first production slice is available in `index.html`. It exercises
+three skin tones, two face shapes, two eye shapes, three hairstyles, two
+outfits, three marking states, three accessory states, randomization, and a
+six-character stress-test lineup. `avatar-v2-engine.js` holds the option
+manifest and applies selections without changing the live game renderer.
