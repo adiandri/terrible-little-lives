@@ -15,5 +15,12 @@ outfits, three marking states, three accessory states, randomization, and a
 six-character stress-test lineup. `avatar-v2-engine.js` holds the option
 manifest and applies selections without changing the live game renderer.
 
+`avatar-v2-compat.js` is the migration boundary between existing saved/random
+avatars and the smaller approved V2 option set. It maps every value emitted by
+the current generator to a valid V2 configuration, incorporates useful
+secondary traits such as eyelid and hair texture, and safely defaults unknown
+or retired values. Run `node --test avatar-v2-compat.test.mjs` to verify the
+legacy option matrix and representative creator archetypes.
+
 Run `node render-contact-sheet.mjs` in a development environment with `sharp`
 available to render 24 deterministic cross-feature portraits for visual QA.
