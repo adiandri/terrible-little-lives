@@ -78,10 +78,10 @@
   </g>
 
   <g id="layer-ears">
-    <path d="M150 203c-23-8-34 12-25 41 7 24 24 38 43 27l4-61Z" fill="#a65a48"/>
-    <path d="M362 203c23-8 34 12 25 41-7 24-24 38-43 27l-4-61Z" fill="#8f4b42"/>
-    <path d="M139 220c13-8 23 4 21 25-9-13-17-14-23-4" fill="none" stroke="#693a38" stroke-width="6" stroke-linecap="round"/>
-    <path d="M373 220c-13-8-23 4-21 25 9-13 17-14 23-4" fill="none" stroke="#613536" stroke-width="6" stroke-linecap="round"/>
+    <path data-color="ear-light" d="M150 203c-23-8-34 12-25 41 7 24 24 38 43 27l4-61Z" fill="#a65a48"/>
+    <path data-color="ear-dark" d="M362 203c23-8 34 12 25 41-7 24-24 38-43 27l-4-61Z" fill="#8f4b42"/>
+    <path data-color="ear-line" d="M139 220c13-8 23 4 21 25-9-13-17-14-23-4" fill="none" stroke="#693a38" stroke-width="6" stroke-linecap="round"/>
+    <path data-color="ear-line" d="M373 220c-13-8-23 4-21 25 9-13 17-14 23-4" fill="none" stroke="#613536" stroke-width="6" stroke-linecap="round"/>
   </g>
 
   <g id="layer-face">
