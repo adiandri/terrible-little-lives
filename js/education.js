@@ -254,6 +254,119 @@
     return getRandomItem(list);
   }
 
+  function generateSchoolAvatar(categoryOrPerson, roleOrCategory, genderOrLevel, age, clique = null, schoolType = 'public', isAnomaly = false) {
+    let category, role, gender, personAge, peerClique, sType, anomaly;
+    if (typeof categoryOrPerson === 'object' && categoryOrPerson !== null) {
+      const p = categoryOrPerson;
+      category = roleOrCategory || p.category || 'classmate';
+      role = p.role || (category === 'classmate' ? 'Classmate' : 'Faculty');
+      gender = p.gender || (Math.random() < 0.5 ? 'Male' : 'Female');
+      personAge = p.age || age || 16;
+      peerClique = p.clique || null;
+      sType = genderOrLevel || 'public';
+      anomaly = !!(p.isAnomaly || p.curse);
+    } else {
+      category = categoryOrPerson || 'classmate';
+      role = roleOrCategory || 'Classmate';
+      gender = genderOrLevel || (Math.random() < 0.5 ? 'Male' : 'Female');
+      personAge = age || 16;
+      peerClique = clique;
+      sType = schoolType || 'public';
+      anomaly = isAnomaly;
+    }
+
+    let clothing = 'casual';
+    let clothingColor = 'charcoal';
+    let hairColor = undefined;
+    let glasses = 'none';
+    let headwear = 'none';
+    let necklace = 'none';
+    let eyeExtra = 'none';
+    let eyeColor = undefined;
+
+    if (category === 'classmate') {
+      if (sType === 'private') {
+        clothing = 'prep_blazer';
+        clothingColor = 'school_navy';
+      } else if (sType === 'elite') {
+        clothing = 'elite_uniform';
+        clothingColor = 'school_maroon';
+      }
+
+      if (peerClique === 'Goths' || peerClique === 'Occult Cabalists') {
+        clothing = (sType === 'public') ? 'goth' : clothing;
+        hairColor = 'raven';
+        necklace = 'choker';
+        eyeExtra = 'eyeliner';
+      } else if (peerClique === 'Nerds' || peerClique === 'Honor Society' || peerClique === 'Academic Overachievers') {
+        clothing = (sType === 'public') ? 'sweater' : clothing;
+        glasses = Math.random() < 0.75 ? 'round_wire' : 'square';
+      } else if (peerClique === 'Jocks') {
+        clothing = 'casual';
+        clothingColor = 'navy';
+        headwear = Math.random() < 0.5 ? 'baseball_cap' : 'none';
+      } else if (peerClique === 'Artists') {
+        clothing = (sType === 'public') ? 'turtleneck' : clothing;
+        headwear = Math.random() < 0.4 ? 'beret' : 'none';
+        necklace = 'pendant';
+        if (Math.random() < 0.4) hairColor = 'rose';
+      }
+
+      if (anomaly) {
+        eyeColor = Math.random() < 0.5 ? 'violet' : (Math.random() < 0.5 ? 'golden' : 'crimson');
+        eyeExtra = 'tired_eyes';
+      }
+    } else if (category === 'teacher') {
+      const r = role || '';
+      if (r.includes('Science') || r.includes('Chemistry') || r.includes('Biology')) {
+        clothing = 'lab_coat';
+        glasses = Math.random() < 0.6 ? 'round_wire' : 'none';
+      } else if (r.includes('Math') || r.includes('Latin') || r.includes('Head') || r.includes('Dean')) {
+        clothing = 'suit';
+        clothingColor = 'black';
+        glasses = Math.random() < 0.5 ? 'thick_frame' : 'none';
+      } else if (r.includes('Art') || r.includes('Drama') || r.includes('Music')) {
+        clothing = 'sweater';
+        clothingColor = 'mustard';
+        headwear = Math.random() < 0.35 ? 'beret' : 'none';
+      } else {
+        clothing = (sType === 'elite' || sType === 'private') ? 'suit' : 'sweater';
+        clothingColor = 'tweed_brown';
+      }
+    } else if (category === 'staff') {
+      const r = role || '';
+      if (r.includes('Janitor') || r.includes('Caretaker') || r.includes('Grounds')) {
+        clothing = 'casual';
+        clothingColor = 'denim';
+        headwear = 'baseball_cap';
+      } else if (r.includes('Nurse') || r.includes('Doctor') || r.includes('Matron')) {
+        clothing = 'scrubs';
+        clothingColor = 'scrubs_teal';
+      } else if (r.includes('Librarian')) {
+        clothing = 'sweater';
+        clothingColor = 'forest';
+        glasses = 'round_wire';
+      } else if (r.includes('Principal') || r.includes('Inspector') || r.includes('Dean') || r.includes('Chancellor')) {
+        clothing = 'suit';
+        clothingColor = 'navy';
+      }
+    }
+
+    return window.generateRandomAvatar({
+      gender,
+      age: personAge || 16,
+      clothing,
+      clothingColor,
+      hairColor,
+      glasses,
+      headwear,
+      necklace,
+      eyeExtra,
+      eyeColor
+    });
+  }
+  window.generateSchoolAvatar = generateSchoolAvatar;
+
   function generateClassmates(character, count = 6, schoolType = 'public') {
     const classmates = [];
     let cliques = ['Nerds', 'Jocks', 'Goths', 'Loners', 'Populars', 'Oddballs', 'Artists'];
@@ -276,23 +389,39 @@
       else if (roll < 0.10) entityType = 'disguised_mimic';
       else if (roll < 0.22) entityType = 'anomaly';
 
+      const peerGender = isMale ? 'Male' : 'Female';
+      const peerClique = getRandomItem(cliques);
+      const isAnomaly = entityType !== 'human';
+      const peerAvatar = generateSchoolAvatar('classmate', 'Classmate', peerGender, character.age, peerClique, schoolType, isAnomaly);
+
       classmates.push({
         id: 'peer_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000),
         category: 'classmate',
         name: `${first} ${surname}`,
-        gender: isMale ? 'Male' : 'Female',
+        gender: peerGender,
         age: character.age,
         popularity: Math.floor(Math.random() * 60) + 20, // 20 - 80%
         smarts: Math.floor(Math.random() * 60) + 20,
         relationship: Math.floor(Math.random() * 30) + 35, // 35 - 65% initial
-        clique: getRandomItem(cliques),
+        clique: peerClique,
         entityType,
         isRevealed: entityType === 'human',
         isBefriended: false,
+        avatar: peerAvatar,
         actionsDone: { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, befriend: 0 }
       });
     }
     return classmates;
+  }
+
+  function finalizeTeachers(teachers, schoolType) {
+    teachers.forEach(t => {
+      if (!t.avatar) {
+        const tAge = Math.floor(Math.random() * 25) + 32;
+        t.avatar = generateSchoolAvatar('teacher', t.role, t.gender, tAge, null, schoolType);
+      }
+    });
+    return teachers;
   }
 
   function generateTeachers(character, level, schoolType = 'public') {
@@ -330,7 +459,7 @@
         relationship: 55,
         actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
       });
-      return teachers;
+      return finalizeTeachers(teachers, schoolType);
     }
 
     if (schoolType === 'private') {
@@ -354,7 +483,7 @@
         relationship: 48,
         actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
       });
-      return teachers;
+      return finalizeTeachers(teachers, schoolType);
     }
 
     if (schoolType === 'elite') {
@@ -378,7 +507,7 @@
         relationship: 45,
         actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
       });
-      return teachers;
+      return finalizeTeachers(teachers, schoolType);
     }
 
     if (level === 'daycare') {
@@ -498,7 +627,17 @@
       });
     }
 
-    return teachers;
+    return finalizeTeachers(teachers, schoolType);
+  }
+
+  function finalizeStaff(staff, schoolType) {
+    staff.forEach(s => {
+      if (!s.avatar) {
+        const sAge = Math.floor(Math.random() * 25) + 35;
+        s.avatar = generateSchoolAvatar('staff', s.role, s.gender, sAge, null, schoolType);
+      }
+    });
+    return staff;
   }
 
   function generateStaff(character, level, schoolType = 'public') {
@@ -546,7 +685,7 @@
         relationship: 55,
         actionsDone: { appeal_discipline: 0, school_pride: 0 }
       });
-      return staff;
+      return finalizeStaff(staff, schoolType);
     }
 
     if (schoolType === 'private' || schoolType === 'elite') {
@@ -597,7 +736,7 @@
         relationship: 40,
         actionsDone: { appeal_discipline: 0, school_pride: 0 }
       });
-      return staff;
+      return finalizeStaff(staff, schoolType);
     }
 
     if (level === 'daycare' || level === 'kindergarten') {
@@ -621,7 +760,7 @@
         relationship: 50,
         actionsDone: { help_clean: 0 }
       });
-      return staff;
+      return finalizeStaff(staff, schoolType);
     }
 
     // Elementary, Middle, High, and University have the standard 4 staff roles:
@@ -674,7 +813,7 @@
       actionsDone: { appeal_discipline: 0, school_pride: 0 }
     });
 
-    return staff;
+    return finalizeStaff(staff, schoolType);
   }
 
   // --- Tuition & Funding Mechanics ---
@@ -1631,5 +1770,8 @@
   window.interactWithStaff = interactWithStaff;
   window.applyToUniversity = applyToUniversity;
   window.dropOutOfSchool = dropOutOfSchool;
+  window.generateClassmates = generateClassmates;
+  window.generateTeachers = generateTeachers;
+  window.generateStaff = generateStaff;
 
 })();

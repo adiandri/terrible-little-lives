@@ -87,6 +87,47 @@ function getActionCount(person, key) {
   return 0;
 }
 
+function generateKinAvatar(role, gender, age, occupationTier, parentA = null, parentB = null) {
+  if (parentA && parentB) {
+    // Sibling / Child Genetic Inheritance Blend
+    const pickGene = (prop) => (Math.random() < 0.5 ? parentA[prop] : parentB[prop]);
+    const skin = Math.random() < 0.85 ? pickGene('skin') : 'golden_peach';
+    const eyeShape = pickGene('eyeShape');
+    const eyeColor = Math.random() < 0.90 ? pickGene('eyeColor') : 'hazel';
+    const faceShape = pickGene('faceShape');
+    const hairTexture = pickGene('hairTexture');
+    const hairColor = Math.random() < 0.85 ? pickGene('hairColor') : (gender === 'Male' ? parentA.hairColor : parentB.hairColor);
+
+    return window.generateRandomAvatar({
+      gender,
+      age,
+      skin,
+      eyeShape,
+      eyeColor,
+      faceShape,
+      hairTexture,
+      hairColor
+    });
+  }
+
+  // Adult or Elder Generation
+  let clothing = 'casual';
+  if (age >= 55) {
+    clothing = Math.random() < 0.6 ? 'cardigan' : 'sweater';
+  } else if (occupationTier === 'affluent') {
+    clothing = Math.random() < 0.7 ? 'suit' : 'prep_blazer';
+  } else if (occupationTier === 'comfortable') {
+    clothing = Math.random() < 0.5 ? 'sweater' : 'casual';
+  }
+
+  return window.generateRandomAvatar({
+    gender,
+    age,
+    clothing
+  });
+}
+window.generateKinAvatar = generateKinAvatar;
+
 function generateFamily(character) {
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
   const surname = character.name.split(' ').slice(1).join(' ') || window.getRandomElement(country.surnames);
@@ -103,6 +144,9 @@ function generateFamily(character) {
 
   const dadSalary = Math.round(dadJobObj.salaryUSD * mult);
   const momSalary = Math.round(momJobObj.salaryUSD * mult);
+
+  const dadAvatar = generateKinAvatar('Father', 'Male', dadAge, dadJobObj.tier);
+  const momAvatar = generateKinAvatar('Mother', 'Female', momAge, momJobObj.tier);
 
   const parents = [
     {
@@ -126,6 +170,7 @@ function generateFamily(character) {
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
+      avatar: dadAvatar,
       actionsDone: createEmptyActionsDone()
     },
     {
@@ -149,11 +194,12 @@ function generateFamily(character) {
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
+      avatar: momAvatar,
       actionsDone: createEmptyActionsDone()
     }
   ];
 
-  // Sibling generation (0 to 2 siblings)
+  // Sibling generation (0 to 2 siblings) with Genetic Inheritance
   const siblings = [];
   const siblingCount = Math.floor(Math.random() * 3); // 0, 1, or 2
   for (let i = 0; i < siblingCount; i++) {
@@ -161,13 +207,14 @@ function generateFamily(character) {
     const sFirst = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
     const ageDiff = Math.floor(Math.random() * 6) + 1; // 1 to 6 years older
     const role = isMale ? (ageDiff > 0 ? 'Older Brother' : 'Younger Brother') : (ageDiff > 0 ? 'Older Sister' : 'Younger Sister');
+    const sibGender = isMale ? 'Male' : 'Female';
 
     siblings.push({
       id: 'sibling_' + Date.now() + '_' + i,
       category: 'family',
       role,
       name: `${sFirst} ${surname}`,
-      gender: isMale ? 'Male' : 'Female',
+      gender: sibGender,
       age: ageDiff,
       alive: true,
       deathYear: null,
@@ -176,6 +223,7 @@ function generateFamily(character) {
       entityType: Math.random() < 0.04 ? 'anomaly' : 'human',
       suspicion: 0,
       isRevealed: false,
+      avatar: generateKinAvatar(role, sibGender, ageDiff, 'comfortable', dadAvatar, momAvatar),
       actionsDone: createEmptyActionsDone()
     });
   }
@@ -189,13 +237,15 @@ function generateFamily(character) {
     const gFirst = isGrandpa ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
     const gSurname = isMaternal ? window.getRandomElement(country.surnames) : surname;
     const gAge = Math.floor(Math.random() * 12) + 63; // 63-75
+    const gGender = isGrandpa ? 'Male' : 'Female';
+    const gRole = isGrandpa ? (isMaternal ? 'Maternal Grandfather' : 'Paternal Grandfather') : (isMaternal ? 'Maternal Grandmother' : 'Paternal Grandmother');
 
     grandparents.push({
       id: 'grandparent_' + Date.now(),
       category: 'family',
-      role: isGrandpa ? (isMaternal ? 'Maternal Grandfather' : 'Paternal Grandfather') : (isMaternal ? 'Maternal Grandmother' : 'Paternal Grandmother'),
+      role: gRole,
       name: `${gFirst} ${gSurname}`,
-      gender: isGrandpa ? 'Male' : 'Female',
+      gender: gGender,
       age: gAge,
       alive: true,
       deathYear: null,
@@ -204,6 +254,7 @@ function generateFamily(character) {
       generosity: Math.floor(Math.random() * 30) + 65,
       pensionUSD: Math.floor(Math.random() * 15000) + 20000,
       entityType: 'human',
+      avatar: generateKinAvatar(gRole, gGender, gAge, 'comfortable'),
       actionsDone: createEmptyActionsDone()
     });
   }

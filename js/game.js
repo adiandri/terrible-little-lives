@@ -76,20 +76,52 @@ class TerribleGame {
       btnCreatorSettings: document.getElementById('btn-creator-settings'),
       btnCreatorRandomizeAll: document.getElementById('btn-creator-randomize-all'),
       btnCreatorBack: document.getElementById('btn-creator-back'),
-      tabAppearance: document.getElementById('tab-appearance'),
+      
+      // Archetype Presets
+      presetGothic: document.getElementById('preset-gothic'),
+      presetPreppy: document.getElementById('preset-preppy'),
+      presetStreet: document.getElementById('preset-street'),
+      presetDreamer: document.getElementById('preset-dreamer'),
+      presetElder: document.getElementById('preset-elder'),
+
+      // Drawer Tabs
+      tabFace: document.getElementById('tab-face'),
+      tabEyes: document.getElementById('tab-eyes'),
+      tabHair: document.getElementById('tab-hair'),
+      tabAttire: document.getElementById('tab-attire'),
       tabIdentity: document.getElementById('tab-identity'),
       tabGodmode: document.getElementById('tab-godmode'),
-      panelAppearance: document.getElementById('panel-appearance'),
+
+      // Drawer Panels
+      panelFace: document.getElementById('panel-face'),
+      panelEyes: document.getElementById('panel-eyes'),
+      panelHair: document.getElementById('panel-hair'),
+      panelAttire: document.getElementById('panel-attire'),
       panelIdentity: document.getElementById('panel-identity'),
       panelGodmode: document.getElementById('panel-godmode'),
 
-      // Appearance Selectors
+      // Granular Feature Selectors (Sheet 1 - 8)
       selSkin: document.getElementById('sel-skin'),
+      selFaceShape: document.getElementById('sel-face-shape'),
+      selNose: document.getElementById('sel-nose'),
+      selLips: document.getElementById('sel-lips'),
+      selMark: document.getElementById('sel-mark'),
       selEyeShape: document.getElementById('sel-eye-shape'),
+      selEyelid: document.getElementById('sel-eyelid'),
       selEyeColor: document.getElementById('sel-eye-color'),
+      selEyebrow: document.getElementById('sel-eyebrow'),
+      selEyeExtra: document.getElementById('sel-eye-extra'),
+      selHairTexture: document.getElementById('sel-hair-texture'),
       selHairStyle: document.getElementById('sel-hair-style'),
       selHairColor: document.getElementById('sel-hair-color'),
-      selMark: document.getElementById('sel-mark'),
+      selBangs: document.getElementById('sel-bangs'),
+      selFacialHair: document.getElementById('sel-facial-hair'),
+      selClothing: document.getElementById('sel-clothing'),
+      selClothingColor: document.getElementById('sel-clothing-color'),
+      selGlasses: document.getElementById('sel-glasses'),
+      selPiercing: document.getElementById('sel-piercing'),
+      selHeadwear: document.getElementById('sel-headwear'),
+      selNecklace: document.getElementById('sel-necklace'),
 
       // Identity Selectors
       selCountry: document.getElementById('sel-country'),
@@ -411,6 +443,7 @@ class TerribleGame {
       btnCloseSchoolPerson: document.getElementById('btn-close-school-person'),
       btnCancelSchoolPerson: document.getElementById('btn-cancel-school-person'),
       schoolPersonAvatarBox: document.getElementById('school-person-avatar-box'),
+      schoolPersonAvatarCanvas: document.getElementById('school-person-avatar-canvas'),
       schoolPersonIcon: document.getElementById('school-person-icon'),
       schoolPersonName: document.getElementById('school-person-name'),
       schoolPersonRoleBadge: document.getElementById('school-person-role-badge'),
@@ -509,33 +542,63 @@ class TerribleGame {
       });
     }
 
-    // Creator Tabs
-    this.dom.tabAppearance.addEventListener('click', () => this.switchCreatorTab('appearance'));
-    this.dom.tabIdentity.addEventListener('click', () => this.switchCreatorTab('identity'));
-    this.dom.tabGodmode.addEventListener('click', () => this.switchCreatorTab('godmode'));
+    // Creator Drawer Tabs
+    if (this.dom.tabFace) this.dom.tabFace.addEventListener('click', () => this.switchCreatorTab('face'));
+    if (this.dom.tabEyes) this.dom.tabEyes.addEventListener('click', () => this.switchCreatorTab('eyes'));
+    if (this.dom.tabHair) this.dom.tabHair.addEventListener('click', () => this.switchCreatorTab('hair'));
+    if (this.dom.tabAttire) this.dom.tabAttire.addEventListener('click', () => this.switchCreatorTab('attire'));
+    if (this.dom.tabIdentity) this.dom.tabIdentity.addEventListener('click', () => this.switchCreatorTab('identity'));
+    if (this.dom.tabGodmode) this.dom.tabGodmode.addEventListener('click', () => this.switchCreatorTab('godmode'));
+
+    // Quick Archetype Presets
+    if (this.dom.presetGothic) this.dom.presetGothic.addEventListener('click', () => this.applyArchetypePreset('goth'));
+    if (this.dom.presetPreppy) this.dom.presetPreppy.addEventListener('click', () => this.applyArchetypePreset('preppy'));
+    if (this.dom.presetStreet) this.dom.presetStreet.addEventListener('click', () => this.applyArchetypePreset('street'));
+    if (this.dom.presetDreamer) this.dom.presetDreamer.addEventListener('click', () => this.applyArchetypePreset('dreamer'));
+    if (this.dom.presetElder) this.dom.presetElder.addEventListener('click', () => this.applyArchetypePreset('elder'));
 
     // Modular Appearance Selectors Change
     const updateAvatarFromSelects = () => {
       this.creatorState.avatar = {
-        skin: this.dom.selSkin.value,
-        eyeShape: this.dom.selEyeShape.value,
-        eyeColor: this.dom.selEyeColor.value,
-        hairStyle: this.dom.selHairStyle.value,
-        hairColor: this.dom.selHairColor.value,
-        mark: this.dom.selMark.value
+        ...this.creatorState.avatar,
+        skin: this.dom.selSkin ? this.dom.selSkin.value : 'porcelain',
+        faceShape: this.dom.selFaceShape ? this.dom.selFaceShape.value : 'oval',
+        noseStyle: this.dom.selNose ? this.dom.selNose.value : 'straight',
+        lipsStyle: this.dom.selLips ? this.dom.selLips.value : 'medium',
+        mark: this.dom.selMark ? this.dom.selMark.value : 'none',
+        eyeShape: this.dom.selEyeShape ? this.dom.selEyeShape.value : 'almond',
+        eyelid: this.dom.selEyelid ? this.dom.selEyelid.value : 'double',
+        eyeColor: this.dom.selEyeColor ? this.dom.selEyeColor.value : 'black',
+        eyebrow: this.dom.selEyebrow ? this.dom.selEyebrow.value : 'soft_arch',
+        eyeExtra: this.dom.selEyeExtra ? this.dom.selEyeExtra.value : 'none',
+        hairTexture: this.dom.selHairTexture ? this.dom.selHairTexture.value : 'straight',
+        hairStyle: this.dom.selHairStyle ? this.dom.selHairStyle.value : 'parted',
+        hairColor: this.dom.selHairColor ? this.dom.selHairColor.value : 'raven',
+        bangs: this.dom.selBangs ? this.dom.selBangs.value : 'none',
+        facialHair: this.dom.selFacialHair ? this.dom.selFacialHair.value : 'clean',
+        clothing: this.dom.selClothing ? this.dom.selClothing.value : 'casual',
+        clothingColor: this.dom.selClothingColor ? this.dom.selClothingColor.value : 'charcoal',
+        glasses: this.dom.selGlasses ? this.dom.selGlasses.value : 'none',
+        piercing: this.dom.selPiercing ? this.dom.selPiercing.value : 'none',
+        headwear: this.dom.selHeadwear ? this.dom.selHeadwear.value : 'none',
+        necklace: this.dom.selNecklace ? this.dom.selNecklace.value : 'none'
       };
       this.renderCreatorAvatar();
     };
 
-    [this.dom.selSkin, this.dom.selEyeShape, this.dom.selEyeColor,
-     this.dom.selHairStyle, this.dom.selHairColor, this.dom.selMark].forEach(sel => {
+    [
+      this.dom.selSkin, this.dom.selFaceShape, this.dom.selNose, this.dom.selLips, this.dom.selMark,
+      this.dom.selEyeShape, this.dom.selEyelid, this.dom.selEyeColor, this.dom.selEyebrow, this.dom.selEyeExtra,
+      this.dom.selHairTexture, this.dom.selHairStyle, this.dom.selHairColor, this.dom.selBangs, this.dom.selFacialHair,
+      this.dom.selClothing, this.dom.selClothingColor, this.dom.selGlasses, this.dom.selPiercing, this.dom.selHeadwear, this.dom.selNecklace
+    ].forEach(sel => {
       if (sel) sel.addEventListener('change', updateAvatarFromSelects);
     });
 
     // Randomize appearance button
     this.dom.btnRandomAvatar.addEventListener('click', () => {
       window.soundEngine.playClick();
-      this.creatorState.avatar = window.generateRandomAvatar();
+      this.creatorState.avatar = window.generateRandomAvatar({ age: 18, gender: this.dom.selGender ? this.dom.selGender.value : 'Male' });
       this.syncCreatorUI();
       this.renderCreatorAvatar();
     });
@@ -1092,21 +1155,117 @@ class TerribleGame {
   }
 
   syncCreatorUI() {
-    this.dom.selSkin.value = this.creatorState.avatar.skin;
-    this.dom.selEyeShape.value = this.creatorState.avatar.eyeShape;
-    this.dom.selEyeColor.value = this.creatorState.avatar.eyeColor;
-    this.dom.selHairStyle.value = this.creatorState.avatar.hairStyle;
-    this.dom.selHairColor.value = this.creatorState.avatar.hairColor;
-    this.dom.selMark.value = this.creatorState.avatar.mark;
+    const av = this.creatorState.avatar;
+    if (!av) return;
+
+    if (this.dom.selSkin && av.skin) this.dom.selSkin.value = av.skin;
+    if (this.dom.selFaceShape && av.faceShape) this.dom.selFaceShape.value = av.faceShape;
+    if (this.dom.selNose && av.noseStyle) this.dom.selNose.value = av.noseStyle;
+    if (this.dom.selLips && av.lipsStyle) this.dom.selLips.value = av.lipsStyle;
+    if (this.dom.selMark && av.mark) this.dom.selMark.value = av.mark;
+    if (this.dom.selEyeShape && av.eyeShape) this.dom.selEyeShape.value = av.eyeShape;
+    if (this.dom.selEyelid && av.eyelid) this.dom.selEyelid.value = av.eyelid;
+    if (this.dom.selEyeColor && av.eyeColor) this.dom.selEyeColor.value = av.eyeColor;
+    if (this.dom.selEyebrow && av.eyebrow) this.dom.selEyebrow.value = av.eyebrow;
+    if (this.dom.selEyeExtra && av.eyeExtra) this.dom.selEyeExtra.value = av.eyeExtra;
+    if (this.dom.selHairTexture && av.hairTexture) this.dom.selHairTexture.value = av.hairTexture;
+    if (this.dom.selHairStyle && av.hairStyle) this.dom.selHairStyle.value = av.hairStyle;
+    if (this.dom.selHairColor && av.hairColor) this.dom.selHairColor.value = av.hairColor;
+    if (this.dom.selBangs && av.bangs) this.dom.selBangs.value = av.bangs;
+    if (this.dom.selFacialHair && av.facialHair) this.dom.selFacialHair.value = av.facialHair;
+    if (this.dom.selClothing && av.clothing) this.dom.selClothing.value = av.clothing;
+    if (this.dom.selClothingColor && av.clothingColor) this.dom.selClothingColor.value = av.clothingColor;
+    if (this.dom.selGlasses && av.glasses) this.dom.selGlasses.value = av.glasses;
+    if (this.dom.selPiercing && av.piercing) this.dom.selPiercing.value = av.piercing;
+    if (this.dom.selHeadwear && av.headwear) this.dom.selHeadwear.value = av.headwear;
+    if (this.dom.selNecklace && av.necklace) this.dom.selNecklace.value = av.necklace;
 
     if (!this.dom.inputFirstName.value) {
       this.randomizeName();
     }
   }
 
+  applyArchetypePreset(presetKey) {
+    window.soundEngine.playClick();
+    if (presetKey === 'goth') {
+      this.creatorState.avatar = {
+        ...this.creatorState.avatar,
+        skin: 'porcelain',
+        faceShape: 'heart',
+        hairStyle: 'wolf_cut',
+        hairColor: 'raven',
+        eyeColor: 'crimson',
+        eyeExtra: 'eyeliner',
+        clothing: 'goth',
+        clothingColor: 'burgundy',
+        necklace: 'choker',
+        piercing: 'nose_stud'
+      };
+    } else if (presetKey === 'preppy') {
+      this.creatorState.avatar = {
+        ...this.creatorState.avatar,
+        skin: 'ivory',
+        faceShape: 'oval',
+        hairStyle: 'parted',
+        hairColor: 'golden_blonde',
+        eyeColor: 'blue',
+        clothing: 'prep_blazer',
+        clothingColor: 'school_navy',
+        glasses: 'none',
+        necklace: 'pearls'
+      };
+    } else if (presetKey === 'street') {
+      this.creatorState.avatar = {
+        ...this.creatorState.avatar,
+        skin: 'warm_bronze',
+        faceShape: 'square',
+        hairStyle: 'dreadlocks',
+        hairTexture: 'coily',
+        hairColor: 'raven',
+        clothing: 'hoodie',
+        clothingColor: 'charcoal',
+        headwear: 'beanie',
+        piercing: 'eyebrow'
+      };
+    } else if (presetKey === 'dreamer') {
+      this.creatorState.avatar = {
+        ...this.creatorState.avatar,
+        skin: 'golden_peach',
+        faceShape: 'round',
+        hairStyle: 'loose_waves',
+        hairColor: 'pastel_pink',
+        eyeColor: 'golden',
+        mark: 'freckles',
+        clothing: 'sweater',
+        clothingColor: 'mustard',
+        headwear: 'beret'
+      };
+    } else if (presetKey === 'elder') {
+      this.creatorState.avatar = {
+        ...this.creatorState.avatar,
+        skin: 'ash',
+        faceShape: 'oblong',
+        hairStyle: 'short_bob',
+        hairColor: 'silver_gray',
+        clothing: 'sweater',
+        clothingColor: 'tweed_brown',
+        glasses: 'round_wire',
+        age: 65
+      };
+    }
+    this.syncCreatorUI();
+    this.renderCreatorAvatar();
+  }
+
   switchCreatorTab(tab) {
-    const tabs = [this.dom.tabAppearance, this.dom.tabIdentity, this.dom.tabGodmode];
-    const panels = [this.dom.panelAppearance, this.dom.panelIdentity, this.dom.panelGodmode];
+    const tabs = [
+      this.dom.tabFace, this.dom.tabEyes, this.dom.tabHair,
+      this.dom.tabAttire, this.dom.tabIdentity, this.dom.tabGodmode
+    ].filter(Boolean);
+    const panels = [
+      this.dom.panelFace, this.dom.panelEyes, this.dom.panelHair,
+      this.dom.panelAttire, this.dom.panelIdentity, this.dom.panelGodmode
+    ].filter(Boolean);
 
     tabs.forEach(t => {
       t.classList.remove('bg-slatecard', 'text-parchment', 'text-amber-300');
@@ -1117,30 +1276,31 @@ class TerribleGame {
       p.style.display = 'none';
     });
 
-    if (tab === 'appearance') {
-      this.dom.tabAppearance.classList.add('bg-slatecard', 'text-parchment');
-      this.dom.tabAppearance.classList.remove('text-dust');
-      this.dom.panelAppearance.classList.remove('hidden');
-      this.dom.panelAppearance.style.display = 'block';
-    } else if (tab === 'identity') {
-      this.dom.tabIdentity.classList.add('bg-slatecard', 'text-parchment');
-      this.dom.tabIdentity.classList.remove('text-dust');
-      this.dom.panelIdentity.classList.remove('hidden');
-      this.dom.panelIdentity.style.display = 'block';
-    } else if (tab === 'godmode') {
-      this.dom.tabGodmode.classList.add('bg-slatecard', 'text-amber-300');
-      this.dom.tabGodmode.classList.remove('text-dust');
-      this.dom.panelGodmode.classList.remove('hidden');
-      this.dom.panelGodmode.style.display = 'block';
+    const activeMap = {
+      face: { tab: this.dom.tabFace, panel: this.dom.panelFace },
+      eyes: { tab: this.dom.tabEyes, panel: this.dom.panelEyes },
+      hair: { tab: this.dom.tabHair, panel: this.dom.panelHair },
+      attire: { tab: this.dom.tabAttire, panel: this.dom.panelAttire },
+      identity: { tab: this.dom.tabIdentity, panel: this.dom.panelIdentity },
+      godmode: { tab: this.dom.tabGodmode, panel: this.dom.panelGodmode, isGod: true }
+    };
+
+    const target = activeMap[tab] || activeMap.face;
+    if (target && target.tab && target.panel) {
+      target.tab.classList.add('bg-slatecard', target.isGod ? 'text-amber-300' : 'text-parchment');
+      target.tab.classList.remove('text-dust');
+      target.panel.classList.remove('hidden');
+      target.panel.style.display = 'block';
     }
 
     if (window.lucide) window.lucide.createIcons();
   }
 
   renderCreatorAvatar() {
+    if (!this.dom.creatorAvatarCanvas) return;
     window.drawGothicAvatar(this.dom.creatorAvatarCanvas, {
       ...this.creatorState.avatar,
-      age: 18
+      age: (this.creatorState.avatar && this.creatorState.avatar.age !== undefined) ? this.creatorState.avatar.age : 18
     });
   }
 
@@ -1906,9 +2066,9 @@ class TerribleGame {
 
       card.innerHTML = `
         <div class="flex items-center justify-between mb-1.5">
-          <div class="flex items-center space-x-2 min-w-0">
-            <div class="w-7 h-7 rounded-lg bg-leadborder/30 flex items-center justify-center text-parchment shrink-0">
-              <i data-lucide="${roleIcon}" class="w-3.5 h-3.5 text-dust"></i>
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-xl border border-leadborder/60 overflow-hidden bg-slatecard shrink-0 shadow-xs">
+              <canvas class="kin-thumb-canvas w-full h-full" width="80" height="80"></canvas>
             </div>
             <div class="truncate">
               <h4 class="font-serif font-bold text-xs text-parchment truncate">${person.name}</h4>
@@ -1935,6 +2095,14 @@ class TerribleGame {
           <p class="text-[10px] italic text-dust/80 mt-1">${person.deathCause || 'Passed away.'}</p>
         `}
       `;
+
+      const thumbCanvas = card.querySelector('.kin-thumb-canvas');
+      if (thumbCanvas) {
+        if (!person.avatar) {
+          person.avatar = window.generateRandomAvatar({ gender: person.gender, age: person.age });
+        }
+        window.drawGothicAvatar(thumbCanvas, { ...person.avatar, age: person.age });
+      }
 
       if (isAlive) {
         card.addEventListener('click', () => {
@@ -2009,13 +2177,18 @@ class TerribleGame {
     }
 
     this.dom.kinDetailDossier.innerHTML = `
-      <div class="flex items-start justify-between">
-        <div>
-          <h4 class="font-serif font-bold text-sm text-parchment">${person.name}</h4>
-          <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age}</p>
-          ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5">Employed: ${person.occupation} ${person.salaryUSD ? `<span class="text-emerald-400 font-bold not-italic">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start space-x-3 min-w-0">
+          <div class="w-14 h-14 rounded-xl border border-leadborder overflow-hidden bg-slatecard shadow-md shrink-0">
+            <canvas id="kin-detail-avatar-canvas" width="120" height="120" class="w-full h-full"></canvas>
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-serif font-bold text-sm text-parchment truncate">${person.name}</h4>
+            <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age}</p>
+            ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5 truncate">Employed: ${person.occupation} ${person.salaryUSD ? `<span class="text-emerald-400 font-bold not-italic">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
+          </div>
         </div>
-        <div class="text-right">
+        <div class="text-right shrink-0">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
             Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}
           </span>
@@ -2035,6 +2208,14 @@ class TerribleGame {
       ${entityInfo}
       ${curseInfo}
     `;
+
+    const kinCanvas = this.dom.kinDetailDossier.querySelector('#kin-detail-avatar-canvas');
+    if (kinCanvas) {
+      if (!person.avatar) {
+        person.avatar = window.generateRandomAvatar({ gender: person.gender, age: person.age });
+      }
+      window.drawGothicAvatar(kinCanvas, { ...person.avatar, age: person.age });
+    }
 
     // Button states & quota/diminishing returns display
     const getCount = (key) => window.getActionCount ? window.getActionCount(person, key) : (person.actionsDone && person.actionsDone[key] ? (typeof person.actionsDone[key] === 'number' ? person.actionsDone[key] : 1) : 0);
@@ -4964,8 +5145,8 @@ class TerribleGame {
 
       card.innerHTML = `
         <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-edu-sky shrink-0">
-            <i data-lucide="${peer.gender === 'Male' ? 'user' : 'user-check'}" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-full border border-leadborder overflow-hidden bg-slatecard shrink-0 shadow-xs">
+            <canvas class="peer-thumb-canvas w-full h-full" width="80" height="80"></canvas>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5 truncate">
@@ -5001,6 +5182,14 @@ class TerribleGame {
         </button>
       `;
 
+      const peerCanvas = card.querySelector('.peer-thumb-canvas');
+      if (peerCanvas && window.drawGothicAvatar) {
+        if (!peer.avatar && window.generateSchoolAvatar) {
+          peer.avatar = window.generateSchoolAvatar(peer, 'classmate', edu.level || 'elementary');
+        }
+        window.drawGothicAvatar(peerCanvas, { ...peer.avatar, age: peer.age || this.character.age });
+      }
+
       const interactBtn = card.querySelector('.btn-peer-interact');
       interactBtn.addEventListener('click', () => {
         this.openSchoolPersonModal(peer, 'classmate');
@@ -5034,8 +5223,8 @@ class TerribleGame {
 
       card.innerHTML = `
         <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-edu-emerald shrink-0">
-            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-full border border-leadborder overflow-hidden bg-slatecard shrink-0 shadow-xs">
+            <canvas class="teacher-thumb-canvas w-full h-full" width="80" height="80"></canvas>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5 truncate">
@@ -5058,6 +5247,14 @@ class TerribleGame {
           Consult
         </button>
       `;
+
+      const teachCanvas = card.querySelector('.teacher-thumb-canvas');
+      if (teachCanvas && window.drawGothicAvatar) {
+        if (!teacher.avatar && window.generateSchoolAvatar) {
+          teacher.avatar = window.generateSchoolAvatar(teacher, 'teacher', edu.level || 'elementary');
+        }
+        window.drawGothicAvatar(teachCanvas, { ...teacher.avatar, age: teacher.age || 38 });
+      }
 
       const consultBtn = card.querySelector('.btn-teacher-consult');
       consultBtn.addEventListener('click', () => {
@@ -5083,27 +5280,11 @@ class TerribleGame {
       card.className = "bg-inputbg border border-leadborder rounded-xl p-3 flex items-center justify-between shadow-xs hover:border-leadborder/90 transition-all";
       
       const rel = Math.max(0, Math.min(100, staffMember.relationship || 50));
-      
-      let staffIcon = 'briefcase';
-      let iconColor = 'text-edu-amber';
-      if (staffMember.role.includes('Janitor') || staffMember.role.includes('Caretaker')) {
-        staffIcon = 'wrench';
-        iconColor = 'text-edu-amber';
-      } else if (staffMember.role.includes('Librarian')) {
-        staffIcon = 'book-open';
-        iconColor = 'text-edu-teal';
-      } else if (staffMember.role.includes('Nurse') || staffMember.role.includes('Matron')) {
-        staffIcon = 'heart';
-        iconColor = 'text-edu-rose';
-      } else if (staffMember.role.includes('Principal') || staffMember.role.includes('Headmaster') || staffMember.role.includes('Dean')) {
-        staffIcon = 'shield';
-        iconColor = 'text-edu-purple';
-      }
 
       card.innerHTML = `
         <div class="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-          <div class="w-9 h-9 rounded-full bg-slatecard border border-leadborder flex items-center justify-center ${iconColor} shrink-0">
-            <i data-lucide="${staffIcon}" class="w-4 h-4"></i>
+          <div class="w-10 h-10 rounded-full border border-leadborder overflow-hidden bg-slatecard shrink-0 shadow-xs">
+            <canvas class="staff-thumb-canvas w-full h-full" width="80" height="80"></canvas>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5 truncate">
@@ -5126,6 +5307,14 @@ class TerribleGame {
           Approach
         </button>
       `;
+
+      const staffCanvas = card.querySelector('.staff-thumb-canvas');
+      if (staffCanvas && window.drawGothicAvatar) {
+        if (!staffMember.avatar && window.generateSchoolAvatar) {
+          staffMember.avatar = window.generateSchoolAvatar(staffMember, 'staff', edu.level || 'elementary');
+        }
+        window.drawGothicAvatar(staffCanvas, { ...staffMember.avatar, age: staffMember.age || 45 });
+      }
 
       const approachBtn = card.querySelector('.btn-staff-approach');
       approachBtn.addEventListener('click', () => {
@@ -5179,6 +5368,20 @@ class TerribleGame {
     const rel = Math.max(0, Math.min(100, person.relationship || 50));
     if (this.dom.schoolPersonRelVal) this.dom.schoolPersonRelVal.textContent = `${rel}%`;
     if (this.dom.schoolPersonRelBar) this.dom.schoolPersonRelBar.style.width = `${rel}%`;
+
+    // Render School Person Avatar Canvas
+    if (this.dom.schoolPersonAvatarCanvas && window.drawGothicAvatar) {
+      if (!person.avatar && window.generateSchoolAvatar) {
+        person.avatar = window.generateSchoolAvatar(person, category, this.character.education ? this.character.education.level : 'elementary');
+      }
+      let personAge = person.age;
+      if (!personAge) {
+        if (category === 'classmate') personAge = this.character.age;
+        else if (category === 'teacher') personAge = 38;
+        else personAge = 45;
+      }
+      window.drawGothicAvatar(this.dom.schoolPersonAvatarCanvas, { ...person.avatar, age: personAge });
+    }
 
     this.renderSchoolPersonActions(person, category);
 

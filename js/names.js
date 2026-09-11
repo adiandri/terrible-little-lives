@@ -145,21 +145,99 @@ function getRandomElement(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function generateRandomAvatar() {
-  const skins = ['porcelain', 'ash', 'sallow', 'olive', 'bruised', 'mortuary'];
-  const eyeShapes = ['sunken', 'wide', 'narrow', 'blind', 'monstrous'];
-  const eyeColors = ['coal', 'ice_blue', 'pale_hazel', 'crimson', 'violet', 'milky'];
-  const hairStyles = ['parted', 'slicked', 'unkempt', 'braids', 'bob'];
-  const hairColors = ['raven', 'ash_brown', 'auburn', 'ghost_white', 'pale_blonde'];
-  const marks = ['hollow_circles', 'spectacles', 'scar', 'caul', 'none'];
+function generateRandomAvatar(options = {}) {
+  const gender = options.gender || (Math.random() > 0.5 ? 'Male' : 'Female');
+  const age = options.age !== undefined ? options.age : 16;
+  const isElder = age >= 51;
+  const isAdult = age >= 30;
+  const isChild = age < 13;
+
+  const skins = ['porcelain', 'ivory', 'warm_beige', 'golden_peach', 'olive', 'warm_bronze', 'chestnut', 'rich_espresso', 'deep_ebony', 'ash', 'sallow'];
+  const faceShapes = ['oval', 'round', 'square', 'rectangle', 'heart', 'diamond', 'triangle', 'inverted_triangle', 'oblong', 'wide'];
+  const eyeShapes = ['almond', 'round', 'hooded', 'monolid', 'upturned', 'downturned', 'deep_set'];
+  const naturalEyeColors = ['black', 'dark_brown', 'brown', 'light_brown', 'hazel', 'amber', 'green', 'olive_green', 'blue', 'gray'];
+  const rareEyeColors = ['golden', 'violet', 'albino_red', 'ice_blue', 'crimson', 'starburst'];
+  const eyeColors = Math.random() < 0.12 ? rareEyeColors : naturalEyeColors;
+  
+  const naturalHairColors = ['raven', 'dark_brown', 'ash_brown', 'chestnut', 'auburn', 'ginger_red', 'strawberry_blonde', 'dark_blonde', 'golden_blonde', 'platinum', 'silver_gray', 'pure_white'];
+  const dyedHairColors = ['pastel_pink', 'rose', 'peach', 'crimson_dye', 'neon_orange', 'moss_green', 'teal', 'deep_blue', 'royal_purple', 'lavender', 'split_black_white'];
+  
+  let chosenHairColor = getRandomElement(naturalHairColors);
+  if (isElder) {
+    chosenHairColor = Math.random() < 0.6 ? 'silver_gray' : 'pure_white';
+  } else if (!isChild && Math.random() < 0.18) {
+    chosenHairColor = getRandomElement(dyedHairColors);
+  }
+
+  const shortHairStyles = ['pixie', 'crop', 'short_bob', 'shag', 'buzz_cut', 'parted'];
+  const mediumLongHairStyles = ['bob', 'wolf_cut', 'mullet', 'braids', 'box_braids', 'dreadlocks', 'space_buns', 'messy_bun', 'long', 'loose_waves', 'straight_long', 'hijab'];
+  const hairStyles = (gender === 'Male' && Math.random() < 0.75) ? shortHairStyles : (gender === 'Female' && Math.random() < 0.75 ? mediumLongHairStyles : [...shortHairStyles, ...mediumLongHairStyles]);
+
+  const hairTextures = ['straight', 'wavy', 'curly', 'coily'];
+  const bangsOptions = ['none', 'none', 'curtain', 'straight', 'wispy', 'micro'];
+  const noseStyles = ['straight', 'button', 'roman', 'aquiline', 'broad', 'snub'];
+  const lipsStyles = ['thin', 'medium', 'full', 'heart', 'wide', 'upturned', 'downturned'];
+  const eyebrows = ['straight', 'arched', 'soft_arch', 'rounded', 'angled', 'thick', 'thin', 'feathered'];
+  
+  // Facial hair for mature males
+  let facialHair = 'clean';
+  if (gender === 'Male' && age >= 18 && Math.random() < 0.55) {
+    facialHair = getRandomElement(['stubble', 'mustache', 'chevron_mustache', 'handlebar', 'short_beard', 'full_beard', 'goatee', 'mutton_chops']);
+    if (isElder && Math.random() < 0.3) facialHair = 'wizard';
+  }
+
+  // Markings
+  const marks = ['none', 'none', 'none', 'freckles', 'moles', 'vitiligo', 'scar', 'cleft_chin'];
+  if (age >= 13 && age <= 19 && Math.random() < 0.25) marks.push('acne_teen');
+
+  // Clothing
+  let clothing = 'casual';
+  if (isChild) {
+    clothing = getRandomElement(['casual', 'hoodie', 'sweater']);
+  } else if (isElder) {
+    clothing = getRandomElement(['sweater', 'cardigan', 'suit', 'casual']);
+  } else {
+    clothing = getRandomElement(['casual', 'hoodie', 'sweater', 'turtleneck', 'prep_blazer', 'elite_uniform', 'suit', 'goth']);
+  }
+
+  // Accessories
+  const glasses = (Math.random() < (isElder ? 0.65 : 0.22)) 
+    ? getRandomElement(['round_wire', 'square', 'thick_frame', 'cat_eye', 'sunglasses']) 
+    : 'none';
+  const piercing = (!isChild && Math.random() < 0.20)
+    ? getRandomElement(['nose_stud', 'septum', 'eyebrow', 'labret', 'earrings'])
+    : 'none';
+  const headwear = (Math.random() < 0.15)
+    ? getRandomElement(['beanie', 'beret', 'baseball_cap'])
+    : 'none';
+  const necklace = (!isChild && Math.random() < 0.18)
+    ? getRandomElement(['choker', 'chain', 'pendant', 'pearls'])
+    : 'none';
 
   return {
-    skin: getRandomElement(skins),
-    eyeShape: getRandomElement(eyeShapes),
-    eyeColor: getRandomElement(eyeColors),
-    hairStyle: getRandomElement(hairStyles),
-    hairColor: getRandomElement(hairColors),
-    mark: getRandomElement(marks)
+    skin: options.skin || getRandomElement(skins),
+    faceShape: options.faceShape || getRandomElement(faceShapes),
+    eyeShape: options.eyeShape || getRandomElement(eyeShapes),
+    eyeColor: options.eyeColor || (chosenHairColor === 'raven' && Math.random() < 0.05 ? 'crimson' : getRandomElement(eyeColors)),
+    eyelid: options.eyelid || getRandomElement(['double', 'single', 'hooded']),
+    eyeExtra: options.eyeExtra || (Math.random() < 0.2 ? getRandomElement(['tired_eyes', 'eye_bags', 'eyeliner']) : 'none'),
+    eyebrow: options.eyebrow || getRandomElement(eyebrows),
+    noseStyle: options.noseStyle || getRandomElement(noseStyles),
+    lipsStyle: options.lipsStyle || getRandomElement(lipsStyles),
+    hairStyle: options.hairStyle || getRandomElement(hairStyles),
+    hairTexture: options.hairTexture || getRandomElement(hairTextures),
+    hairColor: options.hairColor || chosenHairColor,
+    bangs: options.bangs || getRandomElement(bangsOptions),
+    facialHair: options.facialHair || facialHair,
+    mark: options.mark || getRandomElement(marks),
+    clothing: options.clothing || clothing,
+    clothingColor: options.clothingColor || getRandomElement(['black', 'charcoal', 'navy', 'burgundy', 'forest', 'tweed_brown', 'cream', 'denim', 'school_maroon']),
+    glasses: options.glasses || glasses,
+    piercing: options.piercing || piercing,
+    headwear: options.headwear || headwear,
+    necklace: options.necklace || necklace,
+    age: age,
+    gender: gender
   };
 }
 
