@@ -2144,44 +2144,480 @@
       </div>
     </div>
 
-    <!-- LIFE & CHILDHOOD ACTIVITIES MODAL -->
+    <!-- LIFE & CHILDHOOD ACTIVITIES MODAL ("CITY OF BUTTONS") -->
     <div id="activities-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
       <!-- Header -->
       <div class="flex justify-between items-center border-b border-leadborder px-4 py-3 bg-headerbg/80 shrink-0 safe-top">
         <div class="flex items-center space-x-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
-            <i data-lucide="compass" class="w-4 h-4"></i>
+          <button id="btn-back-activities-hub" class="hidden p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 mr-1" title="Back to City Hub" aria-label="Back">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </button>
+          <div id="activities-header-icon-box" class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
+            <i id="activities-header-icon" data-lucide="compass" class="w-4 h-4"></i>
           </div>
           <div class="min-w-0">
-            <h3 class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Activities & Pursuits</h3>
-            <p class="text-[10px] text-dust font-mono truncate">Leisure, studies, dark arts & socializing</p>
+            <h3 id="activities-header-title" class="font-serif font-bold text-sm text-parchment uppercase tracking-wider truncate">Activities</h3>
+            <p id="activities-header-subtitle" class="text-[10px] text-dust font-mono truncate">City of Pursuits</p>
           </div>
         </div>
-        <button id="btn-close-activities" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-2" title="Close" aria-label="Close">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <div class="flex items-center space-x-2 shrink-0">
+          <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+            <i data-lucide="battery-charging" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span id="activities-stamina-text">40 / 40</span>
+          </div>
+          <button id="btn-close-activities" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-1" title="Close" aria-label="Close">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- Main Scrollable Body -->
-      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
-        <!-- Action points stamina banner -->
-        <div class="flex items-center justify-between bg-inputbg border border-leadborder rounded-xl px-3 py-2.5 shrink-0">
-          <div class="flex items-center space-x-1.5 text-xs text-dust">
-            <i data-lucide="battery-charging" class="w-4 h-4 text-amber-400"></i>
-            <span class="font-mono text-[11px]">Energy / Stamina:</span>
+      <!-- VIEW 1: THE CITY OF BUTTONS HUB -->
+      <div id="activities-hub-view" class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-4 safe-bottom">
+        
+        <!-- Sector Row 1: LIFE & PEOPLE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Sector 1A: LIFE -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🏠</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Life</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Mundane & Means</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Work -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-amber-500/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="work">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Work</div>
+                    <div id="hub-status-work" class="text-[10px] text-dust font-mono truncate">Careers, gigs & shifts</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Education -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-sky-500/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="education">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-edu-sky shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Education</div>
+                    <div id="hub-status-education" class="text-[10px] text-dust font-mono truncate">Classes, studies & faculty</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Money -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-amber-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="money">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-amber-300 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="coins" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Money</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Allowance, lottery & schemes</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Home -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-emerald-500/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="home">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Home</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Chores, resting & cellar secrets</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
           </div>
-          <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 rounded-full">
-            40 / 40 Actions Left
+
+          <!-- Sector 1B: PEOPLE -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">👥</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">People</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Kin & Connections</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Relationships -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-rose-500/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="relationships">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-rose-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Relationships</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Romance, courtship & dates</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Family -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-purple-500/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="family">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-purple-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Family</div>
+                    <div id="hub-status-family" class="text-[10px] text-dust font-mono truncate">Parents, siblings & kin</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Social -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-sky-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="social">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Social</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Companions, parties & gossip</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Filter tabs -->
-        <div class="flex space-x-1 bg-inputbg p-1 rounded-xl border border-leadborder shrink-0 overflow-x-auto custom-scroll">
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all" data-category="all">All</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="leisure">Play</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="mind">Mind</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="forbidden">Occult</button>
-          <button class="activity-filter-btn flex-1 min-w-[50px] py-1.5 text-[10px] font-mono rounded-lg text-dust hover:text-parchment transition-all" data-category="social">Social</button>
+        <!-- Sector Row 2: FUN & OUTSIDE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Sector 2A: FUN -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🎭</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Fun</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Pastimes & Joy</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Media -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-sky-300/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="media">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-sky-300 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="tv" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Media</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Television, horror movies & radio</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Hobbies -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-amber-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="hobbies">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="palette" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Hobbies</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Painting, music & dark arts</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Games -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-emerald-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="games">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Games</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Consoles, playground & chess</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sector 2B: OUTSIDE -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🌍</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Outside</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">The Wide World</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Travel -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-rose-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="travel">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-rose-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="car" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Travel</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Road trips, seaside & retreats</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Places -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-purple-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="places">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-purple-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Places</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Graveyards, parks & catacombs</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sector Row 3: HEALTH & TROUBLE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Sector 3A: HEALTH -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🏥</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Health</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Body & Mind</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Medical -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-rose-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="medical">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-rose-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="stethoscope" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Medical</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Checkups, clinics & surgeries</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Mental -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-purple-300/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="mental">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-purple-300 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="brain" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Mental</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Therapy, journaling & sanitarium</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sector 3B: TROUBLE -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">⚖️</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Trouble</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Crime & Law</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Crime -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-crimson/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="crime">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-crimson shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Crime</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Theft, vandalism & dark altar</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Legal -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-amber-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="legal">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="scale" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Legal</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Attorneys, lawsuits & petitions</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sector Row 4: DIGITAL & ANIMALS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Sector 4A: DIGITAL -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">📱</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Digital</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Screens & Signals</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Phone -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-sky-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="phone">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Phone</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Texts, calls & doomscrolling</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Internet -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-teal-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="internet">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-teal-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Internet</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Dark web, occult boards & web</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sector 4B: ANIMALS -->
+          <div class="rounded-2xl border border-leadborder/70 bg-inputbg/85 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-leadborder/40 bg-headerbg/50">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🐾</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Animals</span>
+              </div>
+              <span class="text-[9px] font-mono text-dust uppercase font-bold tracking-wider">Creatures & Beasts</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <!-- Pets -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-amber-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="pets">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="cat" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Pets</div>
+                    <div id="hub-status-pets" class="text-[10px] text-dust font-mono truncate">Familiars, adoption & care</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+              <!-- Wildlife -->
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-cardhover border border-leadborder/60 hover:border-emerald-400/50 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="wildlife">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-inputbg border border-leadborder flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="trees" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Wildlife</div>
+                    <div class="text-[10px] text-dust font-mono truncate">Ravens, stray felines & bats</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sector Row 5: HORROR & RANDOM -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4">
+          <!-- Sector 5A: HORROR -->
+          <div class="rounded-2xl border border-purple-800/60 bg-purple-950/20 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-purple-800/40 bg-purple-950/40">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🩸</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-purple-200">Horror</span>
+              </div>
+              <span class="text-[9px] font-mono text-purple-300/80 uppercase font-bold tracking-wider">The Unseen</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-purple-900/40 border border-purple-800/40 hover:border-purple-500/60 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="horror">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-purple-950/60 border border-purple-700/50 flex items-center justify-center text-purple-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="flame" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Occult & Crypts</div>
+                    <div class="text-[10px] text-purple-300/70 font-mono truncate">Séance, curses & Ouija communion</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sector 5B: RANDOM -->
+          <div class="rounded-2xl border border-amber-800/60 bg-amber-950/20 overflow-hidden shadow-xs">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-amber-800/40 bg-amber-950/40">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🎲</span>
+                <span class="font-serif font-bold text-xs uppercase tracking-wider text-amber-200">Random</span>
+              </div>
+              <span class="text-[9px] font-mono text-amber-300/80 uppercase font-bold tracking-wider">The Unknown</span>
+            </div>
+            <div class="p-2 space-y-1.5">
+              <button class="btn-activity-category w-full p-2.5 rounded-xl bg-slatecard/80 hover:bg-amber-900/40 border border-amber-800/40 hover:border-amber-500/60 flex items-center justify-between transition-all group active:scale-[0.98]" data-category="random">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-amber-950/60 border border-amber-700/50 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <i data-lucide="dices" class="w-4 h-4"></i>
+                  </div>
+                  <div class="text-left min-w-0">
+                    <div class="font-serif font-bold text-xs text-parchment truncate">Wheel of Fate</div>
+                    <div class="text-[10px] text-amber-300/70 font-mono truncate">Roll cosmic dice & encounter mystery</div>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-amber-400 group-hover:text-parchment transition-colors shrink-0"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW 2: CATEGORY ACTION DRILL-DOWN VIEW -->
+      <div id="activities-detail-view" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
+        <!-- Category Banner -->
+        <div id="activity-detail-banner" class="flex items-center justify-between p-3 rounded-xl bg-inputbg border border-leadborder shrink-0 shadow-xs">
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div id="activity-detail-icon-box" class="w-9 h-9 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center shrink-0">
+              <i id="activity-detail-icon" data-lucide="compass" class="w-4 h-4 text-amber-400"></i>
+            </div>
+            <div class="min-w-0">
+              <h4 id="activity-detail-title" class="font-serif font-bold text-sm text-parchment truncate">Category Name</h4>
+              <p id="activity-detail-desc" class="text-[11px] text-dust font-mono truncate">Category description and lore</p>
+            </div>
+          </div>
         </div>
 
         <!-- Activities List Container -->

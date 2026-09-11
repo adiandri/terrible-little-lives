@@ -298,13 +298,26 @@ class TerribleGame {
       btnKinSecret: document.getElementById('btn-kin-secret'),
       btnKinFolktale: document.getElementById('btn-kin-folktale'),
 
-      // Activities Modal
+      // Activities Modal ("City of Buttons")
       btnTabActivities: document.getElementById('btn-tab-activities'),
       activitiesModal: document.getElementById('activities-modal'),
       btnCloseActivities: document.getElementById('btn-close-activities'),
-      activitiesList: document.getElementById('activities-list'),
+      btnBackActivitiesHub: document.getElementById('btn-back-activities-hub'),
+      activitiesHeaderIcon: document.getElementById('activities-header-icon'),
+      activitiesHeaderTitle: document.getElementById('activities-header-title'),
+      activitiesHeaderSubtitle: document.getElementById('activities-header-subtitle'),
       activitiesStaminaBadge: document.getElementById('activities-stamina-badge'),
-      activityFilterBtns: document.querySelectorAll('.activity-filter-btn'),
+      activitiesStaminaText: document.getElementById('activities-stamina-text'),
+      activitiesHubView: document.getElementById('activities-hub-view'),
+      activitiesDetailView: document.getElementById('activities-detail-view'),
+      activityDetailIcon: document.getElementById('activity-detail-icon'),
+      activityDetailTitle: document.getElementById('activity-detail-title'),
+      activityDetailDesc: document.getElementById('activity-detail-desc'),
+      activitiesList: document.getElementById('activities-list'),
+      hubStatusWork: document.getElementById('hub-status-work'),
+      hubStatusEducation: document.getElementById('hub-status-education'),
+      hubStatusFamily: document.getElementById('hub-status-family'),
+      hubStatusPets: document.getElementById('hub-status-pets'),
 
       // Revelation Modal
       revelationModal: document.getElementById('revelation-modal'),
@@ -1003,7 +1016,7 @@ class TerribleGame {
       this.dom.btnCloseFeedback.addEventListener('click', () => this.closeFeedbackModal());
     }
 
-    // Activities Modal Controls
+    // Activities Modal Controls ("City of Buttons")
     if (this.dom.btnTabActivities) {
       this.dom.btnTabActivities.addEventListener('click', () => {
         window.soundEngine.playClick();
@@ -1013,14 +1026,19 @@ class TerribleGame {
     if (this.dom.btnCloseActivities) {
       this.dom.btnCloseActivities.addEventListener('click', () => this.closeActivitiesModal());
     }
-    if (this.dom.activityFilterBtns) {
-      this.dom.activityFilterBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          window.soundEngine.playClick();
-          this.filterActivities(e.currentTarget.dataset.category);
-        });
+    if (this.dom.btnBackActivitiesHub) {
+      this.dom.btnBackActivitiesHub.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.closeActivityCategory();
       });
     }
+    document.querySelectorAll('.btn-activity-category').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        window.soundEngine.playClick();
+        const cat = e.currentTarget.dataset.category;
+        this.openActivityCategory(cat);
+      });
+    });
 
     // Revelation Modal Controls
     if (this.dom.btnRevelationLoyal) {
@@ -3722,13 +3740,14 @@ class TerribleGame {
   }
 
   // ==========================================
-  // ACTIVITIES & PURSUITS SYSTEM
+  // ACTIVITIES & PURSUITS SYSTEM ("CITY OF BUTTONS")
   // ==========================================
 
   openActivitiesModal() {
     this.dom.activitiesModal.classList.remove('hidden');
     this.dom.activitiesModal.style.display = 'flex';
-    this.renderActivitiesList(this.activeActivityFilter);
+    this.closeActivityCategory(); // Ensure we land on the City Hub
+    this.renderActivitiesHub();
   }
 
   closeActivitiesModal() {
@@ -3736,37 +3755,145 @@ class TerribleGame {
     this.dom.activitiesModal.style.display = 'none';
   }
 
-  filterActivities(category) {
-    this.activeActivityFilter = category;
-    this.dom.activityFilterBtns.forEach(btn => {
-      if (btn.dataset.category === category) {
-        btn.className = "activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md bg-slatecard text-parchment font-bold shadow-sm transition-all";
+  renderActivitiesHub() {
+    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
+
+    // Live status indicators on hub cards
+    if (this.dom.hubStatusWork) {
+      if (this.character.job && (this.character.job.title || this.character.job.name)) {
+        this.dom.hubStatusWork.textContent = this.character.job.title || this.character.job.name;
+      } else if (this.character.age < 18) {
+        this.dom.hubStatusWork.textContent = "Odd jobs & shifts";
       } else {
-        btn.className = "activity-filter-btn flex-1 min-w-[50px] py-1 text-[10px] font-mono rounded-md text-dust hover:text-parchment transition-all";
+        this.dom.hubStatusWork.textContent = "Unemployed · Gigs available";
       }
-    });
-    this.renderActivitiesList(category);
+    }
+
+    if (this.dom.hubStatusEducation) {
+      if (this.character.education && this.character.education.enrolled) {
+        this.dom.hubStatusEducation.textContent = this.character.education.name || "Enrolled in school";
+      } else if (this.character.age <= 17) {
+        this.dom.hubStatusEducation.textContent = "Schooling eligible";
+      } else if (this.character.hasHighSchoolDiploma) {
+        this.dom.hubStatusEducation.textContent = "High School Graduate";
+      } else {
+        this.dom.hubStatusEducation.textContent = "No active enrollment";
+      }
+    }
+
+    if (this.dom.hubStatusFamily) {
+      const parentCount = (this.character.kin && this.character.kin.parents) ? this.character.kin.parents.filter(p => p.alive).length : 0;
+      const siblingCount = (this.character.kin && this.character.kin.siblings) ? this.character.kin.siblings.filter(s => s.alive).length : 0;
+      this.dom.hubStatusFamily.textContent = `${parentCount} parent(s) · ${siblingCount} sibling(s)`;
+    }
+
+    if (this.dom.hubStatusPets) {
+      const petCount = (this.character.pets) ? this.character.pets.filter(p => p.alive).length : 0;
+      this.dom.hubStatusPets.textContent = petCount > 0 ? `${petCount} companion animal(s)` : "No pets · Adoption available";
+    }
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
-  renderActivitiesList(category = 'all') {
-    this.dom.activitiesStaminaBadge.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40} Actions Left`;
+  openActivityCategory(categoryKey) {
+    const catData = (window.ACTIVITY_CATEGORIES_DATA && window.ACTIVITY_CATEGORIES_DATA[categoryKey]) || {
+      name: categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1),
+      desc: "Available pursuits in this sector",
+      icon: "compass"
+    };
 
+    // Direct modal shortcuts
+    if (catData.shortcut === 'careers') {
+      this.closeActivitiesModal();
+      this.openCareersModal();
+      return;
+    }
+    if (catData.shortcut === 'education') {
+      this.closeActivitiesModal();
+      this.openEducationModal();
+      return;
+    }
+    if (catData.shortcut === 'kin') {
+      this.closeActivitiesModal();
+      this.openKinModal();
+      return;
+    }
+    if (catData.shortcut === 'pets') {
+      this.closeActivitiesModal();
+      this.openPetsModal();
+      return;
+    }
+    if (catData.shortcut === 'dark_altar') {
+      this.closeActivitiesModal();
+      this.openDarkAltarModal();
+      return;
+    }
+
+    this.activeActivityCategory = categoryKey;
+
+    // Drill down to detail view
+    if (this.dom.activitiesHubView) this.dom.activitiesHubView.classList.add('hidden');
+    if (this.dom.activitiesDetailView) this.dom.activitiesDetailView.classList.remove('hidden');
+    if (this.dom.btnBackActivitiesHub) this.dom.btnBackActivitiesHub.classList.remove('hidden');
+
+    if (this.dom.activitiesHeaderTitle) this.dom.activitiesHeaderTitle.textContent = catData.name;
+    if (this.dom.activitiesHeaderSubtitle) this.dom.activitiesHeaderSubtitle.textContent = catData.desc;
+
+    if (this.dom.activityDetailTitle) this.dom.activityDetailTitle.textContent = catData.name;
+    if (this.dom.activityDetailDesc) this.dom.activityDetailDesc.textContent = catData.desc;
+    if (this.dom.activityDetailIcon) {
+      this.dom.activityDetailIcon.setAttribute('data-lucide', catData.icon || 'compass');
+    }
+
+    this.renderActivitiesList(categoryKey);
+  }
+
+  closeActivityCategory() {
+    this.activeActivityCategory = null;
+    if (this.dom.activitiesHubView) this.dom.activitiesHubView.classList.remove('hidden');
+    if (this.dom.activitiesDetailView) this.dom.activitiesDetailView.classList.add('hidden');
+    if (this.dom.btnBackActivitiesHub) this.dom.btnBackActivitiesHub.classList.add('hidden');
+
+    if (this.dom.activitiesHeaderTitle) this.dom.activitiesHeaderTitle.textContent = "Activities";
+    if (this.dom.activitiesHeaderSubtitle) this.dom.activitiesHeaderSubtitle.textContent = "City of Pursuits";
+
+    this.renderActivitiesHub();
+  }
+
+  renderActivitiesList(categoryKey) {
+    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
+
+    if (!this.dom.activitiesList) return;
     this.dom.activitiesList.innerHTML = '';
+
     const list = window.ACTIVITIES_LIST || [];
     const filtered = list.filter(act => {
-      // If past maxAge (e.g. infant activity for adult character), omit completely
+      // If past maxAge, omit
       if (this.character.age > act.maxAge) return false;
-      // Category filter
-      if (category !== 'all' && act.category !== category) return false;
+      // Category match
+      if (categoryKey && act.category !== categoryKey) return false;
       return true;
     });
 
     if (filtered.length === 0) {
       this.dom.activitiesList.innerHTML = `
-        <div class="text-center py-8 text-dust/70 text-xs italic font-serif">
-          No pursuits available for your current age (${this.character.age}) in this category.
+        <div class="text-center py-10 px-4 bg-inputbg rounded-2xl border border-leadborder space-y-2">
+          <div class="w-10 h-10 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-dust">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+          <div class="font-serif font-bold text-sm text-parchment">No Pursuits Available Yet</div>
+          <p class="text-xs text-dust leading-relaxed font-sans max-w-xs mx-auto">
+            Your character is currently Age ${this.character.age}. Age up by tapping <span class="font-mono text-crimson font-bold">Endure Year</span> to unlock more advanced activities in this sector.
+          </p>
         </div>
       `;
+      if (window.lucide) {
+        try { window.lucide.createIcons(); } catch (e) {}
+      }
       return;
     }
 
@@ -3778,18 +3905,13 @@ class TerribleGame {
       card.dataset.actId = act.id;
       
       if (isLockedByAge) {
-        card.className = "p-3.5 rounded-xl border bg-inputbg/30 border-leadborder/40 opacity-55 transition-all space-y-2 shadow-xs";
+        card.className = "p-3.5 rounded-2xl border bg-inputbg/40 border-leadborder/40 opacity-60 transition-all space-y-2.5 shadow-xs";
       } else {
-        card.className = "p-3.5 rounded-xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2 shadow-xs";
+        card.className = "p-3.5 rounded-2xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2.5 shadow-xs";
       }
 
-      const catBadgeColor = act.category === 'forbidden' ? 'text-crimson bg-crimson/10 border-crimson/30' :
-        (act.category === 'academics' || act.category === 'mind' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' : 
-        (act.category === 'social' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 
-        (act.category === 'occult' ? 'text-purple-400 bg-purple-500/10 border-purple-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30')));
-
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
-      const maxUses = act.maxPerYear || 10;
+      const maxUses = act.maxPerYear || 5;
       const isCapped = uses >= maxUses;
       const isDisabled = isLockedByAge || noEnergy || isCapped;
 
@@ -3797,32 +3919,35 @@ class TerribleGame {
       if (isLockedByAge) {
         btnLabel = `Locked (Age ${act.minAge})`;
       } else if (isCapped) {
-        btnLabel = 'Capped';
+        btnLabel = 'Capped this Year';
       }
 
       const ageBadge = isLockedByAge 
-        ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded border font-semibold text-amber-400/80 bg-amber-500/10 border-amber-500/25 flex items-center gap-1"><i data-lucide="lock" class="w-2.5 h-2.5"></i>Unlocks Age ${act.minAge}</span>`
-        : `<span class="text-[10px] font-mono text-dust">Age ${act.minAge}-${act.maxAge}</span>`;
+        ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1"><i data-lucide="lock" class="w-2.5 h-2.5"></i>Req Age ${act.minAge}</span>`
+        : `<span class="text-[10px] font-mono text-dust/80">Age ${act.minAge}–${act.maxAge}</span>`;
 
       card.innerHTML = `
         <div class="flex justify-between items-start">
-          <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-lg ${isLockedByAge ? 'bg-leadborder/15 text-dust/50' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-xl ${isLockedByAge ? 'bg-leadborder/20 text-dust/50' : 'bg-slatecard text-amber-400 border border-leadborder'} flex items-center justify-center shrink-0">
               <i data-lucide="${isLockedByAge ? 'lock' : (act.icon || 'compass')}" class="w-4 h-4"></i>
             </div>
-            <div>
-              <h4 class="font-serif font-bold text-xs ${isLockedByAge ? 'text-parchment/60' : 'text-parchment'}">${act.name}</h4>
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-semibold ${catBadgeColor}">${act.category}</span>
+            <div class="min-w-0">
+              <h4 class="font-serif font-bold text-xs ${isLockedByAge ? 'text-parchment/60' : 'text-parchment'} truncate">${act.name}</h4>
+              <span class="text-[9px] font-mono text-dust">${isLockedByAge ? 'Milestone' : `Quota: ${uses}/${maxUses} used`}</span>
             </div>
           </div>
           ${ageBadge}
         </div>
 
-        <p class="text-[11px] text-dust leading-relaxed">${act.desc}</p>
+        <p class="text-[11px] text-dust font-sans leading-relaxed">${act.desc}</p>
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
-          <span class="text-[10px] font-mono text-dust/80">${isLockedByAge ? `Milestone: Requires Age ${act.minAge}` : `Cost: 1 Action · Quota: ${uses}/${maxUses}`}</span>
-          <button class="btn-do-activity px-3 py-1.5 rounded-lg text-xs font-serif font-bold transition-all ${
+          <span class="text-[10px] font-mono text-dust/90 flex items-center gap-1">
+            <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+            Cost: 1 Energy
+          </span>
+          <button class="btn-do-activity px-3.5 py-1.5 rounded-xl text-xs font-serif font-bold transition-all ${
             isDisabled 
               ? 'opacity-50 cursor-not-allowed bg-leadborder/20 text-dust border border-leadborder/30' 
               : 'bg-slatecard hover:bg-cardhover text-parchment border border-leadborder active:scale-95 shadow-xs cursor-pointer'
@@ -3848,14 +3973,15 @@ class TerribleGame {
   }
 
   handleActivityClick(activityId) {
-    if (activityId === 'dark_altar_activity') {
-      this.closeActivitiesModal();
-      this.openDarkAltarModal();
-      return;
-    }
-
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.openFeedbackModal({
+        tag: "ENERGY DEPLETED",
+        title: "Exhausted",
+        icon: "battery-charging",
+        iconColor: "text-amber-400",
+        body: "You are physically and mentally exhausted for this year! Click 'Endure Year' to proceed and rest.",
+        effects: {}
+      });
       return;
     }
 
@@ -3865,7 +3991,7 @@ class TerribleGame {
       return;
     }
 
-    if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'urban_exploration' || activityId === 'nursery_lullaby') {
+    if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'midnight_seance' || activityId === 'ouija_board_communion') {
       window.soundEngine.playDread();
     } else {
       window.soundEngine.playTick();
@@ -3877,12 +4003,12 @@ class TerribleGame {
     }
 
     this.renderAll();
-    this.renderActivitiesList(this.activeActivityFilter);
+    this.renderActivitiesList(this.activeActivityCategory);
     this.saveGame();
 
     // Show interactive feedback dialog modal
     this.openFeedbackModal({
-      tag: "ACTIVITY PURSUED",
+      tag: "PURSUIT COMPLETED",
       title: result.title,
       icon: "sparkles",
       iconColor: "text-amber-400",
