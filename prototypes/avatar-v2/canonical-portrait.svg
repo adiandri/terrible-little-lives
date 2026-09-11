@@ -135,10 +135,12 @@
   </g>
 
   <g id="layer-markings">
-    <circle cx="193" cy="272" r="2.4" fill="#684036"/>
-    <circle cx="205" cy="279" r="1.8" fill="#684036"/>
-    <circle cx="316" cy="270" r="2" fill="#684036"/>
-    <path d="M329 227c7 16 5 34-5 48" fill="none" stroke="#8d4b4c" stroke-width="3" stroke-linecap="round" opacity=".66"/>
+    <g data-marking="freckles">
+      <circle cx="193" cy="272" r="2.4" fill="#684036"/>
+      <circle cx="205" cy="279" r="1.8" fill="#684036"/>
+      <circle cx="316" cy="270" r="2" fill="#684036"/>
+    </g>
+    <path data-marking="scar" d="M329 227c7 16 5 34-5 48" fill="none" stroke="#8d4b4c" stroke-width="3" stroke-linecap="round" opacity=".66"/>
   </g>
 
   <g id="layer-frame">
