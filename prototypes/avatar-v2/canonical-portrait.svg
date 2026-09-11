@@ -8,28 +8,28 @@
       <stop offset="1" stop-color="#08090d"/>
     </radialGradient>
     <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#272b36"/>
-      <stop offset=".55" stop-color="#11131a"/>
-      <stop offset="1" stop-color="#07080c"/>
+      <stop data-color="coat-light" stop-color="#272b36"/>
+      <stop data-color="coat-mid" offset=".55" stop-color="#11131a"/>
+      <stop data-color="coat-dark" offset="1" stop-color="#07080c"/>
     </linearGradient>
     <linearGradient id="skin" x1=".25" y1=".1" x2=".75" y2=".95">
-      <stop stop-color="#d99a75"/>
-      <stop offset=".48" stop-color="#b9694e"/>
-      <stop offset="1" stop-color="#713b35"/>
+      <stop data-color="skin-light" stop-color="#d99a75"/>
+      <stop data-color="skin-mid" offset=".48" stop-color="#b9694e"/>
+      <stop data-color="skin-dark" offset="1" stop-color="#713b35"/>
     </linearGradient>
     <linearGradient id="neck" x1="0" y1="0" x2="1" y2="1">
       <stop stop-color="#b96e52"/>
       <stop offset="1" stop-color="#6f3934"/>
     </linearGradient>
     <linearGradient id="hair" x1=".2" y1=".1" x2=".8" y2=".9">
-      <stop stop-color="#3b3038"/>
-      <stop offset=".38" stop-color="#17141a"/>
-      <stop offset="1" stop-color="#07070a"/>
+      <stop data-color="hair-light" stop-color="#3b3038"/>
+      <stop data-color="hair-mid" offset=".38" stop-color="#17141a"/>
+      <stop data-color="hair-dark" offset="1" stop-color="#07070a"/>
     </linearGradient>
     <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#aab778"/>
-      <stop offset=".55" stop-color="#5f713e"/>
-      <stop offset="1" stop-color="#25301d"/>
+      <stop data-color="iris-light" stop-color="#aab778"/>
+      <stop data-color="iris-mid" offset=".55" stop-color="#5f713e"/>
+      <stop data-color="iris-dark" offset="1" stop-color="#25301d"/>
     </linearGradient>
     <filter id="portraitShadow" x="-30%" y="-30%" width="160%" height="180%">
       <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".62"/>
