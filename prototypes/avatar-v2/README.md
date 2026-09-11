@@ -14,3 +14,6 @@ three skin tones, two face shapes, two eye shapes, three hairstyles, two
 outfits, three marking states, three accessory states, randomization, and a
 six-character stress-test lineup. `avatar-v2-engine.js` holds the option
 manifest and applies selections without changing the live game renderer.
+
+Run `node render-contact-sheet.mjs` in a development environment with `sharp`
+available to render 24 deterministic cross-feature portraits for visual QA.
