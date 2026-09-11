@@ -212,6 +212,10 @@
   }
 
   function getRandomFirstName(countryCode, gender = 'Male') {
+    if (window.generateCharacterName) {
+      const res = window.generateCharacterName({ countryCode, gender });
+      return res.first;
+    }
     const data = window.COUNTRIES_DATA || {};
     const country = data[countryCode] || data.USA || { firstNamesMale: ["James", "John", "Thomas"], firstNamesFemale: ["Mary", "Sarah", "Clara"] };
     const list = gender === 'Male' ? country.firstNamesMale : country.firstNamesFemale;
@@ -221,7 +225,7 @@
   function getRandomLastName(countryCode) {
     const data = window.COUNTRIES_DATA || {};
     const country = data[countryCode] || data.USA || { surnames: ["Smith", "Blackwood", "Henderson", "Albright", "Vance"] };
-    return getRandomItem(country.surnames) || "Blackwood";
+    return getRandomItem(country.surnames) || "Smith";
   }
 
   window.getRandomFirstName = getRandomFirstName;
@@ -380,8 +384,16 @@
 
     for (let i = 0; i < count; i++) {
       const isMale = Math.random() < 0.5;
-      const first = isMale ? window.getRandomFirstName(character.countryCode, 'Male') : window.getRandomFirstName(character.countryCode, 'Female');
-      const surname = window.getRandomLastName(character.countryCode);
+      const peerGender = isMale ? 'Male' : 'Female';
+      
+      let peerFullName = "";
+      if (window.generateCharacterName) {
+        peerFullName = window.generateCharacterName({ countryCode: character.countryCode, gender: peerGender }).fullName;
+      } else {
+        const first = isMale ? window.getRandomFirstName(character.countryCode, 'Male') : window.getRandomFirstName(character.countryCode, 'Female');
+        const surname = window.getRandomLastName(character.countryCode);
+        peerFullName = surname ? `${first} ${surname}` : first;
+      }
       
       const roll = Math.random();
       let entityType = 'human';
@@ -389,7 +401,6 @@
       else if (roll < 0.10) entityType = 'disguised_mimic';
       else if (roll < 0.22) entityType = 'anomaly';
 
-      const peerGender = isMale ? 'Male' : 'Female';
       const peerClique = getRandomItem(cliques);
       const isAnomaly = entityType !== 'human';
       const peerAvatar = generateSchoolAvatar('classmate', 'Classmate', peerGender, character.age, peerClique, schoolType, isAnomaly);
@@ -397,7 +408,7 @@
       classmates.push({
         id: 'peer_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000),
         category: 'classmate',
-        name: `${first} ${surname}`,
+        name: peerFullName,
         gender: peerGender,
         age: character.age,
         popularity: Math.floor(Math.random() * 60) + 20, // 20 - 80%

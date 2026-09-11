@@ -706,9 +706,10 @@ class TerribleGame {
     this.dom.btnEmbark.addEventListener('click', () => {
       window.soundEngine.playTick();
       const first = this.dom.inputFirstName.value.trim() || "Alex";
-      const last = this.dom.inputSurname.value.trim() || "Mercer";
+      const last = this.dom.inputSurname.value.trim();
+      const fullName = last ? `${first} ${last}` : first;
       const config = {
-        name: `${first} ${last}`,
+        name: fullName,
         gender: this.dom.selGender.value,
         countryCode: this.creatorState.countryCode,
         city: this.dom.selCity.value || this.creatorState.city,
@@ -1160,16 +1161,32 @@ class TerribleGame {
   }
 
   randomizeName() {
-    const country = window.COUNTRIES_DATA[this.creatorState.countryCode] || window.COUNTRIES_DATA.USA;
-    const isMale = this.dom.selGender.value === 'Male';
-    const first = isMale 
-      ? window.getRandomElement(country.firstNamesMale)
-      : window.getRandomElement(country.firstNamesFemale);
-    const surname = window.getRandomElement(country.surnames);
-    
-    this.dom.inputFirstName.value = first;
-    this.dom.inputSurname.value = surname;
-    this.creatorState.name = { first, surname };
+    const genderVal = this.dom.selGender ? this.dom.selGender.value : 'Male';
+    let gender = genderVal;
+    if (genderVal === 'Enigmatic') {
+      gender = Math.random() > 0.5 ? 'Male' : 'Female';
+    }
+
+    if (window.generateCharacterName) {
+      const nameObj = window.generateCharacterName({
+        countryCode: this.creatorState.countryCode,
+        gender: gender
+      });
+      this.dom.inputFirstName.value = nameObj.first;
+      this.dom.inputSurname.value = nameObj.surname || '';
+      this.creatorState.name = { first: nameObj.first, surname: nameObj.surname || '' };
+    } else {
+      const country = window.COUNTRIES_DATA[this.creatorState.countryCode] || window.COUNTRIES_DATA.USA;
+      const isMale = gender === 'Male';
+      const first = isMale 
+        ? window.getRandomElement(country.firstNamesMale)
+        : window.getRandomElement(country.firstNamesFemale);
+      const surname = window.getRandomElement(country.surnames);
+      
+      this.dom.inputFirstName.value = first;
+      this.dom.inputSurname.value = surname;
+      this.creatorState.name = { first, surname };
+    }
   }
 
   syncCreatorUI() {

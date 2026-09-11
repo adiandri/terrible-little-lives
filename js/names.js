@@ -12,9 +12,36 @@ const COUNTRIES_DATA = {
     maxGodMoney: 100000,
     godMoneyStep: 1000,
     cities: ["Seattle, WA", "New Orleans, LA", "Detroit, MI", "Salem, MA", "Chicago, IL", "Philadelphia, PA"],
-    firstNamesMale: ["Ethan", "Lucas", "Noah", "Caleb", "Julian", "Damian", "Adrian", "Gabriel", "Silas", "Rowan"],
-    firstNamesFemale: ["Chloe", "Maya", "Elena", "Sadie", "Vera", "Raven", "Iris", "Piper", "Harper", "Lilith"],
-    surnames: ["Blackwood", "Mercer", "Holloway", "Cross", "Vance", "Knotts", "Rivers", "Winter", "Ward", "Drake"]
+    firstNamesMale: [
+      "Adrian", "Aiden", "Alex", "Andrew", "Anthony", "Austin", "Avery", "Blake", "Brandon", "Caleb",
+      "Cameron", "Carter", "Charles", "Connor", "Cooper", "Daniel", "David", "Dylan", "Elijah", "Ethan",
+      "Evan", "Gavin", "Isaac", "Isaiah", "Jack", "Jackson", "James", "Jason", "Jayden", "Jordan",
+      "Joseph", "Joshua", "Kevin", "Leo", "Liam", "Logan", "Lucas", "Luke", "Mason", "Michael",
+      "Nathan", "Nicholas", "Nolan", "Owen", "Parker", "Peyton", "Riley", "Ryan", "Sean", "Taylor",
+      "Tristan", "Tyler", "Wyatt", "Xavier"
+    ],
+    firstNamesFemale: [
+      "Abigail", "Addison", "Alex", "Allison", "Amber", "Ariana", "Audrey", "Avery", "Bailey", "Blake",
+      "Brooke", "Caroline", "Cassidy", "Claire", "Delilah", "Eden", "Emma", "Eva", "Faith", "Gabriella",
+      "Hailey", "Hannah", "Harper", "Hazel", "Jade", "Jordan", "Julia", "Kaitlyn", "Kayla", "Kennedy",
+      "Kylie", "Leah", "Madison", "Maya", "Megan", "Mia", "Natalie", "Nicole", "Olivia", "Paige",
+      "Parker", "Peyton", "Riley", "Samantha", "Sarah", "Savannah", "Scarlett", "Serenity", "Sophia", "Stella",
+      "Taylor", "Victoria", "Violet", "Zoe"
+    ],
+    surnames: [
+      "Adams", "Allen", "Anderson", "Bailey", "Baker", "Bell", "Bennett", "Brooks", "Brown", "Butler",
+      "Campbell", "Carter", "Clark", "Coleman", "Collins", "Cook", "Cooper", "Cox", "Crawford", "Davis",
+      "Diaz", "Edwards", "Ellis", "Evans", "Fisher", "Flores", "Foster", "Garcia", "Gardner", "Graham",
+      "Grant", "Gray", "Green", "Griffin", "Hall", "Harris", "Harrison", "Hayes", "Henderson", "Hernandez",
+      "Hill", "Holmes", "Howard", "Hughes", "Jackson", "James", "Jenkins", "Johnson", "Johnston", "Jones",
+      "Kelly", "Kennedy", "King", "Knight", "Lee", "Lewis", "Long", "Lopez", "Marshall", "Martin",
+      "Martinez", "Mason", "Matthews", "Miller", "Mitchell", "Morgan", "Morris", "Murphy", "Murray", "Nelson",
+      "Nguyen", "Nichols", "Parker", "Patterson", "Pearson", "Perry", "Peterson", "Phillips", "Powell", "Price",
+      "Ramirez", "Reed", "Reynolds", "Richardson", "Rivera", "Roberts", "Robinson", "Rodriguez", "Rogers", "Ross",
+      "Russell", "Sanchez", "Sanders", "Scott", "Shaw", "Simmons", "Smith", "Snyder", "Spencer", "Stanley",
+      "Stewart", "Sullivan", "Taylor", "Thomas", "Thompson", "Torres", "Turner", "Walker", "Wallace", "Ward",
+      "Warren", "Washington", "Watson", "Webb", "White", "Williams", "Wilson", "Wood", "Wright", "Young"
+    ]
   },
   GBR: {
     name: "United Kingdom",
@@ -27,9 +54,28 @@ const COUNTRIES_DATA = {
     maxGodMoney: 85000,
     godMoneyStep: 1000,
     cities: ["London", "Edinburgh", "York", "Whitby", "Manchester", "Bristol"],
-    firstNamesMale: ["Oliver", "Arthur", "Felix", "Jasper", "Archie", "George", "Theo", "Callum", "Finley", "Harry"],
-    firstNamesFemale: ["Eleanor", "Florence", "Freya", "Isla", "Imogen", "Phoebe", "Ophelia", "Beatrice", "Maeve", "Clara"],
-    surnames: ["Ravenscroft", "Hastings", "Danvers", "Grimm", "Ashford", "Morcant", "Finch", "Lancaster", "Peck", "Neville"]
+    firstNamesMale: [
+      "Arthur", "Benjamin", "Daniel", "Elias", "George", "Harry", "Henry", "Isaac", "Jack", "Jacob",
+      "James", "Joseph", "Nathan", "Noah", "Oliver", "Oscar", "Samuel", "Thomas", "William"
+    ],
+    firstNamesFemale: [
+      "Amelia", "Ava", "Beatrice", "Bethany", "Charlotte", "Chloe", "Clara", "Daisy", "Eleanor", "Eliza",
+      "Elizabeth", "Ella", "Ellie", "Emily", "Evelyn", "Florence", "Freya", "Grace", "Holly", "Imogen",
+      "Isla", "Jasmine", "Jessica", "Lily", "Lola", "Lucy", "Maisie", "Matilda", "Molly", "Phoebe",
+      "Poppy", "Rosie", "Ruby", "Sophie", "Zoe"
+    ],
+    surnames: [
+      "Anderson", "Baker", "Barnes", "Bennett", "Brooks", "Brown", "Carter", "Chapman", "Clark", "Collins",
+      "Cooper", "Davies", "Dawson", "Edwards", "Ellis", "Evans", "Fisher", "Fletcher", "Foster", "Gibson",
+      "Graham", "Gray", "Green", "Griffin", "Hall", "Harris", "Harrison", "Hart", "Harvey", "Henderson",
+      "Hill", "Holmes", "Hughes", "Hunt", "Jackson", "James", "Jenkins", "Johnson", "Jones", "Kelly",
+      "King", "Knight", "Lewis", "Lloyd", "Marshall", "Martin", "Mason", "Matthews", "Miller", "Mitchell",
+      "Moore", "Morgan", "Morris", "Murphy", "Murray", "Parker", "Pearson", "Perry", "Phillips", "Powell",
+      "Price", "Reed", "Reynolds", "Richardson", "Roberts", "Robinson", "Rogers", "Ross", "Russell", "Scott",
+      "Shaw", "Simpson", "Smith", "Spencer", "Stevens", "Stewart", "Stone", "Taylor", "Thomas", "Thompson",
+      "Turner", "Walker", "Ward", "Watson", "Webb", "West", "White", "Wilkinson", "Williams", "Wilson",
+      "Wood", "Wright", "Young"
+    ]
   },
   JPN: {
     name: "Japan",
@@ -42,9 +88,26 @@ const COUNTRIES_DATA = {
     maxGodMoney: 15000000,
     godMoneyStep: 100000,
     cities: ["Tokyo (Shibuya)", "Kyoto (Gion)", "Aomori (Osorezan)", "Osaka", "Sapporo", "Yokohama"],
-    firstNamesMale: ["Ren", "Haruto", "Kaito", "Sora", "Ryu", "Taiga", "Kazuki", "Yuto", "Shinji", "Hayato"],
-    firstNamesFemale: ["Yuna", "Hina", "Koharu", "Rei", "Aoi", "Mei", "Mio", "Rin", "Kagura", "Sayuri"],
-    surnames: ["Kurosawa", "Saeki", "Tsuchiya", "Mishima", "Inoue", "Moriyama", "Shirakawa", "Takahashi", "Nakamura", "Kondo"]
+    firstNamesMale: [
+      "Akira", "Daichi", "Daisuke", "Haruki", "Haruto", "Hayato", "Hikaru", "Hiroki", "Hiroshi", "Issei",
+      "Itsuki", "Jun", "Kaito", "Kazuki", "Kenji", "Kenta", "Koki", "Kota", "Makoto", "Masato",
+      "Naoki", "Ren", "Riku", "Ryo", "Ryota", "Satoshi", "Shota", "Shun", "Souta", "Subaru",
+      "Takumi", "Tatsuya", "Tomoya", "Yosuke", "Yuki", "Yuji", "Yuma", "Yuto"
+    ],
+    firstNamesFemale: [
+      "Aiko", "Akari", "Akemi", "Ayaka", "Chihiro", "Ema", "Emi", "Hana", "Haruka", "Hina",
+      "Hinata", "Honoka", "Kaede", "Kana", "Kanon", "Karin", "Keiko", "Kiko", "Koharu", "Kokoro",
+      "Mai", "Maki", "Mana", "Manami", "Mariko", "Mei", "Miki", "Mina", "Minami", "Mio",
+      "Misaki", "Momoka", "Nanami", "Nao", "Natsuki", "Nozomi", "Rika", "Rina", "Rin", "Sakura",
+      "Sayaka", "Shiori", "Yui", "Yuka", "Yuki", "Yuna", "Yuriko"
+    ],
+    surnames: [
+      "Abe", "Aoki", "Endo", "Fujii", "Fujimoto", "Fukuda", "Goto", "Hasegawa", "Hashimoto", "Hayashi",
+      "Honda", "Ikeda", "Ishii", "Ishikawa", "Ito", "Iwai", "Kato", "Kimura", "Kobayashi", "Kondo",
+      "Maeda", "Matsuda", "Matsui", "Matsumoto", "Miura", "Miyamoto", "Mori", "Murakami", "Nakagawa", "Nakamura",
+      "Nakano", "Nishimura", "Ogawa", "Okada", "Saito", "Sakai", "Sakurai", "Sasaki", "Shibata", "Shimizu",
+      "Suzuki", "Takahashi", "Tanaka", "Watanabe", "Yamada", "Yamamoto", "Yamaguchi"
+    ]
   },
   DEU: {
     name: "Germany",
@@ -57,9 +120,27 @@ const COUNTRIES_DATA = {
     maxGodMoney: 90000,
     godMoneyStep: 1000,
     cities: ["Berlin", "Freiburg (Black Forest)", "Hamburg", "Munich", "Heidelberg"],
-    firstNamesMale: ["Lukas", "Leon", "Jonas", "Niklas", "Felix", "Maximilian", "Finn", "Elias", "Moritz", "Anton"],
-    firstNamesFemale: ["Hannah", "Emma", "Mia", "Sophie", "Clara", "Lina", "Laura", "Leonie", "Marie", "Greta"],
-    surnames: ["Schmidt", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann", "Koch", "Richter", "Wolf", "Krause"]
+    firstNamesMale: [
+      "Anton", "Ben", "Benjamin", "Bruno", "Emil", "Felix", "Finn", "Florian", "Franz", "Friedrich",
+      "Heinrich", "Jakob", "Jan", "Jonas", "Julian", "Karl", "Leon", "Lukas", "Max", "Maximilian",
+      "Moritz", "Nico", "Niklas", "Noah", "Paul", "Philipp", "Stefan", "Theo", "Theodor", "Tim",
+      "Tobias", "Tom", "Valentin", "Wilhelm"
+    ],
+    firstNamesFemale: [
+      "Anna", "Clara", "Emilia", "Emma", "Frieda", "Greta", "Hannah", "Hanna", "Helene", "Ida",
+      "Jana", "Julia", "Karla", "Katharina", "Klara", "Lara", "Laura", "Lea", "Lena", "Lina",
+      "Luisa", "Marie", "Maria", "Mia", "Mila", "Nina", "Paula", "Rosa", "Sophie", "Viktoria"
+    ],
+    surnames: [
+      "Bauer", "Becker", "Berg", "Böhm", "Brandt", "Braun", "Busch", "Dietrich", "Engel", "Fischer",
+      "Frank", "Friedrich", "Fuchs", "Graf", "Groß", "Günther", "Haas", "Hahn", "Hartmann", "Haug",
+      "Heinrich", "Herrmann", "Hofmann", "Jäger", "Kaiser", "Keller", "Kern", "Klein", "Koch", "König",
+      "Krause", "Krüger", "Kühn", "Lang", "Lange", "Lehmann", "Lorenz", "Ludwig", "Maier", "Mayer",
+      "Meier", "Metzger", "Neumann", "Otto", "Peters", "Pfeiffer", "Richter", "Ritter", "Roth", "Schäfer",
+      "Schmid", "Schmidt", "Schneider", "Scholz", "Schreiber", "Schulz", "Schwarz", "Seidel", "Simon", "Sommer",
+      "Stein", "Thomas", "Vogel", "Vogt", "Wagner", "Walter", "Weber", "Weiss", "Werner", "Winkler",
+      "Winter", "Wolf", "Wolff", "Zimmermann"
+    ]
   },
   FRA: {
     name: "France",
@@ -72,9 +153,23 @@ const COUNTRIES_DATA = {
     maxGodMoney: 90000,
     godMoneyStep: 1000,
     cities: ["Paris (14th Arr.)", "Lyon", "Marseille", "Bordeaux", "Rennes (Brittany)"],
-    firstNamesMale: ["Gabriel", "Leo", "Raphael", "Louis", "Arthur", "Jules", "Adam", "Lucas", "Hugo", "Maxime"],
-    firstNamesFemale: ["Jade", "Louise", "Ambre", "Alice", "Rose", "Anna", "Emma", "Mia", "Lea", "Chloe"],
-    surnames: ["Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit", "Durand", "Leroy", "Moreau"]
+    firstNamesMale: [
+      "Adrien", "Alexandre", "Antoine", "Arthur", "Camille", "Clément", "Étienne", "Félix", "Gabriel", "Hugo",
+      "Julien", "Léon", "Lucas", "Maxime", "Nathan", "Nicolas", "Olivier", "Paul", "Pierre", "Raphaël",
+      "Rémi", "Romain", "Simon", "Théo", "Thomas", "Valentin", "Victor"
+    ],
+    firstNamesFemale: [
+      "Adèle", "Alice", "Amélie", "Anaïs", "Camille", "Chloé", "Clara", "Élodie", "Émilie", "Emma",
+      "Eva", "Inès", "Jade", "Jeanne", "Léa", "Léonie", "Louise", "Lucie", "Manon", "Margaux",
+      "Marie", "Mathilde", "Noémie", "Océane", "Pauline", "Rose", "Sarah", "Sophie", "Yasmine", "Zoé"
+    ],
+    surnames: [
+      "Bernard", "Bertrand", "Blanc", "Bonnet", "Boyer", "Caron", "Chevalier", "Colin", "David", "Denis",
+      "Dubois", "Dupont", "Durand", "Fontaine", "Fournier", "Garnier", "Girard", "Giraud", "Guérin", "Henry",
+      "Lambert", "Laurent", "Lefebvre", "Legrand", "Leroy", "Marchand", "Martin", "Mathieu", "Mercier", "Michel",
+      "Moreau", "Moulin", "Muller", "Nicolas", "Olivier", "Petit", "Philippe", "Picard", "Robin", "Robert",
+      "Roger", "Rousseau", "Roy", "Schmitt", "Simon", "Thomas", "Vincent"
+    ]
   },
   CAN: {
     name: "Canada",
@@ -87,9 +182,25 @@ const COUNTRIES_DATA = {
     maxGodMoney: 125000,
     godMoneyStep: 1000,
     cities: ["Vancouver, BC", "Toronto, ON", "Montreal, QC", "Calgary, AB", "Halifax, NS"],
-    firstNamesMale: ["Liam", "Noah", "Jackson", "Lucas", "Benjamin", "Logan", "William", "James", "Oliver", "Jacob"],
-    firstNamesFemale: ["Olivia", "Emma", "Charlotte", "Amelia", "Ava", "Sophia", "Chloe", "Ella", "Abigail", "Emily"],
-    surnames: ["Tremblay", "Roy", "Gagnon", "Bouchard", "Gauthier", "Morin", "Lavoie", "Fortin", "Cote", "Belanger"]
+    firstNamesMale: [
+      "Adam", "Alex", "André", "Andrew", "Antoine", "Benjamin", "Blake", "Cole", "Daniel", "Ethan",
+      "Félix", "Gabriel", "Henry", "Jacob", "James", "Jean", "Julien", "Liam", "Logan", "Lucas",
+      "Nathan", "Noah", "Olivier", "Owen", "Patrick", "Philippe", "Rémi", "Riley", "Samuel", "Simon",
+      "Thomas", "William", "Xavier"
+    ],
+    firstNamesFemale: [
+      "Aaliyah", "Alex", "Alice", "Amélie", "Audrey", "Blake", "Camille", "Charlotte", "Chloe", "Claire",
+      "Élodie", "Emma", "Gabrielle", "Grace", "Hannah", "Isabelle", "Jade", "Lily", "Léa", "Marie",
+      "Maya", "Mia", "Olivia", "Paige", "Rachel", "Riley", "Rose", "Sarah", "Sophie", "Victoria", "Zoé"
+    ],
+    surnames: [
+      "Anderson", "Baker", "Bélanger", "Bennett", "Bouchard", "Brown", "Campbell", "Caron", "Carter", "Chen",
+      "Clark", "Côté", "Davis", "Dubé", "Dubois", "Duncan", "Edwards", "Fortin", "Fraser", "Gagnon",
+      "Gauthier", "Girard", "Graham", "Grant", "Green", "Hamilton", "Harris", "Henderson", "Johnson", "Jones",
+      "Kennedy", "King", "Labelle", "Lambert", "Landry", "Laurent", "Leblanc", "Lefebvre", "Lévesque", "MacDonald",
+      "Martin", "McDonald", "Miller", "Mitchell", "Moore", "Morin", "Morrison", "Pelletier", "Peterson", "Roy",
+      "Simard", "Smith", "Tremblay", "Walker", "Walsh", "Watson", "Wilson", "Young"
+    ]
   },
   IDN: {
     name: "Indonesia",
@@ -102,9 +213,24 @@ const COUNTRIES_DATA = {
     maxGodMoney: 250000000,
     godMoneyStep: 2500000,
     cities: ["Jakarta (Kota Tua)", "Yogyakarta (Merapi slope)", "Bandung", "Surabaya", "Malang"],
-    firstNamesMale: ["Arya", "Bima", "Dimas", "Fajar", "Galih", "Bayu", "Rian", "Aditya", "Rizky", "Satria"],
-    firstNamesFemale: ["Kirana", "Laras", "Nadia", "Sari", "Tari", "Maya", "Dian", "Citra", "Anggun", "Sekar"],
-    surnames: ["Pratama", "Wijaya", "Kusuma", "Saputra", "Santoso", "Suryono", "Hidayat", "Wibowo", "Permana", "Kurniawan"]
+    firstNamesMale: [
+      "Aditya", "Agung", "Ahmad", "Aldi", "Alif", "Andika", "Angga", "Ardi", "Arif", "Arya",
+      "Bagas", "Bima", "Daffa", "Damar", "Danu", "Dimas", "Eka", "Fajar", "Farhan", "Fikri",
+      "Galih", "Hadi", "Hanif", "Joko", "Lukman", "Naufal", "Rama", "Rangga", "Reza", "Rizky",
+      "Satria", "Surya", "Taufik", "Wahyu", "Yoga", "Yusuf"
+    ],
+    firstNamesFemale: [
+      "Alya", "Amara", "Anisa", "Anita", "Ayu", "Citra", "Dewi", "Diah", "Dian", "Eka",
+      "Farah", "Hana", "Indah", "Intan", "Kartika", "Laras", "Lestari", "Maya", "Melati", "Nadia",
+      "Nanda", "Nia", "Putri", "Rani", "Rara", "Ratih", "Sari", "Sinta", "Tiara", "Vina",
+      "Wulan", "Yani", "Zahra"
+    ],
+    surnames: [
+      "Adinata", "Adiwijaya", "Anggraini", "Anwar", "Bakti", "Cahyadi", "Cahyono", "Dharmawan", "Firmansyah", "Gunawan",
+      "Haryanto", "Hartono", "Hidayat", "Ibrahim", "Iskandar", "Kurniawan", "Kusuma", "Lesmana", "Maulana", "Nugraha",
+      "Permana", "Prasetyo", "Purnama", "Putra", "Putri", "Ramadhan", "Santoso", "Saputra", "Sari", "Setiawan",
+      "Siregar", "Susanto", "Sutanto", "Syahputra", "Wijaya", "Wibowo", "Widodo", "Wulandari"
+    ]
   },
   AUS: {
     name: "Australia",
@@ -117,10 +243,44 @@ const COUNTRIES_DATA = {
     maxGodMoney: 150000,
     godMoneyStep: 1000,
     cities: ["Melbourne", "Sydney", "Brisbane", "Perth", "Hobart (Tasmania)"],
-    firstNamesMale: ["Jack", "William", "Noah", "Thomas", "James", "Lucas", "Henry", "Alexander", "Max", "Cooper"],
-    firstNamesFemale: ["Charlotte", "Olivia", "Amelia", "Isla", "Mia", "Ava", "Grace", "Zoe", "Ruby", "Evelyn"],
-    surnames: ["Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Morton", "Anderson", "Kelly", "Dixon"]
+    firstNamesMale: [
+      "Archer", "Beau", "Benjamin", "Billy", "Charlie", "Connor", "Cooper", "Darcy", "Daniel", "Ethan",
+      "Finn", "Flynn", "Harry", "Harrison", "Henry", "Jack", "Jackson", "James", "Jasper", "Lachlan",
+      "Leo", "Liam", "Lucas", "Max", "Noah", "Oliver", "Oscar", "Riley", "Samuel", "Thomas",
+      "William", "Xavier"
+    ],
+    firstNamesFemale: [
+      "Amelia", "Audrey", "Ava", "Bonnie", "Charlotte", "Chloe", "Daisy", "Ella", "Ellie", "Elsie",
+      "Evie", "Georgia", "Grace", "Harper", "Hazel", "Holly", "Isla", "Ivy", "Lily", "Lola",
+      "Lucy", "Matilda", "Mia", "Millie", "Olivia", "Paige", "Poppy", "Riley", "Ruby", "Sophie",
+      "Summer", "Violet", "Willow", "Zoe"
+    ],
+    surnames: [
+      "Anderson", "Baker", "Barnes", "Bennett", "Brooks", "Brown", "Campbell", "Carter", "Collins", "Cooper",
+      "Cox", "Davis", "Edwards", "Ellis", "Evans", "Fisher", "Fletcher", "Ford", "Foster", "Gibson",
+      "Graham", "Grant", "Gray", "Green", "Hall", "Harris", "Harrison", "Hayes", "Henderson", "Hill",
+      "Holmes", "Hughes", "Jackson", "James", "Jenkins", "Johnson", "Jones", "Kelly", "King", "Knight",
+      "Lewis", "Martin", "Mason", "Matthews", "McKenzie", "Miller", "Mitchell", "Morgan", "Morris", "Murray",
+      "Parker", "Pearson", "Phillips", "Reid", "Richardson", "Roberts", "Robinson", "Rogers", "Ross", "Russell",
+      "Scott", "Shaw", "Smith", "Stewart", "Taylor", "Thomas", "Thompson", "Turner", "Walker", "Walsh",
+      "Ward", "Watson", "Webb", "White", "Williams", "Wilson", "Wood", "Wright", "Young"
+    ]
   }
+};
+
+const RARE_NAMES_DATA = {
+  feminine: [
+    "Astrid", "Celeste", "Daphne", "Elara", "Esme", "Freya", "Iris", "Lilith", "Maeve", "Ophelia",
+    "Raven", "Selene", "Vera"
+  ],
+  masculine: [
+    "Adrian", "Cassian", "Dorian", "Elias", "Felix", "Gideon", "Julian", "Lucian", "Marcel", "Nikolai",
+    "Silas", "Victor"
+  ],
+  neutral: [
+    "Avery", "Blair", "Casey", "Eden", "Emery", "Jordan", "Morgan", "Quinn", "Reese", "Rowan",
+    "Sage", "Taylor"
+  ]
 };
 
 const MODERN_ORIGINS = [
@@ -142,8 +302,10 @@ const MODERN_TRAITS = [
 ];
 
 function getRandomElement(arr) {
+  if (!arr || arr.length === 0) return null;
   return arr[Math.floor(Math.random() * arr.length)];
 }
+window.getRandomElement = getRandomElement;
 
 function generateRandomAvatar(options = {}) {
   const gender = options.gender || (Math.random() > 0.5 ? 'Male' : 'Female');
@@ -258,6 +420,127 @@ function formatMoney(amount, countryCode = "USA") {
   return `${sym}${val.toLocaleString('en-US')}`;
 }
 
+// Ring buffers to prevent excessive repetition
+const RECENT_FULL_NAMES = [];
+const RECENT_FIRST_NAMES = [];
+
+/**
+ * Generates a culturally authentic character name following the 7-step pipeline:
+ * 1. Determine country.
+ * 2. Select culturally appropriate name pool.
+ * 3. Select first name using weighted randomization (including shared Rare Names with lower probability).
+ * 4. Select surname where applicable (Indonesia supports mononyms, two-first names, or family components).
+ * 5. Reject if exact full name appeared in the last 100 generated characters.
+ * 6. Reject if first name appeared excessively recently (last 8 generated characters).
+ * 7. Re-roll if rejected.
+ */
+function generateCharacterName(options = {}) {
+  const countryKeys = Object.keys(COUNTRIES_DATA);
+  const countryCode = options.countryCode || getRandomElement(countryKeys);
+  const country = COUNTRIES_DATA[countryCode] || COUNTRIES_DATA.USA;
+  const gender = options.gender || (Math.random() > 0.5 ? 'Male' : 'Female');
+
+  let attempts = 0;
+  while (attempts < 60) {
+    attempts++;
+
+    // Step 2 & 3: Select first name using weighted randomization
+    // 7% chance for a rare name, otherwise country-specific pool
+    let firstName = "";
+    const useRare = Math.random() < 0.07;
+    if (useRare) {
+      if (gender === 'Male') {
+        firstName = Math.random() < 0.75 
+          ? getRandomElement(RARE_NAMES_DATA.masculine) 
+          : getRandomElement(RARE_NAMES_DATA.neutral);
+      } else if (gender === 'Female') {
+        firstName = Math.random() < 0.75 
+          ? getRandomElement(RARE_NAMES_DATA.feminine) 
+          : getRandomElement(RARE_NAMES_DATA.neutral);
+      } else {
+        firstName = getRandomElement(RARE_NAMES_DATA.neutral);
+      }
+    } else {
+      if (gender === 'Male') {
+        firstName = getRandomElement(country.firstNamesMale);
+      } else if (gender === 'Female') {
+        firstName = getRandomElement(country.firstNamesFemale);
+      } else {
+        const union = [...country.firstNamesMale, ...country.firstNamesFemale];
+        firstName = getRandomElement(union);
+      }
+    }
+
+    // Step 4: Select surname where applicable
+    let surname = "";
+    if (countryCode === 'IDN') {
+      // Indonesia specific formatting:
+      // ~20% mononym (e.g. "Dewi")
+      // ~30% two given names (e.g. "Putri Ayu")
+      // ~50% given name + family component (e.g. "Bagas Prasetyo", "Rizky Maulana")
+      const idnRoll = Math.random();
+      if (idnRoll < 0.20) {
+        surname = ""; // Mononym
+      } else if (idnRoll < 0.50) {
+        // Two given names
+        const pool = gender === 'Male' ? country.firstNamesMale : country.firstNamesFemale;
+        let secondGiven = getRandomElement(pool);
+        if (secondGiven === firstName) {
+          secondGiven = getRandomElement(pool);
+        }
+        surname = secondGiven;
+      } else {
+        surname = getRandomElement(country.surnames);
+      }
+    } else {
+      surname = getRandomElement(country.surnames);
+    }
+
+    const fullName = surname ? `${firstName} ${surname}`.trim() : firstName.trim();
+
+    // Step 5: Reject if exact full name appeared in last 100 generated characters
+    if (RECENT_FULL_NAMES.includes(fullName)) {
+      continue;
+    }
+
+    // Step 6: Reject if first name appeared excessively recently (last 8 characters)
+    if (RECENT_FIRST_NAMES.includes(firstName)) {
+      continue;
+    }
+
+    // Step 7: Approved! Register in recent history
+    RECENT_FULL_NAMES.push(fullName);
+    if (RECENT_FULL_NAMES.length > 100) {
+      RECENT_FULL_NAMES.shift();
+    }
+
+    RECENT_FIRST_NAMES.push(firstName);
+    if (RECENT_FIRST_NAMES.length > 8) {
+      RECENT_FIRST_NAMES.shift();
+    }
+
+    return {
+      first: firstName,
+      surname: surname,
+      fullName: fullName,
+      countryCode: countryCode,
+      gender: gender
+    };
+  }
+
+  // Fallback if max attempts exceeded
+  const fallbackFirst = gender === 'Male' ? getRandomElement(country.firstNamesMale) : getRandomElement(country.firstNamesFemale);
+  const fallbackLast = countryCode === 'IDN' ? '' : getRandomElement(country.surnames);
+  const fallbackFull = fallbackLast ? `${fallbackFirst} ${fallbackLast}` : fallbackFirst;
+  return {
+    first: fallbackFirst,
+    surname: fallbackLast,
+    fullName: fallbackFull,
+    countryCode: countryCode,
+    gender: gender
+  };
+}
+
 function generateCharacter(customConfig = null) {
   const currentYear = 2024;
 
@@ -305,15 +588,15 @@ function generateCharacter(customConfig = null) {
   const countryCode = getRandomElement(countryKeys);
   const country = COUNTRIES_DATA[countryCode];
   const isMale = Math.random() > 0.5;
-  const firstName = isMale ? getRandomElement(country.firstNamesMale) : getRandomElement(country.firstNamesFemale);
-  const surname = getRandomElement(country.surnames);
+  const gender = isMale ? "Male" : "Female";
+  const nameObj = generateCharacterName({ countryCode, gender });
   const city = getRandomElement(country.cities);
   const origin = getRandomElement(MODERN_ORIGINS);
   const trait = getRandomElement(MODERN_TRAITS);
 
   return {
-    name: `${firstName} ${surname}`,
-    gender: isMale ? "Male" : "Female",
+    name: nameObj.fullName,
+    gender: gender,
     countryCode,
     countryName: country.name,
     city,
@@ -323,7 +606,7 @@ function generateCharacter(customConfig = null) {
     year: currentYear,
     money: country.startingMoney,
     shillings: Math.floor(Math.random() * 8) + 2,
-    avatar: generateRandomAvatar(),
+    avatar: generateRandomAvatar({ gender, age: 0 }),
     isGodMode: false,
     job: null,
     paranormalGig: null,
@@ -344,8 +627,10 @@ function generateCharacter(customConfig = null) {
 }
 
 window.COUNTRIES_DATA = COUNTRIES_DATA;
+window.RARE_NAMES_DATA = RARE_NAMES_DATA;
 window.MODERN_ORIGINS = MODERN_ORIGINS;
 window.MODERN_TRAITS = MODERN_TRAITS;
+window.generateCharacterName = generateCharacterName;
 window.generateCharacter = generateCharacter;
 window.generateRandomAvatar = generateRandomAvatar;
 window.getRandomElement = getRandomElement;

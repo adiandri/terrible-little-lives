@@ -129,12 +129,25 @@ function generateKinAvatar(role, gender, age, occupationTier, parentA = null, pa
 window.generateKinAvatar = generateKinAvatar;
 
 function generateFamily(character) {
-  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
-  const surname = character.name.split(' ').slice(1).join(' ') || window.getRandomElement(country.surnames);
+  const countryCode = character.countryCode || "USA";
+  const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
   const mult = country.wageMultiplier || 1.0;
 
-  const dadFirst = window.getRandomElement(country.firstNamesMale);
-  const momFirst = window.getRandomElement(country.firstNamesFemale);
+  // Extract surname or determine for family
+  const parts = character.name.split(' ');
+  let surname = "";
+  if (parts.length > 1) {
+    surname = parts.slice(1).join(' ');
+  } else if (countryCode !== 'IDN') {
+    surname = window.getRandomElement(country.surnames);
+  }
+
+  const dadFirst = window.generateCharacterName 
+    ? window.generateCharacterName({ countryCode, gender: 'Male' }).first
+    : window.getRandomElement(country.firstNamesMale);
+  const momFirst = window.generateCharacterName 
+    ? window.generateCharacterName({ countryCode, gender: 'Female' }).first
+    : window.getRandomElement(country.firstNamesFemale);
 
   const dadAge = Math.floor(Math.random() * 12) + 26; // 26-37
   const momAge = Math.floor(Math.random() * 10) + 24; // 24-33
@@ -148,12 +161,15 @@ function generateFamily(character) {
   const dadAvatar = generateKinAvatar('Father', 'Male', dadAge, dadJobObj.tier);
   const momAvatar = generateKinAvatar('Mother', 'Female', momAge, momJobObj.tier);
 
+  const dadFullName = surname ? `${dadFirst} ${surname}` : dadFirst;
+  const momFullName = surname ? `${momFirst} ${surname}` : momFirst;
+
   const parents = [
     {
       id: 'father_' + Date.now() + '_1',
       category: 'family',
       role: 'Father',
-      name: `${dadFirst} ${surname}`,
+      name: dadFullName,
       gender: 'Male',
       age: dadAge,
       alive: true,
@@ -177,7 +193,7 @@ function generateFamily(character) {
       id: 'mother_' + Date.now() + '_2',
       category: 'family',
       role: 'Mother',
-      name: `${momFirst} ${surname}`,
+      name: momFullName,
       gender: 'Female',
       age: momAge,
       alive: true,
@@ -187,10 +203,10 @@ function generateFamily(character) {
       salary: momSalary,
       salaryUSD: momJobObj.salaryUSD,
       incomeTier: momJobObj.tier,
-      relationship: Math.floor(Math.random() * 20) + 75, // 75-95%
-      generosity: Math.floor(Math.random() * 45) + 45,   // 45-90%
-      strictness: Math.floor(Math.random() * 45) + 35,
-      sanity: Math.floor(Math.random() * 30) + 65,
+      relationship: Math.floor(Math.random() * 25) + 75, // 75-100%
+      generosity: Math.floor(Math.random() * 40) + 50,   // 50-90%
+      strictness: Math.floor(Math.random() * 50) + 25,
+      sanity: Math.floor(Math.random() * 30) + 70,
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
@@ -204,16 +220,19 @@ function generateFamily(character) {
   const siblingCount = Math.floor(Math.random() * 3); // 0, 1, or 2
   for (let i = 0; i < siblingCount; i++) {
     const isMale = Math.random() > 0.5;
-    const sFirst = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
+    const sibGender = isMale ? 'Male' : 'Female';
+    const sFirst = window.generateCharacterName 
+      ? window.generateCharacterName({ countryCode, gender: sibGender }).first
+      : (isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale));
     const ageDiff = Math.floor(Math.random() * 6) + 1; // 1 to 6 years older
     const role = isMale ? (ageDiff > 0 ? 'Older Brother' : 'Younger Brother') : (ageDiff > 0 ? 'Older Sister' : 'Younger Sister');
-    const sibGender = isMale ? 'Male' : 'Female';
+    const sFullName = surname ? `${sFirst} ${surname}` : sFirst;
 
     siblings.push({
       id: 'sibling_' + Date.now() + '_' + i,
       category: 'family',
       role,
-      name: `${sFirst} ${surname}`,
+      name: sFullName,
       gender: sibGender,
       age: ageDiff,
       alive: true,
@@ -234,17 +253,25 @@ function generateFamily(character) {
   if (hasGrandparent) {
     const isMaternal = Math.random() > 0.5;
     const isGrandpa = Math.random() > 0.5;
-    const gFirst = isGrandpa ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
-    const gSurname = isMaternal ? window.getRandomElement(country.surnames) : surname;
-    const gAge = Math.floor(Math.random() * 12) + 63; // 63-75
     const gGender = isGrandpa ? 'Male' : 'Female';
+    const gFirst = window.generateCharacterName 
+      ? window.generateCharacterName({ countryCode, gender: gGender }).first
+      : (isGrandpa ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale));
+    
+    let gSurname = surname;
+    if (isMaternal) {
+      gSurname = countryCode === 'IDN' ? '' : window.getRandomElement(country.surnames);
+    }
+    const gFullName = gSurname ? `${gFirst} ${gSurname}` : gFirst;
+
+    const gAge = Math.floor(Math.random() * 12) + 63; // 63-75
     const gRole = isGrandpa ? (isMaternal ? 'Maternal Grandfather' : 'Paternal Grandfather') : (isMaternal ? 'Maternal Grandmother' : 'Paternal Grandmother');
 
     grandparents.push({
       id: 'grandparent_' + Date.now(),
       category: 'family',
       role: gRole,
-      name: `${gFirst} ${gSurname}`,
+      name: gFullName,
       gender: gGender,
       age: gAge,
       alive: true,
@@ -253,7 +280,13 @@ function generateFamily(character) {
       relationship: Math.floor(Math.random() * 20) + 75,
       generosity: Math.floor(Math.random() * 30) + 65,
       pensionUSD: Math.floor(Math.random() * 15000) + 20000,
-      entityType: 'human',
+      salaryUSD: 0,
+      incomeTier: 'comfortable',
+      strictness: Math.floor(Math.random() * 35) + 15,
+      sanity: Math.floor(Math.random() * 30) + 60,
+      entityType: Math.random() < 0.05 ? 'anomaly' : 'human',
+      suspicion: 0,
+      isRevealed: false,
       avatar: generateKinAvatar(gRole, gGender, gAge, 'comfortable'),
       actionsDone: createEmptyActionsDone()
     });
@@ -296,10 +329,19 @@ function generateFamily(character) {
 
 
 function generateNewFriend(character, context = 'Neighborhood') {
-  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const countryCode = character.countryCode || "USA";
   const isMale = Math.random() > 0.5;
-  const first = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
-  const surname = window.getRandomElement(country.surnames);
+  const friendGender = isMale ? 'Male' : 'Female';
+
+  let friendName = "";
+  if (window.generateCharacterName) {
+    friendName = window.generateCharacterName({ countryCode, gender: friendGender }).fullName;
+  } else {
+    const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
+    const first = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
+    const surname = window.getRandomElement(country.surnames);
+    friendName = surname ? `${first} ${surname}` : first;
+  }
 
   // Entity roll: 76% Human, 14% Anomaly, 7% Disguised Mimic, 3% Blatant Entity
   const roll = Math.random();
@@ -316,7 +358,7 @@ function generateNewFriend(character, context = 'Neighborhood') {
     id: 'friend_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
     category: 'friend',
     role: 'Friend',
-    name: `${first} ${surname}`,
+    name: friendName,
     gender: isMale ? 'Male' : 'Female',
     age: character.age + (Math.floor(Math.random() * 3) - 1), // age +/- 1
     origin: context,
