@@ -49,15 +49,32 @@
 
   <g id="layer-body" clip-path="url(#frameClip)" filter="url(#portraitShadow)">
     <path d="M72 526c8-100 51-158 131-172h106c80 14 123 72 131 172Z" fill="url(#coat)"/>
-    <path d="m203 355 53 84 53-84-20-16h-66Z" fill="#d9d0c2"/>
-    <path d="m203 352 53 87-80-50 23-34Zm106 0-53 87 80-50-23-34Z" fill="#161821" stroke="#3d414d" stroke-width="3"/>
-    <path d="m256 440-13 51h26Z" fill="#781b2b"/>
-    <path d="m256 438-15-17 15-13 15 13Z" fill="#9d2738"/>
   </g>
 
   <g id="layer-neck">
     <path d="M211 304v73c17 24 72 24 90 0v-73Z" fill="url(#neck)"/>
     <path d="M215 330c25 18 57 20 82-1v24c-23 24-61 25-82 2Z" fill="#6d3935" opacity=".38"/>
+  </g>
+
+  <g id="layer-shirt">
+    <path d="m204 354 52 86 52-86-19-15h-66Z" fill="#d9d0c2"/>
+    <path d="m223 339 33 69-52-54Z" fill="#f0e9de"/>
+    <path d="m289 339-33 69 52-54Z" fill="#c9c1b7"/>
+  </g>
+
+  <g id="layer-coat-front">
+    <path d="m203 352 53 87-80-50 23-34Zm106 0-53 87 80-50-23-34Z" fill="#161821" stroke="#3d414d" stroke-width="3"/>
+    <path d="M176 389 256 439 72 526c8-59 42-112 104-137Zm160 0-80 50 184 87c-8-59-42-112-104-137Z" fill="#11131a" opacity=".62"/>
+  </g>
+
+  <g id="layer-neckwear">
+    <path d="M224 369c18 9 46 9 64 0" fill="none" stroke="#17151a" stroke-width="10" stroke-linecap="round"/>
+    <path d="M226 369c17 6 43 6 60 0" fill="none" stroke="#5e2634" stroke-width="3" stroke-linecap="round" opacity=".72"/>
+    <ellipse cx="256" cy="383" rx="14" ry="17" fill="#a17b34" stroke="#d6b35b" stroke-width="3"/>
+    <ellipse cx="256" cy="383" rx="8" ry="11" fill="#7d1c30"/>
+    <path d="M253 376c5 1 8 5 8 10-4-3-8-4-12-3 0-3 1-5 4-7Z" fill="#efc765" opacity=".65"/>
+    <path d="m256 401-15 20 15 16 15-16Z" fill="#781b2b"/>
+    <path d="m256 437-12 54h24Z" fill="#641522"/>
   </g>
 
   <g id="layer-ears">
@@ -75,7 +92,7 @@
     <ellipse cx="312" cy="252" rx="33" ry="17" fill="#c95f60" opacity=".1"/>
   </g>
 
-  <g id="layer-eyes">
+  <g id="layer-eyes" transform="translate(256 218) scale(.78 .84) translate(-256 -218)">
     <path d="M177 217c18-24 48-25 69-3-17 24-51 27-69 3Z" fill="#eee8df"/>
     <path d="M266 214c21-22 51-21 69 3-18 24-52 21-69-3Z" fill="#eee8df"/>
     <ellipse cx="213" cy="216" rx="15" ry="18" fill="url(#iris)"/>
@@ -88,7 +105,7 @@
     <path d="M180 229c18 10 44 10 63-4M269 225c19 14 45 14 63 4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
   </g>
 
-  <g id="layer-brows">
+  <g id="layer-brows" transform="translate(256 188) scale(.9 .92) translate(-256 -188)">
     <path d="M173 185c23-15 52-17 75-3-27-4-49 0-72 12Zm166 1c-23-15-52-17-75-3 27-4 49 0 72 12Z" fill="#241920"/>
   </g>
 
@@ -115,12 +132,6 @@
     <circle cx="205" cy="279" r="1.8" fill="#684036"/>
     <circle cx="316" cy="270" r="2" fill="#684036"/>
     <path d="M329 227c7 16 5 34-5 48" fill="none" stroke="#8d4b4c" stroke-width="3" stroke-linecap="round" opacity=".66"/>
-  </g>
-
-  <g id="layer-accessories">
-    <path d="M214 385c19 14 65 14 84 0" fill="none" stroke="#b99445" stroke-width="3"/>
-    <circle cx="256" cy="403" r="9" fill="#8e1e32" stroke="#d3aa51" stroke-width="3"/>
-    <circle cx="256" cy="403" r="3" fill="#f1c866" opacity=".75"/>
   </g>
 
   <g id="layer-frame">
