@@ -71,6 +71,9 @@ function applyAvatarV2(svg, config = {}) {
   setGradient(svg, 'coat', outfit.coat);
 
   svg.querySelector('#layer-face > path').setAttribute('d', face.path);
+  svg.querySelector('[data-color="ear-light"]').setAttribute('fill', skin.colors[1]);
+  svg.querySelector('[data-color="ear-dark"]').setAttribute('fill', skin.colors[2]);
+  svg.querySelectorAll('[data-color="ear-line"]').forEach(node => node.setAttribute('stroke', skin.colors[2]));
   svg.querySelector('#layer-eyes').setAttribute('transform', `translate(256 218) scale(.78 ${eyes.scaleY}) translate(-256 -218)`);
   svg.querySelector('#layer-hair').innerHTML = hair.svg;
   const markingsLayer = svg.querySelector('#layer-markings');
