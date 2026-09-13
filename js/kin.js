@@ -63,6 +63,7 @@ function createEmptyActionsDone() {
     spentTime: 0,
     askedMoney: 0,
     argued: 0,
+    insulted: 0,
     investigated: 0,
     tribute: 0,
     cuddled: 0,

@@ -318,6 +318,7 @@ class TerribleGame {
       btnKinInvestigate: document.getElementById('btn-kin-investigate'),
       btnKinTribute: document.getElementById('btn-kin-tribute'),
       btnKinArgue: document.getElementById('btn-kin-argue'),
+      btnKinInsult: document.getElementById('btn-kin-insult'),
       btnKinApologize: document.getElementById('btn-kin-apologize'),
       btnKinHex: document.getElementById('btn-kin-hex'),
       btnKinAdvice: document.getElementById('btn-kin-advice'),
@@ -947,6 +948,9 @@ class TerribleGame {
     if (this.dom.btnKinArgue) {
       this.dom.btnKinArgue.addEventListener('click', () => this.handleKinAction('argue'));
     }
+    if (this.dom.btnKinInsult) {
+      this.dom.btnKinInsult.addEventListener('click', () => this.handleKinAction('insult'));
+    }
     if (this.dom.btnKinApologize) {
       this.dom.btnKinApologize.addEventListener('click', () => this.handleKinAction('apology'));
     }
@@ -1560,6 +1564,10 @@ class TerribleGame {
       year: this.character.year,
       entries: []
     };
+
+    if (window.tickReactionYear) {
+      window.tickReactionYear(this.character).forEach(entry => currentYearLog.entries.push(entry));
+    }
 
     // Ensure kin exists and tick their simulation (aging, allowances, mortality, friend discovery)
     if (!this.character.kin) {
@@ -2593,6 +2601,9 @@ class TerribleGame {
       setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
     }
 
+    if (age < 6) setupLockedBtn(this.dom.btnKinInsult, "Deliver an Insult", "Too young to deliberately formulate a cutting insult (Unlocks at Age 6).", 6);
+    else setupBtn(this.dom.btnKinInsult, getCount('insulted'), 5, "Say something deliberately cruel and risk retaliation. (1 Action)", "You have provoked them enough this year (5/5).");
+
     if (this.dom.btnKinApologize) {
       const canApologize = relationshipMind.resentment > 0;
       this.dom.btnKinApologize.classList.toggle('hidden', !canApologize);
@@ -2686,6 +2697,12 @@ class TerribleGame {
     if (!this.selectedKin) return;
     const person = this.selectedKin;
 
+    const interactionBlock = window.canInteractWithNpc ? window.canInteractWithNpc(person, this.character, actionType) : null;
+    if (interactionBlock) {
+      alert(interactionBlock);
+      return;
+    }
+
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
       alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
       return;
@@ -2735,6 +2752,11 @@ class TerribleGame {
         return;
       }
       result = window.argueWithKin(person, this.character);
+    } else if (actionType === 'insult') {
+      if (this.character.age < 6) return;
+      person.actionsDone = person.actionsDone || {};
+      person.actionsDone.insulted = (person.actionsDone.insulted || 0) + 1;
+      result = window.insultNpc ? window.insultNpc(person, this.character) : null;
     } else if (actionType === 'apology') {
       result = window.apologizeToNpc ? window.apologizeToNpc(person, this.character) : null;
     } else if (actionType === 'cuddle') {
@@ -2812,6 +2834,7 @@ class TerribleGame {
       investigate: 'Occult Observation',
       tribute: 'Dark Tribute Offered',
       argue: 'Heated Dispute',
+      insult: 'Cruel Insult',
       apology: 'An Apology Offered',
       cuddle: 'Nurturing Cuddle',
       babble: 'Baby First Words',
@@ -2825,6 +2848,7 @@ class TerribleGame {
       investigate: 'eye',
       tribute: 'skull',
       argue: 'flame',
+      insult: 'message-square-warning',
       apology: 'heart-handshake',
       cuddle: 'heart',
       babble: 'message-circle',
@@ -2838,6 +2862,7 @@ class TerribleGame {
       investigate: 'text-purple-400',
       tribute: 'text-rose-500',
       argue: 'text-orange-500',
+      insult: 'text-rose-400',
       apology: 'text-sky-400',
       cuddle: 'text-rose-400',
       babble: 'text-sky-400',
@@ -2851,6 +2876,7 @@ class TerribleGame {
       investigate: 'OBSERVATION',
       tribute: 'DARK TRIBUTE',
       argue: 'HEATED DISPUTE',
+      insult: 'PROVOCATION',
       apology: 'REPAIR ATTEMPT',
       cuddle: 'NURTURING EMBRACE',
       babble: 'BABY FIRST WORDS',
@@ -5830,6 +5856,7 @@ class TerribleGame {
         actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-edu-amber' });
         actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-edu-purple' });
         actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-edu-rose' });
+        actions.push({ id: 'insult', label: 'Deliver an Insult', desc: 'Say something deliberately cruel and risk immediate retaliation.', icon: 'message-square-warning', color: 'text-rose-400' });
       }
       if (!isEarlyYears && !person.isBefriended) {
         actions.push({ id: 'befriend', label: 'Ask to be Best Friends', desc: 'Invite into your permanent Kin & Friends circle (Req 50%+ Closeness).', icon: 'user-plus', color: 'text-edu-amber' });
@@ -5985,6 +6012,11 @@ class TerribleGame {
   }
 
   handleSchoolPersonAction(person, actionType) {
+    const interactionBlock = window.canInteractWithNpc ? window.canInteractWithNpc(person, this.character, actionType) : null;
+    if (interactionBlock) {
+      this.openFeedbackModal({ tag: 'CONTACT REFUSED', title: 'They Remember', icon: 'ban', iconColor: 'text-rose-400', body: interactionBlock, effects: {} });
+      return;
+    }
     if (this.character.actionsLeft <= 0) {
       this.openFeedbackModal({
         tag: "ENERGY EXHAUSTED",
@@ -6000,6 +6032,14 @@ class TerribleGame {
     let result = null;
     if (actionType === 'apology' && window.apologizeToNpc) {
       result = window.apologizeToNpc(person, this.character);
+    } else if (actionType === 'insult' && window.insultNpc) {
+      person.actionsDone = person.actionsDone || {};
+      const insultCount = person.actionsDone.insult || 0;
+      if (insultCount >= 5) result = { success: false, reason: `You have provoked ${person.name} enough times this year.` };
+      else {
+        person.actionsDone.insult = insultCount + 1;
+        result = window.insultNpc(person, this.character);
+      }
     } else if (person.category === 'classmate' && window.interactWithClassmate) {
       result = window.interactWithClassmate(person, this.character, actionType);
     } else if (person.category === 'teacher' && window.interactWithTeacher) {

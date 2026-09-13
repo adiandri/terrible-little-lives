@@ -6,13 +6,13 @@
     'chat', 'study_together', 'befriend', 'praise', 'ask_help', 'greet_staff', 'nurture',
     'ask_snack', 'help_clean', 'school_pride'
   ]);
-  const HARMFUL_ACTIONS = new Set(['argue', 'prank', 'gossip', 'complain', 'bribe']);
+  const HARMFUL_ACTIONS = new Set(['argue', 'insult', 'prank', 'gossip', 'complain', 'bribe']);
   const ACTION_LABELS = {
     spend_time: 'Spent meaningful time together', converse: 'Had a conversation', compliment: 'Offered a compliment',
     cuddle: 'Shared a comforting cuddle', babble: 'Babbled together', feed_milk: 'Was fed and cared for',
     peekaboo: 'Played peek-a-boo', parent_advice: 'Asked for advice', sibling_secret: 'Shared a private secret',
     sibling_bicker: 'Bickered with each other', grandparent_folktale: 'Listened to an old folktale', gift: 'Gave a gift',
-    tribute: 'Offered a dark tribute', argue: 'Had a bitter argument', chat: 'Spent time talking',
+    tribute: 'Offered a dark tribute', argue: 'Had a bitter argument', insult: 'Delivered a deliberate insult', chat: 'Spent time talking',
     study_together: 'Studied together', gossip: 'Traded harmful gossip', dare: 'Shared a reckless dare',
     prank: 'Pulled a prank', befriend: 'Asked for lasting friendship', praise: 'Offered sincere praise',
     ask_help: 'Asked for help', complain: 'Disputed their decision', bribe: 'Attempted a bribe',
@@ -94,6 +94,15 @@
         else result.message = `${result.message || ''}\n\n${warning}`.trim();
       }
       addNpcMemory(person, character, action, tone, severity, ACTION_LABELS[action]);
+      if (window.resolveNpcReaction) {
+        const reaction = window.resolveNpcReaction(person, character, action, severity);
+        if (reaction) {
+          result.reaction = reaction;
+          const reactionText = `RETALIATION — ${reaction.text}`;
+          if (result.body) result.body += `\n\n${reactionText}`;
+          if (result.message) result.message += `\n\n${reactionText}`;
+        }
+      }
     } else if (tone === 'positive') {
       const unresolved = mind.resentment > 0;
       mind.trust = Math.min(100, mind.trust + (unresolved ? 2 : 5));
@@ -121,6 +130,7 @@
     person.relationship = Math.min(100, (person.relationship || 0) + closenessGain);
     const unresolved = person.memories.find(memory => memory.tone === 'harmful' && !memory.softened);
     if (unresolved) unresolved.softened = true;
+    if (mind.resentment < 15) person.friendshipEnded = false;
     addNpcMemory(person, character, 'apology', 'repair', 1, `Apologized, but the history remained`);
     person.relationshipState = getRelationshipState(person);
     return {

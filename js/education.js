@@ -1103,7 +1103,7 @@
 
     // Reset interaction action quotas for peers/teachers/staff each year
     if (edu.classmates) {
-      edu.classmates.forEach(c => { c.actionsDone = { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, befriend: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(c); });
+      edu.classmates.forEach(c => { c.actionsDone = { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, insult: 0, befriend: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(c); });
     }
     if (edu.teachers) {
       edu.teachers.forEach(t => { t.actionsDone = { praise: 0, ask_help: 0, complain: 0, bribe: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(t); });
