@@ -1103,13 +1103,13 @@
 
     // Reset interaction action quotas for peers/teachers/staff each year
     if (edu.classmates) {
-      edu.classmates.forEach(c => { c.actionsDone = { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, befriend: 0 }; });
+      edu.classmates.forEach(c => { c.actionsDone = { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, befriend: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(c); });
     }
     if (edu.teachers) {
-      edu.teachers.forEach(t => { t.actionsDone = { praise: 0, ask_help: 0, complain: 0, bribe: 0 }; });
+      edu.teachers.forEach(t => { t.actionsDone = { praise: 0, ask_help: 0, complain: 0, bribe: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(t); });
     }
     if (edu.staff) {
-      edu.staff.forEach(s => { s.actionsDone = { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0, reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0, rest_cot: 0, report_anomaly: 0, appeal_discipline: 0, school_pride: 0, nurture: 0, ask_snack: 0 }; });
+      edu.staff.forEach(s => { s.actionsDone = { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0, reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0, rest_cot: 0, report_anomaly: 0, appeal_discipline: 0, school_pride: 0, nurture: 0, ask_snack: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(s); });
     }
 
     // Process annual tuition payment
@@ -1519,6 +1519,9 @@
         suspicion: 0,
         isRevealed: classmate.entityType === 'human',
         loyalty: 'neutral',
+        memories: Array.isArray(classmate.memories) ? classmate.memories : [],
+        relationshipMind: classmate.relationshipMind ? { ...classmate.relationshipMind } : undefined,
+        relationshipState: classmate.relationshipState,
         actionsDone: window.createEmptyActionsDone ? window.createEmptyActionsDone() : {}
       };
 

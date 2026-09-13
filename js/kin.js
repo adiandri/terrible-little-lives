@@ -1047,6 +1047,7 @@ function tickKinYear(character) {
     p.age += 1;
     // Reset actions to clean counts
     p.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(p);
     
     // Natural drift if ignored
     p.relationship = Math.max(10, p.relationship - Math.floor(Math.random() * 3));
@@ -1084,6 +1085,7 @@ function tickKinYear(character) {
     if (!s.alive) return;
     s.age += 1;
     s.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(s);
     s.relationship = Math.max(10, s.relationship - Math.floor(Math.random() * 2));
 
     // Rare sibling tragedy (0.4%)
@@ -1102,6 +1104,7 @@ function tickKinYear(character) {
     if (!g.alive) return;
     g.age += 1;
     g.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(g);
     
     // Grandparent mortality (high after age 72)
     const deathChance = g.age > 78 ? 0.12 : (g.age > 70 ? 0.06 : 0.02);
@@ -1121,6 +1124,7 @@ function tickKinYear(character) {
     if (!f.alive) return;
     f.age += 1;
     f.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(f);
     f.relationship = Math.max(5, f.relationship - Math.floor(Math.random() * 4)); // friends drift faster
   });
 
@@ -1158,3 +1162,4 @@ window.shareSecretWithSibling = shareSecretWithSibling;
 window.listenGrandparentFolktale = listenGrandparentFolktale;
 window.PARENT_OCCUPATIONS_DATA = PARENT_OCCUPATIONS_DATA;
 window.HOUSEHOLD_RESIDENCES = HOUSEHOLD_RESIDENCES;
+window.createEmptyActionsDone = createEmptyActionsDone;

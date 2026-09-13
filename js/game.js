@@ -318,6 +318,7 @@ class TerribleGame {
       btnKinInvestigate: document.getElementById('btn-kin-investigate'),
       btnKinTribute: document.getElementById('btn-kin-tribute'),
       btnKinArgue: document.getElementById('btn-kin-argue'),
+      btnKinApologize: document.getElementById('btn-kin-apologize'),
       btnKinHex: document.getElementById('btn-kin-hex'),
       btnKinAdvice: document.getElementById('btn-kin-advice'),
       btnKinBicker: document.getElementById('btn-kin-bicker'),
@@ -496,6 +497,7 @@ class TerribleGame {
       schoolPersonQuirk: document.getElementById('school-person-quirk'),
       schoolPersonRelVal: document.getElementById('school-person-rel-val'),
       schoolPersonRelBar: document.getElementById('school-person-rel-bar'),
+      schoolPersonMemory: document.getElementById('school-person-memory'),
       schoolPersonActionsList: document.getElementById('school-person-actions-list')
     };
   }
@@ -944,6 +946,9 @@ class TerribleGame {
     }
     if (this.dom.btnKinArgue) {
       this.dom.btnKinArgue.addEventListener('click', () => this.handleKinAction('argue'));
+    }
+    if (this.dom.btnKinApologize) {
+      this.dom.btnKinApologize.addEventListener('click', () => this.handleKinAction('apology'));
     }
     if (this.dom.btnKinHex) {
       this.dom.btnKinHex.addEventListener('click', () => {
@@ -2400,6 +2405,7 @@ class TerribleGame {
 
       ${entityInfo}
       ${curseInfo}
+      ${window.relationshipDossierHtml ? window.relationshipDossierHtml(person) : ''}
     `;
 
     const kinCanvas = this.dom.kinDetailDossier.querySelector('#kin-detail-avatar-canvas');
@@ -2413,6 +2419,7 @@ class TerribleGame {
     // Button states & quota/diminishing returns display
     const getCount = (key) => window.getActionCount ? window.getActionCount(person, key) : (person.actionsDone && person.actionsDone[key] ? (typeof person.actionsDone[key] === 'number' ? person.actionsDone[key] : 1) : 0);
     const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
+    const relationshipMind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : { resentment: 0 };
 
     const setupBtn = (btn, count, maxQuota, normalLabel, doneLabel) => {
       if (!btn) return;
@@ -2586,6 +2593,14 @@ class TerribleGame {
       setupBtn(this.dom.btnKinArgue, getCount('argued'), 5, "Vent pent-up frustration or spark bitter disputes. (1 Action)", "Exhausted your arguments for this year (5/5).");
     }
 
+    if (this.dom.btnKinApologize) {
+      const canApologize = relationshipMind.resentment > 0;
+      this.dom.btnKinApologize.classList.toggle('hidden', !canApologize);
+      this.dom.btnKinApologize.style.display = canApologize ? 'flex' : 'none';
+      this.dom.btnKinApologize.disabled = noEnergy;
+      this.dom.btnKinApologize.classList.toggle('opacity-50', noEnergy);
+    }
+
     // Differentiated Actions:
     // 1. Parent Only: Ask Life Advice
     if (this.dom.btnKinAdvice) {
@@ -2720,6 +2735,8 @@ class TerribleGame {
         return;
       }
       result = window.argueWithKin(person, this.character);
+    } else if (actionType === 'apology') {
+      result = window.apologizeToNpc ? window.apologizeToNpc(person, this.character) : null;
     } else if (actionType === 'cuddle') {
       result = window.cuddleKin(person, this.character);
     } else if (actionType === 'babble') {
@@ -2744,6 +2761,10 @@ class TerribleGame {
       return;
     }
 
+    if (window.finalizeNpcInteraction) {
+      result = window.finalizeNpcInteraction(person, this.character, actionType, result);
+    }
+
     // Deduct 1 action point
     this.character.actionsLeft -= 1;
 
@@ -2752,7 +2773,7 @@ class TerribleGame {
       for (const [stat, val] of Object.entries(result.effects)) {
         if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
         else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
-        else if (stat !== 'relationship') this.modifyStat(stat, val);
+        else if (!['relationship', 'resentment', 'trust', 'fear'].includes(stat)) this.modifyStat(stat, val);
       }
     }
 
@@ -2791,6 +2812,7 @@ class TerribleGame {
       investigate: 'Occult Observation',
       tribute: 'Dark Tribute Offered',
       argue: 'Heated Dispute',
+      apology: 'An Apology Offered',
       cuddle: 'Nurturing Cuddle',
       babble: 'Baby First Words',
       feed_milk: 'Warm Bottle Feeding',
@@ -2803,6 +2825,7 @@ class TerribleGame {
       investigate: 'eye',
       tribute: 'skull',
       argue: 'flame',
+      apology: 'heart-handshake',
       cuddle: 'heart',
       babble: 'message-circle',
       feed_milk: 'cup-soda',
@@ -2815,6 +2838,7 @@ class TerribleGame {
       investigate: 'text-purple-400',
       tribute: 'text-rose-500',
       argue: 'text-orange-500',
+      apology: 'text-sky-400',
       cuddle: 'text-rose-400',
       babble: 'text-sky-400',
       feed_milk: 'text-amber-400',
@@ -2827,6 +2851,7 @@ class TerribleGame {
       investigate: 'OBSERVATION',
       tribute: 'DARK TRIBUTE',
       argue: 'HEATED DISPUTE',
+      apology: 'REPAIR ATTEMPT',
       cuddle: 'NURTURING EMBRACE',
       babble: 'BABY FIRST WORDS',
       feed_milk: 'BOTTLE FEEDING',
@@ -5751,6 +5776,9 @@ class TerribleGame {
     const rel = Math.max(0, Math.min(100, person.relationship || 50));
     if (this.dom.schoolPersonRelVal) this.dom.schoolPersonRelVal.textContent = `${rel}%`;
     if (this.dom.schoolPersonRelBar) this.dom.schoolPersonRelBar.style.width = `${rel}%`;
+    if (this.dom.schoolPersonMemory && window.relationshipDossierHtml) {
+      this.dom.schoolPersonMemory.innerHTML = window.relationshipDossierHtml(person);
+    }
 
     // Render School Person Avatar Canvas
     if (this.dom.schoolPersonAvatarCanvas && window.drawGothicAvatar) {
@@ -5789,6 +5817,7 @@ class TerribleGame {
 
     const actions = [];
     const isEarlyYears = this.character.age < 6;
+    const relationshipMind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : { resentment: 0 };
 
     if (category === 'classmate') {
       if (isEarlyYears) {
@@ -5838,6 +5867,10 @@ class TerribleGame {
         actions.push({ id: 'appeal_discipline', label: 'Appeal Disciplinary Record', desc: 'Submit a formal petition to clear detention marks.', icon: 'check-square', color: 'text-edu-emerald' });
         actions.push({ id: 'school_pride', label: 'Display Institutional Pride', desc: 'Praise the school heritage and display loyalty.', icon: 'award', color: 'text-edu-amber' });
       }
+    }
+
+    if (relationshipMind.resentment > 0) {
+      actions.push({ id: 'apology', label: 'Offer an Apology', desc: 'Acknowledge the incident. Resentment eases slowly; history remains.', icon: 'heart-handshake', color: 'text-sky-400' });
     }
 
     actions.forEach(act => {
@@ -5965,7 +5998,9 @@ class TerribleGame {
     }
 
     let result = null;
-    if (person.category === 'classmate' && window.interactWithClassmate) {
+    if (actionType === 'apology' && window.apologizeToNpc) {
+      result = window.apologizeToNpc(person, this.character);
+    } else if (person.category === 'classmate' && window.interactWithClassmate) {
       result = window.interactWithClassmate(person, this.character, actionType);
     } else if (person.category === 'teacher' && window.interactWithTeacher) {
       result = window.interactWithTeacher(person, this.character, actionType);
@@ -5976,6 +6011,9 @@ class TerribleGame {
     if (!result) return;
 
     if (result.success) {
+      if (window.finalizeNpcInteraction) {
+        result = window.finalizeNpcInteraction(person, this.character, actionType, result);
+      }
       this.character.actionsLeft--;
       const latestLog = this.logs[this.logs.length - 1];
       if (latestLog) {
@@ -5996,6 +6034,10 @@ class TerribleGame {
       const rel = Math.max(0, Math.min(100, person.relationship || 50));
       if (this.dom.schoolPersonRelVal) this.dom.schoolPersonRelVal.textContent = `${rel}%`;
       if (this.dom.schoolPersonRelBar) this.dom.schoolPersonRelBar.style.width = `${rel}%`;
+      if (this.dom.schoolPersonMemory && window.relationshipDossierHtml) {
+        this.dom.schoolPersonMemory.innerHTML = window.relationshipDossierHtml(person);
+      }
+      this.renderSchoolPersonActions(person, person.category);
       
       // If action was befriend, re-render actions so "Ask to be Best Friends" disappears
       if (actionType === 'befriend') {
