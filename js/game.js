@@ -328,6 +328,7 @@ class TerribleGame {
       activityDetailIcon: document.getElementById('activity-detail-icon'),
       activityDetailTitle: document.getElementById('activity-detail-title'),
       activityDetailDesc: document.getElementById('activity-detail-desc'),
+      activityShortcuts: document.getElementById('activity-shortcuts'),
       activitiesList: document.getElementById('activities-list'),
       hubStatusWork: document.getElementById('hub-status-work'),
       hubStatusEducation: document.getElementById('hub-status-education'),
@@ -2044,11 +2045,13 @@ class TerribleGame {
 
   filterKin(filter) {
     this.activeKinFilter = filter;
+    const residenceBanner = document.getElementById('family-residence-banner');
+    if (residenceBanner) residenceBanner.classList.toggle('hidden', !['all', 'family'].includes(filter));
     this.dom.kinFilterBtns.forEach(btn => {
       if (btn.dataset.filter === filter) {
-        btn.className = "kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all";
+        btn.className = "kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all whitespace-nowrap";
       } else {
-        btn.className = "kin-filter-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all";
+        btn.className = "kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap";
       }
     });
     this.renderKinList(filter);
@@ -2073,6 +2076,14 @@ class TerribleGame {
     this.dom.kinList.innerHTML = '';
     if (filter === 'pets') {
       this.renderPetsList();
+      return;
+    }
+    if (filter === 'connect') {
+      this.renderPeopleActions();
+      return;
+    }
+    if (filter === 'circles') {
+      this.renderPeopleCircles();
       return;
     }
     const all = this.getAllKinList();
@@ -2165,6 +2176,53 @@ class TerribleGame {
       this.dom.kinList.appendChild(card);
     });
 
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  renderPeopleActions() {
+    this.dom.kinList.innerHTML = `
+      <button data-people-category="relationships" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
+        <span class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0"><i data-lucide="heart" class="w-5 h-5"></i></span>
+        <span><strong class="block font-serif text-sm text-parchment">Romance & Dating</strong><small class="block mt-1 text-xs text-dust">Courtship, dates and changing relationships</small></span>
+      </button>
+      <button data-people-category="social" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
+        <span class="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center shrink-0"><i data-lucide="message-circle" class="w-5 h-5"></i></span>
+        <span><strong class="block font-serif text-sm text-parchment">Social Life</strong><small class="block mt-1 text-xs text-dust">Meet companions, gather and trade gossip</small></span>
+      </button>`;
+    this.dom.kinList.querySelectorAll('[data-people-category]').forEach(button => {
+      button.addEventListener('click', () => {
+        const category = button.dataset.peopleCategory;
+        this.closeKinModal();
+        this.openActivitiesModal();
+        this.openActivityCategory(category);
+      });
+    });
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  renderPeopleCircles() {
+    const enrolled = this.character.education && this.character.education.enrolled;
+    this.dom.kinList.innerHTML = `
+      <button data-people-circle="education" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
+        <span class="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/30 text-edu-sky flex items-center justify-center shrink-0"><i data-lucide="graduation-cap" class="w-5 h-5"></i></span>
+        <span><strong class="block font-serif text-sm text-parchment">${enrolled ? 'School Community' : 'Education'}</strong><small class="block mt-1 text-xs text-dust">Classmates, teachers and school staff</small></span>
+      </button>
+      <button data-people-circle="careers" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
+        <span class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0"><i data-lucide="briefcase" class="w-5 h-5"></i></span>
+        <span><strong class="block font-serif text-sm text-parchment">Work Community</strong><small class="block mt-1 text-xs text-dust">Jobs, colleagues and professional life</small></span>
+      </button>`;
+    this.dom.kinList.querySelector('[data-people-circle="education"]').addEventListener('click', () => {
+      this.closeKinModal();
+      this.openEducationModal();
+    });
+    this.dom.kinList.querySelector('[data-people-circle="careers"]').addEventListener('click', () => {
+      this.closeKinModal();
+      this.openCareersModal();
+    });
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
@@ -3883,7 +3941,36 @@ class TerribleGame {
       this.dom.activityDetailIcon.setAttribute('data-lucide', catData.icon || 'compass');
     }
 
+    this.renderActivityShortcuts(catData.shortcuts || []);
     this.renderActivitiesList(categoryKey);
+  }
+
+  renderActivityShortcuts(shortcuts) {
+    if (!this.dom.activityShortcuts) return;
+    const labels = {
+      education: ['graduation-cap', 'Education'],
+      careers: ['briefcase', 'Careers'],
+      dark_altar: ['flame', 'Dark Altar']
+    };
+    if (!shortcuts.length) {
+      this.dom.activityShortcuts.classList.add('hidden');
+      this.dom.activityShortcuts.innerHTML = '';
+      return;
+    }
+    this.dom.activityShortcuts.classList.remove('hidden');
+    this.dom.activityShortcuts.innerHTML = shortcuts.map(key => {
+      const [icon, label] = labels[key];
+      return `<button data-activity-shortcut="${key}" class="min-h-[48px] px-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-sm font-serif font-bold text-parchment flex items-center justify-center gap-2"><i data-lucide="${icon}" class="w-4 h-4 text-amber-400"></i>${label}</button>`;
+    }).join('');
+    this.dom.activityShortcuts.querySelectorAll('[data-activity-shortcut]').forEach(button => {
+      button.addEventListener('click', () => {
+        const shortcut = button.dataset.activityShortcut;
+        this.closeActivitiesModal();
+        if (shortcut === 'education') this.openEducationModal();
+        else if (shortcut === 'careers') this.openCareersModal();
+        else if (shortcut === 'dark_altar') this.openDarkAltarModal();
+      });
+    });
   }
 
   closeActivityCategory() {
@@ -3893,7 +3980,8 @@ class TerribleGame {
     if (this.dom.btnBackActivitiesHub) this.dom.btnBackActivitiesHub.classList.add('hidden');
 
     if (this.dom.activitiesHeaderTitle) this.dom.activitiesHeaderTitle.textContent = "Activities";
-    if (this.dom.activitiesHeaderSubtitle) this.dom.activitiesHeaderSubtitle.textContent = "City of Pursuits";
+    if (this.dom.activitiesHeaderSubtitle) this.dom.activitiesHeaderSubtitle.textContent = "Choose how to spend your year";
+    this.renderActivityShortcuts([]);
 
     this.renderActivitiesHub();
   }
@@ -3906,11 +3994,13 @@ class TerribleGame {
     this.dom.activitiesList.innerHTML = '';
 
     const list = window.ACTIVITIES_LIST || [];
+    const categoryData = window.ACTIVITY_CATEGORIES_DATA && window.ACTIVITY_CATEGORIES_DATA[categoryKey];
+    const includedCategories = categoryData && categoryData.categories ? categoryData.categories : [categoryKey];
     const filtered = list.filter(act => {
       // If past maxAge, omit
       if (this.character.age > act.maxAge) return false;
       // Category match
-      if (categoryKey && act.category !== categoryKey) return false;
+      if (categoryKey && !includedCategories.includes(act.category)) return false;
       return true;
     });
 
