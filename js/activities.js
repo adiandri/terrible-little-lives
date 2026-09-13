@@ -2,6 +2,72 @@
 // Governs annual energy pool, City of Buttons categories, recreation, exploration & occult encounters
 
 const ACTIVITY_CATEGORIES_DATA = {
+  occupation: {
+    id: "occupation",
+    name: "Occupation",
+    desc: "Education, employment, shifts, and professional life.",
+    icon: "briefcase-business",
+    iconColor: "text-edu-sky",
+    categories: ["work", "education"],
+    shortcuts: ["education", "careers"]
+  },
+  daily_life: {
+    id: "daily_life",
+    name: "Daily Life",
+    desc: "Home, money, routines, and ordinary survival.",
+    icon: "house",
+    iconColor: "text-emerald-400",
+    categories: ["money", "home"]
+  },
+  leisure: {
+    id: "leisure",
+    name: "Leisure",
+    desc: "Media, hobbies, games, and small sources of joy.",
+    icon: "palette",
+    iconColor: "text-amber-400",
+    categories: ["media", "hobbies", "games"]
+  },
+  explore: {
+    id: "explore",
+    name: "Explore",
+    desc: "Travel, landmarks, wildlife, and the world beyond home.",
+    icon: "map",
+    iconColor: "text-rose-400",
+    categories: ["travel", "places", "wildlife"]
+  },
+  wellbeing: {
+    id: "wellbeing",
+    name: "Wellbeing",
+    desc: "Care for your body and mind.",
+    icon: "heart-pulse",
+    iconColor: "text-sky-400",
+    categories: ["medical", "mental"]
+  },
+  trouble: {
+    id: "trouble",
+    name: "Trouble",
+    desc: "Crime, law, dangerous choices, and consequences.",
+    icon: "shield-alert",
+    iconColor: "text-crimson",
+    categories: ["crime", "legal"],
+    shortcuts: ["dark_altar"]
+  },
+  digital_life: {
+    id: "digital_life",
+    name: "Digital Life",
+    desc: "Phones, networks, broadcasts, and signals in the dark.",
+    icon: "smartphone",
+    iconColor: "text-teal-400",
+    categories: ["phone", "internet"]
+  },
+  paranormal: {
+    id: "paranormal",
+    name: "Paranormal",
+    desc: "Occult rites, crypts, strange bargains, and unpredictable fate.",
+    icon: "moon-star",
+    iconColor: "text-purple-400",
+    categories: ["horror", "random"]
+  },
   work: {
     id: "work",
     name: "Work & Careers",
