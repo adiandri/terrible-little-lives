@@ -21,7 +21,7 @@ class TerribleGame {
       name: { first: "Alex", surname: "Mercer" },
       gender: "Male",
       trait: window.MODERN_TRAITS[0],
-      isGodMode: true,
+      isGodMode: false,
       stats: {
         happiness: 75,
         smarts: 80,
@@ -84,13 +84,15 @@ class TerribleGame {
       presetDreamer: document.getElementById('preset-dreamer'),
       presetElder: document.getElementById('preset-elder'),
 
-      // Drawer Tabs
+      // Three-step creator and appearance tabs
+      stepIdentity: document.getElementById('step-identity'),
+      stepAppearance: document.getElementById('step-appearance'),
+      stepReview: document.getElementById('step-review'),
+      appearanceSubnav: document.getElementById('appearance-subnav'),
       tabFace: document.getElementById('tab-face'),
       tabEyes: document.getElementById('tab-eyes'),
       tabHair: document.getElementById('tab-hair'),
       tabAttire: document.getElementById('tab-attire'),
-      tabIdentity: document.getElementById('tab-identity'),
-      tabGodmode: document.getElementById('tab-godmode'),
 
       // Drawer Panels
       panelFace: document.getElementById('panel-face'),
@@ -98,7 +100,15 @@ class TerribleGame {
       panelHair: document.getElementById('panel-hair'),
       panelAttire: document.getElementById('panel-attire'),
       panelIdentity: document.getElementById('panel-identity'),
+      panelReview: document.getElementById('panel-review'),
       panelGodmode: document.getElementById('panel-godmode'),
+      btnToggleAdvanced: document.getElementById('btn-toggle-advanced'),
+      btnBackReview: document.getElementById('btn-back-review'),
+      reviewName: document.getElementById('review-name'),
+      reviewOrigin: document.getElementById('review-origin'),
+      reviewGender: document.getElementById('review-gender'),
+      reviewTrait: document.getElementById('review-trait'),
+      reviewStyle: document.getElementById('review-style'),
 
       // Granular Feature Selectors (Sheet 1 - 8)
       selSkin: document.getElementById('sel-skin'),
@@ -507,6 +517,7 @@ class TerribleGame {
 
     if (screenId === 'screen-creator') {
       this.renderCreatorAvatar();
+      this.switchCreatorStep('identity');
     } else if (screenId === 'screen-game' && this.character) {
       this.renderAll();
     } else if (screenId === 'screen-crypt') {
@@ -571,13 +582,16 @@ class TerribleGame {
       });
     }
 
-    // Creator Drawer Tabs
+    // Three-step creator flow
+    if (this.dom.stepIdentity) this.dom.stepIdentity.addEventListener('click', () => this.switchCreatorStep('identity'));
+    if (this.dom.stepAppearance) this.dom.stepAppearance.addEventListener('click', () => this.switchCreatorStep('appearance'));
+    if (this.dom.stepReview) this.dom.stepReview.addEventListener('click', () => this.switchCreatorStep('review'));
     if (this.dom.tabFace) this.dom.tabFace.addEventListener('click', () => this.switchCreatorTab('face'));
     if (this.dom.tabEyes) this.dom.tabEyes.addEventListener('click', () => this.switchCreatorTab('eyes'));
     if (this.dom.tabHair) this.dom.tabHair.addEventListener('click', () => this.switchCreatorTab('hair'));
     if (this.dom.tabAttire) this.dom.tabAttire.addEventListener('click', () => this.switchCreatorTab('attire'));
-    if (this.dom.tabIdentity) this.dom.tabIdentity.addEventListener('click', () => this.switchCreatorTab('identity'));
-    if (this.dom.tabGodmode) this.dom.tabGodmode.addEventListener('click', () => this.switchCreatorTab('godmode'));
+    if (this.dom.btnToggleAdvanced) this.dom.btnToggleAdvanced.addEventListener('click', () => this.switchCreatorStep('advanced'));
+    if (this.dom.btnBackReview) this.dom.btnBackReview.addEventListener('click', () => this.switchCreatorStep('review'));
 
     // Quick Archetype Presets
     if (this.dom.presetGothic) this.dom.presetGothic.addEventListener('click', () => this.applyArchetypePreset('goth'));
@@ -1309,12 +1323,10 @@ class TerribleGame {
 
   switchCreatorTab(tab) {
     const tabs = [
-      this.dom.tabFace, this.dom.tabEyes, this.dom.tabHair,
-      this.dom.tabAttire, this.dom.tabIdentity, this.dom.tabGodmode
+      this.dom.tabFace, this.dom.tabEyes, this.dom.tabHair, this.dom.tabAttire
     ].filter(Boolean);
     const panels = [
-      this.dom.panelFace, this.dom.panelEyes, this.dom.panelHair,
-      this.dom.panelAttire, this.dom.panelIdentity, this.dom.panelGodmode
+      this.dom.panelFace, this.dom.panelEyes, this.dom.panelHair, this.dom.panelAttire
     ].filter(Boolean);
 
     tabs.forEach(t => {
@@ -1330,20 +1342,77 @@ class TerribleGame {
       face: { tab: this.dom.tabFace, panel: this.dom.panelFace },
       eyes: { tab: this.dom.tabEyes, panel: this.dom.panelEyes },
       hair: { tab: this.dom.tabHair, panel: this.dom.panelHair },
-      attire: { tab: this.dom.tabAttire, panel: this.dom.panelAttire },
-      identity: { tab: this.dom.tabIdentity, panel: this.dom.panelIdentity },
-      godmode: { tab: this.dom.tabGodmode, panel: this.dom.panelGodmode, isGod: true }
+      attire: { tab: this.dom.tabAttire, panel: this.dom.panelAttire }
     };
 
     const target = activeMap[tab] || activeMap.face;
     if (target && target.tab && target.panel) {
-      target.tab.classList.add('bg-slatecard', target.isGod ? 'text-amber-300' : 'text-parchment');
+      target.tab.classList.add('bg-slatecard', 'text-parchment');
       target.tab.classList.remove('text-dust');
       target.panel.classList.remove('hidden');
       target.panel.style.display = 'block';
     }
 
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  switchCreatorStep(step) {
+    const stepButtons = [this.dom.stepIdentity, this.dom.stepAppearance, this.dom.stepReview].filter(Boolean);
+    stepButtons.forEach(button => {
+      button.classList.remove('bg-slatecard', 'text-parchment', 'font-bold');
+      button.classList.add('text-dust');
+      button.removeAttribute('aria-current');
+    });
+
+    const allPanels = [
+      this.dom.panelIdentity, this.dom.panelFace, this.dom.panelEyes,
+      this.dom.panelHair, this.dom.panelAttire, this.dom.panelReview,
+      this.dom.panelGodmode
+    ].filter(Boolean);
+    allPanels.forEach(panel => {
+      panel.classList.add('hidden');
+      panel.style.display = 'none';
+    });
+    if (this.dom.appearanceSubnav) this.dom.appearanceSubnav.classList.add('hidden');
+
+    let activeButton = this.dom.stepIdentity;
+    if (step === 'identity') {
+      this.dom.panelIdentity.style.display = 'block';
+      this.dom.panelIdentity.classList.remove('hidden');
+    } else if (step === 'appearance') {
+      activeButton = this.dom.stepAppearance;
+      this.dom.appearanceSubnav.classList.remove('hidden');
+      this.switchCreatorTab('face');
+    } else if (step === 'review') {
+      activeButton = this.dom.stepReview;
+      this.renderCreatorReview();
+      this.dom.panelReview.style.display = 'block';
+      this.dom.panelReview.classList.remove('hidden');
+    } else if (step === 'advanced') {
+      activeButton = this.dom.stepReview;
+      this.dom.panelGodmode.style.display = 'block';
+      this.dom.panelGodmode.classList.remove('hidden');
+    }
+
+    if (activeButton) {
+      activeButton.classList.add('bg-slatecard', 'text-parchment', 'font-bold');
+      activeButton.classList.remove('text-dust');
+      activeButton.setAttribute('aria-current', 'step');
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  renderCreatorReview() {
+    const first = this.dom.inputFirstName.value.trim();
+    const last = this.dom.inputSurname.value.trim();
+    this.dom.reviewName.textContent = [first, last].filter(Boolean).join(' ') || 'Unnamed Soul';
+    const country = window.COUNTRIES_DATA[this.creatorState.countryCode] || window.COUNTRIES_DATA.USA;
+    this.dom.reviewOrigin.textContent = [this.dom.selCity.value || this.creatorState.city, country.name].filter(Boolean).join(', ');
+    this.dom.reviewGender.textContent = this.dom.selGender.value || '—';
+    this.dom.reviewTrait.textContent = this.creatorState.trait?.name || '—';
+    const avatar = this.creatorState.avatar || {};
+    const styleParts = [avatar.hairStyle, avatar.clothing].filter(Boolean).map(value => value.replaceAll('_', ' '));
+    this.dom.reviewStyle.textContent = styleParts.length ? styleParts.join(' · ') : 'Custom appearance';
   }
 
   renderCreatorAvatar() {
