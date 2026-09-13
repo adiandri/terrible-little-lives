@@ -35,7 +35,6 @@ class TerribleGame {
       shillings: 25
     };
 
-    this.activeThemeFilter = 'all';
     this.vibrationEnabled = typeof localStorage !== 'undefined' && localStorage.getItem('TLL_VIBRATION') !== 'false';
     this.textSize = (window.getTextSize && window.getTextSize()) || 'normal';
 
@@ -291,12 +290,8 @@ class TerribleGame {
       btnFontGame: document.getElementById('btn-font-game'),
       btnFontDevice: document.getElementById('btn-font-device'),
       settingsFontActiveLabel: document.getElementById('settings-font-active-label'),
-      fontsListContainer: document.getElementById('fonts-list'),
       themeModal: document.getElementById('settings-modal') || document.getElementById('theme-modal'),
       btnCloseThemeModal: document.getElementById('btn-close-settings') || document.getElementById('btn-close-theme-modal'),
-      tabThemeAll: document.getElementById('tab-theme-all'),
-      tabThemeDark: document.getElementById('tab-theme-dark'),
-      tabThemeLight: document.getElementById('tab-theme-light'),
       themeListContainer: document.getElementById('themes-list'),
 
       // Kin Modal
@@ -1130,16 +1125,6 @@ class TerribleGame {
     // Font / Typography buttons
     if (this.dom.btnFontGame) this.dom.btnFontGame.addEventListener('click', () => this.setFont('game-gothic'));
     if (this.dom.btnFontDevice) this.dom.btnFontDevice.addEventListener('click', () => this.setFont('device-system'));
-
-    if (this.dom.tabThemeAll) {
-      this.dom.tabThemeAll.addEventListener('click', () => this.filterThemes('all'));
-    }
-    if (this.dom.tabThemeDark) {
-      this.dom.tabThemeDark.addEventListener('click', () => this.filterThemes('dark'));
-    }
-    if (this.dom.tabThemeLight) {
-      this.dom.tabThemeLight.addEventListener('click', () => this.filterThemes('light'));
-    }
 
     // Crypt clear
     this.dom.btnClearCrypt.addEventListener('click', () => {
@@ -4717,8 +4702,7 @@ class TerribleGame {
   openSettingsModal() {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.syncSettingsUI();
-    this.renderFontsList();
-    this.filterThemes(this.activeThemeFilter || 'all');
+    this.renderThemesList();
     const modal = this.dom.settingsModal || this.dom.themeModal;
     if (modal) {
       this.switchSettingsPanel('experience');
@@ -4806,45 +4790,6 @@ class TerribleGame {
       window.soundEngine.playClick();
     }
     this.syncSettingsUI();
-    this.renderFontsList();
-  }
-
-  renderFontsList() {
-    if (!this.dom.fontsListContainer || !window.FONTS_DATA) return;
-    this.dom.fontsListContainer.innerHTML = '';
-    const activeFont = window.getSavedFont ? window.getSavedFont() : 'game-gothic';
-
-    // Show Google Fonts in the library picker
-    const googleFonts = window.FONTS_DATA.filter(f => f.category === 'google');
-    googleFonts.forEach(font => {
-      const isActive = font.id === activeFont;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `p-2 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
-        isActive
-          ? 'bg-cardhover border-sky-500 shadow-sm ring-1 ring-sky-500/50'
-          : 'bg-slatecard hover:bg-cardhover border-leadborder'
-      }`;
-      btn.innerHTML = `
-        <div class="flex items-center justify-between w-full mb-1">
-          <span class="text-xs font-bold text-parchment truncate" style="font-family: ${font.heading}">${font.name}</span>
-          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border shrink-0 ${
-            isActive ? 'bg-sky-500/20 text-sky-300 border-sky-500/40' : 'bg-trackbg text-dust border-leadborder'
-          }">${font.tag}</span>
-        </div>
-        <p class="text-[11px] text-dust/90 italic truncate mb-1" style="font-family: ${font.body}">"${font.sample}"</p>
-        <div class="flex items-center justify-between w-full pt-1 border-t border-leadborder/40 text-[9px] font-mono text-dust/70">
-          <span class="truncate mr-1">${font.desc}</span>
-          ${isActive 
-            ? '<span class="text-sky-400 font-bold shrink-0">Active</span>' 
-            : '<span class="text-dust/50 hover:text-dust shrink-0">Apply</span>'}
-        </div>
-      `;
-      btn.addEventListener('click', () => {
-        this.setFont(font.id);
-      });
-      this.dom.fontsListContainer.appendChild(btn);
-    });
   }
 
   syncSettingsUI() {
@@ -4926,53 +4871,22 @@ class TerribleGame {
       this.dom.settingsFontActiveLabel.textContent = curFontObj ? curFontObj.name : 'Game Font';
     }
 
-    // Update theme filter tabs with live counts
-    if (window.THEMES_DATA) {
-      const total = window.THEMES_DATA.length;
-      const darkCount = window.THEMES_DATA.filter(t => t.mode === 'dark').length;
-      const lightCount = window.THEMES_DATA.filter(t => t.mode === 'light').length;
-      if (this.dom.tabThemeAll) this.dom.tabThemeAll.textContent = `All (${total})`;
-      if (this.dom.tabThemeDark) this.dom.tabThemeDark.textContent = `🌙 Dark (${darkCount})`;
-      if (this.dom.tabThemeLight) this.dom.tabThemeLight.textContent = `☀️ Light (${lightCount})`;
-    }
-
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
   }
 
-  filterThemes(filter) {
-    this.activeThemeFilter = filter;
-    const tabs = [
-      { el: this.dom.tabThemeAll, key: 'all' },
-      { el: this.dom.tabThemeDark, key: 'dark' },
-      { el: this.dom.tabThemeLight, key: 'light' }
-    ];
-    tabs.forEach(t => {
-      if (!t.el) return;
-      if (t.key === filter) {
-        t.el.className = "py-1 rounded-lg bg-slatecard text-parchment font-serif font-bold text-[11px] transition-all text-center";
-      } else {
-        t.el.className = "py-1 rounded-lg text-dust hover:text-parchment font-serif font-bold text-[11px] transition-all text-center";
-      }
-    });
-    this.renderThemesList();
-  }
-
   renderThemesList() {
     if (!this.dom.themeListContainer || !window.THEMES_DATA) return;
     this.dom.themeListContainer.innerHTML = '';
-    const activeId = window.getActiveThemeId ? window.getActiveThemeId() : 'void-noir';
-    const filtered = window.THEMES_DATA.filter(t => {
-      if (this.activeThemeFilter === 'dark') return t.mode === 'dark';
-      if (this.activeThemeFilter === 'light') return t.mode === 'light';
-      return true;
-    });
+    const activeId = window.getActiveThemeId ? window.getActiveThemeId() : 'morgue-ledger';
 
-    filtered.forEach(theme => {
+    window.THEMES_DATA.forEach(theme => {
       const isActive = theme.id === activeId;
-      const card = document.createElement('div');
-      card.className = `p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between space-x-3 ${isActive ? 'bg-cardhover border-crimson shadow-sm ring-1 ring-crimson/50' : 'bg-slatecard hover:bg-cardhover border-leadborder'}`;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = `identity-theme-card w-full p-3 rounded-xl border transition-all cursor-pointer text-left ${isActive ? 'bg-cardhover' : 'bg-slatecard hover:bg-cardhover border-leadborder'}`;
+      card.setAttribute('aria-pressed', String(isActive));
 
       const swatchesHtml = `
         <div class="flex items-center -space-x-1 shrink-0 p-1 rounded-lg bg-inputbg border border-leadborder">
@@ -4985,18 +4899,16 @@ class TerribleGame {
       card.innerHTML = `
         <div class="flex items-center space-x-3 min-w-0">
           ${swatchesHtml}
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5">
               <h4 class="font-serif font-bold text-xs text-parchment truncate">${theme.name}</h4>
               <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border ${theme.mode === 'dark' ? 'bg-[#0f1118] text-sky-400 border-sky-900/50' : 'bg-[#fef9c3] text-amber-900 border-amber-300'}">${theme.mode === 'dark' ? 'Dark' : 'Light'}</span>
             </div>
-            <p class="text-[10px] text-dust truncate mt-0.5">${theme.desc}</p>
+            <p class="text-[10px] text-dust mt-1 leading-relaxed">${theme.desc}</p>
           </div>
-        </div>
-        <div class="shrink-0 pl-1">
           ${isActive 
-            ? `<span class="p-1 rounded-full bg-emerald-500/20 border border-emerald-600/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
-            : `<span class="text-[10px] font-mono text-dust/60">Select</span>`
+            ? `<span class="p-1 rounded-full bg-crimson/15 border border-crimson/40 text-crimson flex items-center justify-center shrink-0"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
+            : `<span class="text-[10px] font-mono text-dust/60 shrink-0">Choose</span>`
           }
         </div>
       `;
