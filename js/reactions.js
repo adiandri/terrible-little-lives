@@ -43,9 +43,14 @@
   }
 
   function getWitnesses(person, character) {
+    if (person.category === 'coworker') {
+      const colleagues = character && character.workplace && character.workplace.colleagues;
+      return Array.isArray(colleagues) ? colleagues.filter(candidate => candidate !== person && candidate.alive !== false) : [];
+    }
     if (!['classmate', 'teacher', 'staff'].includes(person.category)) return [];
-    const classmates = character && character.education && character.education.classmates;
-    return Array.isArray(classmates) ? classmates.filter(candidate => candidate !== person && candidate.alive !== false) : [];
+    const education = character && character.education;
+    return education ? [...(education.classmates || []), ...(education.teachers || []), ...(education.staff || [])]
+      .filter(candidate => candidate !== person && candidate.alive !== false) : [];
   }
 
   function resolveBystander(person, character, reactionType) {
@@ -54,16 +59,17 @@
     const witness = pick(witnesses);
     const personality = ensureNpcPersonality(witness);
     const relationship = witness.relationship || 50;
-    if (reactionType === 'attack' && personality.empathy + relationship > 105) {
+    const side = window.witnessDecision ? window.witnessDecision(character, witness, person) : 'uncertain';
+    if (reactionType === 'attack' && (side === 'player' || personality.empathy + relationship > 105)) {
       if (character.stats) character.stats.sanity = clamp((character.stats.sanity || 50) + 2);
-      return `${witness.name} stepped between you and ${person.name}, stopping the fight before it became worse.`;
+      return { witness, side: 'player', text: `${witness.name} sided with you and stepped between you and ${person.name}, stopping the fight before it became worse.` };
     }
-    if (personality.aggression > 62 && (person.relationship || 50) > relationship) {
+    if (side === 'instigator' || (personality.aggression > 62 && (person.relationship || 50) > relationship)) {
       if (character.stats) character.stats.happiness = clamp((character.stats.happiness || 50) - 3);
-      return `${witness.name} joined ${person.name}, jeering while the confrontation unfolded.`;
+      return { witness, side: 'instigator', text: `${witness.name} took ${person.name}'s side and joined the confrontation.` };
     }
     if (character.education) character.education.popularity = clamp((character.education.popularity || 50) - 4);
-    return `${witness.name} repeated the story around school. By lunch, strangers were discussing it (-4% Popularity).`;
+    return { witness, side: 'uncertain', text: `${witness.name} repeated the story without choosing a side. By lunch, other people were debating whom to believe (-4% Popularity).` };
   }
 
   function endFriendship(person, character) {
@@ -158,7 +164,8 @@
       text = `${person.name} answered with a vicious insult of their own (-3% Happiness).`;
     }
     const bystander = resolveBystander(person, character, type);
-    const reaction = { type, text: bystander ? `${text}\n\n${bystander}` : text, effects };
+    const reaction = { type, text: bystander ? `${text}\n\n${bystander.text}` : text, effects };
+    if (window.recordReactionReputation) window.recordReactionReputation(character, person, reaction, bystander ? [bystander.witness] : []);
     if (window.scheduleNpcAftermath) window.scheduleNpcAftermath(character, person, reaction, action, severity);
     return reaction;
   }

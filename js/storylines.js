@@ -208,6 +208,12 @@
       if (incident.resolution === 'covered_up' && window.addConsequence) {
         window.addConsequence(character, { type: 'rumor', label: 'Suspected Cover-Up', detail: `${incident.personName} continues searching for proof.`, source: incident.personName, severity: 3, yearsRemaining: 4 });
       }
+      if (window.alterReputation) {
+        const audience = person && window.audienceForPerson ? window.audienceForPerson(person) : 'public';
+        if (['repaired', 'truth', 'self_sacrifice', 'protected'].includes(incident.resolution)) window.alterReputation(character, audience, { esteem: 6, notoriety: 2 }, `Resolved the history with ${incident.personName}`);
+        if (incident.resolution === 'ruin') window.alterReputation(character, 'public', { esteem: -12, fear: 8, notoriety: 14 }, `Destroyed ${incident.personName}'s standing during a feud`);
+        if (incident.resolution === 'covered_up') window.alterReputation(character, 'public', { esteem: -6, fear: 2, notoriety: 9 }, `Suspicion surrounding the conflict with ${incident.personName}`);
+      }
     }
     return incident;
   }

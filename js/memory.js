@@ -113,6 +113,8 @@
       addNpcMemory(person, character, action, relDelta > 0 ? 'positive' : 'harmful', 1, ACTION_LABELS[action]);
     }
 
+    if (window.recordNpcInteractionReputation) window.recordNpcInteractionReputation(character, person, tone, Math.max(1, Math.ceil(Math.abs(relDelta) / 8) || 1), action);
+
     person.relationshipState = getRelationshipState(person);
     return result;
   }

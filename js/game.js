@@ -207,6 +207,8 @@ class TerribleGame {
       profileLifeSummary: document.getElementById('profile-life-summary'),
       profileLocation: document.getElementById('profile-location'),
       profileStats: document.getElementById('profile-stats'),
+      profileReputation: document.getElementById('profile-reputation'),
+      profileRumors: document.getElementById('profile-rumors'),
       profileStoryLedger: document.getElementById('profile-story-ledger'),
       profileOccupation: document.getElementById('profile-occupation'),
       profileTrait: document.getElementById('profile-trait'),
@@ -1578,6 +1580,9 @@ class TerribleGame {
       this.character.kin = window.generateFamily(this.character);
     }
     const kinLogs = window.tickKinYear(this.character) || [];
+    if (window.tickSocialNetwork) {
+      window.tickSocialNetwork(this.character).forEach(entry => currentYearLog.entries.push(`[SOCIAL NETWORK] ${entry}`));
+    }
 
     // ==========================================
     // 5-7 MULTI-EVENT YEARLY CHRONICLE
@@ -2059,6 +2064,7 @@ class TerribleGame {
 
   applyMundaneJob(job) {
     this.character.job = job;
+    if (window.ensureWorkplace) window.ensureWorkplace(this.character);
     window.soundEngine.playClick();
     const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
     
@@ -4277,7 +4283,9 @@ class TerribleGame {
     }
 
     const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
-    const restriction = activity && window.getActivityRestriction ? window.getActivityRestriction(this.character, activity) : null;
+    const consequenceRestriction = activity && window.getActivityRestriction ? window.getActivityRestriction(this.character, activity) : null;
+    const socialRestriction = activity && window.getSocialOpportunityRestriction ? window.getSocialOpportunityRestriction(this.character, activity) : null;
+    const restriction = consequenceRestriction || socialRestriction;
     if (restriction) {
       this.openFeedbackModal({ tag: 'CONSEQUENCE', title: 'Activity Restricted', icon: 'lock', iconColor: 'text-crimson', body: restriction, effects: {} });
       return;
@@ -4298,6 +4306,8 @@ class TerribleGame {
     if (latestLog) latestLog.entries.push(`[${result.title}] ${result.message}`);
     const recoveryNotes = window.applyRecoveryFromActivity ? window.applyRecoveryFromActivity(this.character, activityId) : [];
     if (latestLog) recoveryNotes.forEach(note => latestLog.entries.push(`[Recovery] ${note}`));
+    const reputationNotes = window.recordActivityReputation ? window.recordActivityReputation(this.character, activity, result) : [];
+    if (latestLog) reputationNotes.forEach(note => latestLog.entries.push(`[Reputation] ${note}`));
 
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
@@ -4438,6 +4448,8 @@ class TerribleGame {
     this.dom.profileTrait.textContent = character.trait?.name || 'None';
     this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
     this.dom.profileShillings.textContent = `${character.shillings} s.`;
+    if (this.dom.profileReputation && window.reputationHtml) this.dom.profileReputation.innerHTML = window.reputationHtml(character);
+    if (this.dom.profileRumors && window.rumorHtml) this.dom.profileRumors.innerHTML = window.rumorHtml(character);
     if (this.dom.profileConsequences && window.consequencesHtml) this.dom.profileConsequences.innerHTML = window.consequencesHtml(character);
     if (this.dom.profileStoryLedger && window.storyLedgerHtml) this.dom.profileStoryLedger.innerHTML = window.storyLedgerHtml(character);
 

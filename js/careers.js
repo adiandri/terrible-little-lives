@@ -558,6 +558,17 @@ function checkJobEligibility(character, job) {
     if (!failedReason) failedReason = 'Criminal Record';
   }
 
+  const workplaceStanding = window.getReputationState ? window.getReputationState(character, 'workplace') : 'ordinary';
+  if (workplaceStanding === 'disgraced' && (job.baseSalary || 0) >= 50000) {
+    badges.push({ label: 'Professional Standing', met: false, icon: 'users-round' });
+    isEligible = false;
+    if (!failedReason) failedReason = 'Disgraced at Work';
+  } else if (workplaceStanding === 'beloved' || workplaceStanding === 'respected') {
+    badges.push({ label: 'Trusted Referral', met: true, icon: 'badge-check' });
+  } else if (['feared', 'formidable'].includes(workplaceStanding) && job.payoutShillings) {
+    badges.push({ label: 'Notorious Network', met: true, icon: 'eye' });
+  }
+
   // 2. Vitality
   if (reqs.minVitality !== undefined) {
     const met = character.stats.vitality >= reqs.minVitality;
