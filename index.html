@@ -669,25 +669,26 @@
             <button id="preset-preppy" type="button" class="px-2 py-0.5 rounded bg-inputbg hover:bg-cardhover border border-leadborder text-[10px] font-mono text-dust hover:text-parchment transition-all">Preppy</button>
             <button id="preset-street" type="button" class="px-2 py-0.5 rounded bg-inputbg hover:bg-cardhover border border-leadborder text-[10px] font-mono text-dust hover:text-parchment transition-all">Street</button>
             <button id="preset-dreamer" type="button" class="px-2 py-0.5 rounded bg-inputbg hover:bg-cardhover border border-leadborder text-[10px] font-mono text-dust hover:text-parchment transition-all">Dreamer</button>
-            <button id="preset-elder" type="button" class="px-2 py-0.5 rounded bg-inputbg hover:bg-cardhover border border-leadborder text-[10px] font-mono text-dust hover:text-parchment transition-all">Elder</button>
           </div>
         </div>
 
-        <!-- Creator Mode Tabs (Responsive Scrollable Drawer Bar) -->
-        <div class="flex items-center gap-1 bg-inputbg p-1 rounded-xl border border-leadborder text-[11px] overflow-x-auto no-scrollbar">
-          <button id="tab-face" class="px-3 py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all shrink-0 whitespace-nowrap">Face & Skin</button>
-          <button id="tab-eyes" class="px-3 py-1.5 rounded-lg text-dust hover:text-parchment font-serif transition-all shrink-0 whitespace-nowrap">Eyes & Brows</button>
-          <button id="tab-hair" class="px-3 py-1.5 rounded-lg text-dust hover:text-parchment font-serif transition-all shrink-0 whitespace-nowrap">Hair & Beard</button>
-          <button id="tab-attire" class="px-3 py-1.5 rounded-lg text-dust hover:text-parchment font-serif transition-all shrink-0 whitespace-nowrap">Attire & Extras</button>
-          <button id="tab-identity" class="px-3 py-1.5 rounded-lg text-dust hover:text-parchment font-serif transition-all shrink-0 whitespace-nowrap">Identity</button>
-          <button id="tab-godmode" class="px-3 py-1.5 rounded-lg text-amber-400/80 hover:text-amber-300 font-serif font-bold transition-all shrink-0 whitespace-nowrap flex items-center gap-1">
-            <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
-            <span>God Mode</span>
-          </button>
+        <!-- Three-step creation flow -->
+        <nav class="grid grid-cols-3 gap-1 bg-inputbg p-1 rounded-xl border border-leadborder" aria-label="Character creation steps">
+          <button id="step-identity" class="creator-step min-h-[44px] rounded-lg bg-slatecard text-parchment font-serif font-bold text-xs transition-all" aria-current="step">1. Identity</button>
+          <button id="step-appearance" class="creator-step min-h-[44px] rounded-lg text-dust hover:text-parchment font-serif text-xs transition-all">2. Appearance</button>
+          <button id="step-review" class="creator-step min-h-[44px] rounded-lg text-dust hover:text-parchment font-serif text-xs transition-all">3. Review</button>
+        </nav>
+
+        <!-- Appearance categories only appear during Step 2. -->
+        <div id="appearance-subnav" class="hidden grid grid-cols-2 gap-2 bg-inputbg p-2 rounded-xl border border-leadborder">
+          <button id="tab-face" class="min-h-[42px] px-3 rounded-lg bg-slatecard text-parchment font-serif font-bold text-xs transition-all">Face & Skin</button>
+          <button id="tab-eyes" class="min-h-[42px] px-3 rounded-lg text-dust hover:text-parchment font-serif text-xs transition-all">Eyes & Brows</button>
+          <button id="tab-hair" class="min-h-[42px] px-3 rounded-lg text-dust hover:text-parchment font-serif text-xs transition-all">Hair & Beard</button>
+          <button id="tab-attire" class="min-h-[42px] px-3 rounded-lg text-dust hover:text-parchment font-serif text-xs transition-all">Attire & Extras</button>
         </div>
 
         <!-- PANEL 1: FACE & COMPLEXION (Sheet 1) -->
-        <div id="panel-face" class="space-y-3">
+        <div id="panel-face" class="hidden space-y-3">
           <!-- Skin Complexion -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust mb-1.5">Skin Complexion</label>
@@ -1067,7 +1068,7 @@
         </div>
 
         <!-- PANEL B: IDENTITY & COUNTRY -->
-        <div id="panel-identity" class="hidden space-y-3">
+        <div id="panel-identity" class="space-y-3">
           <!-- Country & City Selector -->
           <div class="bg-slatecard border border-leadborder rounded-xl p-3 space-y-2">
             <label class="block text-[11px] font-mono uppercase tracking-wider text-dust">Birth Country & City</label>
@@ -1116,8 +1117,32 @@
           </div>
         </div>
 
-        <!-- PANEL C: GOD MODE (PROTOTYPE SLIDERS) -->
+        <!-- PANEL 3: REVIEW -->
+        <div id="panel-review" class="hidden space-y-3">
+          <div class="bg-slatecard border border-leadborder rounded-2xl p-4 space-y-4">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-dust font-mono">Final Review</p>
+              <h3 id="review-name" class="font-serif font-bold text-xl text-parchment mt-1">Unnamed Soul</h3>
+              <p id="review-origin" class="text-sm text-dust mt-1">Choose an identity to continue.</p>
+            </div>
+            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm border-t border-leadborder pt-3">
+              <dt class="text-dust">Gender</dt><dd id="review-gender" class="text-parchment text-right">—</dd>
+              <dt class="text-dust">Trait</dt><dd id="review-trait" class="text-parchment text-right">—</dd>
+              <dt class="text-dust">Style</dt><dd id="review-style" class="text-parchment text-right">Custom appearance</dd>
+            </dl>
+          </div>
+          <button id="btn-toggle-advanced" class="w-full min-h-[48px] px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-serif font-bold text-sm flex items-center justify-between">
+            <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i>Advanced Fate Controls</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+          <p class="text-xs text-dust text-center leading-relaxed">Optional controls for starting stats and currencies. Your character can begin normally without touching them.</p>
+        </div>
+
+        <!-- OPTIONAL ADVANCED GOD MODE -->
         <div id="panel-godmode" class="hidden space-y-3">
+          <button id="btn-back-review" class="min-h-[44px] px-3 rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment text-sm flex items-center gap-2">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Review
+          </button>
           <div class="bg-slatecard border border-amber-500/30 rounded-xl p-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
               <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
@@ -1129,12 +1154,12 @@
               </div>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input id="chk-godmode" type="checkbox" checked class="sr-only peer">
+              <input id="chk-godmode" type="checkbox" class="sr-only peer">
               <div class="w-9 h-5 bg-trackbg peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
             </label>
           </div>
 
-          <div id="godmode-sliders" class="bg-slatecard border border-leadborder rounded-xl p-3.5 space-y-3">
+          <div id="godmode-sliders" class="bg-slatecard border border-leadborder rounded-xl p-3.5 space-y-3 opacity-40 pointer-events-none">
             <!-- Happiness -->
             <div>
               <div class="flex justify-between text-xs mb-1">
