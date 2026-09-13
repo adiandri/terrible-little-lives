@@ -1580,6 +1580,10 @@ function performActivity(activityId, character) {
 
   const result = activity.run(character, currentUses);
 
+  if (result && /caught|arrest|police/i.test(`${result.title || ''} ${result.message || ''}`) && ['crime', 'legal'].includes(activity.category) && window.addConsequence) {
+    window.addConsequence(character, { type: 'criminal_record', label: 'Criminal Record', detail: result.message, source: activity.name, severity: 1, yearsRemaining: null });
+  }
+
   if (result && result.success !== false) {
     character.actionsLeft -= 1;
     character.activityUses[activityId] = currentUses + 1;

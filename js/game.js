@@ -211,6 +211,7 @@ class TerribleGame {
       profileTrait: document.getElementById('profile-trait'),
       profileMoney: document.getElementById('profile-money'),
       profileShillings: document.getElementById('profile-shillings'),
+      profileConsequences: document.getElementById('profile-consequences'),
 
       // Careers Modal
       careersModal: document.getElementById('careers-modal'),
@@ -1565,7 +1566,9 @@ class TerribleGame {
       entries: []
     };
 
-    if (window.tickReactionYear) {
+    if (window.tickConsequences) {
+      window.tickConsequences(this.character).forEach(entry => currentYearLog.entries.push(entry));
+    } else if (window.tickReactionYear) {
       window.tickReactionYear(this.character).forEach(entry => currentYearLog.entries.push(entry));
     }
 
@@ -1666,7 +1669,9 @@ class TerribleGame {
         this.character.money -= annualRentCost;
         currentYearLog.entries.push(`Paid annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
       } else {
+        const shortfall = annualRentCost - this.character.money;
         this.character.money = 0;
+        if (window.addDebtConsequence) window.addDebtConsequence(this.character, shortfall, 'annual rent and living expenses');
         this.modifyStat('happiness', -3);
         this.modifyStat('vitality', -2);
         currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety strained your well-being.`);
@@ -1754,7 +1759,7 @@ class TerribleGame {
     const triggerChance = isMilestone ? 1.0 : 0.85;
 
     if (availableDilemmas.length > 0 && Math.random() < triggerChance) {
-      const chosen = availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
+      const chosen = window.chooseWeightedDilemma ? window.chooseWeightedDilemma(this.character, availableDilemmas) : availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
       this.usedDilemmaIds.add(chosen.id);
       this.activeDilemma = chosen;
 
@@ -1855,6 +1860,9 @@ class TerribleGame {
     if (choice.effects) {
       for (const [stat, delta] of Object.entries(choice.effects)) {
         if (stat === 'money') {
+          if (this.character.money + delta < 0 && window.addDebtConsequence) {
+            window.addDebtConsequence(this.character, Math.abs(this.character.money + delta), dilemma.title);
+          }
           this.character.money = Math.max(0, this.character.money + delta);
         } else if (stat === 'coin' || stat === 'shillings') {
           this.character.shillings = Math.max(0, this.character.shillings + delta);
@@ -1867,6 +1875,7 @@ class TerribleGame {
     const title = dilemma.title;
     const outcome = choice.outcome;
     const effects = choice.effects || {};
+    if (window.recordOutcomeConsequences) window.recordOutcomeConsequences(this.character, title, outcome, effects);
 
     this.activeDilemma = null;
     this.hideModals();
@@ -2303,19 +2312,19 @@ class TerribleGame {
 
   renderPeopleCircles() {
     const enrolled = this.character.education && this.character.education.enrolled;
+    const schoolStatus = this.character.education && this.character.education.graduationStatus;
+    const schoolTerminated = schoolStatus === 'expelled' || schoolStatus === 'dropped_out';
     this.dom.kinList.innerHTML = `
-      <button data-people-circle="education" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
+      ${schoolTerminated ? '' : `<button data-people-circle="education" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
         <span class="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/30 text-edu-sky flex items-center justify-center shrink-0"><i data-lucide="graduation-cap" class="w-5 h-5"></i></span>
         <span><strong class="block font-serif text-sm text-parchment">${enrolled ? 'School Community' : 'Education'}</strong><small class="block mt-1 text-xs text-dust">Classmates, teachers and school staff</small></span>
-      </button>
+      </button>`}
       <button data-people-circle="careers" class="w-full min-h-[76px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left flex items-center gap-3 transition-all active:scale-[0.99]">
         <span class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0"><i data-lucide="briefcase" class="w-5 h-5"></i></span>
         <span><strong class="block font-serif text-sm text-parchment">Work Community</strong><small class="block mt-1 text-xs text-dust">Jobs, colleagues and professional life</small></span>
       </button>`;
-    this.dom.kinList.querySelector('[data-people-circle="education"]').addEventListener('click', () => {
-      this.closeKinModal();
-      this.openEducationModal();
-    });
+    const educationCircle = this.dom.kinList.querySelector('[data-people-circle="education"]');
+    if (educationCircle) educationCircle.addEventListener('click', () => { this.closeKinModal(); this.openEducationModal(); });
     this.dom.kinList.querySelector('[data-people-circle="careers"]').addEventListener('click', () => {
       this.closeKinModal();
       this.openCareersModal();
@@ -3986,6 +3995,9 @@ class TerribleGame {
   renderActivitiesHub() {
     const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
     if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
+    const schoolStatus = this.character.education && this.character.education.graduationStatus;
+    const educationCard = this.dom.activitiesModal && this.dom.activitiesModal.querySelector('[data-category="education"]');
+    if (educationCard) educationCard.classList.toggle('hidden', schoolStatus === 'expelled' || schoolStatus === 'dropped_out');
 
     // Live status indicators on hub cards
     if (this.dom.hubStatusWork) {
@@ -4082,6 +4094,8 @@ class TerribleGame {
 
   renderActivityShortcuts(shortcuts) {
     if (!this.dom.activityShortcuts) return;
+    const schoolStatus = this.character.education && this.character.education.graduationStatus;
+    if (schoolStatus === 'expelled' || schoolStatus === 'dropped_out') shortcuts = shortcuts.filter(key => key !== 'education');
     const labels = {
       education: ['graduation-cap', 'Education'],
       careers: ['briefcase', 'Careers'],
@@ -4161,6 +4175,7 @@ class TerribleGame {
 
     filtered.forEach(act => {
       const isLockedByAge = this.character.age < act.minAge;
+      const consequenceRestriction = window.getActivityRestriction ? window.getActivityRestriction(this.character, act) : null;
       const card = document.createElement('div');
       card.dataset.actId = act.id;
       
@@ -4173,13 +4188,15 @@ class TerribleGame {
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
       const maxUses = act.maxPerYear || 5;
       const isCapped = uses >= maxUses;
-      const isDisabled = isLockedByAge || noEnergy || isCapped;
+      const isDisabled = isLockedByAge || noEnergy || isCapped || !!consequenceRestriction;
 
       let btnLabel = 'Engage';
       if (isLockedByAge) {
         btnLabel = `Locked (Age ${act.minAge})`;
       } else if (isCapped) {
         btnLabel = 'Capped this Year';
+      } else if (consequenceRestriction) {
+        btnLabel = 'Restricted';
       }
 
       const ageBadge = isLockedByAge 
@@ -4201,6 +4218,7 @@ class TerribleGame {
         </div>
 
         <p class="text-[11px] text-dust font-sans leading-relaxed">${act.desc}</p>
+        ${consequenceRestriction ? `<p class="text-[10px] text-crimson font-mono leading-relaxed">${consequenceRestriction}</p>` : ''}
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
           <span class="text-[10px] font-mono text-dust/90 flex items-center gap-1">
@@ -4245,6 +4263,12 @@ class TerribleGame {
       return;
     }
 
+    const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
+    const restriction = activity && window.getActivityRestriction ? window.getActivityRestriction(this.character, activity) : null;
+    if (restriction) {
+      this.openFeedbackModal({ tag: 'CONSEQUENCE', title: 'Activity Restricted', icon: 'lock', iconColor: 'text-crimson', body: restriction, effects: {} });
+      return;
+    }
     const result = window.performActivity(activityId, this.character);
     if (!result || !result.success) {
       alert(result ? result.message : "Activity could not be performed.");
@@ -4258,9 +4282,9 @@ class TerribleGame {
     }
 
     const latestLog = this.logs[this.logs.length - 1];
-    if (latestLog) {
-      latestLog.entries.push(`[${result.title}] ${result.message}`);
-    }
+    if (latestLog) latestLog.entries.push(`[${result.title}] ${result.message}`);
+    const recoveryNotes = window.applyRecoveryFromActivity ? window.applyRecoveryFromActivity(this.character, activityId) : [];
+    if (latestLog) recoveryNotes.forEach(note => latestLog.entries.push(`[Recovery] ${note}`));
 
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
@@ -4401,6 +4425,7 @@ class TerribleGame {
     this.dom.profileTrait.textContent = character.trait?.name || 'None';
     this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
     this.dom.profileShillings.textContent = `${character.shillings} s.`;
+    if (this.dom.profileConsequences && window.consequencesHtml) this.dom.profileConsequences.innerHTML = window.consequencesHtml(character);
 
     const stats = [
       ['Health', 'heart', 'text-red-400', character.stats.vitality],
@@ -5219,6 +5244,11 @@ class TerribleGame {
   }
 
   openEducationModal(activeTab = 'overview') {
+    const schoolStatus = this.character.education && this.character.education.graduationStatus;
+    if (schoolStatus === 'expelled' || schoolStatus === 'dropped_out') {
+      this.openFeedbackModal({ tag: 'EDUCATION CLOSED', title: schoolStatus === 'expelled' ? 'Expelled' : 'No Longer Enrolled', icon: 'school', iconColor: 'text-crimson', body: schoolStatus === 'expelled' ? 'Your former school is no longer an active location. Its people and facilities cannot be accessed after expulsion.' : 'You are no longer enrolled at that institution.', effects: {} });
+      return;
+    }
     if (this.character && this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled)) {
       if (!this.character.education || (this.character.education.graduationStatus !== 'expelled' && this.character.education.graduationStatus !== 'dropped_out')) {
         if (window.enrollInSchool) window.enrollInSchool(this.character);
@@ -5227,7 +5257,7 @@ class TerribleGame {
     if (!this.character.education || !this.character.education.enrolled) {
       if (this.character.age >= 18 && this.character.hasHighSchoolDiploma) {
         // Can open higher education admissions
-      } else if (this.character.age <= 17) {
+      } else if (this.character.age <= 17 && schoolStatus !== 'expelled' && schoolStatus !== 'dropped_out') {
         if (window.enrollInSchool) window.enrollInSchool(this.character);
       } else {
         this.openCareersModal();
@@ -5949,6 +5979,10 @@ class TerribleGame {
   }
 
   handleSchoolAction(actionType, param = null) {
+    if (window.getActiveConsequences && window.getActiveConsequences(this.character, 'suspension').length) {
+      this.openFeedbackModal({ tag: 'SUSPENDED', title: 'School Access Revoked', icon: 'school', iconColor: 'text-amber-400', body: 'Your suspension prevents school activities until it expires.', effects: {} });
+      return;
+    }
     if (this.character.actionsLeft <= 0) {
       this.openFeedbackModal({
         tag: "ENERGY EXHAUSTED",
@@ -6008,10 +6042,15 @@ class TerribleGame {
     }
 
     this.renderAll();
-    this.renderEducationModal(this.activeEducationTab);
+    if (this.character.education && this.character.education.enrolled) this.renderEducationModal(this.activeEducationTab);
+    else this.closeEducationModal();
   }
 
   handleSchoolPersonAction(person, actionType) {
+    if (window.getActiveConsequences && window.getActiveConsequences(this.character, 'suspension').length) {
+      this.openFeedbackModal({ tag: 'SUSPENDED', title: 'School Access Revoked', icon: 'school', iconColor: 'text-amber-400', body: 'Your suspension prevents contact with classmates and school personnel until it expires.', effects: {} });
+      return;
+    }
     const interactionBlock = window.canInteractWithNpc ? window.canInteractWithNpc(person, this.character, actionType) : null;
     if (interactionBlock) {
       this.openFeedbackModal({ tag: 'CONTACT REFUSED', title: 'They Remember', icon: 'ban', iconColor: 'text-rose-400', body: interactionBlock, effects: {} });
@@ -6356,6 +6395,10 @@ class TerribleGame {
     } else {
       window.soundEngine.playDread();
       this.vibrate([40, 30, 70]);
+    }
+
+    if (result.outcome === 'caught' && crimeId.startsWith('crime_') && window.addConsequence) {
+      window.addConsequence(this.character, { type: 'criminal_record', label: 'Occult Criminal Record', detail: result.message, source: result.title, severity: 2, yearsRemaining: null });
     }
 
     // Chronicle logging

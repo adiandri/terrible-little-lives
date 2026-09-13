@@ -551,6 +551,13 @@ function checkJobEligibility(character, job) {
 
   const reqs = job.reqs || {};
 
+  const seriousRecord = window.getActiveConsequences && window.getActiveConsequences(character, 'criminal_record').some(record => record.severity >= 2);
+  if (seriousRecord && (job.baseSalary || 0) >= 50000) {
+    badges.push({ label: 'Background Check', met: false, icon: 'file-warning' });
+    isEligible = false;
+    if (!failedReason) failedReason = 'Criminal Record';
+  }
+
   // 2. Vitality
   if (reqs.minVitality !== undefined) {
     const met = character.stats.vitality >= reqs.minVitality;

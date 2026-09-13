@@ -1321,12 +1321,17 @@
       body += ` However, the hall monitor spotted you and issued an official detention warning! (Disciplinary Marks: ${edu.disciplinaryRecord})`;
       modStat(character, 'sanity', -2);
       effects.sanity = -2;
+      if (edu.disciplinaryRecord >= 3 && edu.disciplinaryRecord < 5 && window.addConsequence) {
+        window.addConsequence(character, { type: 'suspension', label: 'School Suspension', detail: 'Repeated disciplinary incidents temporarily revoked school access.', source: edu.name, severity: 2, yearsRemaining: 1 });
+        body += ` You were suspended from school activities until the next year.`;
+      }
     }
 
     // Check expulsion
     if (edu.disciplinaryRecord >= 5) {
       edu.enrolled = false;
       edu.graduationStatus = 'expelled';
+      if (window.addConsequence) window.addConsequence(character, { type: 'social_stigma', label: 'Expelled Student', detail: `Expelled from ${edu.name}.`, source: edu.name, severity: 3, yearsRemaining: 4 });
       body += `\n\n[EXPULSION]: Due to repeated truancy and contempt of school authority, the headmaster officially expelled you!`;
     }
 

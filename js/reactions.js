@@ -31,6 +31,13 @@
       yearsRemaining: severity >= 3 ? 2 : 1,
       active: true
     };
+    if (window.addConsequence) {
+      const consequence = window.addConsequence(character, {
+        type: 'injury', label: injury.name, detail: `Sustained during an attack by ${attacker.name}.`,
+        source: attacker.name, severity, yearsRemaining: injury.yearsRemaining
+      });
+      injury.consequenceId = consequence.id;
+    }
     character.injuries.unshift(injury);
     return injury;
   }
@@ -103,6 +110,7 @@
     if (type === 'attack') {
       const damage = Math.floor(Math.random() * 7) + 5;
       const injury = addInjury(character, person, damage >= 9 ? 3 : 2);
+      if (damage >= 9 && window.addConsequence) window.addConsequence(character, { type: 'trauma', label: 'Post-Attack Trauma', detail: `The attack by ${person.name} left a lasting psychological wound.`, source: person.name, severity: 2, yearsRemaining: null });
       if (character.stats) character.stats.vitality = clamp((character.stats.vitality || 50) - damage);
       const schoolFight = person.category === 'classmate' && character.education;
       if (schoolFight) character.education.disciplinaryRecord = (character.education.disciplinaryRecord || 0) + 1;
@@ -122,15 +130,21 @@
       effects.popularity = -8;
       effects.happiness = -4;
       text = `${person.name} publicly humiliated you by repeating your words to a laughing crowd (-8% Popularity, -4% Happiness).`;
+      if (window.addConsequence) {
+        window.addConsequence(character, { type: 'rumor', label: `Rumor spread by ${person.name}`, source: person.name, severity: 2, yearsRemaining: 3 });
+        window.addConsequence(character, { type: 'social_stigma', label: 'Publicly Humiliated', source: person.name, severity: 2, yearsRemaining: 3 });
+      }
     } else if (type === 'exclusion') {
       person.excludedPlayerUntilAge = playerAge + 1;
       if (character.stats) character.stats.happiness = clamp((character.stats.happiness || 50) - 4);
       effects.happiness = -4;
       text = `${person.name} shut you out of their circle and warned others not to include you until things cool down.`;
+      if (window.addConsequence) window.addConsequence(character, { type: 'social_stigma', label: 'Excluded from a Social Circle', source: person.name, severity: 2, yearsRemaining: 2 });
     } else if (type === 'sabotage') {
       if (character.education) character.education.grades = clamp((character.education.grades || 75) - 6);
       effects.grades = -6;
       text = `${person.name} retaliated by ruining shared coursework and leaving your name attached to the mess (-6% Grades).`;
+      if (window.addConsequence) window.addConsequence(character, { type: 'rumor', label: 'Blamed for Ruined Coursework', source: person.name, severity: 2, yearsRemaining: 2 });
     } else if (type === 'blocked') {
       person.blockedPlayerUntilAge = playerAge + 1;
       text = `${person.name} blocked your calls and messages. Friendly contact is closed until at least next year.`;
@@ -163,6 +177,7 @@
   }
 
   function tickReactionYear(character) {
+    if (window.tickConsequences) return [];
     if (!Array.isArray(character.injuries)) return [];
     const logs = [];
     character.injuries.forEach(injury => {
