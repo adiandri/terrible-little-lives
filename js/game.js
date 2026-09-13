@@ -1722,8 +1722,10 @@ class TerribleGame {
     const ambientPool = (window.AMBIENT_YEAR_EVENTS || (window.GAME_DATA && window.GAME_DATA.AMBIENT_YEAR_EVENTS) || []).filter(e =>
       this.character.age >= e.minAge && this.character.age <= e.maxAge
     );
-    if (ambientPool.length > 0) {
-      const ambient = ambientPool[Math.floor(Math.random() * ambientPool.length)];
+    const ambient = window.selectAnnualAmbient
+      ? window.selectAnnualAmbient(this.character, ambientPool)
+      : (ambientPool.length ? ambientPool[Math.floor(Math.random() * ambientPool.length)] : null);
+    if (ambient) {
       currentYearLog.entries.push(ambient.text);
     } else {
       currentYearLog.entries.push("Another restless year went by under neon billboard glare and rain-slicked asphalt.");
@@ -1736,14 +1738,16 @@ class TerribleGame {
         "You woke up with black grit under your fingernails and your browser history opened to deleted surveillance footage.",
         "Your smart TV booted into a static test pattern transmitting the sound of wet footsteps approaching."
       ];
-      currentYearLog.entries.push(window.getRandomElement(modernWhispers));
+      const strainEvent = window.getRandomElement(modernWhispers);
+      currentYearLog.entries.push(strainEvent);
+      if (window.observeHorror) window.observeHorror(this.character, { source: 'sanity', text: strainEvent, classification: 'mental_strain', intensity: 1, engaged: false });
       this.modifyStat('sanity', -3);
     } else {
       const sensoryEvents = [
-        "A late-night storm knocked out municipal transformers; the entire district plunged into dead silence for hours.",
-        "You noticed several stray cats perched motionless on fire escapes, all staring toward the same locked sewer grate.",
-        "A low-frequency hum resonated through your water pipes every Tuesday at dawn.",
-        "You found an old cassette tape on the subway platform with your name written on the magnetic strip in dried marker."
+        "A late-night storm knocked out municipal transformers; the neighborhood spent an hour by candlelight.",
+        "A delivery van blocked the road while several impatient drivers leaned on their horns.",
+        "Rain tapped against the windows until the gutters finally overflowed.",
+        "Someone left an old cassette tape on a subway bench, and a cleaner swept it into lost property."
       ];
       currentYearLog.entries.push(window.getRandomElement(sensoryEvents));
     }
@@ -1778,17 +1782,24 @@ class TerribleGame {
     const triggerChance = isMilestone ? 1.0 : 0.85;
 
     if (availableDilemmas.length > 0 && Math.random() < triggerChance) {
-      const chosen = window.chooseWeightedDilemma ? window.chooseWeightedDilemma(this.character, availableDilemmas) : availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)];
-      this.usedDilemmaIds.add(chosen.id);
-      this.activeDilemma = chosen;
+      const chosen = window.chooseDirectedDilemma
+        ? window.chooseDirectedDilemma(this.character, availableDilemmas, window.chooseWeightedDilemma)
+        : (window.chooseWeightedDilemma ? window.chooseWeightedDilemma(this.character, availableDilemmas) : availableDilemmas[Math.floor(Math.random() * availableDilemmas.length)]);
+      if (!chosen) {
+        currentYearLog.entries.push("Ordinary obligations filled the year, leaving little room for anything stranger.");
+      } else {
+        this.usedDilemmaIds.add(chosen.id);
+        this.activeDilemma = chosen;
+        if (window.notePresentedDilemma) window.notePresentedDilemma(this.character, chosen);
 
-      this.logs.push(currentYearLog);
-      this.renderAll();
-      this.triggerDilemma(chosen);
-      this.saveGame();
-      return;
+        this.logs.push(currentYearLog);
+        this.renderAll();
+        this.triggerDilemma(chosen);
+        this.saveGame();
+        return;
+      }
     } else {
-      currentYearLog.entries.push("A rumor spread through town about a locked basement door found open near the city reservoir.");
+      currentYearLog.entries.push("News and neighborhood gossip passed without drawing you into anything consequential.");
     }
 
     this.logs.push(currentYearLog);
@@ -1896,6 +1907,7 @@ class TerribleGame {
     const effects = choice.effects || {};
     if (window.recordOutcomeConsequences) window.recordOutcomeConsequences(this.character, title, outcome, effects);
     if (window.processLifeOutcome) window.processLifeOutcome(this.character, { domain: dilemma.domain, result: { title, body: outcome, effects } });
+    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'dilemma_choice', title, outcome, effects, engaged: true });
     if (window.resolveStoryChoice && dilemma.storyIncidentId) window.resolveStoryChoice(this.character, dilemma, choice);
 
     this.activeDilemma = null;
@@ -2817,6 +2829,7 @@ class TerribleGame {
     if (window.finalizeNpcInteraction) {
       result = window.finalizeNpcInteraction(person, this.character, actionType, result);
     }
+    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: result.title || person.name, outcome: result.body || result.message, effects: result.effects, engaged: true });
 
     // Deduct 1 action point
     this.character.actionsLeft -= 1;
@@ -3981,6 +3994,7 @@ class TerribleGame {
     if (latestLog) {
       latestLog.entries.push(`[${pet.name}] ${result.message}`);
     }
+    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: `${pet.name}'s Response`, outcome: result.message, effects: result.effects, genuine: pet.category === 'supernatural', engaged: true, investigated: actionType === 'commune' });
 
     this.renderAll();
     this.saveGame();
@@ -4288,7 +4302,8 @@ class TerribleGame {
     const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
     const consequenceRestriction = activity && window.getActivityRestriction ? window.getActivityRestriction(this.character, activity) : null;
     const socialRestriction = activity && window.getSocialOpportunityRestriction ? window.getSocialOpportunityRestriction(this.character, activity) : null;
-    const restriction = consequenceRestriction || socialRestriction;
+    const horrorRestriction = activity && window.getHorrorActivityGate ? window.getHorrorActivityGate(this.character, activity) : null;
+    const restriction = consequenceRestriction || socialRestriction || horrorRestriction;
     if (restriction) {
       this.openFeedbackModal({ tag: 'CONSEQUENCE', title: 'Activity Restricted', icon: 'lock', iconColor: 'text-crimson', body: restriction, effects: {} });
       return;
@@ -4313,6 +4328,7 @@ class TerribleGame {
     if (latestLog) reputationNotes.forEach(note => latestLog.entries.push(`[Reputation] ${note}`));
     const lifeEffectNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { activity, result }) : [];
     if (latestLog) lifeEffectNotes.forEach(note => latestLog.entries.push(`[Life Effect] ${note}`));
+    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: `activity_${activity?.category || 'general'}`, title: result.title, outcome: result.message, effects: result.effects, engaged: true, investigated: /research|study|record|investigat|explore/i.test(`${activityId} ${result.title} ${result.message}`) });
 
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
@@ -6125,6 +6141,7 @@ class TerribleGame {
       if (window.finalizeNpcInteraction) {
         result = window.finalizeNpcInteraction(person, this.character, actionType, result);
       }
+      if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: result.title || person.name, outcome: result.body || result.message, effects: result.effects, engaged: true });
       this.character.actionsLeft--;
       const latestLog = this.logs[this.logs.length - 1];
       if (latestLog) {
@@ -6433,6 +6450,7 @@ class TerribleGame {
       window.addConsequence(this.character, { type: 'criminal_record', label: 'Occult Criminal Record', detail: result.message, source: result.title, severity: 2, yearsRemaining: null });
     }
     const altarNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { domain: result.outcome === 'caught' ? 'crime' : 'supernatural', result: { title: result.title, body: result.message, effects: result.effects || (result.outcome === 'backfire' ? { sanity: -6 } : {}) } }) : [];
+    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'dark_rite', title: result.title, outcome: result.message, effects: result.effects, genuine: true, engaged: true });
 
     // Chronicle logging
     const latestLog = this.logs[this.logs.length - 1];
