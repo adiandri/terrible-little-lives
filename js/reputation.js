@@ -136,7 +136,8 @@
     const evidence = clamp(data.evidence || 0);
     const sourceCred = source ? credibilityOf(source) : 35;
     const witnessCred = witnesses.length ? witnesses.reduce((sum, person) => sum + credibilityOf(person), 0) / witnesses.length : 0;
-    const credibility = clamp(sourceCred * 0.45 + witnessCred * 0.35 + evidence * 0.5 + witnesses.length * 5);
+    const loyalDefenders = window.getActiveBenefits ? window.getActiveBenefits(character, 'loyalty').length : 0;
+    const credibility = clamp(sourceCred * 0.45 + witnessCred * 0.35 + evidence * 0.5 + witnesses.length * 5 - loyalDefenders * 8);
     const rumor = {
       id: `rumor_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
       claim: data.claim, audience: data.audience || audienceForPerson(source), valence: data.valence || 'negative',
@@ -269,6 +270,11 @@
       ensureWorkplace(character);
       alterReputation(character, 'workplace', { esteem: 3, notoriety: 1 }, 'Built goodwill with coworkers');
       notes.push('Coworkers now regard you more warmly (+3 Workplace Esteem).');
+      if (character.reputation.workplace.esteem >= 65 && window.addBenefit && !window.hasRecommendation?.(character)) {
+        const supervisor = character.workplace.colleagues.find(person => person.role === 'Supervisor') || character.workplace.colleagues[0];
+        window.addBenefit(character, { type: 'recommendation', label: `Recommendation from ${supervisor.name}`, detail: 'A professional endorsement can overcome damaged workplace standing.', source: supervisor.name, domain: 'work', yearsRemaining: 3 });
+        notes.push(`${supervisor.name} offered a professional recommendation.`);
+      }
     } else if (['heart_to_heart_talk', 'group_hangout'].includes(activity.id)) {
       alterReputation(character, 'public', { esteem: 2, notoriety: -1 }, 'Made a visible effort to repair social trust');
       notes.push('Visible repair improved your Public Esteem slightly.');

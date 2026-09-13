@@ -104,7 +104,8 @@
     let type = 'insult_back';
     const attackScore = personality.aggression + escalation + (state === 'hostile' ? 25 : 0) - personality.composure;
     const socialScore = personality.socialPower + personality.vindictiveness + escalation;
-    if (peerLike && playerAge >= 8 && attackerAge >= 7 && attackScore > 68) type = 'attack';
+    if ((mind.harmfulIncidents || 1) <= 1 && personality.empathy > 74) type = pick(['warning', 'forgive', 'mediation']);
+    else if (peerLike && playerAge >= 8 && attackerAge >= 7 && attackScore > 68 && (!window.canNpcAttack || window.canNpcAttack(character, person))) type = 'attack';
     else if (schoolAuthority && personality.composure > 55) type = 'reported';
     else if ((person.category === 'friend' || person.isBefriended) && (state === 'hostile' || mind.harmfulIncidents >= 3)) type = 'friendship_loss';
     else if (socialScore > 135) type = pick(['humiliation', 'exclusion', 'sabotage']);
@@ -114,6 +115,11 @@
     let text = '';
     const effects = {};
     if (type === 'attack') {
+      const protection = window.consumeProtection ? window.consumeProtection(character, person) : null;
+      if (protection) {
+        type = 'protected';
+        text = protection;
+      } else {
       const damage = Math.floor(Math.random() * 7) + 5;
       const injury = addInjury(character, person, damage >= 9 ? 3 : 2);
       if (damage >= 9 && window.addConsequence) window.addConsequence(character, { type: 'trauma', label: 'Post-Attack Trauma', detail: `The attack by ${person.name} left a lasting psychological wound.`, source: person.name, severity: 2, yearsRemaining: null });
@@ -123,10 +129,12 @@
       effects.vitality = -damage;
       if (schoolFight) effects.discipline = 1;
       text = `${person.name} attacked you during the confrontation. You were left with ${injury.name} (-${damage}% Vitality).${schoolFight ? ' The school recorded your part in the fight (+1 Disciplinary Mark).' : ''}`;
+      if (window.registerNpcAttack) window.registerNpcAttack(character, person);
+      }
     } else if (type === 'reported') {
       if (character.education) character.education.disciplinaryRecord = (character.education.disciplinaryRecord || 0) + 1;
       effects.discipline = 1;
-      text = `${person.name} documented the incident and reported you to school administration (+1 Disciplinary Mark).`;
+      text = pick([`${person.name} documented the incident and reported you to school administration (+1 Disciplinary Mark).`, `${person.name} filed a formal account with dates, witnesses, and your exact words (+1 Disciplinary Mark).`]);
     } else if (type === 'friendship_loss') {
       endFriendship(person, character);
       text = `${person.name} ended the friendship. Another pleasant conversation will not undo what happened.`;
@@ -135,7 +143,7 @@
       if (character.stats) character.stats.happiness = clamp((character.stats.happiness || 50) - 4);
       effects.popularity = -8;
       effects.happiness = -4;
-      text = `${person.name} publicly humiliated you by repeating your words to a laughing crowd (-8% Popularity, -4% Happiness).`;
+      text = pick([`${person.name} publicly humiliated you by repeating your words to a laughing crowd (-8% Popularity, -4% Happiness).`, `${person.name} circulated a cruelly edited version of the confrontation until it became a running joke (-8% Popularity, -4% Happiness).`]);
       if (window.addConsequence) {
         window.addConsequence(character, { type: 'rumor', label: `Rumor spread by ${person.name}`, source: person.name, severity: 2, yearsRemaining: 3 });
         window.addConsequence(character, { type: 'social_stigma', label: 'Publicly Humiliated', source: person.name, severity: 2, yearsRemaining: 3 });
@@ -153,17 +161,26 @@
       if (window.addConsequence) window.addConsequence(character, { type: 'rumor', label: 'Blamed for Ruined Coursework', source: person.name, severity: 2, yearsRemaining: 2 });
     } else if (type === 'blocked') {
       person.blockedPlayerUntilAge = playerAge + 1;
-      text = `${person.name} blocked your calls and messages. Friendly contact is closed until at least next year.`;
+      text = pick([`${person.name} blocked your calls and messages. Friendly contact is closed until at least next year.`, `${person.name} removed you from every shared channel and instructed friends not to relay messages.`]);
     } else if (type === 'confrontation') {
       if (character.stats) character.stats.sanity = clamp((character.stats.sanity || 50) - 3);
       effects.sanity = -3;
-      text = `${person.name} cornered you and demanded you repeat the insult to their face (-3% Sanity).`;
+      text = pick([`${person.name} cornered you and demanded you repeat the insult to their face (-3% Sanity).`, `${person.name} confronted you in front of witnesses and refused to let you change the subject (-3% Sanity).`, `${person.name} demanded a direct explanation while everyone nearby went silent (-3% Sanity).`]);
+    } else if (type === 'warning') {
+      text = pick([`${person.name} firmly warned you that another incident would end all ordinary contact.`, `${person.name} named the behavior plainly and set a hard boundary without retaliating.`]);
+    } else if (type === 'forgive') {
+      text = `${person.name} chose not to retaliate this time, but made clear that forgiveness would not survive repetition.`;
+      mind.resentment = Math.max(0, mind.resentment - 3);
+    } else if (type === 'mediation') {
+      text = `${person.name} asked a neutral third person to mediate instead of escalating the conflict.`;
+      if (character.stats) character.stats.humanity = clamp((character.stats.humanity || 50) + 1);
     } else {
       if (character.stats) character.stats.happiness = clamp((character.stats.happiness || 50) - 3);
       effects.happiness = -3;
-      text = `${person.name} answered with a vicious insult of their own (-3% Happiness).`;
+      text = pick([`${person.name} answered with a vicious insult of their own (-3% Happiness).`, `${person.name} found the insecurity you hide best and aimed directly at it (-3% Happiness).`, `${person.name} replied quietly enough that only you heard—and made every word count (-3% Happiness).`]);
     }
     const bystander = resolveBystander(person, character, type);
+    if (bystander && bystander.side === 'player' && window.grantProtection) window.grantProtection(character, bystander.witness, 'school');
     const reaction = { type, text: bystander ? `${text}\n\n${bystander.text}` : text, effects };
     if (window.recordReactionReputation) window.recordReactionReputation(character, person, reaction, bystander ? [bystander.witness] : []);
     if (window.scheduleNpcAftermath) window.scheduleNpcAftermath(character, person, reaction, action, severity);

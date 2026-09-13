@@ -106,6 +106,7 @@
     } else if (tone === 'positive') {
       const unresolved = mind.resentment > 0;
       mind.trust = Math.min(100, mind.trust + (unresolved ? 2 : 5));
+      mind.positiveInteractions = (mind.positiveInteractions || 0) + 1;
       // Kindness can rebuild trust, but it cannot silently erase a grudge.
       addNpcMemory(person, character, action, tone, 1, ACTION_LABELS[action]);
       if (window.considerLoyaltyStory) window.considerLoyaltyStory(character, person);
@@ -114,6 +115,7 @@
     }
 
     if (window.recordNpcInteractionReputation) window.recordNpcInteractionReputation(character, person, tone, Math.max(1, Math.ceil(Math.abs(relDelta) / 8) || 1), action);
+    if (window.processLifeOutcome) window.processLifeOutcome(character, { person, action, result });
 
     person.relationshipState = getRelationshipState(person);
     return result;

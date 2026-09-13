@@ -210,6 +210,7 @@ class TerribleGame {
       profileReputation: document.getElementById('profile-reputation'),
       profileRumors: document.getElementById('profile-rumors'),
       profileStoryLedger: document.getElementById('profile-story-ledger'),
+      profileBenefits: document.getElementById('profile-benefits'),
       profileOccupation: document.getElementById('profile-occupation'),
       profileTrait: document.getElementById('profile-trait'),
       profileMoney: document.getElementById('profile-money'),
@@ -1574,6 +1575,7 @@ class TerribleGame {
     } else if (window.tickReactionYear) {
       window.tickReactionYear(this.character).forEach(entry => currentYearLog.entries.push(entry));
     }
+    if (window.tickLifeEffects) window.tickLifeEffects(this.character).forEach(entry => currentYearLog.entries.push(`[LASTING ADVANTAGE] ${entry}`));
 
     // Ensure kin exists and tick their simulation (aging, allowances, mortality, friend discovery)
     if (!this.character.kin) {
@@ -1893,6 +1895,7 @@ class TerribleGame {
     const outcome = choice.outcome;
     const effects = choice.effects || {};
     if (window.recordOutcomeConsequences) window.recordOutcomeConsequences(this.character, title, outcome, effects);
+    if (window.processLifeOutcome) window.processLifeOutcome(this.character, { domain: dilemma.domain, result: { title, body: outcome, effects } });
     if (window.resolveStoryChoice && dilemma.storyIncidentId) window.resolveStoryChoice(this.character, dilemma, choice);
 
     this.activeDilemma = null;
@@ -4308,6 +4311,8 @@ class TerribleGame {
     if (latestLog) recoveryNotes.forEach(note => latestLog.entries.push(`[Recovery] ${note}`));
     const reputationNotes = window.recordActivityReputation ? window.recordActivityReputation(this.character, activity, result) : [];
     if (latestLog) reputationNotes.forEach(note => latestLog.entries.push(`[Reputation] ${note}`));
+    const lifeEffectNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { activity, result }) : [];
+    if (latestLog) lifeEffectNotes.forEach(note => latestLog.entries.push(`[Life Effect] ${note}`));
 
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
@@ -4451,6 +4456,7 @@ class TerribleGame {
     if (this.dom.profileReputation && window.reputationHtml) this.dom.profileReputation.innerHTML = window.reputationHtml(character);
     if (this.dom.profileRumors && window.rumorHtml) this.dom.profileRumors.innerHTML = window.rumorHtml(character);
     if (this.dom.profileConsequences && window.consequencesHtml) this.dom.profileConsequences.innerHTML = window.consequencesHtml(character);
+    if (this.dom.profileBenefits && window.benefitsHtml) this.dom.profileBenefits.innerHTML = window.benefitsHtml(character);
     if (this.dom.profileStoryLedger && window.storyLedgerHtml) this.dom.profileStoryLedger.innerHTML = window.storyLedgerHtml(character);
 
     const stats = [
@@ -6426,11 +6432,13 @@ class TerribleGame {
     if (result.outcome === 'caught' && crimeId.startsWith('crime_') && window.addConsequence) {
       window.addConsequence(this.character, { type: 'criminal_record', label: 'Occult Criminal Record', detail: result.message, source: result.title, severity: 2, yearsRemaining: null });
     }
+    const altarNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { domain: result.outcome === 'caught' ? 'crime' : 'supernatural', result: { title: result.title, body: result.message, effects: result.effects || (result.outcome === 'backfire' ? { sanity: -6 } : {}) } }) : [];
 
     // Chronicle logging
     const latestLog = this.logs[this.logs.length - 1];
     if (latestLog) {
       latestLog.entries.push(`[Dark Altar] ${result.title}: ${result.message}`);
+      altarNotes.forEach(note => latestLog.entries.push(`[Life Effect] ${note}`));
     }
 
     this.renderAll();

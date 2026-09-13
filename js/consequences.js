@@ -40,7 +40,18 @@
       existing.recoveryNeeded = Math.max(existing.recoveryNeeded || 0, data.recoveryNeeded || 0);
       return existing;
     }
+    const activeSameType = consequences.filter(item => item.active && item.type === type);
+    if (type !== 'debt' && activeSameType.length >= 3) {
+      const merged = activeSameType[0];
+      merged.severity = Math.min(4, Math.max(merged.severity, data.severity || 1));
+      if (Number.isFinite(data.yearsRemaining)) merged.yearsRemaining = Math.min(4, Math.max(merged.yearsRemaining || 0, data.yearsRemaining));
+      merged.detail = `${merged.detail} A related incident occurred again.`.trim();
+      return merged;
+    }
     const definition = DEFINITIONS[type] || {};
+    const severeLoad = consequences.filter(item => item.active && item.severity >= 3).length;
+    const safeSeverity = severeLoad >= 4 ? Math.min(2, data.severity || 1) : Math.min(4, data.severity || 1);
+    const safeDuration = Number.isFinite(data.yearsRemaining) ? Math.min(5, Math.max(1, data.yearsRemaining)) : data.yearsRemaining;
     const consequence = {
       id: `consequence_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
       type,
@@ -48,10 +59,10 @@
       detail: data.detail || '',
       source: data.source || 'Unknown incident',
       acquiredAge: Number.isFinite(character.age) ? character.age : null,
-      severity: data.severity || 1,
-      yearsRemaining: data.yearsRemaining ?? null,
+      severity: safeSeverity,
+      yearsRemaining: safeDuration ?? null,
       recoveryProgress: 0,
-      recoveryNeeded: data.recoveryNeeded ?? definition.recoveryNeeded ?? 0,
+      recoveryNeeded: Math.min(4, data.recoveryNeeded ?? definition.recoveryNeeded ?? 0),
       amount: data.amount || 0,
       active: true
     };

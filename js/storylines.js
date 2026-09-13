@@ -63,7 +63,6 @@
     if (!character || !person) return null;
     const mind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : null;
     if (!mind) return null;
-    mind.positiveInteractions = (mind.positiveInteractions || 0) + 1;
     if (mind.positiveInteractions < 4 || mind.trust < 65 || mind.resentment >= 12 || (person.relationship || 0) < 60) return null;
     if (Number.isFinite(mind.lastLoyaltyStoryAge) && character.age - mind.lastLoyaltyStoryAge < 4) return null;
     const ledger = ensureStoryLedger(character);

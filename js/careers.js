@@ -559,7 +559,9 @@ function checkJobEligibility(character, job) {
   }
 
   const workplaceStanding = window.getReputationState ? window.getReputationState(character, 'workplace') : 'ordinary';
-  if (workplaceStanding === 'disgraced' && (job.baseSalary || 0) >= 50000) {
+  const recommended = window.hasRecommendation && window.hasRecommendation(character);
+  if (recommended) badges.push({ label: 'Active Recommendation', met: true, icon: 'badge-check' });
+  if (workplaceStanding === 'disgraced' && (job.baseSalary || 0) >= 50000 && !recommended) {
     badges.push({ label: 'Professional Standing', met: false, icon: 'users-round' });
     isEligible = false;
     if (!failedReason) failedReason = 'Disgraced at Work';
