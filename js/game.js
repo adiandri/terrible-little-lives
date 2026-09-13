@@ -270,6 +270,12 @@ class TerribleGame {
       // Settings & Theme Modal
       settingsModal: document.getElementById('settings-modal'),
       btnCloseSettings: document.getElementById('btn-close-settings'),
+      tabSettingsExperience: document.getElementById('tab-settings-experience'),
+      tabSettingsReading: document.getElementById('tab-settings-reading'),
+      tabSettingsTheme: document.getElementById('tab-settings-theme'),
+      panelSettingsExperience: document.getElementById('panel-settings-experience'),
+      panelSettingsReading: document.getElementById('panel-settings-reading'),
+      panelSettingsTheme: document.getElementById('panel-settings-theme'),
       btnSoundOff: document.getElementById('btn-sound-off'),
       btnSoundOn: document.getElementById('btn-sound-on'),
       settingsSoundIcon: document.getElementById('settings-sound-icon'),
@@ -1098,6 +1104,9 @@ class TerribleGame {
     if (this.dom.btnGameSettings) this.dom.btnGameSettings.addEventListener('click', openSettings);
     if (this.dom.btnCloseSettings) this.dom.btnCloseSettings.addEventListener('click', () => this.closeSettingsModal());
     if (this.dom.btnCloseThemeModal) this.dom.btnCloseThemeModal.addEventListener('click', () => this.closeSettingsModal());
+    if (this.dom.tabSettingsExperience) this.dom.tabSettingsExperience.addEventListener('click', () => this.switchSettingsPanel('experience'));
+    if (this.dom.tabSettingsReading) this.dom.tabSettingsReading.addEventListener('click', () => this.switchSettingsPanel('reading'));
+    if (this.dom.tabSettingsTheme) this.dom.tabSettingsTheme.addEventListener('click', () => this.switchSettingsPanel('theme'));
 
     // Sound toggle buttons
     if (this.dom.btnSoundOff) this.dom.btnSoundOff.addEventListener('click', () => this.setSoundEnabled(false));
@@ -4585,14 +4594,21 @@ class TerribleGame {
 
   renderCrypt() {
     this.dom.cryptList.innerHTML = '';
+    this.dom.btnClearCrypt.classList.toggle('hidden', this.crypt.length === 0);
     if (this.crypt.length === 0) {
       this.dom.cryptList.innerHTML = `
-        <div class="text-center py-12 text-dust">
-          <i data-lucide="cross" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
-          <p class="font-serif text-sm">The morgue is quiet.</p>
-          <p class="text-[11px] text-dust/70 mt-1">No souls have met their demise in this lineage yet.</p>
+        <div class="min-h-full flex items-center justify-center py-8">
+          <div class="w-full text-center bg-slatecard border border-leadborder rounded-2xl p-6 text-dust shadow-sm">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-inputbg border border-leadborder flex items-center justify-center">
+              <i data-lucide="archive" class="w-6 h-6 text-crimson opacity-70"></i>
+            </div>
+            <p class="font-serif font-bold text-base text-parchment">No past lives yet</p>
+            <p class="text-[11px] text-dust/80 mt-2 leading-relaxed">When a life ends, its name, fate, and epitaph will be kept here.</p>
+            <button id="btn-crypt-begin-life" class="mt-5 w-full min-h-[44px] rounded-xl bg-crimson hover:opacity-90 text-parchment font-serif font-bold text-xs tracking-wider active:scale-[0.98] transition-all">CREATE YOUR FIRST LIFE</button>
+          </div>
         </div>
       `;
+      document.getElementById('btn-crypt-begin-life')?.addEventListener('click', () => this.showScreen('screen-creator'));
       if (window.lucide) window.lucide.createIcons();
       return;
     }
@@ -4649,6 +4665,34 @@ class TerribleGame {
     } catch (e) {}
   }
 
+  switchSettingsPanel(panelName) {
+    const panels = {
+      experience: this.dom.panelSettingsExperience,
+      reading: this.dom.panelSettingsReading,
+      theme: this.dom.panelSettingsTheme
+    };
+    const tabs = {
+      experience: this.dom.tabSettingsExperience,
+      reading: this.dom.tabSettingsReading,
+      theme: this.dom.tabSettingsTheme
+    };
+
+    Object.entries(panels).forEach(([name, panel]) => {
+      if (panel) panel.classList.toggle('hidden', name !== panelName);
+    });
+    Object.entries(tabs).forEach(([name, tab]) => {
+      if (!tab) return;
+      const isActive = name === panelName;
+      tab.classList.toggle('bg-slatecard', isActive);
+      tab.classList.toggle('border', isActive);
+      tab.classList.toggle('border-leadborder', isActive);
+      tab.classList.toggle('text-parchment', isActive);
+      tab.classList.toggle('text-dust', !isActive);
+      if (isActive) tab.setAttribute('aria-current', 'page');
+      else tab.removeAttribute('aria-current');
+    });
+  }
+
   openSettingsModal() {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.syncSettingsUI();
@@ -4656,6 +4700,7 @@ class TerribleGame {
     this.filterThemes(this.activeThemeFilter || 'all');
     const modal = this.dom.settingsModal || this.dom.themeModal;
     if (modal) {
+      this.switchSettingsPanel('experience');
       modal.classList.remove('hidden');
       modal.style.display = 'flex';
     }

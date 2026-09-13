@@ -607,22 +607,22 @@
           <span id="label-resume-life">RESUME LIFE</span>
         </button>
 
-        <!-- Forge a Soul (Character Creator + God Mode) -->
+        <!-- Forge a Soul -->
         <button id="btn-to-creator" class="w-full py-3.5 px-4 rounded-xl bg-crimson hover:opacity-90 text-parchment font-serif font-bold text-sm tracking-wider shadow-lg active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
-          <span>FORGE A SOUL (CREATOR & GOD MODE)</span>
+          <span>CREATE YOUR LIFE</span>
         </button>
 
         <!-- Quick Life (Random Generation) -->
         <button id="btn-quick-life" class="w-full py-3 px-4 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-parchment font-serif text-xs tracking-wider active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
           <i data-lucide="dice-5" class="w-3.5 h-3.5 text-dust"></i>
-          <span>QUICK START (RANDOM LIFE)</span>
+          <span>START A RANDOM LIFE</span>
         </button>
 
         <!-- The Crypt (Past Deaths) -->
         <button id="btn-to-crypt" class="w-full py-2.5 px-4 rounded-xl bg-transparent hover:bg-slatecard/50 text-dust hover:text-parchment font-serif text-xs tracking-wider transition-all flex items-center justify-center space-x-1.5">
           <i data-lucide="cross" class="w-3.5 h-3.5 text-crimson"></i>
-          <span>THE CITY MORGUE (PAST LIVES)</span>
+          <span>VIEW PAST LIVES</span>
         </button>
       </div>
     </section>
@@ -2972,8 +2972,15 @@
           </button>
         </div>
 
+        <nav class="grid grid-cols-3 gap-1 rounded-xl bg-trackbg border border-leadborder p-1 mb-3 shrink-0" aria-label="Settings sections">
+          <button id="tab-settings-experience" class="settings-tab min-h-[36px] rounded-lg bg-slatecard border border-leadborder text-parchment text-[10px] font-mono font-bold transition-all" aria-current="page">EXPERIENCE</button>
+          <button id="tab-settings-reading" class="settings-tab min-h-[36px] rounded-lg text-dust hover:text-parchment text-[10px] font-mono font-bold transition-all">READING</button>
+          <button id="tab-settings-theme" class="settings-tab min-h-[36px] rounded-lg text-dust hover:text-parchment text-[10px] font-mono font-bold transition-all">THEME</button>
+        </nav>
+
         <!-- Scrollable Settings Body -->
-        <div class="flex-1 overflow-y-auto custom-scroll space-y-3 pr-1">
+        <div class="flex-1 overflow-y-auto custom-scroll pr-1">
+          <section id="panel-settings-experience" class="space-y-3" aria-label="Experience settings">
           <!-- 1. Sound Effects Toggle -->
           <div class="bg-inputbg p-3 rounded-xl border border-leadborder">
             <div class="flex items-center justify-between">
@@ -3008,7 +3015,11 @@
             </div>
           </div>
 
+          <p class="px-1 text-[10px] leading-relaxed text-dust/70">Sound and vibration only affect feedback. Your progress is saved separately.</p>
+          </section>
+
           <!-- 3. Text Size Adjustment -->
+          <section id="panel-settings-reading" class="hidden space-y-3" aria-label="Reading settings">
           <div class="bg-inputbg p-3 rounded-xl border border-leadborder space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2.5">
@@ -3065,9 +3076,11 @@
               </div>
             </div>
           </div>
+          </section>
 
           <!-- 5. Themes Selection -->
-          <div class="space-y-2 pt-1 border-t border-leadborder/70">
+          <section id="panel-settings-theme" class="hidden space-y-2" aria-label="Theme settings">
+          <div class="space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <i data-lucide="palette" class="w-4 h-4 text-crimson"></i>
@@ -3086,6 +3099,7 @@
               <!-- Injected dynamically by game.js -->
             </div>
           </div>
+          </section>
         </div>
       </div>
     </div>
