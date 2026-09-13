@@ -207,6 +207,7 @@ class TerribleGame {
       profileLifeSummary: document.getElementById('profile-life-summary'),
       profileLocation: document.getElementById('profile-location'),
       profileStats: document.getElementById('profile-stats'),
+      profileStoryLedger: document.getElementById('profile-story-ledger'),
       profileOccupation: document.getElementById('profile-occupation'),
       profileTrait: document.getElementById('profile-trait'),
       profileMoney: document.getElementById('profile-money'),
@@ -1746,6 +1747,17 @@ class TerribleGame {
       this.modifyStat('looks', -1);
     }
 
+    // Unfinished choices return before unrelated yearly dilemmas.
+    const dueStory = window.popDueStory ? window.popDueStory(this.character) : null;
+    if (dueStory) {
+      currentYearLog.entries.push(`[OLD CHOICE RETURNS] ${dueStory.prompt.split('\n')[0]}`);
+      this.logs.push(currentYearLog);
+      this.renderAll();
+      this.triggerDilemma(dueStory);
+      this.saveGame();
+      return;
+    }
+
     // 7. Interactive Dilemma or Ambient Encounter
     const dilemmaPool = window.INTERACTIVE_DILEMMAS || (window.GAME_DATA && window.GAME_DATA.INTERACTIVE_DILEMMAS) || [];
     const availableDilemmas = dilemmaPool.filter(d => 
@@ -1876,6 +1888,7 @@ class TerribleGame {
     const outcome = choice.outcome;
     const effects = choice.effects || {};
     if (window.recordOutcomeConsequences) window.recordOutcomeConsequences(this.character, title, outcome, effects);
+    if (window.resolveStoryChoice && dilemma.storyIncidentId) window.resolveStoryChoice(this.character, dilemma, choice);
 
     this.activeDilemma = null;
     this.hideModals();
@@ -4426,6 +4439,7 @@ class TerribleGame {
     this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
     this.dom.profileShillings.textContent = `${character.shillings} s.`;
     if (this.dom.profileConsequences && window.consequencesHtml) this.dom.profileConsequences.innerHTML = window.consequencesHtml(character);
+    if (this.dom.profileStoryLedger && window.storyLedgerHtml) this.dom.profileStoryLedger.innerHTML = window.storyLedgerHtml(character);
 
     const stats = [
       ['Health', 'heart', 'text-red-400', character.stats.vitality],

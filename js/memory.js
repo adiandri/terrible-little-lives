@@ -108,6 +108,7 @@
       mind.trust = Math.min(100, mind.trust + (unresolved ? 2 : 5));
       // Kindness can rebuild trust, but it cannot silently erase a grudge.
       addNpcMemory(person, character, action, tone, 1, ACTION_LABELS[action]);
+      if (window.considerLoyaltyStory) window.considerLoyaltyStory(character, person);
     } else if (relDelta !== 0) {
       addNpcMemory(person, character, action, relDelta > 0 ? 'positive' : 'harmful', 1, ACTION_LABELS[action]);
     }

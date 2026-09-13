@@ -158,7 +158,9 @@
       text = `${person.name} answered with a vicious insult of their own (-3% Happiness).`;
     }
     const bystander = resolveBystander(person, character, type);
-    return { type, text: bystander ? `${text}\n\n${bystander}` : text, effects };
+    const reaction = { type, text: bystander ? `${text}\n\n${bystander}` : text, effects };
+    if (window.scheduleNpcAftermath) window.scheduleNpcAftermath(character, person, reaction, action, severity);
+    return reaction;
   }
 
   function insultNpc(person) {
