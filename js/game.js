@@ -186,7 +186,22 @@ class TerribleGame {
       // Log feed & Endure button
       logFeed: document.getElementById('log-feed'),
       btnEndure: document.getElementById('btn-endure'),
-      btnTabCareers: document.getElementById('btn-tab-careers'),
+      btnTabLife: document.getElementById('btn-tab-life'),
+      btnTabProfile: document.getElementById('btn-tab-profile'),
+
+      // Character Profile
+      profileModal: document.getElementById('profile-modal'),
+      btnCloseProfile: document.getElementById('btn-close-profile'),
+      btnProfileDone: document.getElementById('btn-profile-done'),
+      profileAvatar: document.getElementById('profile-avatar'),
+      profileName: document.getElementById('profile-name'),
+      profileLifeSummary: document.getElementById('profile-life-summary'),
+      profileLocation: document.getElementById('profile-location'),
+      profileStats: document.getElementById('profile-stats'),
+      profileOccupation: document.getElementById('profile-occupation'),
+      profileTrait: document.getElementById('profile-trait'),
+      profileMoney: document.getElementById('profile-money'),
+      profileShillings: document.getElementById('profile-shillings'),
 
       // Careers Modal
       careersModal: document.getElementById('careers-modal'),
@@ -726,18 +741,17 @@ class TerribleGame {
     // Gameplay Controls
     this.dom.btnEndure.addEventListener('click', () => this.endureYear());
 
-    // Dynamic Occupation (School / Careers) Tab Controls
-    this.dom.btnTabCareers.addEventListener('click', () => {
+    // Primary navigation. Occupation remains available from Activities.
+    if (this.dom.btnTabLife) this.dom.btnTabLife.addEventListener('click', () => {
       window.soundEngine.playClick();
-      if (this.character && this.character.education && this.character.education.enrolled) {
-        this.openEducationModal();
-      } else if (this.character && this.character.age <= 17 && (!this.character.education || this.character.education.graduationStatus !== 'expelled')) {
-        if (window.enrollInSchool) window.enrollInSchool(this.character);
-        this.openEducationModal();
-      } else {
-        this.openCareersModal();
-      }
+      this.hideModals();
+      this.setPrimaryNav('life');
+      if (this.dom.logFeed) this.dom.logFeed.scrollTo({ top: this.dom.logFeed.scrollHeight, behavior: 'smooth' });
     });
+
+    if (this.dom.btnTabProfile) this.dom.btnTabProfile.addEventListener('click', () => this.openProfile());
+    if (this.dom.btnCloseProfile) this.dom.btnCloseProfile.addEventListener('click', () => this.closeProfile());
+    if (this.dom.btnProfileDone) this.dom.btnProfileDone.addEventListener('click', () => this.closeProfile());
 
     // Education Modal Controls
     if (this.dom.btnCloseEducation) {
@@ -1993,6 +2007,7 @@ class TerribleGame {
       this.character.kin = window.generateFamily(this.character);
     }
     this.updateFamilyResidenceUI();
+    this.setPrimaryNav('people');
     this.dom.kinModal.classList.remove('hidden');
     this.dom.kinModal.style.display = 'flex';
     this.renderKinList(this.activeKinFilter);
@@ -2024,6 +2039,7 @@ class TerribleGame {
   closeKinModal() {
     this.dom.kinModal.classList.add('hidden');
     this.dom.kinModal.style.display = 'none';
+    this.setPrimaryNav('life');
   }
 
   filterKin(filter) {
@@ -3761,6 +3777,7 @@ class TerribleGame {
   // ==========================================
 
   openActivitiesModal() {
+    this.setPrimaryNav('activities');
     this.dom.activitiesModal.classList.remove('hidden');
     this.dom.activitiesModal.style.display = 'flex';
     this.closeActivityCategory(); // Ensure we land on the City Hub
@@ -3770,6 +3787,7 @@ class TerribleGame {
   closeActivitiesModal() {
     this.dom.activitiesModal.classList.add('hidden');
     this.dom.activitiesModal.style.display = 'none';
+    this.setPrimaryNav('life');
   }
 
   renderActivitiesHub() {
@@ -4102,7 +4120,8 @@ class TerribleGame {
       this.dom.revelationModal,
       this.dom.educationModal,
       this.dom.schoolChoiceModal,
-      this.dom.schoolPersonModal
+      this.dom.schoolPersonModal,
+      this.dom.profileModal
     ];
 
     modals.forEach(m => {
@@ -4111,6 +4130,75 @@ class TerribleGame {
         m.style.display = 'none';
       }
     });
+  }
+
+  setPrimaryNav(active) {
+    const buttons = {
+      life: this.dom.btnTabLife,
+      people: this.dom.btnTabKin,
+      activities: this.dom.btnTabActivities,
+      profile: this.dom.btnTabProfile
+    };
+    Object.entries(buttons).forEach(([key, button]) => {
+      if (!button) return;
+      const selected = key === active;
+      button.classList.toggle('is-active', selected);
+      if (selected) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+  }
+
+  openProfile() {
+    if (!this.character || !this.dom.profileModal) return;
+    window.soundEngine.playClick();
+    this.renderProfile();
+    this.setPrimaryNav('profile');
+    this.dom.profileModal.classList.remove('hidden');
+    this.dom.profileModal.style.display = 'flex';
+  }
+
+  closeProfile() {
+    if (!this.dom.profileModal) return;
+    this.dom.profileModal.classList.add('hidden');
+    this.dom.profileModal.style.display = 'none';
+    this.setPrimaryNav('life');
+  }
+
+  renderProfile() {
+    const character = this.character;
+    if (!character) return;
+    window.drawGothicAvatar(this.dom.profileAvatar, { ...character.avatar, age: character.age });
+    this.dom.profileName.textContent = character.name;
+    this.dom.profileLifeSummary.textContent = `Age ${character.age} · ${character.statusTitle}`;
+    const country = window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode];
+    this.dom.profileLocation.textContent = [character.city, country ? country.name : character.countryCode].filter(Boolean).join(', ');
+    this.dom.profileOccupation.textContent = character.job?.title || character.paranormalGig?.title || character.statusTitle || 'Unoccupied';
+    this.dom.profileTrait.textContent = character.trait?.name || 'None';
+    this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
+    this.dom.profileShillings.textContent = `${character.shillings} s.`;
+
+    const stats = [
+      ['Health', 'heart', 'text-red-400', character.stats.vitality],
+      ['Happiness', 'smile', 'text-yellow-400', character.stats.happiness],
+      ['Mind', 'eye', 'text-sky-400', character.stats.sanity],
+      ['Humanity', 'sparkles', 'text-amber-500', character.stats.humanity],
+      ['Smarts', 'brain', 'text-emerald-400', character.stats.smarts],
+      ['Looks', 'sparkle', 'text-pink-400', character.stats.looks],
+      ['Occult', 'flame', 'text-purple-400', character.stats.occult]
+    ];
+    this.dom.profileStats.innerHTML = stats.map(([label, icon, color, rawValue]) => {
+      const value = Math.max(0, Math.min(100, Math.round(rawValue || 0)));
+      return `<div class="profile-stat-row">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 text-sm ${color}"><i data-lucide="${icon}" class="w-4 h-4"></i><span>${label}</span></div>
+          <div class="primary-stat-track"><div class="h-full rounded-full bg-current ${color}" style="width:${value}%"></div></div>
+        </div>
+        <strong class="font-mono text-sm text-parchment">${value}%</strong>
+      </div>`;
+    }).join('');
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
   renderAll() {
@@ -4129,7 +4217,7 @@ class TerribleGame {
       : (this.character.paranormalGig ? this.character.paranormalGig.title : this.character.statusTitle);
     this.dom.charJobTitle.textContent = activeTitle;
 
-    this.dom.charAgeYear.textContent = `Age: ${this.character.age} | ${this.character.year}`;
+    this.dom.charAgeYear.textContent = `Age ${this.character.age} · ${this.character.year}`;
     
     // Dual currency display
     this.dom.charMoney.textContent = window.formatMoney(this.character.money, this.character.countryCode);
@@ -4165,12 +4253,12 @@ class TerribleGame {
       this.dom.btnEndure.disabled = false;
       this.dom.btnEndure.classList.remove('opacity-40', 'cursor-not-allowed');
       this.dom.btnEndure.innerHTML = `
-        <span class="font-serif tracking-widest text-sm font-bold group-hover:text-red-300">ENDURE YEAR</span>
-        <span class="text-[10px] text-dust font-sans block tracking-wider">[ +1 Year ]</span>
+        <i data-lucide="chevrons-up" class="w-4 h-4"></i>
+        <span class="font-serif tracking-widest text-sm font-bold">ENDURE ANOTHER YEAR</span>
       `;
     }
 
-    this.updateOccupationTab();
+    this.setPrimaryNav('life');
     this.renderLogs();
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -6072,4 +6160,3 @@ if (document.readyState === 'loading') {
 } else {
   initGame();
 }
-

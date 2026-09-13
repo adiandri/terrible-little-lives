@@ -42,7 +42,7 @@ Because this prototype is built with modern zero-dependency web technologies (HT
 4. Leave all build settings at default (Vercel automatically detects static HTML/JS).
 5. Click **"Deploy"**.
 
-Your game is now live with an SSL URL: `https://terrible-little-lives.vercel.app`!
+Your game is now live with an SSL URL: `https://terriblelittlelives.vercel.app`!
 
 ---
 
