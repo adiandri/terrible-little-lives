@@ -438,12 +438,16 @@ class TerribleGame {
       eduSchoolGradeLabel: document.getElementById('edu-school-grade-label'),
       eduValGrades: document.getElementById('edu-val-grades'),
       eduBarGrades: document.getElementById('edu-bar-grades'),
+      eduLabelGrades: document.getElementById('edu-label-grades'),
       eduValPopularity: document.getElementById('edu-val-popularity'),
       eduBarPopularity: document.getElementById('edu-bar-popularity'),
+      eduLabelPopularity: document.getElementById('edu-label-popularity'),
       eduDisciplinaryBanner: document.getElementById('edu-disciplinary-banner'),
       eduDisciplinaryCount: document.getElementById('edu-disciplinary-count'),
       btnEduStudyHarder: document.getElementById('btn-edu-study-harder'),
       btnEduSkipClass: document.getElementById('btn-edu-skip-class'),
+      labelEduStudy: document.getElementById('label-edu-study'),
+      labelEduSkip: document.getElementById('label-edu-skip'),
       tabEduOverview: document.getElementById('tab-edu-overview'),
       tabEduClassmates: document.getElementById('tab-edu-classmates'),
       tabEduTeachers: document.getElementById('tab-edu-teachers'),
@@ -455,6 +459,7 @@ class TerribleGame {
       eduClubsList: document.getElementById('edu-clubs-list'),
       eduClubsCount: document.getElementById('edu-clubs-count'),
       eduMysteriesList: document.getElementById('edu-mysteries-list'),
+      eduMysteriesSection: document.getElementById('edu-mysteries-section'),
       eduUniversitySection: document.getElementById('edu-university-section'),
       eduMajorsList: document.getElementById('edu-majors-list'),
       eduDropoutContainer: document.getElementById('edu-dropout-container'),
@@ -1550,10 +1555,12 @@ class TerribleGame {
     this.character.activityUses = {};
 
     // Status titles by age
-    if (this.character.age <= 2) this.character.statusTitle = "Infant";
-    else if (this.character.age <= 6) this.character.statusTitle = "Toddler";
-    else if (this.character.age <= 12) this.character.statusTitle = "Child";
-    else if (this.character.age <= 17) this.character.statusTitle = "Adolescent";
+    if (this.character.age <= 1) this.character.statusTitle = "Infant";
+    else if (this.character.age <= 3) this.character.statusTitle = "Toddler";
+    else if (this.character.age <= 5) this.character.statusTitle = "Young Child";
+    else if (this.character.age <= 10) this.character.statusTitle = "Child";
+    else if (this.character.age <= 13) this.character.statusTitle = "Preteen";
+    else if (this.character.age <= 17) this.character.statusTitle = "Teenager";
     else if (this.character.age <= 30) this.character.statusTitle = "Young Adult";
     else if (this.character.age <= 60) this.character.statusTitle = "Adult";
     else this.character.statusTitle = "Elder";
@@ -1577,20 +1584,34 @@ class TerribleGame {
     // 1. Life Stage & Developmental Milestone
     if (this.character.age === 1) {
       currentYearLog.entries.push(`Turned 1 year old. You learned to crawl across cold hardwood floorboards, watching dust motes spin in pale sunlight.`);
-    } else if (this.character.age <= 4) {
+    } else if (this.character.age <= 3) {
       const toddlerMilestones = [
         `Turned ${this.character.age}. You learned to speak in fragmented sentences, pointing out shadows that lingered too long in the corners.`,
         `Turned ${this.character.age}. You spent hours stacking wooden blocks, knocking them over whenever footsteps passed the doorway.`,
         `Turned ${this.character.age}. Your nursery window stayed damp with winter frost; you learned to recognize passing siren wails.`
       ];
       currentYearLog.entries.push(window.getRandomElement(toddlerMilestones));
-    } else if (this.character.age <= 11) {
+    } else if (this.character.age <= 5) {
+      const kindergartenMilestones = [
+        `Turned ${this.character.age}. Practiced letters and counting in kindergarten while rain tapped against the classroom windows.`,
+        `Turned ${this.character.age}. Shared crayons and picture books during circle time, avoiding the chair nobody else seemed to notice.`,
+        `Turned ${this.character.age}. Learned playground rules and carried home a finger-painting that looked different after sunset.`
+      ];
+      currentYearLog.entries.push(window.getRandomElement(kindergartenMilestones));
+    } else if (this.character.age <= 10) {
       const elementaryMilestones = [
         `Turned ${this.character.age}. Attended municipal primary school in ${this.character.city}. Fluorescent bulbs hummed steadily over chalkboards.`,
         `Turned ${this.character.age}. Traded pencil erasers and horror comics with classmates beneath the playground stairwell.`,
         `Turned ${this.character.age}. Handed in school homework while rumors circulated about stray animals vanishing around the city reservoir.`
       ];
       currentYearLog.entries.push(window.getRandomElement(elementaryMilestones));
+    } else if (this.character.age <= 13) {
+      const middleSchoolMilestones = [
+        `Turned ${this.character.age}. Navigated middle-school timetables, new teachers, and friendships that changed without warning.`,
+        `Turned ${this.character.age}. Carried heavier textbooks through crowded corridors while lockers clicked open on their own.`,
+        `Turned ${this.character.age}. Stayed late for a group assignment as footsteps paced the empty floor above.`
+      ];
+      currentYearLog.entries.push(window.getRandomElement(middleSchoolMilestones));
     } else if (this.character.age <= 17) {
       const adolescentMilestones = [
         `Turned ${this.character.age}. Navigated high school corridors, peer cliques, and the suffocating pressure of an uncertain future.`,
@@ -5304,7 +5325,7 @@ class TerribleGame {
     }
     if (this.dom.eduSchoolLevelBadge) {
       const levelLabels = {
-        daycare: 'Toddler Daycare',
+        daycare: this.character.age <= 1 ? 'Infant Care' : 'Toddler Daycare',
         kindergarten: 'Kindergarten',
         elementary: 'Elementary School',
         middle: 'Middle School',
@@ -5314,7 +5335,7 @@ class TerribleGame {
       this.dom.eduSchoolLevelBadge.textContent = levelLabels[edu.level] || 'School';
     }
     if (this.dom.eduSchoolGradeLabel) {
-      if (edu.level === 'daycare') this.dom.eduSchoolGradeLabel.textContent = `Toddler Room ${edu.gradeYear}`;
+      if (edu.level === 'daycare') this.dom.eduSchoolGradeLabel.textContent = this.character.age <= 1 ? 'Infant Room' : `Toddler Room ${Math.max(1, this.character.age - 1)}`;
       else if (edu.level === 'kindergarten') this.dom.eduSchoolGradeLabel.textContent = `Kindergarten Year ${edu.gradeYear}`;
       else if (edu.level === 'university') this.dom.eduSchoolGradeLabel.textContent = `${edu.major || 'Undergraduate'} · Year ${edu.gradeYear}`;
       else this.dom.eduSchoolGradeLabel.textContent = `Grade ${edu.gradeYear}`;
@@ -5331,15 +5352,24 @@ class TerribleGame {
     else if (grades >= 50) letter = 'D';
     else letter = 'F';
 
-    if (this.dom.eduValGrades) this.dom.eduValGrades.textContent = `${grades}% (${letter})`;
+    const isDaycare = edu.level === 'daycare';
+    const isKindergarten = edu.level === 'kindergarten';
+    const isEarlyYears = isDaycare || isKindergarten;
+    if (this.dom.eduLabelGrades) {
+      this.dom.eduLabelGrades.innerHTML = `<i data-lucide="${isEarlyYears ? 'shapes' : 'book-open'}" class="w-3 h-3"></i> ${isDaycare ? 'Development' : (isKindergarten ? 'School Readiness' : 'Academic Grades')}`;
+    }
+    if (this.dom.eduValGrades) this.dom.eduValGrades.textContent = isEarlyYears ? `${grades}%` : `${grades}% (${letter})`;
     if (this.dom.eduBarGrades) this.dom.eduBarGrades.style.width = `${grades}%`;
+    if (this.dom.eduLabelPopularity) {
+      this.dom.eduLabelPopularity.innerHTML = `<i data-lucide="${isDaycare ? 'heart-handshake' : 'award'}" class="w-3 h-3"></i> ${isDaycare ? 'Comfort & Trust' : (isKindergarten ? 'Classroom Confidence' : 'School Popularity')}`;
+    }
     if (this.dom.eduValPopularity) {
-      this.dom.eduValPopularity.textContent = edu.schoolType === 'homeschool' ? `Autonomy` : `${popularity}%`;
+      this.dom.eduValPopularity.textContent = edu.schoolType === 'homeschool' && !isEarlyYears ? `Autonomy` : `${popularity}%`;
     }
     if (this.dom.eduBarPopularity) this.dom.eduBarPopularity.style.width = `${popularity}%`;
 
     // Disciplinary Banner
-    if (edu.disciplinaryRecord && edu.disciplinaryRecord > 0) {
+    if (!isEarlyYears && edu.disciplinaryRecord && edu.disciplinaryRecord > 0) {
       if (this.dom.eduDisciplinaryBanner) {
         this.dom.eduDisciplinaryBanner.classList.remove('hidden');
         this.dom.eduDisciplinaryBanner.style.display = 'flex';
@@ -5351,6 +5381,11 @@ class TerribleGame {
         this.dom.eduDisciplinaryBanner.style.display = 'none';
       }
     }
+
+    if (this.dom.labelEduStudy) this.dom.labelEduStudy.textContent = isDaycare ? 'Practice a Skill' : (isKindergarten ? 'Practice Letters' : 'Study Harder');
+    if (this.dom.labelEduSkip) this.dom.labelEduSkip.textContent = isDaycare ? 'Refuse Nap' : (isKindergarten ? 'Avoid Circle Time' : 'Skip Class');
+    if (this.dom.tabEduClassmates) this.dom.tabEduClassmates.textContent = isDaycare ? 'Playmates' : 'Classmates';
+    if (this.dom.tabEduTeachers) this.dom.tabEduTeachers.textContent = isDaycare ? 'Caregivers' : 'Teachers';
 
     // Drop out container (High school or University only)
     if (this.dom.eduDropoutContainer) {
@@ -5494,7 +5529,8 @@ class TerribleGame {
     }
 
     // 2. School Supernatural Mysteries
-    if (this.dom.eduMysteriesList) {
+    if (this.dom.eduMysteriesSection) this.dom.eduMysteriesSection.classList.toggle('hidden', this.character.age < 6);
+    if (this.dom.eduMysteriesList && this.character.age >= 6) {
       this.dom.eduMysteriesList.innerHTML = '';
       const availableMysteries = (window.SCHOOL_MYSTERIES || []).filter(m => m.reqLevel.includes(edu.level));
 
@@ -5840,24 +5876,38 @@ class TerribleGame {
     this.dom.schoolPersonActionsList.innerHTML = '';
 
     const actions = [];
+    const isEarlyYears = this.character.age < 6;
 
     if (category === 'classmate') {
-      actions.push({ id: 'chat', label: 'Chat & Whisper', desc: 'Engage in friendly hallway banter.', icon: 'message-square', color: 'text-edu-sky' });
-      actions.push({ id: 'study_together', label: 'Study Together', desc: 'Review homework sets and class notes.', icon: 'book-open', color: 'text-edu-emerald' });
-      actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-edu-amber' });
-      actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-edu-purple' });
-      actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-edu-rose' });
-      if (!person.isBefriended) {
+      if (isEarlyYears) {
+        actions.push({ id: 'chat', label: 'Play Together', desc: 'Spend playtime building blocks and sharing stories.', icon: 'blocks', color: 'text-edu-sky' });
+        actions.push({ id: 'study_together', label: 'Practice Together', desc: 'Match shapes, colors, letters, or picture cards together.', icon: 'shapes', color: 'text-edu-emerald' });
+        actions.push({ id: 'dare', label: 'Share a Favorite Toy', desc: 'Offer them a toy during supervised playtime.', icon: 'gift', color: 'text-edu-purple' });
+      } else {
+        actions.push({ id: 'chat', label: 'Chat & Whisper', desc: 'Engage in friendly hallway banter.', icon: 'message-square', color: 'text-edu-sky' });
+        actions.push({ id: 'study_together', label: 'Study Together', desc: 'Review homework sets and class notes.', icon: 'book-open', color: 'text-edu-emerald' });
+        actions.push({ id: 'gossip', label: 'Trade School Gossip', desc: 'Share rumors regarding students and faculty.', icon: 'radio', color: 'text-edu-amber' });
+        actions.push({ id: 'dare', label: 'Playground Dare', desc: 'Perform a reckless corridor dare.', icon: 'zap', color: 'text-edu-purple' });
+        actions.push({ id: 'prank', label: 'Pull a Prank', desc: 'Slip a mischievous surprise in their locker.', icon: 'smile', color: 'text-edu-rose' });
+      }
+      if (!isEarlyYears && !person.isBefriended) {
         actions.push({ id: 'befriend', label: 'Ask to be Best Friends', desc: 'Invite into your permanent Kin & Friends circle (Req 50%+ Closeness).', icon: 'user-plus', color: 'text-edu-amber' });
       }
     } else if (category === 'teacher') {
-      actions.push({ id: 'praise', label: 'Praise Teaching', desc: 'Compliment their curriculum and lecture dedication.', icon: 'thumbs-up', color: 'text-edu-emerald' });
-      actions.push({ id: 'ask_help', label: 'Request Tutoring', desc: 'Ask for after-school academic assistance.', icon: 'help-circle', color: 'text-edu-sky' });
-      actions.push({ id: 'complain', label: 'Dispute Homework Grade', desc: 'Object to an unfair assignment mark.', icon: 'alert-circle', color: 'text-edu-amber' });
-      actions.push({ id: 'bribe', label: 'Offer Grade Bribe ($50)', desc: 'Slip cash into their desk for extra credit.', icon: 'dollar-sign', color: 'text-edu-rose' });
+      actions.push({ id: 'praise', label: isEarlyYears ? 'Give a Drawing' : 'Praise Teaching', desc: isEarlyYears ? 'Offer them a drawing you made during class.' : 'Compliment their curriculum and lecture dedication.', icon: 'thumbs-up', color: 'text-edu-emerald' });
+      actions.push({ id: 'ask_help', label: isEarlyYears ? 'Ask for Help' : 'Request Tutoring', desc: isEarlyYears ? 'Ask for help with a classroom activity.' : 'Ask for after-school academic assistance.', icon: 'help-circle', color: 'text-edu-sky' });
+      if (!isEarlyYears) {
+        actions.push({ id: 'complain', label: 'Dispute Homework Grade', desc: 'Object to an unfair assignment mark.', icon: 'alert-circle', color: 'text-edu-amber' });
+        actions.push({ id: 'bribe', label: 'Offer Grade Bribe ($50)', desc: 'Slip cash into their desk for extra credit.', icon: 'dollar-sign', color: 'text-edu-rose' });
+      }
     } else if (category === 'staff') {
       const role = person.role || '';
-      if (role.includes('Janitor') || role.includes('Custodian') || role.includes('Caretaker')) {
+      if (isEarlyYears && (role.includes('Nurse') || role.includes('Matron'))) {
+        actions.push({ id: 'nurture', label: 'Seek Comfort', desc: 'Ask for a warm hug, quiet story, and reassurance.', icon: 'heart', color: 'text-edu-rose' });
+        actions.push({ id: 'ask_snack', label: 'Ask for a Snack', desc: 'Request juice and a small nursery snack.', icon: 'cookie', color: 'text-edu-amber' });
+      } else if (isEarlyYears) {
+        actions.push({ id: 'greet_staff', label: 'Wave Hello', desc: 'Greet the familiar adult who looks after the building.', icon: 'hand', color: 'text-edu-sky' });
+      } else if (role.includes('Janitor') || role.includes('Custodian') || role.includes('Caretaker')) {
         actions.push({ id: 'help_clean', label: 'Help Sweep Corridors & Classrooms', desc: 'Grab a push-broom and assist with chores. (+Reputation, chance of lost money)', icon: 'sparkles', color: 'text-edu-amber' });
         actions.push({ id: 'ask_boiler_room', label: 'Ask About Locked Boiler Room', desc: 'Inquire regarding subterranean furnace rumors.', icon: 'flame', color: 'text-edu-purple' });
         actions.push({ id: 'search_lost_found', label: 'Search Lost & Found Crate', desc: 'Rummage through forgotten student relics.', icon: 'search', color: 'text-edu-teal' });
@@ -5868,7 +5918,7 @@ class TerribleGame {
       } else if (role.includes('Nurse') || role.includes('Matron')) {
         actions.push({ id: 'rest_cot', label: 'Rest on Clinic Cot', desc: 'Fake a headache and sleep behind privacy curtains. (+Vitality)', icon: 'moon', color: 'text-edu-emerald' });
         actions.push({ id: 'report_anomaly', label: 'Report Strange Symptoms & Chills', desc: 'Consult regarding odd physical sensations and shadows.', icon: 'activity', color: 'text-edu-purple' });
-        if (role.includes('Matron') || this.character.age <= 5) {
+        if (role.includes('Matron')) {
           actions.push({ id: 'nurture', label: 'Seek Nurture & Warm Hug', desc: 'Ask for comforting nursery story and attention.', icon: 'heart', color: 'text-edu-rose' });
           actions.push({ id: 'ask_snack', label: 'Ask for Nursery Snack', desc: 'Request sweet apple juice and animal crackers.', icon: 'coffee', color: 'text-edu-amber' });
         }

@@ -1150,11 +1150,18 @@
     else if (edu.grades >= 50) gradeLetter = 'D';
     else gradeLetter = 'F';
 
-    let reportVignette = `Received report card from ${edu.name}: Grade mark ${gradeLetter} (${edu.grades}%).`;
-    if (edu.grades >= 85) {
-      reportVignette += " Your teachers commended your academic dedication.";
-    } else if (edu.grades < 50) {
-      reportVignette += " Your instructors expressed grave concern regarding your lack of attentiveness.";
+    let reportVignette;
+    if (edu.level === 'daycare') {
+      reportVignette = `Received a caregiver development note from ${edu.name}: ${edu.grades}% progress in play, communication, and daily routines.`;
+    } else if (edu.level === 'kindergarten') {
+      reportVignette = `Received a kindergarten progress note from ${edu.name}: ${edu.grades}% school readiness in letters, numbers, and classroom routines.`;
+    } else {
+      reportVignette = `Received report card from ${edu.name}: Grade mark ${gradeLetter} (${edu.grades}%).`;
+      if (edu.grades >= 85) {
+        reportVignette += " Your teachers commended your academic dedication.";
+      } else if (edu.grades < 50) {
+        reportVignette += " Your instructors expressed grave concern regarding your lack of attentiveness.";
+      }
     }
     logs.push(reportVignette);
 
@@ -1242,6 +1249,27 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
+    if (edu.level === 'daycare') {
+      edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + 4);
+      modStat(character, 'smarts', 1);
+      modStat(character, 'happiness', 2);
+      return {
+        success: true,
+        title: "Practiced a New Skill",
+        body: `You stacked blocks, matched painted shapes, and proudly repeated a new word for your caregiver.`,
+        effects: { smarts: 1, happiness: 2, development: 4 }
+      };
+    }
+    if (edu.level === 'kindergarten') {
+      edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + 5);
+      modStat(character, 'smarts', 1);
+      return {
+        success: true,
+        title: "Practiced Letters and Numbers",
+        body: `You traced letters, counted wooden shapes, and finished a picture-book exercise with your teacher.`,
+        effects: { smarts: 1, readiness: 5 }
+      };
+    }
     edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + Math.floor(Math.random() * 5) + 6); // +6 to +10%
     modStat(character, 'smarts', 2);
     modStat(character, 'happiness', -2);
@@ -1259,6 +1287,26 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
+    if (edu.level === 'daycare') {
+      edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - 1);
+      modStat(character, 'happiness', 2);
+      return {
+        success: true,
+        title: "Refused Nap Time",
+        body: `You stayed stubbornly awake on your mat, whispering to yourself until a caregiver came to settle you.`,
+        effects: { happiness: 2, development: -1 }
+      };
+    }
+    if (edu.level === 'kindergarten') {
+      edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - 2);
+      modStat(character, 'happiness', 2);
+      return {
+        success: true,
+        title: "Avoided Circle Time",
+        body: `You hid in the reading corner instead of joining circle time. Your teacher eventually found you behind an oversized picture book.`,
+        effects: { happiness: 2, readiness: -2 }
+      };
+    }
     const gradeLoss = Math.floor(Math.random() * 2) + 2; // -2 to -3%
     edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - gradeLoss);
     modStat(character, 'happiness', 3);
@@ -1293,6 +1341,9 @@
   function investigateMystery(character, mysteryId) {
     if (!character.education || !character.education.enrolled) {
       return { success: false, reason: "You are not currently enrolled in school." };
+    }
+    if (character.age < 6) {
+      return { success: false, reason: "You are too young to deliberately investigate school grounds without an adult." };
     }
     const mystery = SCHOOL_MYSTERIES.find(m => m.id === mysteryId) || SCHOOL_MYSTERIES[0];
     let title = mystery.title;
@@ -1343,6 +1394,9 @@
   // --- School Classmate Interactions ---
   function interactWithClassmate(classmate, character, actionType) {
     if (!classmate) return { success: false, reason: "No classmate specified." };
+    if (character.age < 6 && ['gossip', 'prank', 'befriend'].includes(actionType)) {
+      return { success: false, reason: "That interaction is not available during early childhood." };
+    }
     classmate.actionsDone = classmate.actionsDone || {};
     const count = classmate.actionsDone[actionType] || 0;
 
@@ -1361,8 +1415,10 @@
       modStat(character, 'happiness', 3);
       effects.relationship = relGain;
       effects.happiness = 3;
-      title = `Chatted with ${classmate.name}`;
-      body = `You and ${classmate.name} shared gossip about teachers and whispered through fifth period. They seemed to appreciate your company.`;
+      title = character.age < 6 ? `Played with ${classmate.name}` : `Chatted with ${classmate.name}`;
+      body = character.age < 6
+        ? `You and ${classmate.name} built a crooked block tower and laughed when it tumbled across the play mat.`
+        : `You and ${classmate.name} shared gossip about teachers and whispered through fifth period. They seemed to appreciate your company.`;
     } else if (actionType === 'study_together') {
       const relGain = Math.floor(Math.random() * 5) + 4;
       classmate.relationship = Math.min(100, classmate.relationship + relGain);
@@ -1373,8 +1429,10 @@
       effects.relationship = relGain;
       effects.smarts = 2;
       effects.grades = 4;
-      title = `Studied with ${classmate.name}`;
-      body = `You met at the cafeteria tables to review biology notes and solve problem sets. Both of your study notes improved.`;
+      title = character.age < 6 ? `Practiced with ${classmate.name}` : `Studied with ${classmate.name}`;
+      body = character.age < 6
+        ? `You and ${classmate.name} matched picture cards and practiced shapes together while a caregiver watched nearby.`
+        : `You met at the cafeteria tables to review biology notes and solve problem sets. Both of your study notes improved.`;
     } else if (actionType === 'gossip') {
       const success = Math.random() < 0.65;
       if (success) {
@@ -1391,6 +1449,16 @@
         body = `${classmate.name} took offense to the rumors and called you untrustworthy.`;
       }
     } else if (actionType === 'dare') {
+      if (character.age < 6) {
+        const relGain = Math.floor(Math.random() * 5) + 5;
+        classmate.relationship = Math.min(100, classmate.relationship + relGain);
+        modStat(character, 'happiness', 4);
+        effects.relationship = relGain;
+        effects.happiness = 4;
+        title = `Shared with ${classmate.name}`;
+        body = `You offered ${classmate.name} your favorite toy. They played carefully and handed it back when the bell chimed.`;
+        return { success: true, title, body, effects };
+      }
       const success = Math.random() < 0.7;
       if (success) {
         if (character.education) character.education.popularity = Math.min(100, (character.education.popularity || 50) + 7);
@@ -1473,6 +1541,9 @@
   // --- Teacher Interactions ---
   function interactWithTeacher(teacher, character, actionType) {
     if (!teacher) return { success: false, reason: "No teacher specified." };
+    if (character.age < 6 && ['complain', 'bribe'].includes(actionType)) {
+      return { success: false, reason: "That interaction is not available during early childhood." };
+    }
     teacher.actionsDone = teacher.actionsDone || {};
     const count = teacher.actionsDone[actionType] || 0;
 
@@ -1489,8 +1560,10 @@
       const relGain = Math.floor(Math.random() * 6) + 5;
       teacher.relationship = Math.min(100, teacher.relationship + relGain);
       effects.relationship = relGain;
-      title = `Praised ${teacher.name}`;
-      body = `You stayed behind after class to compliment ${teacher.name}'s lesson plan. They seemed genuinely flattered by your attentiveness.`;
+      title = character.age < 6 ? `Gave ${teacher.name} a Drawing` : `Praised ${teacher.name}`;
+      body = character.age < 6
+        ? `You handed ${teacher.name} a wax-crayon drawing. They displayed it near the classroom door and thanked you warmly.`
+        : `You stayed behind after class to compliment ${teacher.name}'s lesson plan. They seemed genuinely flattered by your attentiveness.`;
     } else if (actionType === 'ask_help') {
       const relGain = Math.floor(Math.random() * 4) + 3;
       teacher.relationship = Math.min(100, teacher.relationship + relGain);
@@ -1499,8 +1572,10 @@
       effects.relationship = relGain;
       effects.smarts = 2;
       effects.grades = 5;
-      title = `Academic Tutoring`;
-      body = `${teacher.name} sat down with you to review challenging curriculum problems. Your comprehension significantly improved.`;
+      title = character.age < 6 ? `Help with Classwork` : `Academic Tutoring`;
+      body = character.age < 6
+        ? `${teacher.name} sat beside you and patiently helped you finish a difficult matching exercise.`
+        : `${teacher.name} sat down with you to review challenging curriculum problems. Your comprehension significantly improved.`;
     } else if (actionType === 'complain') {
       const backfire = Math.random() * 100 < teacher.strictness;
       if (backfire) {
@@ -1552,6 +1627,10 @@
   // --- Role-Specific Staff Interactions ---
   function interactWithStaff(staffMember, character, actionType) {
     if (!staffMember) return { success: false, reason: "No staff member specified." };
+    const earlyYearsActions = ['greet_staff', 'nurture', 'ask_snack'];
+    if (character.age < 6 && !earlyYearsActions.includes(actionType)) {
+      return { success: false, reason: "That interaction is not available during early childhood." };
+    }
     staffMember.actionsDone = staffMember.actionsDone || {};
     const count = staffMember.actionsDone[actionType] || 0;
 
@@ -1565,7 +1644,15 @@
     let body = "";
 
     // 1. JANITOR ACTIONS
-    if (actionType === 'help_clean') {
+    if (actionType === 'greet_staff') {
+      const relGain = 4;
+      staffMember.relationship = Math.min(100, staffMember.relationship + relGain);
+      effects.relationship = relGain;
+      effects.happiness = 1;
+      modStat(character, 'happiness', 1);
+      title = `Waved to ${staffMember.name}`;
+      body = `You waved from the classroom doorway. ${staffMember.name} smiled and waved back before continuing their rounds.`;
+    } else if (actionType === 'help_clean') {
       const relGain = Math.floor(Math.random() * 6) + 8;
       staffMember.relationship = Math.min(100, staffMember.relationship + relGain);
       if (character.education) character.education.popularity = Math.min(100, (character.education.popularity || 50) + 3);
