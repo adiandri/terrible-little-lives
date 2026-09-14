@@ -318,6 +318,7 @@
   window.ensureSocialNetwork = ensureSocialNetwork;
   window.audienceForPerson = audienceForPerson;
   window.witnessDecision = witnessDecision;
+  window.createRumor = createRumor;
   window.recordReactionReputation = recordReactionReputation;
   window.recordNpcInteractionReputation = recordNpcInteractionReputation;
   window.alterReputation = alterReputation;

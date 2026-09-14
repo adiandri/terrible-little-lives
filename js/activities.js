@@ -58,7 +58,8 @@ const ACTIVITY_CATEGORIES_DATA = {
     desc: "Phones, networks, broadcasts, and signals in the dark.",
     icon: "smartphone",
     iconColor: "text-teal-400",
-    categories: ["phone", "internet"]
+    categories: ["phone", "internet"],
+    shortcuts: ["terriblenet"]
   },
   paranormal: {
     id: "paranormal",

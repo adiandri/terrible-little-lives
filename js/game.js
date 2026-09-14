@@ -433,6 +433,13 @@ class TerribleGame {
       ritualPrepWording: document.getElementById('ritual-prep-wording'),
       btnSealRitual: document.getElementById('btn-seal-ritual'),
 
+      // TerribleNet
+      terribleNetModal: document.getElementById('terriblenet-modal'),
+      btnCloseTerribleNet: document.getElementById('btn-close-terriblenet'),
+      terribleNetSummary: document.getElementById('terriblenet-summary'),
+      terribleNetTabs: document.getElementById('terriblenet-tabs'),
+      terribleNetContent: document.getElementById('terriblenet-content'),
+
       // Ask Money Modal
       kinAskMoneyModal: document.getElementById('kin-ask-money-modal'),
       btnCloseAskMoney: document.getElementById('btn-close-ask-money'),
@@ -1111,6 +1118,21 @@ class TerribleGame {
     if (this.dom.btnSealRitual) {
       this.dom.btnSealRitual.addEventListener('click', () => this.sealPreparedRitual());
     }
+    if (this.dom.btnCloseTerribleNet) {
+      this.dom.btnCloseTerribleNet.addEventListener('click', () => this.closeTerribleNetModal());
+    }
+    if (this.dom.terribleNetTabs) {
+      this.dom.terribleNetTabs.addEventListener('click', event => {
+        const button = event.target.closest('[data-net-tab]');
+        if (button) this.renderTerribleNet(button.dataset.netTab);
+      });
+    }
+    if (this.dom.terribleNetContent) {
+      this.dom.terribleNetContent.addEventListener('click', event => this.handleTerribleNetAction(event));
+      this.dom.terribleNetContent.addEventListener('change', event => {
+        if (event.target.id === 'net-compose-platform') this.syncTerribleNetComposer();
+      });
+    }
 
     // Ask Money Modal Controls
     if (this.dom.btnCloseAskMoney) {
@@ -1667,6 +1689,9 @@ class TerribleGame {
     if (window.tickEntities) window.tickEntities(this.character).forEach(entry => currentYearLog.entries.push(entry));
     if (window.tickSocialNetwork) {
       window.tickSocialNetwork(this.character).forEach(entry => currentYearLog.entries.push(`[SOCIAL NETWORK] ${entry}`));
+    }
+    if (window.tickTerribleNet) {
+      window.tickTerribleNet(this.character).forEach(entry => currentYearLog.entries.push(`[TERRIBLENET] ${entry}`));
     }
 
     // ==========================================
@@ -4497,7 +4522,8 @@ class TerribleGame {
     const labels = {
       education: ['graduation-cap', 'Education'],
       careers: ['briefcase', 'Careers'],
-      dark_altar: ['flame', 'Dark Altar']
+      dark_altar: ['flame', 'Dark Altar'],
+      terriblenet: ['radio-tower', 'TerribleNet']
     };
     if (!shortcuts.length) {
       this.dom.activityShortcuts.classList.add('hidden');
@@ -4516,6 +4542,7 @@ class TerribleGame {
         if (shortcut === 'education') this.openEducationModal();
         else if (shortcut === 'careers') this.openCareersModal();
         else if (shortcut === 'dark_altar') this.openDarkAltarModal();
+        else if (shortcut === 'terriblenet') this.openTerribleNetModal();
       });
     });
   }
@@ -6555,6 +6582,145 @@ class TerribleGame {
 
     this.renderAll();
     this.renderEducationModal(this.activeEducationTab);
+  }
+
+  // ==========================================
+  // TERRIBLENET: SOCIAL MEDIA & DIGITAL HORROR
+  // ==========================================
+
+  openTerribleNetModal() {
+    if (!this.character?.isAlive || !this.dom.terribleNetModal || !window.ensureTerribleNet) return;
+    this.closeActivitiesModal();
+    window.ensureTerribleNet(this.character);
+    this.dom.terribleNetModal.classList.remove('hidden');
+    this.dom.terribleNetModal.style.display = 'flex';
+    this.renderTerribleNet(this.activeTerribleNetTab || 'platforms');
+  }
+
+  closeTerribleNetModal() {
+    if (!this.dom.terribleNetModal) return;
+    this.dom.terribleNetModal.classList.add('hidden');
+    this.dom.terribleNetModal.style.display = 'none';
+  }
+
+  escapeNet(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  }
+
+  renderTerribleNet(tab = 'platforms') {
+    if (!this.dom.terribleNetContent || !window.ensureTerribleNet) return;
+    const system = window.ensureTerribleNet(this.character);
+    this.activeTerribleNetTab = tab;
+    const accounts = Object.values(system.accounts);
+    const followerTotal = accounts.reduce((sum, account) => sum + account.followers, 0);
+    const unread = system.messages.filter(message => !message.read).length;
+    if (this.dom.terribleNetSummary) this.dom.terribleNetSummary.textContent = `${accounts.length} identities · ${followerTotal} followers · ${unread} unread · ${system.screenshots.length} surviving screenshots`;
+    this.dom.terribleNetTabs?.querySelectorAll('[data-net-tab]').forEach(button => {
+      const active = button.dataset.netTab === tab;
+      button.className = `net-tab px-3 py-1.5 rounded-full border text-[10px] font-mono whitespace-nowrap ${active ? 'bg-teal-500/15 border-teal-500/50 text-teal-300' : 'bg-inputbg border-leadborder text-dust'}`;
+    });
+    if (tab === 'feed') this.dom.terribleNetContent.innerHTML = this.terribleNetFeedHtml(system);
+    else if (tab === 'compose') this.dom.terribleNetContent.innerHTML = this.terribleNetComposeHtml(system);
+    else if (tab === 'inbox') this.dom.terribleNetContent.innerHTML = this.terribleNetInboxHtml(system);
+    else if (tab === 'blackglass') this.dom.terribleNetContent.innerHTML = this.terribleNetBlackglassHtml(system);
+    else if (tab === 'archive') this.dom.terribleNetContent.innerHTML = this.terribleNetArchiveHtml(system);
+    else this.dom.terribleNetContent.innerHTML = this.terribleNetPlatformsHtml(system);
+    if (tab === 'compose') this.syncTerribleNetComposer();
+    if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
+  }
+
+  terribleNetPlatformsHtml(system) {
+    return Object.entries(window.TERRIBLENET_PLATFORMS || {}).map(([id, platform]) => {
+      const access = window.getTerribleNetAccess(this.character, id);
+      const account = system.accounts[id];
+      return `<article class="rounded-2xl border ${account ? 'border-teal-500/30 bg-teal-500/5' : 'border-leadborder bg-inputbg'} p-4 space-y-3">
+        <div class="flex items-start justify-between gap-3"><div class="flex gap-3 min-w-0"><div class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-teal-400 shrink-0"><i data-lucide="${platform.icon}" class="w-5 h-5"></i></div><div><h4 class="font-serif font-bold text-sm text-parchment">${platform.name}</h4><p class="text-[11px] text-dust leading-relaxed">${platform.desc}</p></div></div><span class="text-[8px] font-mono uppercase border border-leadborder rounded-full px-2 py-1 text-dust shrink-0">${platform.inviteOnly ? 'invite only' : `age ${platform.minAge}+`}</span></div>
+        ${account ? `<div class="grid grid-cols-4 gap-1.5 text-center"><div class="rounded-lg bg-slatecard p-2"><strong class="text-xs text-parchment">${account.followers}</strong><p class="text-[8px] text-dust uppercase">Followers</p></div><div class="rounded-lg bg-slatecard p-2"><strong class="text-xs text-emerald-300">${account.credibility}%</strong><p class="text-[8px] text-dust uppercase">Credible</p></div><div class="rounded-lg bg-slatecard p-2"><strong class="text-xs text-amber-300">${account.notoriety}%</strong><p class="text-[8px] text-dust uppercase">Notoriety</p></div><div class="rounded-lg bg-slatecard p-2"><strong class="text-xs text-rose-300">${account.parasocial}%</strong><p class="text-[8px] text-dust uppercase">Attachment</p></div></div><p class="text-[9px] font-mono text-dust">@${this.escapeNet(account.handle)}${account.anonymous ? ' · anonymous identity' : ''}${account.monetized ? ' · monetized' : ''}</p>` : `<button data-net-action="create-account" data-platform="${id}" ${access.allowed ? '' : 'disabled'} class="w-full py-2 rounded-xl border text-xs font-serif font-bold ${access.allowed ? 'border-teal-500/40 bg-teal-500/10 text-teal-300' : 'border-leadborder bg-slatecard text-dust opacity-60'}">${access.allowed ? 'Create identity' : this.escapeNet(access.reason)}</button>`}
+      </article>`;
+    }).join('');
+  }
+
+  terribleNetFeedHtml(system) {
+    const visible = system.posts.slice(0, 30);
+    if (!visible.length) return '<div class="rounded-2xl border border-leadborder bg-inputbg p-6 text-center"><i data-lucide="signal-zero" class="w-7 h-7 text-dust mx-auto"></i><p class="text-sm text-parchment mt-3">Nothing published yet.</p><p class="text-xs text-dust mt-1">Create an identity, then leave something future employers can discover.</p></div>';
+    return visible.map(post => {
+      const platform = window.TERRIBLENET_PLATFORMS[post.platformId];
+      return `<article class="rounded-2xl border ${post.deleted ? 'border-leadborder/50 opacity-70' : post.viral ? 'border-amber-500/40' : 'border-leadborder'} bg-inputbg p-4 space-y-3">
+        <div class="flex justify-between gap-3"><span class="text-[9px] font-mono uppercase text-teal-300">${platform.name} · ${post.type}${post.viral ? ' · VIRAL' : ''}</span><span class="text-[9px] text-dust">Age ${post.createdAge}</span></div>
+        <p class="text-xs text-parchment leading-relaxed">${this.escapeNet(post.text)}</p>
+        ${post.targetName ? `<p class="text-[9px] font-mono text-rose-300">TARGET: ${this.escapeNet(post.targetName)}</p>` : ''}
+        ${post.paranormalVerdict ? `<div class="rounded-lg border border-purple-500/30 bg-purple-500/5 p-2 text-[10px] text-purple-200">WakeWatch verdict: ${post.paranormalVerdict.replaceAll('_', ' ')}</div>` : ''}
+        <div class="flex justify-between items-center text-[9px] font-mono text-dust"><span>${post.reach} reached · ${post.reactions.length} known reactions</span><span>${post.screenshotted ? 'Screenshot survives' : post.deleted ? 'Deleted' : 'Live'}</span></div>
+        ${!post.deleted ? `<button data-net-action="delete-post" data-post-id="${post.id}" class="text-[10px] font-mono text-rose-300 hover:text-rose-200">Delete original</button>` : ''}
+      </article>`;
+    }).join('');
+  }
+
+  terribleNetComposeHtml(system) {
+    const accounts = Object.values(system.accounts).filter(account => !['blackglass', 'archive'].includes(account.platformId));
+    if (!accounts.length) return '<div class="rounded-2xl border border-leadborder bg-inputbg p-5 text-center text-xs text-dust">Create at least one social identity under Networks before publishing.</div>';
+    const targets = window.getAllPotentialTargets ? window.getAllPotentialTargets(this.character) : [];
+    const platformOptions = accounts.map(account => `<option value="${account.platformId}">${window.TERRIBLENET_PLATFORMS[account.platformId].name} · @${this.escapeNet(account.handle)}</option>`).join('');
+    const toneOptions = Object.entries(window.TERRIBLENET_TONES || {}).map(([id, tone]) => `<option value="${id}">${tone.label}</option>`).join('');
+    const targetOptions = targets.map(target => `<option value="${this.escapeNet(target.id)}">${this.escapeNet(target.name)} · ${this.escapeNet(target.group)}</option>`).join('');
+    return `<div class="rounded-2xl border border-teal-500/30 bg-inputbg p-4 space-y-4">
+      <div><h4 class="font-serif font-bold text-parchment">Publish to TerribleNet</h4><p class="text-[10px] text-dust">Costs 1 Energy. Reach comes from followers and Batch 10 notoriety; belief comes from trust and credibility.</p></div>
+      <label class="block text-[9px] font-mono uppercase text-dust">Identity<select id="net-compose-platform" class="mt-1 w-full p-2.5 rounded-lg bg-slatecard border border-leadborder text-xs text-parchment">${platformOptions}</select></label>
+      <div class="grid grid-cols-2 gap-2"><label class="block text-[9px] font-mono uppercase text-dust">Format<select id="net-compose-type" class="mt-1 w-full p-2.5 rounded-lg bg-slatecard border border-leadborder text-xs text-parchment">${(window.TERRIBLENET_CONTENT_TYPES || []).map(type => `<option value="${type}">${type}</option>`).join('')}</select></label><label class="block text-[9px] font-mono uppercase text-dust">Purpose<select id="net-compose-tone" class="mt-1 w-full p-2.5 rounded-lg bg-slatecard border border-leadborder text-xs text-parchment">${toneOptions}</select></label></div>
+      <label class="block text-[9px] font-mono uppercase text-dust">Optional target<select id="net-compose-target" class="mt-1 w-full p-2.5 rounded-lg bg-slatecard border border-leadborder text-xs text-parchment"><option value="">No named target</option>${targetOptions}</select></label>
+      <label class="block text-[9px] font-mono uppercase text-dust">Content<textarea id="net-compose-text" maxlength="400" rows="5" placeholder="Say something the Archive may preserve forever…" class="mt-1 w-full p-3 rounded-lg bg-slatecard border border-leadborder text-xs text-parchment focus:outline-none focus:border-teal-500"></textarea></label>
+      <button data-net-action="publish" class="w-full py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white border border-teal-500 font-serif font-bold active:scale-[0.99]">Publish · 1 Energy</button>
+    </div>`;
+  }
+
+  syncTerribleNetComposer() {
+    const platformId = document.getElementById('net-compose-platform')?.value;
+    const typeSelect = document.getElementById('net-compose-type');
+    const allowed = window.TERRIBLENET_PLATFORMS?.[platformId]?.formats || [];
+    if (!typeSelect) return;
+    Array.from(typeSelect.options).forEach(option => { option.disabled = !allowed.includes(option.value); });
+    if (!allowed.includes(typeSelect.value)) typeSelect.value = allowed[0] || 'post';
+  }
+
+  terribleNetInboxHtml(system) {
+    if (!system.messages.length) return '<div class="rounded-2xl border border-leadborder bg-inputbg p-6 text-center text-xs text-dust">No private messages. Enjoy this historically temporary condition.</div>';
+    return system.messages.map(message => `<article class="rounded-2xl border ${message.threat ? 'border-rose-500/40 bg-rose-500/5' : 'border-leadborder bg-inputbg'} p-4 space-y-2">
+      <div class="flex justify-between gap-2"><strong class="text-xs text-parchment">${this.escapeNet(message.subject)}</strong><span class="text-[9px] font-mono ${message.read ? 'text-dust' : 'text-teal-300'}">${message.read ? 'READ' : 'NEW'}</span></div><p class="text-[10px] font-mono text-dust">${this.escapeNet(message.senderName)} · age ${message.age}</p><p class="text-[11px] text-parchment leading-relaxed">${this.escapeNet(message.body)}</p>
+      ${message.threat && !message.resolved ? `<div class="grid grid-cols-4 gap-1 pt-2">${['ignore', 'report', 'confront', 'comply'].map(response => `<button data-net-action="respond" data-message-id="${message.id}" data-response="${response}" class="py-2 rounded-lg border border-leadborder bg-slatecard text-[9px] font-mono text-dust hover:text-parchment capitalize">${response}</button>`).join('')}</div>` : message.resolved ? `<p class="text-[9px] font-mono text-amber-300 uppercase">Resolved: ${message.response}</p>` : `<button data-net-action="respond" data-message-id="${message.id}" data-response="ignore" class="text-[10px] text-teal-300">Mark read</button>`}
+    </article>`).join('');
+  }
+
+  terribleNetBlackglassHtml(system) {
+    const access = window.getTerribleNetAccess(this.character, 'blackglass');
+    if (!system.accounts.blackglass) return `<div class="rounded-2xl border border-rose-900/60 bg-black/30 p-6 text-center"><i data-lucide="scan-eye" class="w-8 h-8 text-rose-500 mx-auto"></i><h4 class="font-serif font-bold text-rose-200 mt-3">Blackglass Invitation Gate</h4><p class="text-xs text-dust mt-2">${this.escapeNet(access.reason || 'Your invitation has been verified.')}</p>${access.allowed ? '<button data-net-action="create-account" data-platform="blackglass" class="mt-4 px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs font-bold">Enter using invitation</button>' : ''}</div>`;
+    return `<div class="rounded-xl border border-rose-900/50 bg-black/30 p-3 text-[10px] text-rose-200">Purchases may produce curses, investigations, blackmail, stalking, or information contamination. Escrow does not accept regret.</div>${(window.BLACKGLASS_LISTINGS || []).map(item => `<article class="rounded-2xl border border-rose-900/40 bg-inputbg p-4"><div class="flex justify-between gap-3"><div><h4 class="font-serif font-bold text-parchment">${item.name}</h4><p class="text-[11px] text-dust mt-1">${item.desc}</p></div><span class="text-xs font-mono text-amber-300">${this.escapeNet(window.formatMoney ? window.formatMoney(item.cost, this.character.countryCode) : '$' + item.cost)}</span></div><div class="flex justify-between items-center mt-3"><span class="text-[9px] font-mono text-rose-300 uppercase">Risk index ${item.danger}% · ${item.kind}</span><button data-net-action="blackglass-buy" data-listing-id="${item.id}" class="px-3 py-1.5 rounded-lg bg-rose-950/50 border border-rose-700/50 text-rose-200 text-[10px] font-bold">Purchase</button></div></article>`).join('')}`;
+  }
+
+  terribleNetArchiveHtml(system) {
+    if (!system.memorials.length) return '<div class="rounded-2xl border border-leadborder bg-inputbg p-6 text-center"><i data-lucide="book-heart" class="w-7 h-7 text-dust mx-auto"></i><p class="text-xs text-dust mt-3">No memorial profiles are connected to your account.</p></div>';
+    return system.memorials.map(memorial => `<article class="rounded-2xl border ${memorial.updates.length ? 'border-purple-500/40' : 'border-leadborder'} bg-inputbg p-4"><div class="flex justify-between"><div><h4 class="font-serif font-bold text-parchment">${this.escapeNet(memorial.name)}</h4><p class="text-[9px] font-mono text-dust">Memorialized · followed</p></div><i data-lucide="${memorial.updates.length ? 'refresh-cw' : 'flower-2'}" class="w-4 h-4 ${memorial.updates.length ? 'text-purple-300' : 'text-dust'}"></i></div>${memorial.updates.length ? memorial.updates.slice(0, 3).map(update => `<div class="mt-3 border-l-2 border-purple-500/30 pl-3"><p class="text-[11px] text-parchment">${this.escapeNet(update.text)}</p><span class="text-[8px] font-mono text-dust">Updated when you were age ${update.age}</span></div>`).join('') : '<p class="text-[11px] text-dust mt-3">No posthumous activity detected.</p>'}</article>`).join('');
+  }
+
+  handleTerribleNetAction(event) {
+    const button = event.target.closest('[data-net-action]');
+    if (!button) return;
+    const action = button.dataset.netAction;
+    let result = null;
+    if (action === 'create-account') result = window.createTerribleNetAccount(this.character, button.dataset.platform, button.dataset.platform === 'hush');
+    else if (action === 'delete-post') result = window.deleteTerribleNetPost(this.character, button.dataset.postId);
+    else if (action === 'respond') result = window.respondTerribleNetMessage(this.character, button.dataset.messageId, button.dataset.response);
+    else if (action === 'blackglass-buy') result = window.buyBlackglassListing(this.character, button.dataset.listingId);
+    else if (action === 'publish') {
+      result = window.createTerribleNetPost(this.character, { platformId: document.getElementById('net-compose-platform')?.value, type: document.getElementById('net-compose-type')?.value, tone: document.getElementById('net-compose-tone')?.value, targetId: document.getElementById('net-compose-target')?.value, text: document.getElementById('net-compose-text')?.value });
+    }
+    if (!result) return;
+    if (result.success) {
+      const latestLog = this.logs[this.logs.length - 1];
+      if (latestLog) latestLog.entries.push(`[TerribleNet] ${result.title}: ${result.message}`);
+      this.saveGame(); this.renderAll();
+    }
+    this.renderTerribleNet(action === 'publish' && result.success ? 'feed' : this.activeTerribleNetTab);
+    this.openFeedbackModal({ tag: result.success ? 'TERRIBLENET' : 'NETWORK ACTION BLOCKED', title: result.title || 'Connection Refused', icon: result.success ? 'radio-tower' : 'wifi-off', iconColor: result.success ? 'text-teal-300' : 'text-amber-400', body: result.message || result.reason, effects: result.effects || {} });
   }
 
   // ==========================================
