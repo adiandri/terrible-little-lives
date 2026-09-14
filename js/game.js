@@ -1693,6 +1693,9 @@ class TerribleGame {
     if (window.tickTerribleNet) {
       window.tickTerribleNet(this.character).forEach(entry => currentYearLog.entries.push(`[TERRIBLENET] ${entry}`));
     }
+    if (window.tickFame) {
+      window.tickFame(this.character).forEach(entry => currentYearLog.entries.push(`[PUBLIC IDENTITY] ${entry}`));
+    }
 
     // ==========================================
     // 5-7 MULTI-EVENT YEARLY CHRONICLE
@@ -4760,6 +4763,7 @@ class TerribleGame {
     this.character.isAlive = false;
     this.character.deathCause = cause;
     this.character.epitaph = epitaph;
+    if (window.recordPosthumousFame) window.recordPosthumousFame(this.character);
 
     this.addToCrypt(this.character);
 
@@ -4800,6 +4804,7 @@ class TerribleGame {
       this.dom.kinGiftModal,
       this.dom.kinFeedbackModal,
       this.dom.activitiesModal,
+      this.dom.terribleNetModal,
       this.dom.revelationModal,
       this.dom.educationModal,
       this.dom.schoolChoiceModal,
@@ -6622,6 +6627,7 @@ class TerribleGame {
     if (tab === 'feed') this.dom.terribleNetContent.innerHTML = this.terribleNetFeedHtml(system);
     else if (tab === 'compose') this.dom.terribleNetContent.innerHTML = this.terribleNetComposeHtml(system);
     else if (tab === 'inbox') this.dom.terribleNetContent.innerHTML = this.terribleNetInboxHtml(system);
+    else if (tab === 'fame') this.dom.terribleNetContent.innerHTML = this.terribleNetFameHtml();
     else if (tab === 'blackglass') this.dom.terribleNetContent.innerHTML = this.terribleNetBlackglassHtml(system);
     else if (tab === 'archive') this.dom.terribleNetContent.innerHTML = this.terribleNetArchiveHtml(system);
     else this.dom.terribleNetContent.innerHTML = this.terribleNetPlatformsHtml(system);
@@ -6690,6 +6696,25 @@ class TerribleGame {
     </article>`).join('');
   }
 
+  terribleNetFameHtml() {
+    if (!window.getFameSnapshot) return '<p class="text-xs text-dust">Public identity registry unavailable.</p>';
+    const fame = window.getFameSnapshot(this.character);
+    const identity = window.FAME_IDENTITIES?.[fame.identity.type] || window.FAME_IDENTITIES?.private_citizen;
+    const activeScandal = fame.scandals.find(item => item.active);
+    const pending = fame.offers.filter(item => item.status === 'pending');
+    const activeContracts = fame.contracts.filter(item => item.active);
+    return `<section class="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-purple-500/5 p-4 space-y-3">
+      <div class="flex items-start gap-3"><div class="w-11 h-11 rounded-xl bg-slatecard border border-amber-500/30 flex items-center justify-center text-amber-300"><i data-lucide="${identity.icon}" class="w-5 h-5"></i></div><div class="min-w-0"><p class="text-[9px] font-mono uppercase tracking-widest text-amber-300">Current public identity</p><h4 class="font-serif font-bold text-lg text-parchment">${identity.label}</h4><p class="text-[11px] text-dust mt-1">${identity.danger}</p></div></div>
+      <div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-xl bg-slatecard/70 border border-leadborder p-2"><strong class="text-sm text-parchment">${fame.publicReach}</strong><p class="text-[8px] uppercase text-dust">Recognizable reach</p></div><div class="rounded-xl bg-slatecard/70 border border-leadborder p-2"><strong class="text-sm text-rose-300">${fame.privacyLoss}%</strong><p class="text-[8px] uppercase text-dust">Privacy lost</p></div><div class="rounded-xl bg-slatecard/70 border border-leadborder p-2"><strong class="text-sm text-amber-300">${fame.identityHistory.length}</strong><p class="text-[8px] uppercase text-dust">Identity eras</p></div></div>
+    </section>
+    <section><p class="text-[9px] font-mono uppercase text-dust mb-2">People gathered around your name</p><div class="grid grid-cols-5 gap-1">${Object.entries(fame.factions).map(([name, count]) => `<div class="rounded-lg bg-inputbg border border-leadborder p-2 text-center"><strong class="text-xs ${name === 'stalkers' ? 'text-rose-300' : 'text-parchment'}">${count}</strong><p class="text-[7px] text-dust uppercase truncate">${name}</p></div>`).join('')}</div></section>
+    <section><p class="text-[9px] font-mono uppercase text-dust mb-2">Audience demographics</p><div class="space-y-2">${Object.entries(fame.audiences).map(([id, audience]) => `<div class="rounded-xl bg-inputbg border border-leadborder p-3"><div class="flex justify-between text-[10px]"><span class="text-parchment">${window.FAME_DEMOGRAPHICS[id]}</span><span class="font-mono text-dust">Exposure ${audience.exposure}% · Affinity ${audience.affinity}%</span></div><div class="h-1 bg-slatecard rounded-full mt-2 overflow-hidden"><div class="h-full bg-teal-500" style="width:${audience.exposure}%"></div></div></div>`).join('')}</div></section>
+    ${activeScandal ? `<section class="rounded-2xl border ${activeScandal.documented ? 'border-rose-500/50' : 'border-amber-500/40'} bg-inputbg p-4"><div class="flex justify-between"><p class="text-[9px] font-mono uppercase ${activeScandal.documented ? 'text-rose-300' : 'text-amber-300'}">${activeScandal.documented ? 'Documented scandal' : 'Unverified claim'}</p><span class="text-[9px] text-dust">Heat ${activeScandal.heat}%</span></div><p class="text-xs text-parchment mt-2">${this.escapeNet(activeScandal.claim)}</p><div class="grid grid-cols-4 gap-1 mt-3">${[['apologize','Apologize'],['deny','Deny'],['double_down','Double down'],['silence','No comment']].map(([stance,label]) => `<button data-net-action="fame-statement" data-stance="${stance}" class="py-2 rounded-lg border border-leadborder bg-slatecard text-[8px] font-mono text-dust">${label}</button>`).join('')}</div></section>` : ''}
+    ${pending.length ? `<section><p class="text-[9px] font-mono uppercase text-dust mb-2">Pending contracts</p>${pending.map(offer => `<article class="rounded-2xl border ${offer.exploitative ? 'border-rose-500/40' : 'border-emerald-500/30'} bg-inputbg p-4 mb-2"><div class="flex justify-between"><strong class="text-xs text-parchment">${this.escapeNet(offer.sponsor)}</strong><span class="text-xs text-amber-300">${this.escapeNet(window.formatMoney ? window.formatMoney(offer.upfront, this.character.countryCode) : '$'+offer.upfront)}</span></div><p class="text-[10px] text-dust mt-2">${offer.rights} ${offer.exclusivity}</p><p class="text-[9px] text-rose-300 mt-1">${offer.scandalClause}</p><div class="grid grid-cols-2 gap-2 mt-3"><button data-net-action="fame-offer" data-offer-id="${offer.id}" data-decision="reject" class="py-2 rounded-lg border border-leadborder text-xs text-dust">Reject</button><button data-net-action="fame-offer" data-offer-id="${offer.id}" data-decision="accept" class="py-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-xs text-amber-200">Sign</button></div></article>`).join('')}</section>` : ''}
+    ${activeContracts.length ? `<section class="rounded-2xl border border-leadborder bg-inputbg p-4"><p class="text-[9px] font-mono uppercase text-dust">Active likeness contracts</p>${activeContracts.map(contract => `<p class="text-[11px] text-parchment mt-2">${this.escapeNet(contract.sponsor)} · ${contract.yearsRemaining} year(s) · ${contract.exploitative ? 'Sponsor controls scandal rights' : 'Limited campaign rights'}</p>`).join('')}</section>` : ''}
+    <section class="rounded-2xl border border-leadborder bg-inputbg p-4"><p class="text-[9px] font-mono uppercase text-dust">Public appearances · 1 Energy</p><div class="grid grid-cols-3 gap-2 mt-3">${[['friendly','Friendly profile'],['investigative','Investigative'],['sensational','Sensational live']].map(([kind,label]) => `<button data-net-action="fame-appearance" data-kind="${kind}" class="py-2.5 rounded-lg border border-teal-500/30 bg-teal-500/5 text-[9px] font-mono text-teal-200">${label}</button>`).join('')}</div></section>`;
+  }
+
   terribleNetBlackglassHtml(system) {
     const access = window.getTerribleNetAccess(this.character, 'blackglass');
     if (!system.accounts.blackglass) return `<div class="rounded-2xl border border-rose-900/60 bg-black/30 p-6 text-center"><i data-lucide="scan-eye" class="w-8 h-8 text-rose-500 mx-auto"></i><h4 class="font-serif font-bold text-rose-200 mt-3">Blackglass Invitation Gate</h4><p class="text-xs text-dust mt-2">${this.escapeNet(access.reason || 'Your invitation has been verified.')}</p>${access.allowed ? '<button data-net-action="create-account" data-platform="blackglass" class="mt-4 px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs font-bold">Enter using invitation</button>' : ''}</div>`;
@@ -6710,6 +6735,9 @@ class TerribleGame {
     else if (action === 'delete-post') result = window.deleteTerribleNetPost(this.character, button.dataset.postId);
     else if (action === 'respond') result = window.respondTerribleNetMessage(this.character, button.dataset.messageId, button.dataset.response);
     else if (action === 'blackglass-buy') result = window.buyBlackglassListing(this.character, button.dataset.listingId);
+    else if (action === 'fame-offer') result = window.handleFameOffer(this.character, button.dataset.offerId, button.dataset.decision);
+    else if (action === 'fame-appearance') result = window.performPublicAppearance(this.character, button.dataset.kind);
+    else if (action === 'fame-statement') result = window.makeFameStatement(this.character, button.dataset.stance);
     else if (action === 'publish') {
       result = window.createTerribleNetPost(this.character, { platformId: document.getElementById('net-compose-platform')?.value, type: document.getElementById('net-compose-type')?.value, tone: document.getElementById('net-compose-tone')?.value, targetId: document.getElementById('net-compose-target')?.value, text: document.getElementById('net-compose-text')?.value });
     }
