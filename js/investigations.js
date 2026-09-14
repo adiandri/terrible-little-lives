@@ -20,6 +20,22 @@
       .filter(person => person && person.alive !== false && !person.missing);
   }
 
+  function personId(person) {
+    return person && (person.id || person.name);
+  }
+
+  function isKnownNonhuman(character, person) {
+    if (!person) return false;
+    if (person.replaced) return true;
+    if (person.isRevealed && person.entityType && person.entityType !== 'human') return true;
+    const id = personId(person);
+    return !!character.entitySystem?.entities?.some(entity => entity.known !== false && entity.sourcePersonId === id);
+  }
+
+  function investigationPeople(character) {
+    return allPeople(character).filter(person => !isKnownNonhuman(character, person));
+  }
+
   function ensureInvestigationSystem(character) {
     if (!character.investigationSystem || typeof character.investigationSystem !== 'object') character.investigationSystem = {};
     const system = character.investigationSystem;
@@ -36,6 +52,13 @@
       if (!Array.isArray(file.investigators)) file.investigators = [];
       if (!Array.isArray(file.publications)) file.publications = [];
       if (!Number.isFinite(file.analysis)) file.analysis = 0;
+      file.investigators.forEach(investigator => {
+        const person = allPeople(character).find(candidate => personId(candidate) === investigator.personId);
+        if (investigator.active && person && isKnownNonhuman(character, person)) {
+          investigator.active = false;
+          investigator.removalReason = 'Identity confirmed as nonhuman';
+        }
+      });
     });
     return system;
   }
@@ -94,7 +117,7 @@
         publications: [], lastUpdatedAge: character.age
       };
       if (truth === 'human_deception') {
-        const possibleCulprits = allPeople(character);
+        const possibleCulprits = investigationPeople(character);
         const culprit = possibleCulprits.length ? pick(possibleCulprits) : null;
         file.actualCulpritId = culprit ? (culprit.id || culprit.name) : null;
       }
@@ -161,7 +184,7 @@
   function recruit(character, caseId, personId) {
     const system = ensureInvestigationSystem(character);
     const file = system.cases.find(item => item.id === caseId);
-    const person = allPeople(character).find(item => (item.id || item.name) === personId);
+    const person = investigationPeople(character).find(item => (item.id || item.name) === personId);
     if (!file || !person) return { success: false, reason: 'That potential investigator is unavailable.' };
     if (file.investigators.some(item => item.personId === personId && item.active)) return { success: false, reason: `${person.name} is already helping with this case.` };
     const mind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : { trust: Math.round((person.relationship || 50) * 0.8), resentment: 0, fear: 0 };
@@ -205,7 +228,7 @@
     if (!file || !TRUTHS.includes(conclusion)) return { success: false, reason: 'That conclusion cannot be filed.' };
     let suspect = null;
     if (conclusion === 'human_deception') {
-      suspect = allPeople(character).find(item => (item.id || item.name) === suspectId);
+      suspect = investigationPeople(character).find(item => (item.id || item.name) === suspectId);
       if (!suspect) return { success: false, reason: 'Name the person you believe staged the incidents.' };
     }
     const suspectCorrect = conclusion !== 'human_deception' || !file.actualCulpritId || (suspect && (suspect.id || suspect.name) === file.actualCulpritId);
@@ -292,7 +315,7 @@
     system.cases.forEach(file => {
       const danger = averageEvidence(file, system, 'danger');
       file.investigators.filter(item => item.active).forEach(investigator => {
-        const person = allPeople(character).find(candidate => (candidate.id || candidate.name) === investigator.personId);
+        const person = investigationPeople(character).find(candidate => (candidate.id || candidate.name) === investigator.personId);
         if (!person) { investigator.active = false; return; }
         const mind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : { trust: 40, fear: 0 };
         if (danger > 65 && (mind.trust || 0) + (person.relationship || 50) - (mind.fear || 0) < 70 && Math.random() < 0.3) {
@@ -314,6 +337,6 @@
   window.fileCaseConclusion = conclude;
   window.publishCaseFile = publish;
   window.getEvidenceForCase = evidenceForCase;
-  window.getInvestigationPeople = allPeople;
+  window.getInvestigationPeople = investigationPeople;
   window.tickInvestigations = tickInvestigations;
 })();
