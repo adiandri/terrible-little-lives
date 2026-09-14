@@ -325,6 +325,31 @@ class TerribleGame {
       creatureDetailHunger: document.getElementById('creature-detail-hunger'),
       creatureActions: document.getElementById('creature-actions'),
       creatureMemory: document.getElementById('creature-memory'),
+      tabArchiveCreatures: document.getElementById('tab-archive-creatures'),
+      tabArchiveCases: document.getElementById('tab-archive-cases'),
+      archiveCreaturesPanel: document.getElementById('archive-creatures-panel'),
+      archiveCasesPanel: document.getElementById('archive-cases-panel'),
+      archiveCaseSummary: document.getElementById('archive-case-summary'),
+      caseFilesList: document.getElementById('case-files-list'),
+      evidenceInventory: document.getElementById('evidence-inventory'),
+      caseDetailModal: document.getElementById('case-detail-modal'),
+      btnCloseCaseDetail: document.getElementById('btn-close-case-detail'),
+      caseDetailTitle: document.getElementById('case-detail-title'),
+      caseDetailStatus: document.getElementById('case-detail-status'),
+      btnInvestigateAlone: document.getElementById('btn-investigate-alone'),
+      btnInvestigateTeam: document.getElementById('btn-investigate-team'),
+      btnAnalyzeEvidence: document.getElementById('btn-analyze-evidence'),
+      caseRecruitSelect: document.getElementById('case-recruit-select'),
+      btnCaseRecruit: document.getElementById('btn-case-recruit'),
+      caseInvestigators: document.getElementById('case-investigators'),
+      caseEvidenceList: document.getElementById('case-evidence-list'),
+      caseConclusionSelect: document.getElementById('case-conclusion-select'),
+      caseSuspectRow: document.getElementById('case-suspect-row'),
+      caseSuspectSelect: document.getElementById('case-suspect-select'),
+      btnFileConclusion: document.getElementById('btn-file-conclusion'),
+      btnPublishCase: document.getElementById('btn-publish-case'),
+      btnSubmitCase: document.getElementById('btn-submit-case'),
+      caseIncidents: document.getElementById('case-incidents'),
 
       // Kin Detail Modal
       kinDetailModal: document.getElementById('kin-detail-modal'),
@@ -802,6 +827,17 @@ class TerribleGame {
     if (this.dom.btnTabCreatures) this.dom.btnTabCreatures.addEventListener('click', () => this.openCreaturesModal());
     if (this.dom.btnCloseCreatures) this.dom.btnCloseCreatures.addEventListener('click', () => this.closeCreaturesModal());
     if (this.dom.btnCloseCreatureDetail) this.dom.btnCloseCreatureDetail.addEventListener('click', () => this.closeCreatureDetail());
+    if (this.dom.tabArchiveCreatures) this.dom.tabArchiveCreatures.addEventListener('click', () => this.switchArchiveTab('creatures'));
+    if (this.dom.tabArchiveCases) this.dom.tabArchiveCases.addEventListener('click', () => this.switchArchiveTab('cases'));
+    if (this.dom.btnCloseCaseDetail) this.dom.btnCloseCaseDetail.addEventListener('click', () => this.closeCaseDetail());
+    if (this.dom.btnInvestigateAlone) this.dom.btnInvestigateAlone.addEventListener('click', () => this.handleCaseAction('investigate_alone'));
+    if (this.dom.btnInvestigateTeam) this.dom.btnInvestigateTeam.addEventListener('click', () => this.handleCaseAction('investigate_team'));
+    if (this.dom.btnAnalyzeEvidence) this.dom.btnAnalyzeEvidence.addEventListener('click', () => this.handleCaseAction('analyze'));
+    if (this.dom.btnCaseRecruit) this.dom.btnCaseRecruit.addEventListener('click', () => this.handleCaseAction('recruit'));
+    if (this.dom.caseConclusionSelect) this.dom.caseConclusionSelect.addEventListener('change', () => this.syncCaseConclusionUI());
+    if (this.dom.btnFileConclusion) this.dom.btnFileConclusion.addEventListener('click', () => this.handleCaseAction('conclude'));
+    if (this.dom.btnPublishCase) this.dom.btnPublishCase.addEventListener('click', () => this.handleCaseAction('publish'));
+    if (this.dom.btnSubmitCase) this.dom.btnSubmitCase.addEventListener('click', () => this.handleCaseAction('submit'));
     if (this.dom.btnCloseProfile) this.dom.btnCloseProfile.addEventListener('click', () => this.closeProfile());
     if (this.dom.btnProfileDone) this.dom.btnProfileDone.addEventListener('click', () => this.closeProfile());
 
@@ -1599,6 +1635,7 @@ class TerribleGame {
       window.tickReactionYear(this.character).forEach(entry => currentYearLog.entries.push(entry));
     }
     if (window.tickLifeEffects) window.tickLifeEffects(this.character).forEach(entry => currentYearLog.entries.push(`[LASTING ADVANTAGE] ${entry}`));
+    if (window.tickInvestigations) window.tickInvestigations(this.character).forEach(entry => currentYearLog.entries.push(`[ARCHIVE] ${entry}`));
 
     // Ensure kin exists and tick their simulation (aging, allowances, mortality, friend discovery)
     if (!this.character.kin) {
@@ -4052,6 +4089,7 @@ class TerribleGame {
     window.soundEngine.playDread();
     if (window.ensureEntitySystem) window.ensureEntitySystem(this.character);
     this.setPrimaryNav('creatures');
+    this.switchArchiveTab('creatures');
     this.renderCreaturesList();
     this.dom.creaturesModal.classList.remove('hidden');
     this.dom.creaturesModal.style.display = 'flex';
@@ -4066,7 +4104,12 @@ class TerribleGame {
       this.dom.creaturesModal.classList.add('hidden');
       this.dom.creaturesModal.style.display = 'none';
     }
+    if (this.dom.caseDetailModal) {
+      this.dom.caseDetailModal.classList.add('hidden');
+      this.dom.caseDetailModal.style.display = 'none';
+    }
     this.selectedEntityId = null;
+    this.selectedCaseId = null;
     this.setPrimaryNav('life');
   }
 
@@ -4162,6 +4205,14 @@ class TerribleGame {
       alert(result.reason || 'The creature refused to respond.');
       return;
     }
+    if (action === 'investigate' && window.ensureCaseForEntity && window.collectCaseEvidence) {
+      const file = window.ensureCaseForEntity(this.character, result.entity);
+      const finding = window.collectCaseEvidence(this.character, file.id, 'alone');
+      if (finding.success) {
+        result.message += ` ${finding.message}`;
+        Object.entries(finding.effects || {}).forEach(([key, value]) => result.effects[key] = (result.effects[key] || 0) + value);
+      }
+    }
     this.character.actionsLeft -= 1;
     Object.entries(result.effects || {}).forEach(([stat, value]) => {
       if (stat === 'money') this.character.money = Math.max(0, this.character.money + value);
@@ -4173,6 +4224,126 @@ class TerribleGame {
     this.saveGame();
     this.openCreatureDetail(result.entity.id);
     this.openFeedbackModal({ tag: 'ENTITY RESPONSE', title: result.entity.name, icon: result.entity.icon || 'eye', iconColor: 'text-purple-400', body: result.message, effects: result.effects || {} });
+  }
+
+  switchArchiveTab(tab) {
+    const casesActive = tab === 'cases';
+    this.dom.archiveCreaturesPanel?.classList.toggle('hidden', casesActive);
+    this.dom.archiveCasesPanel?.classList.toggle('hidden', !casesActive);
+    [
+      [this.dom.tabArchiveCreatures, !casesActive],
+      [this.dom.tabArchiveCases, casesActive]
+    ].forEach(([button, active]) => {
+      if (!button) return;
+      button.classList.toggle('bg-slatecard', active);
+      button.classList.toggle('border', active);
+      button.classList.toggle('border-leadborder', active);
+      button.classList.toggle('text-parchment', active);
+      button.classList.toggle('text-dust', !active);
+      if (active) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
+    });
+    if (casesActive) this.renderCaseFiles();
+    else this.renderCreaturesList();
+  }
+
+  evidenceCardHtml(evidence) {
+    const meta = (window.EVIDENCE_TYPES && window.EVIDENCE_TYPES[evidence.type]) || { label: evidence.type, icon: 'file-question' };
+    const dangerClass = evidence.danger >= 65 ? 'text-rose-400' : (evidence.danger >= 35 ? 'text-amber-300' : 'text-emerald-300');
+    return `<div class="rounded-xl border border-leadborder bg-inputbg p-3">
+      <div class="flex items-start gap-2.5"><i data-lucide="${meta.icon}" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i><div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><strong class="text-xs text-parchment">${evidence.label}</strong><span class="text-[8px] font-mono uppercase ${evidence.analyzed ? 'text-emerald-300' : 'text-dust'}">${evidence.analyzed ? 'Analyzed' : 'Raw'}</span></div><p class="text-[10px] text-dust mt-1 leading-relaxed">${evidence.description}</p></div></div>
+      <div class="grid grid-cols-4 gap-1 mt-2 pt-2 border-t border-leadborder/60 text-center font-mono"><div><span class="block text-[7px] uppercase text-dust">Authentic</span><b class="text-[9px] text-parchment">${evidence.analyzed ? `${evidence.authenticity}%` : 'Unverified'}</b></div><div><span class="block text-[7px] uppercase text-dust">Tainted</span><b class="text-[9px] text-purple-300">${evidence.contamination}%</b></div><div><span class="block text-[7px] uppercase text-dust">Danger</span><b class="text-[9px] ${dangerClass}">${evidence.danger}%</b></div><div><span class="block text-[7px] uppercase text-dust">Credible</span><b class="text-[9px] text-sky-300">${evidence.credibility}%</b></div></div>
+    </div>`;
+  }
+
+  renderCaseFiles() {
+    if (!window.ensureInvestigationSystem || !this.dom.caseFilesList) return;
+    const system = window.ensureInvestigationSystem(this.character);
+    const entities = window.ensureEntitySystem ? window.ensureEntitySystem(this.character).entities : [];
+    if (window.ensureCaseForEntity) entities.filter(entity => entity.known !== false).forEach(entity => window.ensureCaseForEntity(this.character, entity));
+    this.dom.archiveCaseSummary.textContent = `${system.cases.length} case file${system.cases.length === 1 ? '' : 's'} · ${system.evidence.length} evidence item${system.evidence.length === 1 ? '' : 's'} · Institutional attention ${system.institutionAttention}%`;
+    this.dom.caseFilesList.innerHTML = system.cases.length ? system.cases.map(file => {
+      const evidenceCount = file.evidenceIds.length;
+      const conclusion = file.conclusion ? file.conclusion.label : 'Unresolved';
+      return `<button type="button" class="case-file-card w-full rounded-xl border border-leadborder bg-inputbg hover:bg-cardhover p-3 text-left" data-case-id="${file.id}"><div class="flex justify-between gap-3"><div class="min-w-0"><strong class="block font-serif text-xs text-parchment truncate">${file.title}</strong><span class="block mt-1 text-[9px] font-mono text-dust">Opened age ${file.openedAge} · ${file.incidents.length} incident${file.incidents.length === 1 ? '' : 's'} · ${evidenceCount} evidence</span></div><span class="text-[8px] uppercase tracking-wider font-mono text-purple-300 shrink-0">${file.status}</span></div><p class="text-[10px] text-dust mt-2">Conclusion: ${conclusion} · Analysis ${Math.round(file.analysis)}%</p></button>`;
+    }).join('') : '<div class="rounded-xl border border-dashed border-leadborder p-5 text-center text-xs text-dust">No case files yet. Investigate a creature or survive related incidents across multiple years.</div>';
+    this.dom.caseFilesList.querySelectorAll('.case-file-card').forEach(card => card.addEventListener('click', () => this.openCaseDetail(card.dataset.caseId)));
+    this.dom.evidenceInventory.innerHTML = system.evidence.length ? system.evidence.map(item => this.evidenceCardHtml(item)).join('') : '<p class="text-xs text-dust/70 italic">No evidence has been catalogued.</p>';
+    if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
+  }
+
+  openCaseDetail(caseId) {
+    this.selectedCaseId = caseId;
+    this.renderCaseDetail();
+    this.dom.caseDetailModal.classList.remove('hidden');
+    this.dom.caseDetailModal.style.display = 'flex';
+  }
+
+  closeCaseDetail() {
+    if (!this.dom.caseDetailModal) return;
+    this.dom.caseDetailModal.classList.add('hidden');
+    this.dom.caseDetailModal.style.display = 'none';
+    this.selectedCaseId = null;
+    this.renderCaseFiles();
+  }
+
+  renderCaseDetail() {
+    const system = window.ensureInvestigationSystem ? window.ensureInvestigationSystem(this.character) : null;
+    const file = system?.cases.find(item => item.id === this.selectedCaseId);
+    if (!file) return;
+    const evidence = window.getEvidenceForCase ? window.getEvidenceForCase(this.character, file.id) : [];
+    const people = window.getInvestigationPeople ? window.getInvestigationPeople(this.character) : [];
+    const activeIds = new Set(file.investigators.filter(item => item.active).map(item => item.personId));
+    this.dom.caseDetailTitle.textContent = file.title;
+    this.dom.caseDetailStatus.innerHTML = `<div class="flex justify-between gap-3"><div><p class="text-[9px] font-mono uppercase tracking-wider text-purple-400">${file.status}</p><p class="text-xs text-dust mt-1">Opened at age ${file.openedAge} · Updated age ${file.lastUpdatedAge}</p></div><strong class="text-sm text-parchment">${Math.round(file.analysis)}% analyzed</strong></div>${file.conclusion ? `<p class="mt-3 pt-3 border-t border-purple-800/30 text-xs text-dust">Filed conclusion: <span class="text-parchment">${file.conclusion.label}${file.conclusion.suspectName ? ` · ${file.conclusion.suspectName} implicated` : ''}</span></p>` : ''}`;
+    this.dom.caseEvidenceList.innerHTML = evidence.length ? evidence.map(item => this.evidenceCardHtml(item)).join('') : '<p class="text-xs text-dust/70 italic">The evidence sleeves are empty.</p>';
+    this.dom.caseInvestigators.innerHTML = file.investigators.length ? file.investigators.filter(item => item.active).map(item => `<div class="rounded-lg border border-leadborder bg-inputbg px-2.5 py-2 text-[10px] text-dust"><span class="text-parchment">${item.name}</span> · Contribution ${item.contribution}% · Joined age ${item.joinedAge}</div>`).join('') : '<p class="text-[10px] text-dust/70">You are currently working alone.</p>';
+    const recruitable = people.filter(person => !activeIds.has(person.id || person.name));
+    this.dom.caseRecruitSelect.innerHTML = recruitable.length ? recruitable.map(person => `<option value="${person.id || person.name}">${person.name} · ${person.role || person.category || 'Contact'}</option>`).join('') : '<option value="">No available contacts</option>';
+    this.dom.caseSuspectSelect.innerHTML = people.length ? people.map(person => `<option value="${person.id || person.name}">${person.name}</option>`).join('') : '<option value="">Nobody available</option>';
+    this.dom.caseConclusionSelect.value = file.conclusion?.type || 'genuine_paranormal';
+    this.syncCaseConclusionUI();
+    this.dom.caseIncidents.innerHTML = file.incidents.length ? [...file.incidents].reverse().map(incident => `<div class="rounded-xl border-l-2 border-purple-700 bg-inputbg p-3"><p class="text-[9px] font-mono uppercase text-purple-400">Age ${incident.age} · ${incident.title}</p><p class="text-[10px] text-dust mt-1 leading-relaxed">${incident.detail}</p></div>`).join('') : '<p class="text-xs text-dust/70">No incidents linked.</p>';
+    const noActions = this.character.actionsLeft <= 0;
+    [this.dom.btnInvestigateAlone, this.dom.btnInvestigateTeam, this.dom.btnAnalyzeEvidence, this.dom.btnCaseRecruit, this.dom.btnPublishCase, this.dom.btnSubmitCase].forEach(button => { if (button) button.disabled = noActions; });
+    if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
+  }
+
+  syncCaseConclusionUI() {
+    if (!this.dom.caseConclusionSelect || !this.dom.caseSuspectRow) return;
+    this.dom.caseSuspectRow.classList.toggle('hidden', this.dom.caseConclusionSelect.value !== 'human_deception');
+  }
+
+  applyCaseResult(result, actionCost = 1) {
+    if (!result.success) {
+      alert(result.reason || 'The archive rejected the request.');
+      return false;
+    }
+    if (actionCost) this.character.actionsLeft = Math.max(0, this.character.actionsLeft - actionCost);
+    Object.entries(result.effects || {}).forEach(([stat, value]) => {
+      if (!value) return;
+      if (stat === 'money') this.character.money = Math.max(0, this.character.money + value);
+      else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + value);
+      else if (stat !== 'relationship') this.modifyStat(stat, value);
+    });
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) latestLog.entries.push(`[ARCHIVE — ${result.title}] ${result.message}`);
+    this.saveGame(); this.renderAll(); this.renderCaseDetail();
+    this.openFeedbackModal({ tag: 'MUNICIPAL LIFE ARCHIVE', title: result.title, icon: 'folder-search-2', iconColor: 'text-purple-400', body: result.message, effects: result.effects || {} });
+    return true;
+  }
+
+  handleCaseAction(action) {
+    if (!this.selectedCaseId) return;
+    if (action !== 'conclude' && this.character.actionsLeft <= 0) { alert('You have no energy left to work this case this year.'); return; }
+    let result;
+    if (action === 'investigate_alone') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'alone');
+    else if (action === 'investigate_team') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'team');
+    else if (action === 'analyze') result = window.analyzeCaseEvidence(this.character, this.selectedCaseId);
+    else if (action === 'recruit') result = window.recruitCaseInvestigator(this.character, this.selectedCaseId, this.dom.caseRecruitSelect.value);
+    else if (action === 'conclude') result = window.fileCaseConclusion(this.character, this.selectedCaseId, this.dom.caseConclusionSelect.value, this.dom.caseSuspectSelect.value);
+    else if (action === 'publish') result = window.publishCaseFile(this.character, this.selectedCaseId, 'public');
+    else if (action === 'submit') result = window.publishCaseFile(this.character, this.selectedCaseId, 'institution');
+    if (result) this.applyCaseResult(result, action === 'conclude' ? 0 : 1);
   }
 
   // ==========================================
@@ -4582,7 +4753,8 @@ class TerribleGame {
       this.dom.schoolPersonModal,
       this.dom.profileModal,
       this.dom.creaturesModal,
-      this.dom.creatureDetailModal
+      this.dom.creatureDetailModal,
+      this.dom.caseDetailModal
     ];
 
     modals.forEach(m => {

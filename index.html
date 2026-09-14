@@ -1439,21 +1439,83 @@
     <div id="creatures-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
       <header class="bg-headerbg border-b border-leadborder px-4 py-3 flex items-center justify-between shrink-0">
         <div class="min-w-0">
-          <p class="text-[9px] font-mono tracking-[0.24em] uppercase text-purple-400">Known Presences</p>
-          <h2 class="font-serif font-bold text-lg text-parchment">Creature Registry</h2>
-          <p class="text-[10px] text-dust">They remember what you did. They may follow what you love.</p>
+          <p class="text-[9px] font-mono tracking-[0.24em] uppercase text-purple-400">Restricted Division</p>
+          <h2 class="font-serif font-bold text-lg text-parchment">Municipal Life Archive</h2>
+          <p class="text-[10px] text-dust">Presences, evidence, and unresolved patterns.</p>
         </div>
         <button id="btn-close-creatures" class="w-9 h-9 rounded-xl border border-leadborder bg-inputbg text-dust hover:text-parchment flex items-center justify-center" aria-label="Close creature registry">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </header>
+      <nav class="grid grid-cols-2 gap-1.5 px-4 py-2 border-b border-leadborder bg-headerbg/60" aria-label="Municipal archive sections">
+        <button id="tab-archive-creatures" class="rounded-lg bg-slatecard border border-leadborder py-2 text-xs font-serif font-bold text-parchment">Creatures</button>
+        <button id="tab-archive-cases" class="rounded-lg py-2 text-xs font-serif font-bold text-dust">Case Files</button>
+      </nav>
       <main class="flex-1 overflow-y-auto custom-scroll p-4 safe-bottom">
-        <div id="creatures-empty" class="hidden min-h-[52vh] rounded-2xl border border-dashed border-purple-800/50 bg-purple-950/10 p-6 flex-col items-center justify-center text-center">
-          <i data-lucide="eye-off" class="w-9 h-9 text-purple-400/70 mb-3"></i>
-          <h3 class="font-serif font-bold text-parchment">Nothing has admitted it exists.</h3>
-          <p class="text-xs text-dust mt-2 max-w-xs">Strange encounters may reveal recurring entities. Until then, an empty registry proves very little.</p>
-        </div>
-        <div id="creatures-list" class="space-y-3"></div>
+        <section id="archive-creatures-panel">
+          <div id="creatures-empty" class="hidden min-h-[52vh] rounded-2xl border border-dashed border-purple-800/50 bg-purple-950/10 p-6 flex-col items-center justify-center text-center">
+            <i data-lucide="eye-off" class="w-9 h-9 text-purple-400/70 mb-3"></i>
+            <h3 class="font-serif font-bold text-parchment">Nothing has admitted it exists.</h3>
+            <p class="text-xs text-dust mt-2 max-w-xs">Strange encounters may reveal recurring entities. Until then, an empty registry proves very little.</p>
+          </div>
+          <div id="creatures-list" class="space-y-3"></div>
+        </section>
+        <section id="archive-cases-panel" class="hidden space-y-4">
+          <div class="rounded-2xl border border-purple-800/40 bg-purple-950/15 p-3.5 flex items-center justify-between gap-3">
+            <div><p class="text-[9px] font-mono uppercase tracking-wider text-purple-400">Evidence Control</p><p id="archive-case-summary" class="text-xs text-dust mt-1"></p></div>
+            <i data-lucide="folder-search-2" class="w-6 h-6 text-purple-300 shrink-0"></i>
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-sm text-parchment mb-2">Case Files</h3>
+            <div id="case-files-list" class="space-y-2.5"></div>
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-sm text-parchment mb-2">Evidence Inventory</h3>
+            <div id="evidence-inventory" class="space-y-2"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- CASE FILE DOSSIER -->
+    <div id="case-detail-modal" class="hidden absolute inset-0 bg-slatecard z-50 flex flex-col overflow-hidden">
+      <header class="bg-headerbg border-b border-leadborder px-4 py-3 flex items-center justify-between shrink-0">
+        <button id="btn-close-case-detail" class="w-9 h-9 rounded-xl border border-leadborder bg-inputbg text-dust hover:text-parchment flex items-center justify-center" aria-label="Back to case files"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+        <div class="text-center min-w-0 px-3"><p class="text-[9px] font-mono tracking-[0.2em] uppercase text-purple-400">Municipal Case File</p><h2 id="case-detail-title" class="font-serif font-bold text-lg text-parchment truncate"></h2></div>
+        <span class="w-9 h-9 rounded-xl border border-purple-800/50 bg-purple-950/30 text-purple-300 flex items-center justify-center"><i data-lucide="folder-search-2" class="w-5 h-5"></i></span>
+      </header>
+      <main class="flex-1 overflow-y-auto custom-scroll p-4 space-y-4 safe-bottom">
+        <section id="case-detail-status" class="rounded-2xl border border-purple-800/40 bg-purple-950/15 p-4"></section>
+        <section>
+          <h3 class="font-serif font-bold text-sm text-parchment mb-2">Investigate</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-investigate-alone" class="rounded-xl border border-leadborder bg-inputbg px-3 py-2.5 text-xs text-parchment"><i data-lucide="search" class="inline w-3.5 h-3.5 mr-1"></i>Work Alone</button>
+            <button id="btn-investigate-team" class="rounded-xl border border-leadborder bg-inputbg px-3 py-2.5 text-xs text-parchment"><i data-lucide="users" class="inline w-3.5 h-3.5 mr-1"></i>Work With Team</button>
+            <button id="btn-analyze-evidence" class="col-span-2 rounded-xl border border-purple-700/40 bg-purple-950/25 px-3 py-2.5 text-xs text-purple-200"><i data-lucide="microscope" class="inline w-3.5 h-3.5 mr-1"></i>Analyze Collected Evidence</button>
+          </div>
+        </section>
+        <section>
+          <h3 class="font-serif font-bold text-sm text-parchment mb-2">Recruit an Investigator</h3>
+          <div class="flex gap-2"><select id="case-recruit-select" class="min-w-0 flex-1 rounded-xl border border-leadborder bg-inputbg px-3 py-2 text-xs text-parchment"></select><button id="btn-case-recruit" class="rounded-xl border border-leadborder bg-slatecard px-3 py-2 text-xs text-parchment">Ask</button></div>
+          <div id="case-investigators" class="mt-2 space-y-1.5"></div>
+        </section>
+        <section>
+          <h3 class="font-serif font-bold text-sm text-parchment mb-2">Evidence</h3>
+          <div id="case-evidence-list" class="space-y-2"></div>
+        </section>
+        <section>
+          <h3 class="font-serif font-bold text-sm text-parchment mb-2">File a Conclusion</h3>
+          <select id="case-conclusion-select" class="w-full rounded-xl border border-leadborder bg-inputbg px-3 py-2 text-xs text-parchment mb-2">
+            <option value="genuine_paranormal">Genuine paranormal activity</option><option value="human_deception">Human deception</option><option value="mental_strain">Mental strain</option><option value="coincidence">Coincidence</option>
+          </select>
+          <div id="case-suspect-row" class="hidden mb-2"><label class="text-[9px] font-mono uppercase text-dust">Person implicated</label><select id="case-suspect-select" class="w-full mt-1 rounded-xl border border-leadborder bg-inputbg px-3 py-2 text-xs text-parchment"></select></div>
+          <button id="btn-file-conclusion" class="w-full rounded-xl border border-leadborder bg-slatecard px-3 py-2.5 text-xs font-bold text-parchment">Sign Conclusion</button>
+        </section>
+        <section class="grid grid-cols-2 gap-2">
+          <button id="btn-publish-case" class="rounded-xl border border-amber-700/40 bg-amber-950/20 px-3 py-2.5 text-xs text-amber-200">Publish Publicly</button>
+          <button id="btn-submit-case" class="rounded-xl border border-purple-700/40 bg-purple-950/25 px-3 py-2.5 text-xs text-purple-200">Submit to Institution</button>
+        </section>
+        <section><h3 class="font-serif font-bold text-sm text-parchment mb-2">Incident Timeline</h3><div id="case-incidents" class="space-y-2"></div></section>
       </main>
     </div>
 
@@ -3550,8 +3612,9 @@
   <script src="js/consequences.js?v=28"></script>
   <script src="js/storylines.js?v=29"></script>
   <script src="js/reputation.js?v=30"></script>
-  <script src="js/horror-director.js?v=32"></script>
-  <script src="js/entities.js?v=33"></script>
+  <script src="js/horror-director.js?v=34"></script>
+  <script src="js/entities.js?v=34"></script>
+  <script src="js/investigations.js?v=34"></script>
   <script src="js/life-effects.js?v=31"></script>
   <script src="js/reactions.js?v=27"></script>
   <script src="js/kin.js?v=26"></script>
@@ -3560,6 +3623,6 @@
   <script src="js/crimes.js?v=24"></script>
   <script src="js/events.js?v=24"></script>
   <script src="js/education.js?v=26"></script>
-  <script src="js/game.js?v=33"></script>
+  <script src="js/game.js?v=34"></script>
 </body>
 </html>

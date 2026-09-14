@@ -94,6 +94,7 @@
     remember(entity, character, 'encountered', options.origin || `It first allowed ${character.name} to notice it.`);
     system.entities.push(entity);
     system.hauntings.push({ entityId: entity.id, attachment: { ...entity.attachment }, active: true, startedAge: character.age });
+    if (window.ensureCaseForEntity) window.ensureCaseForEntity(character, entity);
     return entity;
   }
 

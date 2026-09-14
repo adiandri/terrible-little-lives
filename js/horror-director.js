@@ -107,6 +107,7 @@
     if (state.history.length > 30) state.history.length = 30;
     if (state.recentSignatures.length > 18) state.recentSignatures.shift();
     state.tier = calculateTier(character, state);
+    if (text && context.recordCase !== false && window.recordInvestigativeIncident) window.recordInvestigativeIncident(character, { source: context.source || 'event', title: context.title, text }, classification);
     return classification;
   }
 
