@@ -419,6 +419,19 @@ class TerribleGame {
       darkAltarPlayerShillings: document.getElementById('dark-altar-player-shillings'),
       darkAltarPlayerEnergy: document.getElementById('dark-altar-player-energy'),
       darkAltarCrimesList: document.getElementById('dark-altar-crimes-list'),
+      darkAltarMaterials: document.getElementById('dark-altar-materials'),
+      darkAltarLedger: document.getElementById('dark-altar-ledger'),
+      btnAcquireRitualMaterials: document.getElementById('btn-acquire-ritual-materials'),
+      ritualPreparation: document.getElementById('ritual-preparation'),
+      btnCloseRitualPrep: document.getElementById('btn-close-ritual-prep'),
+      ritualPrepName: document.getElementById('ritual-prep-name'),
+      ritualPrepIntent: document.getElementById('ritual-prep-intent'),
+      ritualPrepChance: document.getElementById('ritual-prep-chance'),
+      ritualPrepMaterials: document.getElementById('ritual-prep-materials'),
+      ritualPrepPrice: document.getElementById('ritual-prep-price'),
+      ritualPrepBackfires: document.getElementById('ritual-prep-backfires'),
+      ritualPrepWording: document.getElementById('ritual-prep-wording'),
+      btnSealRitual: document.getElementById('btn-seal-ritual'),
 
       // Ask Money Modal
       kinAskMoneyModal: document.getElementById('kin-ask-money-modal'),
@@ -1088,6 +1101,15 @@ class TerribleGame {
       this.dom.darkAltarTargetSelect.addEventListener('change', () => {
         this.onDarkAltarTargetChanged();
       });
+    }
+    if (this.dom.btnAcquireRitualMaterials) {
+      this.dom.btnAcquireRitualMaterials.addEventListener('click', () => this.acquireDarkAltarMaterials());
+    }
+    if (this.dom.btnCloseRitualPrep) {
+      this.dom.btnCloseRitualPrep.addEventListener('click', () => this.closeRitualPreparation());
+    }
+    if (this.dom.btnSealRitual) {
+      this.dom.btnSealRitual.addEventListener('click', () => this.sealPreparedRitual());
     }
 
     // Ask Money Modal Controls
@@ -1777,6 +1799,10 @@ class TerribleGame {
     if (window.tickAnnualCurses) {
       const curseLogs = window.tickAnnualCurses(this.character) || [];
       curseLogs.forEach(cl => currentYearLog.entries.push(cl));
+    }
+    if (window.tickRitualContracts) {
+      const contractLogs = window.tickRitualContracts(this.character) || [];
+      contractLogs.forEach(entry => currentYearLog.entries.push(entry));
     }
 
     // 5. Urban Atmosphere & Ambient Lore
@@ -6568,6 +6594,31 @@ class TerribleGame {
     if (this.dom.darkAltarPlayerEnergy) {
       this.dom.darkAltarPlayerEnergy.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
     }
+    this.renderRitualCabinet();
+  }
+
+  renderRitualCabinet() {
+    if (!window.ensureRitualSystem) return;
+    const system = window.ensureRitualSystem(this.character);
+    if (this.dom.darkAltarMaterials) {
+      const labels = window.RITUAL_MATERIALS || {};
+      const held = Object.entries(system.materials).filter(([, qty]) => qty > 0).map(([id, qty]) => `${labels[id] || id} ×${qty}`);
+      this.dom.darkAltarMaterials.textContent = held.length ? held.join(' · ') : 'The cabinet is empty.';
+    }
+    if (this.dom.darkAltarLedger) {
+      const unpaid = system.contracts.filter(item => item.hiddenPriceDueAge && !item.hiddenPriceCollected).length;
+      const vessels = system.cursedObjects.length;
+      this.dom.darkAltarLedger.textContent = `${system.contracts.length} contract${system.contracts.length === 1 ? '' : 's'} filed · ${unpaid} uncollected price${unpaid === 1 ? '' : 's'} · ${vessels} contaminated object${vessels === 1 ? '' : 's'}`;
+    }
+  }
+
+  acquireDarkAltarMaterials() {
+    if (!window.acquireRitualMaterials) return;
+    const result = window.acquireRitualMaterials(this.character);
+    this.updateDarkAltarPlayerStats();
+    this.onDarkAltarTargetChanged();
+    if (result.success) this.saveGame();
+    this.openFeedbackModal({ tag: result.success ? 'OCCULT PROCUREMENT' : 'SEARCH BLOCKED', title: result.title || 'No Supplies Found', icon: result.success ? 'package-open' : 'alert-circle', iconColor: result.success ? 'text-purple-400' : 'text-amber-400', body: result.message || result.reason, effects: {} });
   }
 
   populateDarkAltarTargetSelect(preferredTarget = null) {
@@ -6674,6 +6725,7 @@ class TerribleGame {
       const hasTarget = !!selectedTarget;
       const isCleanse = !!crime.isCleanse;
       const targetHasCurse = selectedTarget && selectedTarget.curse;
+      const originKnown = !!targetHasCurse?.origin?.discovered;
 
       // Eligibility checks
       const meetsAge = char.age >= crime.minAge;
@@ -6698,7 +6750,7 @@ class TerribleGame {
       }
 
       // Action button text and state
-      let btnLabel = 'Cast Rite';
+      let btnLabel = 'Prepare Contract';
       if (!meetsAge) {
         btnLabel = `Req. Age ${crime.minAge}`;
       } else if (!meetsOccult) {
@@ -6707,6 +6759,8 @@ class TerribleGame {
         btnLabel = 'Select Target';
       } else if (isCleanse && !targetHasCurse) {
         btnLabel = 'Target Not Cursed';
+      } else if (isCleanse && !originKnown) {
+        btnLabel = 'Trace Origin · 1 Energy';
       } else if (!meetsShillings) {
         btnLabel = `Req. ${crime.costShillings} s.`;
       } else if (!meetsEnergy) {
@@ -6734,6 +6788,7 @@ class TerribleGame {
         </div>
 
         <p class="text-[11px] text-dust leading-relaxed">${crime.desc}</p>
+        ${crime.intent ? `<div class="text-[10px] font-mono text-dust space-y-1"><p><span class="text-purple-700 dark:text-purple-300 font-bold">INTENT:</span> ${crime.intent}</p><p><span class="text-amber-700 dark:text-amber-300 font-bold">VISIBLE PRICE:</span> ${crime.visiblePrice}</p></div>` : ''}
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/50">
           ${chanceText || `<span class="text-[10px] font-mono text-dust/70">Unlocks at ${crime.minOccult}% Occult</span>`}
@@ -6750,7 +6805,11 @@ class TerribleGame {
       if (canCast) {
         const btn = card.querySelector('.btn-execute-rite');
         btn.addEventListener('click', () => {
-          this.executeDarkAltarCrime(crime.id, selectedTarget ? selectedTarget.raw : null);
+          if (crime.isCleanse && selectedTarget?.curse && !selectedTarget.curse.origin?.discovered) {
+            this.traceDarkAltarCurse(selectedTarget.raw);
+          } else {
+            this.openRitualPreparation(crime.id, selectedTarget ? selectedTarget.raw : null);
+          }
         });
       }
 
@@ -6762,10 +6821,55 @@ class TerribleGame {
     }
   }
 
-  executeDarkAltarCrime(crimeId, targetRaw) {
+  traceDarkAltarCurse(targetRaw) {
+    const result = window.traceCurseOrigin ? window.traceCurseOrigin(this.character, targetRaw) : { success: false, reason: 'Origin tracing is unavailable.' };
+    if (result.success) this.saveGame();
+    this.onDarkAltarTargetChanged();
+    this.updateDarkAltarPlayerStats();
+    this.openFeedbackModal({ tag: result.outcome === 'success' ? 'ARCHIVE PROVENANCE' : 'TRACE FAILED', title: result.title || 'Origin Unknown', icon: result.outcome === 'success' ? 'folder-search-2' : 'scan-search', iconColor: result.outcome === 'success' ? 'text-purple-400' : 'text-rose-400', body: result.message || result.reason, effects: {} });
+  }
+
+  openRitualPreparation(crimeId, targetRaw) {
+    const ritual = (window.PARANORMAL_CRIMES_DATA || []).find(item => item.id === crimeId);
+    if (!ritual || !this.dom.ritualPreparation) return;
+    const materials = window.getRitualMaterialStatus ? window.getRitualMaterialStatus(this.character, crimeId) : [];
+    const chance = Math.round(ritual.successChance(this.character, targetRaw) * 100);
+    this.preparedRitual = { crimeId, targetRaw };
+    this.dom.ritualPrepName.textContent = ritual.name;
+    this.dom.ritualPrepIntent.textContent = ritual.intent || ritual.desc;
+    this.dom.ritualPrepChance.textContent = `~${chance}% before witnesses and wording`;
+    this.dom.ritualPrepPrice.textContent = ritual.visiblePrice || `${ritual.costShillings} shillings and ${ritual.energyCost} Energy`;
+    this.dom.ritualPrepMaterials.innerHTML = materials.map(item => `<div class="flex justify-between items-center rounded-lg border ${item.met ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-rose-500/30 bg-rose-500/5'} px-3 py-2 text-[11px]"><span class="text-parchment">${item.label} ×${item.qty}</span><span class="font-mono ${item.met ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-300'}">${item.held}/${item.qty} ${item.met ? 'READY' : 'MISSING'}</span></div>`).join('');
+    this.dom.ritualPrepBackfires.innerHTML = (ritual.backfires || []).map(text => `<li>${text}</li>`).join('');
+    this.dom.ritualPrepWording.value = String(ritual.wording || '').replaceAll('{target}', targetRaw?.name || 'the named target');
+    this.dom.btnSealRitual.disabled = materials.some(item => !item.met);
+    this.dom.btnSealRitual.classList.toggle('opacity-50', this.dom.btnSealRitual.disabled);
+    this.dom.ritualPreparation.classList.remove('hidden');
+    this.dom.ritualPreparation.classList.add('flex');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  closeRitualPreparation() {
+    if (!this.dom.ritualPreparation) return;
+    this.dom.ritualPreparation.classList.add('hidden');
+    this.dom.ritualPreparation.classList.remove('flex');
+    this.preparedRitual = null;
+  }
+
+  sealPreparedRitual() {
+    if (!this.preparedRitual) return;
+    const { crimeId, targetRaw } = this.preparedRitual;
+    const wording = this.dom.ritualPrepWording?.value || '';
+    this.closeRitualPreparation();
+    this.executeDarkAltarCrime(crimeId, targetRaw, wording);
+  }
+
+  executeDarkAltarCrime(crimeId, targetRaw, wording = '') {
     if (!window.executeParanormalCrime) return;
 
-    const result = window.executeParanormalCrime(crimeId, this.character, targetRaw);
+    const result = window.executePreparedRitual
+      ? window.executePreparedRitual(crimeId, this.character, targetRaw, wording)
+      : window.executeParanormalCrime(crimeId, this.character, targetRaw);
     if (!result.success) {
       this.openFeedbackModal({
         tag: "RITE BLOCKED",
@@ -6802,6 +6906,7 @@ class TerribleGame {
     const latestLog = this.logs[this.logs.length - 1];
     if (latestLog) {
       latestLog.entries.push(`[Dark Altar] ${result.title}: ${result.message}`);
+      if (result.contract) latestLog.entries.push(`[Ritual Contract] “${result.contract.wording}” Visible price: ${result.contract.visiblePrice}`);
       altarNotes.forEach(note => latestLog.entries.push(`[Life Effect] ${note}`));
     }
 
