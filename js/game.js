@@ -301,10 +301,30 @@ class TerribleGame {
 
       // Kin Modal
       btnTabKin: document.getElementById('btn-tab-kin'),
+      btnTabCreatures: document.getElementById('btn-tab-creatures'),
       kinModal: document.getElementById('kin-modal'),
       btnCloseKin: document.getElementById('btn-close-kin'),
       kinList: document.getElementById('kin-list'),
       kinFilterBtns: document.querySelectorAll('.kin-filter-btn'),
+
+      // Creature Registry
+      creaturesModal: document.getElementById('creatures-modal'),
+      btnCloseCreatures: document.getElementById('btn-close-creatures'),
+      creaturesEmpty: document.getElementById('creatures-empty'),
+      creaturesList: document.getElementById('creatures-list'),
+      creatureDetailModal: document.getElementById('creature-detail-modal'),
+      btnCloseCreatureDetail: document.getElementById('btn-close-creature-detail'),
+      creatureDetailType: document.getElementById('creature-detail-type'),
+      creatureDetailName: document.getElementById('creature-detail-name'),
+      creatureDetailIcon: document.getElementById('creature-detail-icon'),
+      creatureDetailDescription: document.getElementById('creature-detail-description'),
+      creatureDetailState: document.getElementById('creature-detail-state'),
+      creatureDetailAttachment: document.getElementById('creature-detail-attachment'),
+      creatureDetailBond: document.getElementById('creature-detail-bond'),
+      creatureDetailLoyalty: document.getElementById('creature-detail-loyalty'),
+      creatureDetailHunger: document.getElementById('creature-detail-hunger'),
+      creatureActions: document.getElementById('creature-actions'),
+      creatureMemory: document.getElementById('creature-memory'),
 
       // Kin Detail Modal
       kinDetailModal: document.getElementById('kin-detail-modal'),
@@ -779,6 +799,9 @@ class TerribleGame {
     });
 
     if (this.dom.btnTabProfile) this.dom.btnTabProfile.addEventListener('click', () => this.openProfile());
+    if (this.dom.btnTabCreatures) this.dom.btnTabCreatures.addEventListener('click', () => this.openCreaturesModal());
+    if (this.dom.btnCloseCreatures) this.dom.btnCloseCreatures.addEventListener('click', () => this.closeCreaturesModal());
+    if (this.dom.btnCloseCreatureDetail) this.dom.btnCloseCreatureDetail.addEventListener('click', () => this.closeCreatureDetail());
     if (this.dom.btnCloseProfile) this.dom.btnCloseProfile.addEventListener('click', () => this.closeProfile());
     if (this.dom.btnProfileDone) this.dom.btnProfileDone.addEventListener('click', () => this.closeProfile());
 
@@ -1582,6 +1605,7 @@ class TerribleGame {
       this.character.kin = window.generateFamily(this.character);
     }
     const kinLogs = window.tickKinYear(this.character) || [];
+    if (window.tickEntities) window.tickEntities(this.character).forEach(entry => currentYearLog.entries.push(entry));
     if (window.tickSocialNetwork) {
       window.tickSocialNetwork(this.character).forEach(entry => currentYearLog.entries.push(`[SOCIAL NETWORK] ${entry}`));
     }
@@ -1908,6 +1932,7 @@ class TerribleGame {
     if (window.recordOutcomeConsequences) window.recordOutcomeConsequences(this.character, title, outcome, effects);
     if (window.processLifeOutcome) window.processLifeOutcome(this.character, { domain: dilemma.domain, result: { title, body: outcome, effects } });
     if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'dilemma_choice', title, outcome, effects, engaged: true });
+    if (window.recordEntityEncounter) window.recordEntityEncounter(this.character, { source: 'dilemma_choice', title, outcome, effects, action: choice.text });
     if (window.resolveStoryChoice && dilemma.storyIncidentId) window.resolveStoryChoice(this.character, dilemma, choice);
 
     this.activeDilemma = null;
@@ -2257,6 +2282,10 @@ class TerribleGame {
       let statusBadge = '';
       if (!isAlive) {
         statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-500/30">Deceased</span>`;
+      } else if (person.missing) {
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">Missing</span>`;
+      } else if (person.entityCondition) {
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">${person.entityCondition.type}</span>`;
       } else if (person.isRevealed && person.entityType !== 'human') {
         const entityLabel = person.entityType === 'disguised_mimic' ? 'Disguised Mimic' : (person.entityType === 'blatant_entity' ? 'Abyssal Entity' : 'Anomaly');
         statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40 animate-pulse">👁️ ${entityLabel}</span>`;
@@ -2739,6 +2768,10 @@ class TerribleGame {
   handleKinAction(actionType) {
     if (!this.selectedKin) return;
     const person = this.selectedKin;
+    if (person.missing) {
+      alert(`${person.name} is missing. There is nobody here to answer you.`);
+      return;
+    }
 
     const interactionBlock = window.canInteractWithNpc ? window.canInteractWithNpc(person, this.character, actionType) : null;
     if (interactionBlock) {
@@ -4011,6 +4044,138 @@ class TerribleGame {
   }
 
   // ==========================================
+  // CREATURE REGISTRY & ENTITY RELATIONSHIPS
+  // ==========================================
+
+  openCreaturesModal() {
+    if (!this.character || !this.dom.creaturesModal) return;
+    window.soundEngine.playDread();
+    if (window.ensureEntitySystem) window.ensureEntitySystem(this.character);
+    this.setPrimaryNav('creatures');
+    this.renderCreaturesList();
+    this.dom.creaturesModal.classList.remove('hidden');
+    this.dom.creaturesModal.style.display = 'flex';
+  }
+
+  closeCreaturesModal() {
+    if (this.dom.creatureDetailModal) {
+      this.dom.creatureDetailModal.classList.add('hidden');
+      this.dom.creatureDetailModal.style.display = 'none';
+    }
+    if (this.dom.creaturesModal) {
+      this.dom.creaturesModal.classList.add('hidden');
+      this.dom.creaturesModal.style.display = 'none';
+    }
+    this.selectedEntityId = null;
+    this.setPrimaryNav('life');
+  }
+
+  renderCreaturesList() {
+    if (!this.dom.creaturesList) return;
+    const system = window.ensureEntitySystem ? window.ensureEntitySystem(this.character) : { entities: [] };
+    const entities = system.entities.filter(entity => entity.known !== false);
+    this.dom.creaturesList.innerHTML = '';
+    if (this.dom.creaturesEmpty) {
+      this.dom.creaturesEmpty.classList.toggle('hidden', entities.length > 0);
+      this.dom.creaturesEmpty.classList.toggle('flex', entities.length === 0);
+    }
+    entities.forEach(entity => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'w-full rounded-2xl border border-purple-800/40 bg-purple-950/15 hover:bg-purple-950/30 p-3.5 text-left transition-all active:scale-[0.99]';
+      const danger = ['hunting', 'hungry', 'offended'].includes(entity.state);
+      card.innerHTML = `
+        <div class="flex items-start gap-3">
+          <span class="w-10 h-10 rounded-xl border ${danger ? 'border-crimson/60 text-crimson' : 'border-purple-700/50 text-purple-300'} bg-inputbg flex items-center justify-center shrink-0"><i data-lucide="${entity.icon || 'eye'}" class="w-5 h-5"></i></span>
+          <span class="min-w-0 flex-1">
+            <span class="flex items-center justify-between gap-2"><strong class="font-serif text-sm text-parchment truncate">${entity.name}</strong><span class="text-[9px] uppercase tracking-wider font-mono ${danger ? 'text-rose-400' : 'text-purple-400'}">${entity.state}</span></span>
+            <span class="block text-[10px] font-mono text-dust mt-0.5">${entity.typeName} · Bound to ${entity.attachment?.label || 'an unknown place'}</span>
+            <span class="block text-[10px] text-dust/80 mt-2">Bond ${entity.bond}% · Loyalty ${entity.loyalty}%</span>
+          </span>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-dust shrink-0 mt-3"></i>
+        </div>`;
+      card.addEventListener('click', () => this.openCreatureDetail(entity.id));
+      this.dom.creaturesList.appendChild(card);
+    });
+    if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
+  }
+
+  openCreatureDetail(entityId) {
+    const system = window.ensureEntitySystem ? window.ensureEntitySystem(this.character) : { entities: [] };
+    const entity = system.entities.find(item => item.id === entityId);
+    if (!entity || !this.dom.creatureDetailModal) return;
+    this.selectedEntityId = entity.id;
+    this.dom.creatureDetailType.textContent = `${entity.typeName} · First seen at age ${entity.firstSeenAge}`;
+    this.dom.creatureDetailName.textContent = entity.name;
+    this.dom.creatureDetailIcon.innerHTML = `<i data-lucide="${entity.icon || 'eye'}" class="w-5 h-5"></i>`;
+    this.dom.creatureDetailDescription.textContent = entity.description;
+    this.dom.creatureDetailState.textContent = entity.state;
+    this.dom.creatureDetailAttachment.textContent = `${entity.attachment?.kind || 'unknown'} · ${entity.attachment?.label || 'unknown'}`;
+    this.dom.creatureDetailBond.textContent = `${entity.bond}%`;
+    this.dom.creatureDetailLoyalty.textContent = `${entity.loyalty}%`;
+    this.dom.creatureDetailHunger.textContent = `${entity.hunger}%${entity.demandLevel ? ` · Demands escalated ${entity.demandLevel} time${entity.demandLevel === 1 ? '' : 's'}` : ''}`;
+    this.renderCreatureActions(entity);
+    this.dom.creatureMemory.innerHTML = entity.memories.length ? entity.memories.map(memory => `
+      <div class="rounded-xl border border-leadborder bg-inputbg p-3">
+        <p class="text-[9px] font-mono uppercase tracking-wider text-purple-400">Age ${memory.age} · ${String(memory.action).replace(/_/g, ' ')}</p>
+        <p class="text-xs text-dust mt-1 leading-relaxed">${memory.detail}</p>
+      </div>`).join('') : '<p class="text-xs text-dust">It has revealed no readable history.</p>';
+    this.dom.creatureDetailModal.classList.remove('hidden');
+    this.dom.creatureDetailModal.style.display = 'flex';
+    if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
+  }
+
+  closeCreatureDetail() {
+    if (!this.dom.creatureDetailModal) return;
+    this.dom.creatureDetailModal.classList.add('hidden');
+    this.dom.creatureDetailModal.style.display = 'none';
+    this.selectedEntityId = null;
+    this.renderCreaturesList();
+  }
+
+  renderCreatureActions(entity) {
+    if (!this.dom.creatureActions) return;
+    const actions = [
+      ['befriend', 'Befriend', 'heart-handshake'], ['help', 'Help It', 'hand-heart'], ['appease', 'Appease (2 s.)', 'coins'],
+      ['investigate', 'Investigate', 'search'], ['report', 'Report / Expose', 'megaphone'],
+      ['worship', 'Worship', 'flame'], ['resist', 'Resist', 'shield'], ['harm', 'Harm It', 'swords'], ['escape', 'Try to Escape', 'door-open']
+    ];
+    if (entity.pendingDemand) actions.unshift(['fulfill_demand', 'Obey Its Demand', 'badge-check']);
+    if (entity.attachment?.kind === 'object' && entity.attachment.intact !== false) actions.push(['destroy_object', 'Destroy Object', 'hammer']);
+    this.dom.creatureActions.innerHTML = '';
+    actions.forEach(([id, label, icon]) => {
+      const used = (entity.actionsDone?.[id] || 0) >= 1;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.disabled = used || this.character.actionsLeft <= 0;
+      button.className = 'rounded-xl border border-leadborder bg-inputbg hover:border-purple-600/60 px-3 py-2.5 text-xs text-parchment disabled:opacity-40 flex items-center justify-center gap-2 transition-all';
+      button.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i><span>${used ? 'Done this year' : label}</span>`;
+      button.addEventListener('click', () => this.handleCreatureAction(id));
+      this.dom.creatureActions.appendChild(button);
+    });
+  }
+
+  handleCreatureAction(action) {
+    if (!this.selectedEntityId || this.character.actionsLeft <= 0 || !window.interactWithEntity) return;
+    const result = window.interactWithEntity(this.character, this.selectedEntityId, action);
+    if (!result.success) {
+      alert(result.reason || 'The creature refused to respond.');
+      return;
+    }
+    this.character.actionsLeft -= 1;
+    Object.entries(result.effects || {}).forEach(([stat, value]) => {
+      if (stat === 'money') this.character.money = Math.max(0, this.character.money + value);
+      else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + value);
+      else this.modifyStat(stat, value);
+    });
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) latestLog.entries.push(`[CREATURE — ${result.entity.name}] ${result.message}`);
+    this.saveGame();
+    this.openCreatureDetail(result.entity.id);
+    this.openFeedbackModal({ tag: 'ENTITY RESPONSE', title: result.entity.name, icon: result.entity.icon || 'eye', iconColor: 'text-purple-400', body: result.message, effects: result.effects || {} });
+  }
+
+  // ==========================================
   // ACTIVITIES & PURSUITS SYSTEM ("CITY OF BUTTONS")
   // ==========================================
 
@@ -4329,6 +4494,7 @@ class TerribleGame {
     const lifeEffectNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { activity, result }) : [];
     if (latestLog) lifeEffectNotes.forEach(note => latestLog.entries.push(`[Life Effect] ${note}`));
     if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: `activity_${activity?.category || 'general'}`, title: result.title, outcome: result.message, effects: result.effects, engaged: true, investigated: /research|study|record|investigat|explore/i.test(`${activityId} ${result.title} ${result.message}`) });
+    if (window.recordEntityEncounter) window.recordEntityEncounter(this.character, { source: 'activity', title: result.title, outcome: result.message, effects: result.effects });
 
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
@@ -4414,7 +4580,9 @@ class TerribleGame {
       this.dom.educationModal,
       this.dom.schoolChoiceModal,
       this.dom.schoolPersonModal,
-      this.dom.profileModal
+      this.dom.profileModal,
+      this.dom.creaturesModal,
+      this.dom.creatureDetailModal
     ];
 
     modals.forEach(m => {
@@ -4429,6 +4597,7 @@ class TerribleGame {
     const buttons = {
       life: this.dom.btnTabLife,
       people: this.dom.btnTabKin,
+      creatures: this.dom.btnTabCreatures,
       activities: this.dom.btnTabActivities,
       profile: this.dom.btnTabProfile
     };
@@ -6095,6 +6264,10 @@ class TerribleGame {
   }
 
   handleSchoolPersonAction(person, actionType) {
+    if (person.missing) {
+      this.openFeedbackModal({ tag: 'MISSING', title: 'Nobody Answers', icon: 'user-x', iconColor: 'text-purple-400', body: `${person.name} has vanished and cannot be contacted.`, effects: {} });
+      return;
+    }
     if (window.getActiveConsequences && window.getActiveConsequences(this.character, 'suspension').length) {
       this.openFeedbackModal({ tag: 'SUSPENDED', title: 'School Access Revoked', icon: 'school', iconColor: 'text-amber-400', body: 'Your suspension prevents contact with classmates and school personnel until it expires.', effects: {} });
       return;
@@ -6451,6 +6624,7 @@ class TerribleGame {
     }
     const altarNotes = window.processLifeOutcome ? window.processLifeOutcome(this.character, { domain: result.outcome === 'caught' ? 'crime' : 'supernatural', result: { title: result.title, body: result.message, effects: result.effects || (result.outcome === 'backfire' ? { sanity: -6 } : {}) } }) : [];
     if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'dark_rite', title: result.title, outcome: result.message, effects: result.effects, genuine: true, engaged: true });
+    if (window.recordEntityEncounter) window.recordEntityEncounter(this.character, { source: 'dark_rite', title: result.title, outcome: result.message, effects: result.effects });
 
     // Chronicle logging
     const latestLog = this.logs[this.logs.length - 1];

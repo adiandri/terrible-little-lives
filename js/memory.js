@@ -173,8 +173,12 @@
       const when = memory.age !== null ? `Age ${memory.age}` : (memory.year !== null ? `${memory.year}` : 'Earlier');
       return `<li class="flex gap-2 text-[10px] leading-snug"><span class="${marker}">●</span><span class="text-dust"><span class="text-parchment">${memory.summary}</span> · ${when}${memory.softened ? ' · acknowledged' : ''}</span></li>`;
     }).join('') : '<li class="text-[10px] text-dust/70 italic">No important history recorded yet.</li>';
+    const entityCondition = person.entityCondition
+      ? `<div class="rounded-lg border border-purple-500/30 bg-purple-950/25 p-2 text-[10px] text-purple-200"><span class="font-mono uppercase tracking-wider">Unnatural change:</span> ${person.entityCondition.type} since age ${person.entityCondition.sinceAge}</div>`
+      : '';
     return `
       <div class="rounded-lg border ${stateStyles[state]} p-2.5 space-y-2">
+        ${entityCondition}
         <div class="flex items-center justify-between gap-2">
           <span class="text-[9px] font-mono uppercase tracking-wider text-dust">Relationship state</span>
           <span class="text-[10px] font-mono font-bold uppercase">${state}</span>
