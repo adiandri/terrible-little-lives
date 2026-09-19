@@ -3626,6 +3626,40 @@
       </div>
     </div>
 
+    <!-- HOME DOSSIER -->
+    <div id="homes-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
+      <header class="bg-headerbg border-b border-leadborder px-4 py-3 flex items-center justify-between shrink-0 safe-top">
+        <div class="min-w-0">
+          <p class="text-[9px] font-mono tracking-[0.24em] uppercase text-emerald-400">Domestic Record</p>
+          <h2 class="font-serif font-bold text-lg text-parchment">Home & Haunted Places</h2>
+          <p class="text-[10px] text-dust">Addresses remember what their occupants try to forget.</p>
+        </div>
+        <button id="btn-close-homes" class="w-9 h-9 rounded-xl border border-leadborder bg-inputbg text-dust hover:text-parchment flex items-center justify-center" aria-label="Close home dossier">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </header>
+      <main class="flex-1 overflow-y-auto custom-scroll p-4 safe-bottom space-y-4">
+        <section id="homes-summary" class="rounded-2xl border border-emerald-800/40 bg-emerald-950/10 p-4"></section>
+        <section>
+          <div class="flex items-center justify-between mb-2"><h3 class="font-serif font-bold text-sm text-parchment">Floor Plan</h3><span class="text-[9px] font-mono uppercase text-dust">Inspect or ward</span></div>
+          <div id="homes-rooms" class="space-y-2"></div>
+        </section>
+        <section class="grid grid-cols-1 gap-2">
+          <button id="btn-home-repair" class="min-h-[48px] rounded-xl border border-leadborder bg-inputbg hover:bg-cardhover px-3 flex items-center justify-between text-left">
+            <span><strong class="block text-xs font-serif text-parchment">Repair Residence</strong><span class="block text-[10px] text-dust mt-0.5">Restore condition; cost scales with damage.</span></span><i data-lucide="hammer" class="w-4 h-4 text-amber-400"></i>
+          </button>
+        </section>
+        <section>
+          <div class="flex items-center justify-between mb-2"><h3 class="font-serif font-bold text-sm text-parchment">Move</h3><span class="text-[9px] font-mono uppercase text-dust">Age 18+</span></div>
+          <div id="homes-market" class="space-y-2"></div>
+        </section>
+        <section>
+          <h3 class="font-serif font-bold text-sm text-parchment mb-2">Address History</h3>
+          <div id="homes-history" class="space-y-2"></div>
+        </section>
+      </main>
+    </div>
+
     <!-- Post-Mortem / Coroner Inquest Modal (Death Screen) -->
     <div id="death-modal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 p-6 flex flex-col justify-between items-center text-center">
       <div class="my-auto max-w-xs space-y-4">
@@ -3685,8 +3719,9 @@
   <script src="js/ritual-contracts.js?v=36"></script>
   <script src="js/terriblenet.js?v=37"></script>
   <script src="js/fame.js?v=38"></script>
+  <script src="js/homes.js?v=39"></script>
   <script src="js/events.js?v=24"></script>
   <script src="js/education.js?v=26"></script>
-  <script src="js/game.js?v=38"></script>
+  <script src="js/game.js?v=39"></script>
 </body>
 </html>
