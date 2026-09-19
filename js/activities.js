@@ -17,7 +17,8 @@ const ACTIVITY_CATEGORIES_DATA = {
     desc: "Home, money, routines, and ordinary survival.",
     icon: "house",
     iconColor: "text-emerald-400",
-    categories: ["money", "home"]
+    categories: ["money", "home"],
+    shortcuts: ["homes"]
   },
   leisure: {
     id: "leisure",
@@ -97,7 +98,8 @@ const ACTIVITY_CATEGORIES_DATA = {
     name: "Home & Quarters",
     desc: "Domestic routines, chores, deep rest, and forbidden basement exploration.",
     icon: "home",
-    iconColor: "text-emerald-400"
+    iconColor: "text-emerald-400",
+    shortcut: "homes"
   },
   relationships: {
     id: "relationships",
