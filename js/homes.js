@@ -165,14 +165,24 @@
     return { success: true, title: 'Threshold Sealed', message: `You marked ${room.name} with salt, iron, and a paid name. Whatever occupies it has been suppressed—not removed.`, effects: { shillings: -6, warding: 14 } };
   }
 
+  function moveEligibility(character, type) {
+    const template = PROPERTY_TYPES[type];
+    if (!template || type === 'family_flat') return { allowed: false, reason: 'That residence is unavailable.', upfront: 0, balance: Number(character.money) || 0 };
+    const upfront = template.tenure === 'owned' ? template.value : Math.round(template.annualCost / 3);
+    const balance = Number(character.money);
+    if (!Number.isFinite(balance)) return { allowed: false, reason: 'Your recorded balance is invalid. Save and resume the life to repair it.', upfront, balance: 0 };
+    if (character.age < 18) return { allowed: false, reason: `Independent housing unlocks at age 18. You are currently age ${character.age}.`, upfront, balance };
+    if (balance < upfront) return { allowed: false, reason: `Moving requires ${money(upfront, character)} upfront; your balance is ${money(balance, character)}.`, upfront, balance };
+    return { allowed: true, reason: '', upfront, balance };
+  }
+
   function moveHome(character, type) {
     const system = ensureHousing(character);
     const template = PROPERTY_TYPES[type];
-    if (!template || type === 'family_flat') return { success: false, reason: 'That residence is unavailable.' };
-    if (character.age < 18) return { success: false, reason: 'You cannot establish an independent household before age 18.' };
-    const upfront = template.tenure === 'owned' ? template.value : Math.round(template.annualCost / 3);
-    if ((character.money || 0) < upfront) return { success: false, reason: `Moving requires ${money(upfront, character)} upfront.` };
-    character.money -= upfront;
+    const eligibility = moveEligibility(character, type);
+    if (!eligibility.allowed) return { success: false, reason: eligibility.reason };
+    const upfront = eligibility.upfront;
+    character.money = eligibility.balance - upfront;
     const old = system.current;
     old.leftAge = character.age;
     old.active = false;
@@ -237,6 +247,7 @@
   window.inspectHomeRoom = inspectRoom;
   window.repairCurrentHome = repairHome;
   window.wardHomeRoom = wardRoom;
+  window.getHomeMoveEligibility = moveEligibility;
   window.moveHome = moveHome;
   window.tickHousing = tickHousing;
   window.getHomeHauntingScore = hauntingScore;
