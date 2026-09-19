@@ -4824,10 +4824,11 @@ class TerribleGame {
 
     const types = window.HOME_PROPERTY_TYPES || {};
     if (this.dom.homesMarket) this.dom.homesMarket.innerHTML = Object.entries(types).filter(([key]) => key !== 'family_flat' && key !== home.type).map(([key, item]) => {
-      const upfront = item.tenure === 'owned' ? item.value : Math.round(item.annualCost / 3);
+      const eligibility = window.getHomeMoveEligibility ? window.getHomeMoveEligibility(this.character, key) : { allowed: true, upfront: item.tenure === 'owned' ? item.value : Math.round(item.annualCost / 3), reason: '' };
+      const upfront = eligibility.upfront;
       const price = window.formatMoney ? window.formatMoney(upfront, this.character.countryCode) : `$${upfront}`;
-      const locked = this.character.age < 18 || this.character.money < upfront;
-      return `<button data-home-type="${key}" ${locked ? 'disabled' : ''} class="w-full min-h-[52px] rounded-xl border border-leadborder bg-inputbg px-3 flex items-center justify-between text-left ${locked ? 'opacity-50' : 'hover:bg-cardhover'}"><span><strong class="block text-xs font-serif text-parchment">${item.label}</strong><span class="block text-[10px] text-dust mt-0.5 capitalize">${item.tenure} · ${price} upfront · ${item.rooms.length} rooms</span></span><i data-lucide="key-round" class="w-4 h-4 text-amber-400"></i></button>`;
+      const availability = eligibility.allowed ? `${item.tenure} · ${price} upfront · ${item.rooms.length} rooms` : eligibility.reason;
+      return `<button data-home-type="${key}" aria-disabled="${eligibility.allowed ? 'false' : 'true'}" class="w-full min-h-[52px] rounded-xl border border-leadborder bg-inputbg px-3 flex items-center justify-between text-left ${eligibility.allowed ? 'hover:bg-cardhover' : 'opacity-65 hover:border-amber-500/50'}"><span><strong class="block text-xs font-serif text-parchment">${item.label}</strong><span class="block text-[10px] ${eligibility.allowed ? 'text-dust capitalize' : 'text-amber-400'} mt-0.5">${availability}</span></span><i data-lucide="${eligibility.allowed ? 'key-round' : 'info'}" class="w-4 h-4 ${eligibility.allowed ? 'text-amber-400' : 'text-dust'}"></i></button>`;
     }).join('');
 
     if (this.dom.homesHistory) {
