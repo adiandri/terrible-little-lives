@@ -440,6 +440,15 @@ class TerribleGame {
       terribleNetTabs: document.getElementById('terriblenet-tabs'),
       terribleNetContent: document.getElementById('terriblenet-content'),
 
+      // Homes & Haunted Places
+      homesModal: document.getElementById('homes-modal'),
+      btnCloseHomes: document.getElementById('btn-close-homes'),
+      homesSummary: document.getElementById('homes-summary'),
+      homesRooms: document.getElementById('homes-rooms'),
+      homesMarket: document.getElementById('homes-market'),
+      homesHistory: document.getElementById('homes-history'),
+      btnHomeRepair: document.getElementById('btn-home-repair'),
+
       // Ask Money Modal
       kinAskMoneyModal: document.getElementById('kin-ask-money-modal'),
       btnCloseAskMoney: document.getElementById('btn-close-ask-money'),
@@ -1133,6 +1142,16 @@ class TerribleGame {
         if (event.target.id === 'net-compose-platform') this.syncTerribleNetComposer();
       });
     }
+    if (this.dom.btnCloseHomes) this.dom.btnCloseHomes.addEventListener('click', () => this.closeHomesModal());
+    if (this.dom.btnHomeRepair) this.dom.btnHomeRepair.addEventListener('click', () => this.handleHomeAction('repair'));
+    if (this.dom.homesRooms) this.dom.homesRooms.addEventListener('click', event => {
+      const button = event.target.closest('[data-home-action]');
+      if (button) this.handleHomeAction(button.dataset.homeAction, button.dataset.roomId);
+    });
+    if (this.dom.homesMarket) this.dom.homesMarket.addEventListener('click', event => {
+      const button = event.target.closest('[data-home-type]');
+      if (button) this.handleHomeAction('move', button.dataset.homeType);
+    });
 
     // Ask Money Modal Controls
     if (this.dom.btnCloseAskMoney) {
@@ -1576,6 +1595,7 @@ class TerribleGame {
           if (!this.character.activityUses) {
             this.character.activityUses = {};
           }
+          if (window.ensureHousing) window.ensureHousing(this.character);
           if (this.character.age <= 17 && (!this.character.education || !this.character.education.enrolled) && window.enrollInSchool) {
             window.enrollInSchool(this.character);
           }
@@ -1601,6 +1621,7 @@ class TerribleGame {
     this.character.actionsLeft = 40;
     this.character.maxActions = 40;
     this.character.activityUses = {};
+    if (window.ensureHousing) window.ensureHousing(this.character);
     this.usedDilemmaIds.clear();
 
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
@@ -1695,6 +1716,9 @@ class TerribleGame {
     }
     if (window.tickFame) {
       window.tickFame(this.character).forEach(entry => currentYearLog.entries.push(`[PUBLIC IDENTITY] ${entry}`));
+    }
+    if (window.tickHousing) {
+      window.tickHousing(this.character).forEach(entry => currentYearLog.entries.push(`[HOME] ${entry}`));
     }
 
     // ==========================================
@@ -4497,6 +4521,11 @@ class TerribleGame {
       this.openDarkAltarModal();
       return;
     }
+    if (catData.shortcut === 'homes') {
+      this.closeActivitiesModal();
+      this.openHomesModal();
+      return;
+    }
 
     this.activeActivityCategory = categoryKey;
 
@@ -4526,7 +4555,8 @@ class TerribleGame {
       education: ['graduation-cap', 'Education'],
       careers: ['briefcase', 'Careers'],
       dark_altar: ['flame', 'Dark Altar'],
-      terriblenet: ['radio-tower', 'TerribleNet']
+      terriblenet: ['radio-tower', 'TerribleNet'],
+      homes: ['house', 'Home Dossier']
     };
     if (!shortcuts.length) {
       this.dom.activityShortcuts.classList.add('hidden');
@@ -4546,6 +4576,7 @@ class TerribleGame {
         else if (shortcut === 'careers') this.openCareersModal();
         else if (shortcut === 'dark_altar') this.openDarkAltarModal();
         else if (shortcut === 'terriblenet') this.openTerribleNetModal();
+        else if (shortcut === 'homes') this.openHomesModal();
       });
     });
   }
@@ -4738,6 +4769,94 @@ class TerribleGame {
     });
   }
 
+  // ==========================================
+  // HOMES & HAUNTED PLACES
+  // ==========================================
+
+  openHomesModal() {
+    if (!this.character || !this.dom.homesModal || !window.ensureHousing) return;
+    window.soundEngine.playClick();
+    window.ensureHousing(this.character);
+    this.renderHomesModal();
+    this.dom.homesModal.classList.remove('hidden');
+    this.dom.homesModal.style.display = 'flex';
+  }
+
+  closeHomesModal() {
+    if (!this.dom.homesModal) return;
+    this.dom.homesModal.classList.add('hidden');
+    this.dom.homesModal.style.display = 'none';
+    this.setPrimaryNav('life');
+  }
+
+  renderHomesModal() {
+    if (!this.character || !window.ensureHousing) return;
+    const system = window.ensureHousing(this.character);
+    const home = system.current;
+    const activeHauntings = home.hauntings.filter(item => item.active);
+    const knownHauntings = activeHauntings.filter(item => item.known);
+    const cost = window.formatMoney ? window.formatMoney(home.annualCost || 0, this.character.countryCode) : `$${home.annualCost || 0}`;
+    const conditionTone = home.condition < 30 ? 'text-rose-400' : home.condition < 60 ? 'text-amber-400' : 'text-emerald-400';
+
+    if (this.dom.homesSummary) this.dom.homesSummary.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div><p class="text-[9px] font-mono uppercase tracking-wider text-emerald-400">Current Address · ${home.city}</p><h3 class="font-serif font-bold text-base text-parchment mt-1">${home.label}</h3><p class="text-xs text-dust mt-1 capitalize">${home.tenure} · Annual cost ${cost}</p></div>
+        <i data-lucide="house" class="w-7 h-7 text-emerald-400 shrink-0"></i>
+      </div>
+      <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+        <div class="rounded-xl bg-inputbg border border-leadborder p-2"><span class="block text-[9px] text-dust uppercase font-mono">Condition</span><strong class="text-sm ${conditionTone}">${home.condition}%</strong></div>
+        <div class="rounded-xl bg-inputbg border border-leadborder p-2"><span class="block text-[9px] text-dust uppercase font-mono">Warding</span><strong class="text-sm text-purple-400">${home.warding}%</strong></div>
+        <div class="rounded-xl bg-inputbg border border-leadborder p-2"><span class="block text-[9px] text-dust uppercase font-mono">Known</span><strong class="text-sm text-rose-400">${knownHauntings.length}/${activeHauntings.length}</strong></div>
+      </div>`;
+
+    if (this.dom.homesRooms) this.dom.homesRooms.innerHTML = home.rooms.map(room => {
+      const haunting = activeHauntings.find(item => item.roomId === room.id);
+      const known = haunting?.known;
+      const status = known ? `Manifestation · Severity ${haunting.severity}/5` : room.investigated ? 'Inspected · No disclosed presence' : 'Uninspected';
+      return `<article class="rounded-xl border ${known ? 'border-purple-700/50 bg-purple-950/15' : 'border-leadborder bg-inputbg'} p-3">
+        <div class="flex items-start justify-between gap-2"><div><strong class="text-xs font-serif text-parchment">${room.name}</strong><p class="text-[10px] ${known ? 'text-purple-300' : 'text-dust'} mt-1">${status}</p>${known ? `<p class="text-[10px] text-dust leading-relaxed mt-1">${haunting.manifestation}</p>` : ''}</div><i data-lucide="${known ? 'ghost' : room.sealed ? 'shield-check' : 'door-closed'}" class="w-4 h-4 ${known ? 'text-purple-400' : room.sealed ? 'text-emerald-400' : 'text-dust'} shrink-0"></i></div>
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <button data-home-action="inspect" data-room-id="${room.id}" class="min-h-[38px] rounded-lg border border-leadborder bg-slatecard hover:bg-cardhover text-[10px] font-bold text-parchment">Inspect · 1 Energy</button>
+          <button data-home-action="ward" data-room-id="${room.id}" class="min-h-[38px] rounded-lg border border-purple-700/40 bg-purple-950/20 hover:bg-purple-900/30 text-[10px] font-bold text-purple-300">Ward · 6 s.</button>
+        </div>
+      </article>`;
+    }).join('');
+
+    const types = window.HOME_PROPERTY_TYPES || {};
+    if (this.dom.homesMarket) this.dom.homesMarket.innerHTML = Object.entries(types).filter(([key]) => key !== 'family_flat' && key !== home.type).map(([key, item]) => {
+      const upfront = item.tenure === 'owned' ? item.value : Math.round(item.annualCost / 3);
+      const price = window.formatMoney ? window.formatMoney(upfront, this.character.countryCode) : `$${upfront}`;
+      const locked = this.character.age < 18 || this.character.money < upfront;
+      return `<button data-home-type="${key}" ${locked ? 'disabled' : ''} class="w-full min-h-[52px] rounded-xl border border-leadborder bg-inputbg px-3 flex items-center justify-between text-left ${locked ? 'opacity-50' : 'hover:bg-cardhover'}"><span><strong class="block text-xs font-serif text-parchment">${item.label}</strong><span class="block text-[10px] text-dust mt-0.5 capitalize">${item.tenure} · ${price} upfront · ${item.rooms.length} rooms</span></span><i data-lucide="key-round" class="w-4 h-4 text-amber-400"></i></button>`;
+    }).join('');
+
+    if (this.dom.homesHistory) {
+      const history = system.formerResidences || [];
+      this.dom.homesHistory.innerHTML = history.length ? history.map(item => `<div class="rounded-xl border border-leadborder bg-inputbg p-3"><strong class="text-xs text-parchment">${item.label}</strong><p class="text-[10px] text-dust mt-1">Ages ${item.acquiredAge}–${item.leftAge ?? '?'} · ${item.hauntings?.length || 0} recorded manifestation(s)</p></div>`).join('') : '<p class="text-xs text-dust rounded-xl border border-dashed border-leadborder p-4 text-center">No former address has released you yet.</p>';
+    }
+    if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
+  }
+
+  handleHomeAction(action, target) {
+    let result = null;
+    if (action === 'inspect') result = window.inspectHomeRoom?.(this.character, target);
+    else if (action === 'ward') result = window.wardHomeRoom?.(this.character, target);
+    else if (action === 'repair') result = window.repairCurrentHome?.(this.character);
+    else if (action === 'move') result = window.moveHome?.(this.character, target);
+    if (!result?.success) {
+      this.openFeedbackModal({ tag: 'HOME DOSSIER', title: 'Action Unavailable', icon: 'lock', iconColor: 'text-crimson', body: result?.reason || 'The house refused the request.', effects: {} });
+      return;
+    }
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) latestLog.entries.push(`[HOME] ${result.title}: ${result.message}`);
+    if (/Room Answered|Irregularity|Threshold/.test(result.title)) window.soundEngine.playDread();
+    else window.soundEngine.playTick();
+    this.saveGame();
+    this.renderAll();
+    this.renderHomesModal();
+    this.openFeedbackModal({ tag: 'HOME DOSSIER', title: result.title, icon: action === 'move' ? 'key-round' : action === 'repair' ? 'hammer' : action === 'ward' ? 'shield' : 'search', iconColor: action === 'ward' ? 'text-purple-400' : 'text-emerald-400', body: result.message, effects: result.effects || {} });
+  }
+
   modifyStat(stat, delta) {
     if (this.character.stats[stat] !== undefined) {
       // Never decrease scores by 7% or more; max decrease is capped at 2-3 points (especially for sanity and mortality stats)
@@ -4805,6 +4924,7 @@ class TerribleGame {
       this.dom.kinFeedbackModal,
       this.dom.activitiesModal,
       this.dom.terribleNetModal,
+      this.dom.homesModal,
       this.dom.revelationModal,
       this.dom.educationModal,
       this.dom.schoolChoiceModal,
