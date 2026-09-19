@@ -34,7 +34,7 @@
     if (!Array.isArray(system.hauntings)) system.hauntings = [];
     if (!Number.isFinite(system.sequence)) system.sequence = 1;
     if (!Number.isFinite(system.lastDiscoveryAge)) system.lastDiscoveryAge = -10;
-    if (!system.residenceMarker) system.residenceMarker = character.kin?.residence?.name || 'Family Home';
+    if (!system.residenceMarker) system.residenceMarker = character.housing?.current?.id || character.kin?.residence?.name || 'Family Home';
     system.entities.forEach(entity => {
       entity.bond = clamp(entity.bond);
       entity.loyalty = clamp(entity.loyalty);
@@ -53,7 +53,9 @@
 
   function attachmentFor(character, type) {
     const people = allPeople(character);
-    const residence = character.kin?.residence?.name || 'Family Home';
+    const currentHome = character.housing?.current;
+    const residence = currentHome?.id || character.kin?.residence?.name || 'Family Home';
+    const residenceLabel = currentHome?.label || character.kin?.residence?.name || 'Family Home';
     let kinds = character.age < 5 ? ['player', 'home', 'bloodline'] : ['player', 'npc', 'home', 'object', 'bloodline'];
     if (!people.length) kinds = kinds.filter(kind => kind !== 'npc');
     if (type.id === 'object_spirit') kinds = ['object'];
@@ -64,7 +66,7 @@
       const person = pick(people);
       return { kind, targetId: person.id || person.name, label: person.name };
     }
-    if (kind === 'home') return { kind, targetId: residence, label: residence };
+    if (kind === 'home') return { kind, targetId: residence, label: residenceLabel };
     if (kind === 'object') {
       const object = pick(OBJECTS);
       return { kind, targetId: `object_${Date.now()}_${Math.floor(Math.random() * 9999)}`, label: object, intact: true };
@@ -145,12 +147,13 @@
   }
 
   function reconcileResidence(character, system) {
-    const current = character.kin?.residence?.name || 'Family Home';
+    const current = character.housing?.current?.id || character.kin?.residence?.name || 'Family Home';
+    const currentLabel = character.housing?.current?.label || character.kin?.residence?.name || 'Family Home';
     if (system.residenceMarker === current) return;
     system.entities.filter(entity => entity.attachment?.kind === 'home' && entity.attachment.targetId === system.residenceMarker).forEach(entity => {
       if (entity.bond >= 45 || entity.state === 'hunting' || Math.random() < 0.5) {
         entity.attachment = { kind: 'player', targetId: 'player', label: character.name };
-        remember(entity, character, 'followed', `It left ${system.residenceMarker} and followed the family to ${current}.`);
+        remember(entity, character, 'followed', `It left its former address and followed the family to ${currentLabel}.`);
       } else {
         remember(entity, character, 'left_behind', `It remained inside ${system.residenceMarker}; moving did not destroy it.`);
       }

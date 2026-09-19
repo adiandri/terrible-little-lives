@@ -72,3 +72,4 @@ The game will now launch fullscreen without browser bars, displaying its custom 
 * **`js/names.js`**: Gothic names, ominous birthplaces, and eerie birth origins.
 * **`js/audio.js`**: Procedural synthesizer using the Web Audio API (heartbeats, clock ticks, low-dread bass drones, discord whispers, death chimes).
 * **`js/game.js`**: State machine, age progression loop, mortality checks, and `localStorage` auto-save.
+* **`js/homes.js`**: Persistent residences, property costs and condition, room inspections, wards, address history, and room-level hauntings.
