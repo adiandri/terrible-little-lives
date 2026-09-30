@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Terrible Little Lives avatar V2 prototype</title>
+  <desc id="desc">A polished gothic illustrated portrait built from separable avatar layers.</desc>
+  <defs>
+    <radialGradient id="backdrop" cx="50%" cy="36%" r="72%">
+      <stop offset="0" stop-color="#34303a"/>
+      <stop offset=".5" stop-color="#171820"/>
+      <stop offset="1" stop-color="#08090d"/>
+    </radialGradient>
+    <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1">
+      <stop data-color="coat-light" stop-color="#272b36"/>
+      <stop data-color="coat-mid" offset=".55" stop-color="#11131a"/>
+      <stop data-color="coat-dark" offset="1" stop-color="#07080c"/>
+    </linearGradient>
+    <linearGradient id="skin" x1=".25" y1=".1" x2=".75" y2=".95">
+      <stop data-color="skin-light" stop-color="#d99a75"/>
+      <stop data-color="skin-mid" offset=".48" stop-color="#b9694e"/>
+      <stop data-color="skin-dark" offset="1" stop-color="#713b35"/>
+    </linearGradient>
+    <linearGradient id="neck" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b96e52"/>
+      <stop offset="1" stop-color="#6f3934"/>
+    </linearGradient>
+    <linearGradient id="hair" x1=".2" y1=".1" x2=".8" y2=".9">
+      <stop data-color="hair-light" stop-color="#3b3038"/>
+      <stop data-color="hair-mid" offset=".38" stop-color="#17141a"/>
+      <stop data-color="hair-dark" offset="1" stop-color="#07070a"/>
+    </linearGradient>
+    <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1">
+      <stop data-color="iris-light" stop-color="#aab778"/>
+      <stop data-color="iris-mid" offset=".55" stop-color="#5f713e"/>
+      <stop data-color="iris-dark" offset="1" stop-color="#25301d"/>
+    </linearGradient>
+    <filter id="portraitShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".62"/>
+    </filter>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <clipPath id="frameClip"><rect x="30" y="30" width="452" height="452" rx="30"/></clipPath>
+  </defs>
+
+  <g id="layer-backdrop">
+    <rect width="512" height="512" rx="36" fill="#08090d"/>
+    <rect x="20" y="20" width="472" height="472" rx="35" fill="url(#backdrop)"/>
+    <ellipse cx="256" cy="474" rx="174" ry="38" fill="#000" opacity=".48" filter="url(#softShadow)"/>
+    <path d="M54 424C101 393 125 346 119 284M458 424c-47-31-71-78-65-140" fill="none" stroke="#7d1d2c" stroke-opacity=".19" stroke-width="2"/>
+  </g>
+
+  <g id="layer-body" clip-path="url(#frameClip)" filter="url(#portraitShadow)">
+    <path d="M72 526c8-100 51-158 131-172h106c80 14 123 72 131 172Z" fill="url(#coat)"/>
+  </g>
+
+  <g id="layer-neck">
+    <path d="M211 304v73c17 24 72 24 90 0v-73Z" fill="url(#neck)"/>
+    <path d="M215 330c25 18 57 20 82-1v24c-23 24-61 25-82 2Z" fill="#6d3935" opacity=".38"/>
+  </g>
+
+  <g id="layer-shirt">
+    <path d="m204 354 52 86 52-86-19-15h-66Z" fill="#d9d0c2"/>
+    <path d="m223 339 33 69-52-54Z" fill="#f0e9de"/>
+    <path d="m289 339-33 69 52-54Z" fill="#c9c1b7"/>
+  </g>
+
+  <g id="layer-coat-front">
+    <path d="m203 352 53 87-80-50 23-34Zm106 0-53 87 80-50-23-34Z" fill="#161821" stroke="#3d414d" stroke-width="3"/>
+    <path d="M176 389 256 439 72 526c8-59 42-112 104-137Zm160 0-80 50 184 87c-8-59-42-112-104-137Z" fill="#11131a" opacity=".62"/>
+  </g>
+
+  <g id="layer-neckwear">
+    <path d="M224 369c18 9 46 9 64 0" fill="none" stroke="#17151a" stroke-width="10" stroke-linecap="round"/>
+    <path d="M226 369c17 6 43 6 60 0" fill="none" stroke="#5e2634" stroke-width="3" stroke-linecap="round" opacity=".72"/>
+    <ellipse cx="256" cy="383" rx="14" ry="17" fill="#a17b34" stroke="#d6b35b" stroke-width="3"/>
+    <ellipse cx="256" cy="383" rx="8" ry="11" fill="#7d1c30"/>
+    <path d="M253 376c5 1 8 5 8 10-4-3-8-4-12-3 0-3 1-5 4-7Z" fill="#efc765" opacity=".65"/>
+    <path d="m256 401-15 20 15 16 15-16Z" fill="#781b2b"/>
+    <path d="m256 437-12 54h24Z" fill="#641522"/>
+  </g>
+
+  <g id="layer-ears">
+    <path data-color="ear-light" d="M150 203c-23-8-34 12-25 41 7 24 24 38 43 27l4-61Z" fill="#a65a48"/>
+    <path data-color="ear-dark" d="M362 203c23-8 34 12 25 41-7 24-24 38-43 27l-4-61Z" fill="#8f4b42"/>
+    <path data-color="ear-line" d="M139 220c13-8 23 4 21 25-9-13-17-14-23-4" fill="none" stroke="#693a38" stroke-width="6" stroke-linecap="round"/>
+    <path data-color="ear-line" d="M373 220c-13-8-23 4-21 25 9-13 17-14 23-4" fill="none" stroke="#613536" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <g id="layer-face">
+    <path d="M166 124c22-45 67-68 116-60 51 8 83 51 78 110l-8 89c-4 44-29 84-69 107-17 10-37 10-54 0-42-24-66-64-70-108l-7-83c-2-20 3-39 14-55Z" fill="url(#skin)"/>
+    <path d="M168 159c27-57 90-74 147-44 25 13 38 36 42 60-18-25-29-26-44-48-30 19-80 28-145 32Z" fill="#efb08a" opacity=".16"/>
+    <path d="M329 158c22 53 21 134-22 181 23-10 40-37 45-76l8-89c2-22-2-43-11-60Z" fill="#4b2730" opacity=".18"/>
+    <ellipse cx="200" cy="252" rx="33" ry="17" fill="#c95f60" opacity=".14"/>
+    <ellipse cx="312" cy="252" rx="33" ry="17" fill="#c95f60" opacity=".1"/>
+  </g>
+
+  <g id="layer-eyes" transform="translate(256 218) scale(.78 .84) translate(-256 -218)">
+    <g transform="translate(-13 0)">
+      <path d="M177 217c18-24 48-25 69-3-17 24-51 27-69 3Z" fill="#eee8df"/>
+      <ellipse cx="213" cy="216" rx="15" ry="18" fill="url(#iris)"/>
+      <ellipse cx="213" cy="218" rx="7" ry="11" fill="#0a0d09"/>
+      <circle cx="208" cy="210" r="4" fill="#fff" opacity=".92"/>
+      <path d="M176 216c19-24 49-27 72-2" fill="none" stroke="#332128" stroke-width="8" stroke-linecap="round"/>
+      <path d="M180 229c18 10 44 10 63-4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
+    </g>
+    <g transform="translate(13 0)">
+      <path d="M266 214c21-22 51-21 69 3-18 24-52 21-69-3Z" fill="#eee8df"/>
+      <ellipse cx="299" cy="216" rx="15" ry="18" fill="url(#iris)"/>
+      <ellipse cx="299" cy="218" rx="7" ry="11" fill="#0a0d09"/>
+      <circle cx="294" cy="210" r="4" fill="#fff" opacity=".92"/>
+      <path d="M264 214c22-25 53-23 72 3" fill="none" stroke="#332128" stroke-width="8" stroke-linecap="round"/>
+      <path d="M269 225c19 14 45 14 63 4" fill="none" stroke="#713b41" stroke-width="3" opacity=".55"/>
+    </g>
+  </g>
+
+  <g id="layer-brows" transform="translate(256 188) scale(.9 .92) translate(-256 -188)">
+    <path d="M173 185c23-15 52-17 75-3-27-4-49 0-72 12Z" fill="#241920" transform="translate(-11 0)"/>
+    <path d="M339 186c-23-15-52-17-75-3 27-4 49 0 72 12Z" fill="#241920" transform="translate(11 0)"/>
+  </g>
+
+  <g id="layer-nose">
+    <path d="M256 219c-2 20-4 39-11 61-3 10 3 16 12 18 11 1 20-4 23-11" fill="none" stroke="#713d3b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M241 298c10 7 22 7 32 0" fill="none" stroke="#512f33" stroke-width="4" stroke-linecap="round" opacity=".65"/>
+  </g>
+
+  <g id="layer-mouth">
+    <path d="M217 326c13-7 25-8 39-2 14-6 29-5 42 2-21 28-59 29-81 0Z" fill="#71313e"/>
+    <path d="M217 326c16 2 26 0 39-2 14 3 25 4 42 2-24 11-57 12-81 0Z" fill="#a95160"/>
+    <path d="M231 348c15 7 35 7 50-1" fill="none" stroke="#4d2b31" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+  </g>
+
+  <g id="layer-hair">
+    <path d="M151 210c-14-55-2-111 40-144 42-34 111-31 151 5 32 29 39 79 20 135-4-48-19-76-49-98-26 22-71 40-132 46-8 16-13 35-15 57Z" fill="url(#hair)"/>
+    <path d="M177 158c13-74 71-103 137-59-47 15-77 39-137 59Z" fill="#5a4552" opacity=".28"/>
+    <path d="M154 186c-8 68 0 130 42 171-16-10-34-25-47-47-19-33-22-85 5-124Zm204-8c15 64 9 135-37 180 21-10 43-28 55-53 17-36 11-92-18-127Z" fill="#0a090d"/>
+    <path d="M183 106c32-25 77-35 118-14" fill="none" stroke="#806070" stroke-opacity=".33" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <g id="layer-markings">
+    <g data-marking="freckles">
+      <circle cx="193" cy="272" r="2.4" fill="#684036"/>
+      <circle cx="205" cy="279" r="1.8" fill="#684036"/>
+      <circle cx="316" cy="270" r="2" fill="#684036"/>
+    </g>
+    <path data-marking="scar" d="M329 227c7 16 5 34-5 48" fill="none" stroke="#8d4b4c" stroke-width="3" stroke-linecap="round" opacity=".66"/>
+  </g>
+
+  <g id="layer-frame">
+    <rect x="20" y="20" width="472" height="472" rx="35" fill="none" stroke="#191b22" stroke-width="18"/>
+    <rect x="29" y="29" width="454" height="454" rx="28" fill="none" stroke="#8b7444" stroke-width="3"/>
+    <path d="M45 78V45h33M434 45h33v33M45 434v33h33M434 467h33v-33" fill="none" stroke="#c5a35a" stroke-width="5" stroke-linecap="round"/>
+    <rect x="37" y="37" width="438" height="438" rx="22" fill="none" stroke="#d5bd79" stroke-opacity=".22"/>
+  </g>
+</svg>
