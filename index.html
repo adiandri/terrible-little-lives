@@ -165,6 +165,14 @@
       transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    @keyframes timelineEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .timeline-entry-animate {
+      animation: timelineEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
     input[type=range] {
       accent-color: var(--accent-primary);
     }
@@ -1358,6 +1366,9 @@
 
           <!-- Top-Right Actions -->
           <div class="flex items-center space-x-1 shrink-0">
+            <button id="btn-tab-creatures" class="p-1.5 rounded-lg bg-inputbg hover:bg-cardhover text-dust hover:text-purple-300 border border-leadborder transition-colors flex items-center justify-center active:scale-95" title="Municipal Archive (Creatures & Cases)" aria-label="Municipal Archive">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            </button>
             <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all items-center justify-center active:scale-95" title="Open God Mode Inspector" aria-label="Open God Mode Inspector">
               <i data-lucide="zap" class="w-3.5 h-3.5"></i>
             </button>
@@ -1425,38 +1436,41 @@
       </section>
 
       <!-- Scrollable Event Log -->
-      <main id="log-feed" class="flex-1 overflow-y-auto px-4 py-3 custom-scroll space-y-3">
+      <main id="log-feed" class="flex-1 overflow-y-auto px-4 py-3 custom-scroll space-y-1 pb-6">
         <!-- Injected dynamically -->
       </main>
 
-      <!-- Bottom Navigation -->
-      <footer class="bg-headerbg border-t border-leadborder px-3 pt-2 pb-3 shrink-0 flex flex-col space-y-2 z-10">
-        <!-- Endure Button -->
-        <button id="btn-endure" class="w-full min-h-[52px] px-4 rounded-xl bg-crimson hover:opacity-90 active:scale-[0.98] transition-all text-parchment shadow-lg flex items-center justify-center gap-2 group">
-          <i data-lucide="chevrons-up" class="w-4 h-4"></i>
-          <span class="font-serif tracking-widest text-sm font-bold">ENDURE ANOTHER YEAR</span>
-        </button>
+      <!-- BITLIFE-STYLE DOCKED BOTTOM NAVIGATION WITH EMBEDDED CENTER ENDURE PILL -->
+      <footer class="bg-headerbg/95 backdrop-blur-md border-t border-leadborder/70 px-3 py-2 shrink-0 z-20 transition-colors duration-200">
+        <nav class="flex items-center justify-between gap-1 max-w-lg mx-auto" aria-label="Primary game navigation">
+          <!-- Tab 1: Life / Timeline -->
+          <button id="btn-tab-life" class="core-nav-button is-active flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95" aria-current="page">
+            <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate">Life</span>
+          </button>
 
-        <nav class="grid grid-cols-5 gap-1" aria-label="Primary game navigation">
-          <button id="btn-tab-life" class="core-nav-button is-active rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition-colors" aria-current="page">
-            <i data-lucide="book-open" class="w-4 h-4"></i>
-            <span>Life</span>
+          <!-- Tab 2: People / Kin -->
+          <button id="btn-tab-kin" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate">People</span>
           </button>
-          <button id="btn-tab-kin" class="core-nav-button rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition-colors">
-            <i data-lucide="users" class="w-4 h-4"></i>
-            <span>People</span>
+
+          <!-- Center: Iconic BitLife-Style Large Action Pill -->
+          <button id="btn-endure" class="btn-endure-pill shrink-0 px-5 py-2.5 rounded-full bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-lg border border-red-500/30 ring-2 ring-crimson/20 flex items-center justify-center gap-1.5 group cursor-pointer" title="Advance 1 Year">
+            <i data-lucide="chevrons-up" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5"></i>
+            <span class="font-serif tracking-widest text-xs font-bold whitespace-nowrap">+ ENDURE</span>
           </button>
-          <button id="btn-tab-creatures" class="core-nav-button rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition-colors">
-            <i data-lucide="eye" class="w-4 h-4"></i>
-            <span>Creatures</span>
+
+          <!-- Tab 3: Activities -->
+          <button id="btn-tab-activities" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate">Activities</span>
           </button>
-          <button id="btn-tab-activities" class="core-nav-button rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition-colors">
-            <i data-lucide="compass" class="w-4 h-4"></i>
-            <span>Activities</span>
-          </button>
-          <button id="btn-tab-profile" class="core-nav-button rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition-colors">
-            <i data-lucide="user-round" class="w-4 h-4"></i>
-            <span>Profile</span>
+
+          <!-- Tab 4: Profile / Assets -->
+          <button id="btn-tab-profile" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="user-round" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate">Profile</span>
           </button>
         </nav>
       </footer>

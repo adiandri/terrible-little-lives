@@ -5338,8 +5338,8 @@ class TerribleGame {
       this.dom.btnEndure.disabled = false;
       this.dom.btnEndure.classList.remove('opacity-40', 'cursor-not-allowed');
       this.dom.btnEndure.innerHTML = `
-        <i data-lucide="chevrons-up" class="w-4 h-4"></i>
-        <span class="font-serif tracking-widest text-sm font-bold">ENDURE ANOTHER YEAR</span>
+        <i data-lucide="chevrons-up" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5"></i>
+        <span class="font-serif tracking-widest text-xs font-bold whitespace-nowrap">+ ENDURE</span>
       `;
     }
 
@@ -5360,47 +5360,73 @@ class TerribleGame {
   renderLogs() {
     this.dom.logFeed.innerHTML = '';
 
-    this.logs.forEach(yearLog => {
-      const card = document.createElement('div');
-      card.className = "bg-slatecard border border-leadborder rounded-xl p-3 shadow-sm";
+    this.logs.forEach((yearLog, yearIndex) => {
+      const yearSection = document.createElement('div');
+      yearSection.className = "timeline-year-group space-y-1 mb-4";
+      if (yearIndex === this.logs.length - 1) {
+        yearSection.classList.add('timeline-entry-animate');
+      }
 
+      // Elegant Age Milestone Banner
       const header = document.createElement('div');
-      header.className = "flex items-center justify-between border-b border-leadborder/70 pb-1.5 mb-2";
-
-      const badge = document.createElement('span');
-      badge.className = "text-[10px] font-serif font-bold text-parchment tracking-wider uppercase bg-inputbg px-2 py-0.5 rounded-md border border-leadborder shadow-xs";
-      badge.textContent = `AGE ${yearLog.age}`;
-
-      const yearText = document.createElement('span');
-      yearText.className = "text-[10px] text-dust font-mono";
-      yearText.textContent = `${yearLog.year}`;
-
-      header.appendChild(badge);
-      header.appendChild(yearText);
-      card.appendChild(header);
+      header.className = "flex items-center gap-3 my-2.5";
+      header.innerHTML = `
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-leadborder/70 to-leadborder/70"></div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-inputbg/80 border border-leadborder/80 text-[11px] font-serif font-bold text-parchment tracking-wider shadow-xs">
+          <span>Age ${yearLog.age}</span>
+          <span class="text-dust/40">•</span>
+          <span class="text-[10px] font-mono font-normal text-dust">${yearLog.year}</span>
+        </div>
+        <div class="h-px flex-1 bg-gradient-to-l from-transparent via-leadborder/70 to-leadborder/70"></div>
+      `;
+      yearSection.appendChild(header);
 
       const list = document.createElement('div');
-      list.className = "space-y-1.5 text-xs text-parchment leading-relaxed";
+      list.className = "space-y-1 text-xs text-parchment/90 leading-relaxed";
 
       yearLog.entries.forEach(entry => {
-        const p = document.createElement('p');
-        p.className = "relative pl-3 before:content-['•'] before:absolute before:left-0 before:text-dust/70";
-        
+        const item = document.createElement('div');
+        item.className = "flex items-start gap-2 py-1 px-2 rounded-lg hover:bg-slatecard/50 transition-colors";
+
+        let iconHtml = `<span class="mt-0.5 text-dust/60 shrink-0 text-[10px]">✦</span>`;
+        let textClass = "text-parchment/90 flex-1";
+
         if (entry.startsWith('[')) {
-          p.className = "relative pl-3 text-crimson font-medium before:content-['✦'] before:absolute before:left-0 before:text-crimson";
+          if (/PROMOTION|SHELTER SECURED|UPGRADE|STABILIZED|RELEASED|PAROLE APPROVED/i.test(entry)) {
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="check" class="w-2.5 h-2.5"></i></span>`;
+            textClass = "text-emerald-300 font-medium flex-1";
+          } else if (/EVICTION|TERMINATED|COMMITMENT|ARREST|PENITENTIARY|ASYLUM|CAUGHT|CORNERED/i.test(entry)) {
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="alert-triangle" class="w-2.5 h-2.5"></i></span>`;
+            textClass = "text-crimson font-medium flex-1";
+          } else if (/AFFLICTION|AILMENT|CONSUMPTION|FEVER|MELANCHOLIA/i.test(entry)) {
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="skull" class="w-2.5 h-2.5"></i></span>`;
+            textClass = "text-amber-300 font-medium flex-1";
+          } else {
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i></span>`;
+            textClass = "text-purple-300 font-medium flex-1";
+          }
         } else if (entry.startsWith('Deposited salary') || entry.startsWith('Starting Fiat Balance')) {
-          p.className = "relative pl-3 text-fiat font-semibold before:content-['$'] before:absolute before:left-0 before:text-fiat";
+          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold font-mono">$</span>`;
+          textClass = "text-emerald-400 font-medium flex-1";
         } else if (entry.startsWith('Collected') || entry.startsWith('Secret Paranormal Shillings') || entry.startsWith('Signed an occult contract')) {
-          p.className = "relative pl-3 text-shilling font-semibold before:content-['🪙'] before:absolute before:left-0 before:text-shilling";
+          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-[10px] font-bold">🪙</span>`;
+          textClass = "text-amber-400 font-medium flex-1";
         }
-        
-        p.textContent = entry;
-        list.appendChild(p);
+
+        item.innerHTML = `
+          ${iconHtml}
+          <p class="${textClass}">${entry}</p>
+        `;
+        list.appendChild(item);
       });
 
-      card.appendChild(list);
-      this.dom.logFeed.appendChild(card);
+      yearSection.appendChild(list);
+      this.dom.logFeed.appendChild(yearSection);
     });
+
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
 
     setTimeout(() => {
       this.dom.logFeed.scrollTop = this.dom.logFeed.scrollHeight;
