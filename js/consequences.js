@@ -123,6 +123,26 @@
   }
 
   function getActivityRestriction(character, activity) {
+    if (character.institution && character.institution.active) {
+      const allowedAsylum = ['asylum_therapy', 'asylum_garden', 'asylum_comply', 'asylum_escape', 'meditate_breathe'];
+      const allowedPrison = ['prison_yard_workout', 'prison_library', 'prison_contraband', 'prison_parole_hearing', 'meditate_breathe'];
+      if (character.institution.type === 'asylum') {
+        if (!allowedAsylum.includes(activity.id)) {
+          return `You are involuntarily committed to ${character.institution.name || "St. Dymphna's Asylum"}. High stone walls and vigilant orderlies bar access to the outside city.`;
+        }
+      } else if (character.institution.type === 'prison') {
+        if (!allowedPrison.includes(activity.id)) {
+          return `You are incarcerated at ${character.institution.name || "Blackthorn Penitentiary"}. Armed guards and iron bars prevent outside movement.`;
+        }
+      }
+    }
+    if (activity.id.startsWith('asylum_') && (!character.institution || character.institution.type !== 'asylum' || !character.institution.active)) {
+      return "You are not an admitted patient at the psychiatric asylum.";
+    }
+    if (activity.id.startsWith('prison_') && (!character.institution || character.institution.type !== 'prison' || !character.institution.active)) {
+      return "You are not an inmate in the penitentiary.";
+    }
+
     const active = activeConsequences(character);
     if (active.some(item => item.type === 'suspension') && ['education', 'social'].includes(activity.category)) {
       return 'Suspension bars you from school and organized peer activities.';

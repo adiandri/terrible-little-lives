@@ -6,6 +6,9 @@ const MUNDANE_CAREERS = [
   {
     id: "fast_food",
     title: "Fast Food Crew / Fry Cook",
+    track: "hospitality",
+    tier: 1,
+    nextTierId: "barista",
     minAge: 16,
     baseSalary: 24000,
     stress: 15,
@@ -15,6 +18,9 @@ const MUNDANE_CAREERS = [
   {
     id: "barista",
     title: "Artisan Coffee Barista",
+    track: "hospitality",
+    tier: 2,
+    nextTierId: "lounge_bartender",
     minAge: 17,
     baseSalary: 28000,
     stress: 10,
@@ -24,6 +30,9 @@ const MUNDANE_CAREERS = [
   {
     id: "lifestyle_vlogger",
     title: "Social Media Micro-Influencer",
+    track: "media",
+    tier: 1,
+    nextTierId: "runway_model",
     minAge: 16,
     baseSalary: 32000,
     stress: 20,
@@ -33,6 +42,9 @@ const MUNDANE_CAREERS = [
   {
     id: "runway_model",
     title: "High-Fashion Editorial Model",
+    track: "media",
+    tier: 2,
+    nextTierId: "news_anchor",
     minAge: 17,
     baseSalary: 62000,
     stress: 30,
@@ -42,6 +54,9 @@ const MUNDANE_CAREERS = [
   {
     id: "app_delivery",
     title: "On-Demand Scooter Courier",
+    track: "industrial",
+    tier: 1,
+    nextTierId: "warehouse_stocker",
     minAge: 18,
     baseSalary: 34000,
     stress: 20,
@@ -53,6 +68,9 @@ const MUNDANE_CAREERS = [
   {
     id: "warehouse_stocker",
     title: "Industrial Logistics Night Stocker",
+    track: "industrial",
+    tier: 2,
+    nextTierId: "subway_track_worker",
     minAge: 18,
     baseSalary: 38000,
     stress: 20,
@@ -62,6 +80,9 @@ const MUNDANE_CAREERS = [
   {
     id: "nightclub_bouncer",
     title: "Underground Nightclub Bouncer",
+    track: "investigation",
+    tier: 1,
+    nextTierId: "debt_collector",
     minAge: 20,
     baseSalary: 42000,
     stress: 25,
@@ -71,6 +92,9 @@ const MUNDANE_CAREERS = [
   {
     id: "high_rise_scaffolder",
     title: "High-Rise Scaffolder & Rigger",
+    track: "industrial",
+    tier: 4,
+    nextTierId: "deep_sea_welder",
     minAge: 19,
     baseSalary: 58000,
     stress: 35,
@@ -89,6 +113,9 @@ const MUNDANE_CAREERS = [
   {
     id: "subway_track_worker",
     title: "Subterranean Track Maintenance",
+    track: "industrial",
+    tier: 3,
+    nextTierId: "high_rise_scaffolder",
     minAge: 20,
     baseSalary: 54000,
     stress: 25,
@@ -98,6 +125,8 @@ const MUNDANE_CAREERS = [
   {
     id: "deep_sea_welder",
     title: "Offshore Underwater Welder",
+    track: "industrial",
+    tier: 5,
     minAge: 22,
     baseSalary: 95000,
     stress: 45,
@@ -118,6 +147,8 @@ const MUNDANE_CAREERS = [
   {
     id: "hotel_concierge",
     title: "Five-Star Hotel Head Concierge",
+    track: "hospitality",
+    tier: 4,
     minAge: 21,
     baseSalary: 56000,
     stress: 20,
@@ -127,6 +158,9 @@ const MUNDANE_CAREERS = [
   {
     id: "lounge_bartender",
     title: "Speakeasy Mixologist",
+    track: "hospitality",
+    tier: 3,
+    nextTierId: "hotel_concierge",
     minAge: 19,
     baseSalary: 44000,
     stress: 15,
@@ -136,6 +170,9 @@ const MUNDANE_CAREERS = [
   {
     id: "news_anchor",
     title: "Late-Night Broadcast TV Anchor",
+    track: "media",
+    tier: 3,
+    nextTierId: "luxury_realtor",
     minAge: 23,
     baseSalary: 78000,
     stress: 25,
@@ -145,6 +182,8 @@ const MUNDANE_CAREERS = [
   {
     id: "luxury_realtor",
     title: "Luxury Penthouse Real Estate Broker",
+    track: "media",
+    tier: 4,
     minAge: 21,
     baseSalary: 88000,
     stress: 30,
@@ -156,6 +195,9 @@ const MUNDANE_CAREERS = [
   {
     id: "biohazard_cleaner",
     title: "Forensic Crime Scene Biohazard Tech",
+    track: "medical",
+    tier: 3,
+    nextTierId: "forensic_pathologist",
     minAge: 20,
     baseSalary: 64000,
     stress: 35,
@@ -165,6 +207,8 @@ const MUNDANE_CAREERS = [
   {
     id: "air_traffic_controller",
     title: "Metropolitan Air Traffic Controller",
+    track: "investigation",
+    tier: 4,
     minAge: 23,
     baseSalary: 115000,
     stress: 45,
@@ -174,6 +218,9 @@ const MUNDANE_CAREERS = [
   {
     id: "psychiatric_orderly",
     title: "Psychiatric Intensive Ward Orderly",
+    track: "medical",
+    tier: 1,
+    nextTierId: "er_nurse",
     minAge: 21,
     baseSalary: 48000,
     stress: 30,
@@ -194,6 +241,9 @@ const MUNDANE_CAREERS = [
   {
     id: "debt_collector",
     title: "Predatory Subprime Debt Collector",
+    track: "investigation",
+    tier: 2,
+    nextTierId: "private_investigator",
     minAge: 20,
     baseSalary: 52000,
     stress: 25,
@@ -212,6 +262,9 @@ const MUNDANE_CAREERS = [
   {
     id: "corporate_layoff_lead",
     title: "Corporate Restructuring 'Hatchet Man'",
+    track: "corporate",
+    tier: 3,
+    nextTierId: "financial_analyst",
     minAge: 25,
     baseSalary: 120000,
     stress: 35,
@@ -221,6 +274,9 @@ const MUNDANE_CAREERS = [
   {
     id: "private_investigator",
     title: "Infidelity & Surveillance Investigator",
+    track: "investigation",
+    tier: 3,
+    nextTierId: "air_traffic_controller",
     minAge: 22,
     baseSalary: 60000,
     stress: 25,
@@ -232,6 +288,9 @@ const MUNDANE_CAREERS = [
   {
     id: "office_clerk",
     title: "Corporate Data Entry Clerk",
+    track: "corporate",
+    tier: 1,
+    nextTierId: "software_qa",
     minAge: 19,
     baseSalary: 45000,
     stress: 15,
@@ -241,6 +300,9 @@ const MUNDANE_CAREERS = [
   {
     id: "software_qa",
     title: "Enterprise Software QA Tester",
+    track: "corporate",
+    tier: 2,
+    nextTierId: "corporate_layoff_lead",
     minAge: 20,
     baseSalary: 68000,
     stress: 20,
@@ -250,6 +312,9 @@ const MUNDANE_CAREERS = [
   {
     id: "er_nurse",
     title: "Hospital ER Trauma Nurse",
+    track: "medical",
+    tier: 2,
+    nextTierId: "biohazard_cleaner",
     minAge: 22,
     baseSalary: 82000,
     stress: 40,
@@ -268,6 +333,8 @@ const MUNDANE_CAREERS = [
   {
     id: "financial_analyst",
     title: "Senior Quantitative Financial Analyst",
+    track: "corporate",
+    tier: 4,
     minAge: 24,
     baseSalary: 130000,
     stress: 35,
@@ -277,6 +344,8 @@ const MUNDANE_CAREERS = [
   {
     id: "forensic_pathologist",
     title: "Chief County Medical Examiner (MD)",
+    track: "medical",
+    tier: 4,
     minAge: 27,
     baseSalary: 185000,
     stress: 30,
@@ -299,6 +368,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "tarot_medium",
     title: "Late-Night Cable Tarot Reader",
+    track: "paranormal_scholar",
+    tier: 1,
+    nextTierId: "darkweb_transcriber",
     minAge: 18,
     payoutShillings: 50,
     sanityCost: 1,
@@ -317,6 +389,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "rf_monitor",
     title: "Ghost Frequency Radio Monitor",
+    track: "dark_underworld",
+    tier: 1,
+    nextTierId: "grave_robber",
     minAge: 18,
     payoutShillings: 65,
     sanityCost: 1,
@@ -326,6 +401,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "grave_robber",
     title: "Historical Vault Grave Robber",
+    track: "dark_underworld",
+    tier: 2,
+    nextTierId: "relic_fence",
     minAge: 18,
     payoutShillings: 80,
     sanityCost: 2,
@@ -335,6 +413,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "darkweb_transcriber",
     title: "Dark Web Occult Audio Archiver",
+    track: "paranormal_scholar",
+    tier: 2,
+    nextTierId: "glyph_translator",
     minAge: 18,
     payoutShillings: 90,
     sanityCost: 2,
@@ -391,6 +472,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "relic_fence",
     title: "Cursed Antiquities Fence",
+    track: "dark_underworld",
+    tier: 3,
+    nextTierId: "soul_pawnbroker",
     minAge: 21,
     payoutShillings: 150,
     sanityCost: 2,
@@ -400,6 +484,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "glyph_translator",
     title: "Dead Language Glyph Translator",
+    track: "paranormal_scholar",
+    tier: 3,
+    nextTierId: "cursed_librarian",
     minAge: 21,
     payoutShillings: 160,
     sanityCost: 2,
@@ -409,6 +496,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "cursed_librarian",
     title: "Forbidden Archive Conservator",
+    track: "paranormal_scholar",
+    tier: 4,
+    nextTierId: "high_inquisitor",
     minAge: 21,
     payoutShillings: 170,
     sanityCost: 2,
@@ -447,6 +537,9 @@ const PARANORMAL_CAREERS = [
   {
     id: "soul_pawnbroker",
     title: "Black Market Soul Pawnbroker",
+    track: "dark_underworld",
+    tier: 4,
+    nextTierId: "salon_host",
     minAge: 22,
     payoutShillings: 240,
     sanityCost: 3,
@@ -474,6 +567,8 @@ const PARANORMAL_CAREERS = [
   {
     id: "salon_host",
     title: "Occult Salon Grand Master",
+    track: "dark_underworld",
+    tier: 5,
     minAge: 24,
     payoutShillings: 270,
     sanityCost: 3,
@@ -521,6 +616,8 @@ const PARANORMAL_CAREERS = [
   {
     id: "high_inquisitor",
     title: "Grand Inquisitor of the Silent Circle",
+    track: "paranormal_scholar",
+    tier: 5,
     minAge: 28,
     payoutShillings: 500,
     sanityCost: 3,
@@ -682,7 +779,14 @@ function getAdjustedSalary(baseSalary, countryCode) {
   return Math.round(baseSalary * mult);
 }
 
+function getPromotionForJob(job) {
+  if (!job || !job.nextTierId) return null;
+  const all = (window.MUNDANE_CAREERS || []).concat(window.PARANORMAL_CAREERS || []);
+  return all.find(j => j.id === job.nextTierId) || null;
+}
+
 window.MUNDANE_CAREERS = MUNDANE_CAREERS;
 window.PARANORMAL_CAREERS = PARANORMAL_CAREERS;
 window.checkJobEligibility = checkJobEligibility;
 window.getAdjustedSalary = getAdjustedSalary;
+window.getPromotionForJob = getPromotionForJob;

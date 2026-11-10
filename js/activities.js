@@ -247,6 +247,9 @@ const ACTIVITIES_LIST = [
       const country = (window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode]) || { wageMultiplier: 1.0 };
       const basePay = Math.round((Math.floor(Math.random() * 120) + 100) * (country.wageMultiplier || 1.0));
       character.money = (character.money || 0) + basePay;
+      if (character.job) {
+        character.jobPerformance = Math.min(100, (character.jobPerformance || 50) + (attemptIndex === 0 ? 15 : 10));
+      }
       const sanLoss = attemptIndex === 0 ? -3 : -5;
       const vitLoss = attemptIndex === 0 ? -2 : -4;
       character.stats.sanity = Math.max(0, (character.stats.sanity || 50) + sanLoss);
@@ -255,8 +258,8 @@ const ACTIVITIES_LIST = [
         success: true,
         title: attemptIndex === 0 ? "Overtime Completed" : "Relentless Double Shift",
         message: attemptIndex === 0
-          ? `You endured a grueling evening shift under flickering tubes. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, -3% Sanity, -2% Vitality).`
-          : `A second grueling shift completely wrecked your nervous system. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, -5% Sanity, -4% Vitality from exhaustion).`,
+          ? `You endured a grueling evening shift under flickering tubes. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, +Performance, -3% Sanity, -2% Vitality).`
+          : `A second grueling shift completely wrecked your nervous system. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, +Performance, -5% Sanity, -4% Vitality from exhaustion).`,
         effects: { money: basePay, sanity: sanLoss, vitality: vitLoss }
       };
     }
@@ -1284,6 +1287,80 @@ const ACTIVITIES_LIST = [
       };
     }
   },
+  {
+    id: "burglary_break_in",
+    name: "Cat Burglary & Residential Break-in",
+    category: "crime",
+    icon: "key",
+    minAge: 16,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Scale fire escapes and jemmy open second-floor sash windows while occupants sleep.",
+    run: (character) => {
+      const successChance = 0.45 + (character.stats.smarts || 50) * 0.003;
+      if (Math.random() < successChance) {
+        const loot = Math.floor(Math.random() * 300) + 200;
+        character.money = (character.money || 0) + loot;
+        character.stats.humanity = Math.max(0, (character.stats.humanity || 50) - 4);
+        return {
+          success: true,
+          title: "Clean Heist",
+          message: `You slipped through a dark drawing room and pocketed silverware, cash, and heirloom jewelry (+$${loot}, -4% Humanity).`,
+          effects: { money: loot, humanity: -4 }
+        };
+      } else {
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 8);
+        character.stats.happiness = Math.max(0, (character.stats.happiness || 50) - 10);
+        if (window.sentenceToPrison) {
+          window.sentenceToPrison(character, 2, "Second-degree burglary and unlawful entry");
+        }
+        return {
+          success: true,
+          title: "Arrested by Police!",
+          message: "A siren screamed outside! Patrol officers cornered you in the corridor and slammed you in handcuffs. Sentenced to 2 years at Blackthorn Penitentiary (-Sanity, -Happiness).",
+          effects: { sanity: -8, happiness: -10 }
+        };
+      }
+    }
+  },
+  {
+    id: "grave_robbery",
+    name: "Midnight Grave Robbery",
+    category: "crime",
+    icon: "skull",
+    minAge: 17,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Unearth freshly interred coffins in the municipal cemetery for gold teeth and occult jewelry.",
+    run: (character) => {
+      const successChance = 0.40 + (character.stats.occult || 0) * 0.003;
+      if (Math.random() < successChance) {
+        const cash = Math.floor(Math.random() * 400) + 250;
+        const shillings = Math.floor(Math.random() * 4) + 2;
+        character.money = (character.money || 0) + cash;
+        character.shillings = (character.shillings || 0) + shillings;
+        character.stats.occult = Math.min(100, (character.stats.occult || 0) + 8);
+        character.stats.humanity = Math.max(0, (character.stats.humanity || 50) - 8);
+        return {
+          success: true,
+          title: "Coffin Desecrated",
+          message: `You cracked open the rotting pine lid with an iron spade, stripping silver crucifixes and antique rings (+${cash} cash, +${shillings} s., +8% Occult, -8% Humanity).`,
+          effects: { money: cash, shillings, occult: 8, humanity: -8 }
+        };
+      } else {
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 10);
+        if (window.sentenceToPrison) {
+          window.sentenceToPrison(character, 3, "Grave desecration and nocturnal larceny");
+        }
+        return {
+          success: true,
+          title: "Caught in the Cemetery!",
+          message: "Searchlights illuminated the dirt mound! Caretakers and armed police tackled you into the open grave. Sentenced to 3 years at Blackthorn Penitentiary (-Sanity).",
+          effects: { sanity: -10 }
+        };
+      }
+    }
+  },
 
   // ==========================================
   // 6. TROUBLE: LEGAL
@@ -1309,6 +1386,222 @@ const ACTIVITIES_LIST = [
         message: "Your attorney filed pre-emptive motions protecting your estate and reputation (-$100, +Sanity).",
         effects: { money: -100, sanity: 8 }
       };
+    }
+  },
+  {
+    id: "asylum_therapy",
+    name: "Consult Attending Psychiatrist",
+    category: "mental",
+    icon: "brain",
+    minAge: 14,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Undergo clinical psychoanalysis with Dr. Van Thal in the consultation parlor.",
+    run: (character) => {
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 12);
+      character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 3);
+      let paroleBonus = "";
+      if (character.institution && character.institution.type === 'asylum' && Math.random() < 0.35) {
+        character.institution.yearsLeft = Math.max(0, (character.institution.yearsLeft || 1) - 1);
+        paroleBonus = " Dr. Van Thal filed a commendation for psychological stabilization, reducing your stay by 1 year!";
+      }
+      return {
+        success: true,
+        title: "Psychiatric Consultation",
+        message: `You dissected your recurring terrors and trauma in the leather parlor chair (+12% Sanity, +3% Smarts).${paroleBonus}`,
+        effects: { sanity: 12, smarts: 3 }
+      };
+    }
+  },
+  {
+    id: "asylum_garden",
+    name: "Walk Enclosed Courtyard",
+    category: "mental",
+    icon: "sun",
+    minAge: 14,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Pace the walled brick courtyard among dead rose bushes and quiet fellow patients.",
+    run: (character) => {
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 6);
+      character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 6);
+      return {
+        success: true,
+        title: "Courtyard Respite",
+        message: "Pale sunlight filtered through the overhead wire netting. The rhythmic crunch of cold gravel calmed your racing pulse (+6% Sanity, +6% Happiness).",
+        effects: { sanity: 6, happiness: 6 }
+      };
+    }
+  },
+  {
+    id: "asylum_comply",
+    name: "Comply with Sedation Regimen",
+    category: "mental",
+    icon: "droplet",
+    minAge: 14,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Swallow the bitter chloral hydrate elixir dispensed from the orderly's steel trolley.",
+    run: (character) => {
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 10);
+      character.stats.vitality = Math.max(1, (character.stats.vitality || 50) - 3);
+      let goodBehavior = "";
+      if (character.institution && character.institution.type === 'asylum' && Math.random() < 0.40) {
+        character.institution.yearsLeft = Math.max(0, (character.institution.yearsLeft || 1) - 1);
+        goodBehavior = " Orderlies marked your chart 'compliant and docile', recommending early release review!";
+      }
+      return {
+        success: true,
+        title: "Chemical Tranquility",
+        message: `The medicine silenced the scratching sounds behind the drywall, leaving you drowsy but anchored (+10% Sanity, -3% Vitality).${goodBehavior}`,
+        effects: { sanity: 10, vitality: -3 }
+      };
+    }
+  },
+  {
+    id: "asylum_escape",
+    name: "Midnight Breakout Attempt",
+    category: "crime",
+    icon: "lock",
+    minAge: 14,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Pick the laundry chute latch with a sharpened spoon and scale the perimeter wall into the dark woods.",
+    run: (character) => {
+      const escapeChance = 0.35 + ((character.stats.smarts || 50) * 0.003) + ((character.stats.vitality || 50) * 0.002);
+      if (Math.random() < escapeChance) {
+        if (character.institution) {
+          character.institution.active = false;
+        }
+        character.housing = 'homeless';
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 5);
+        if (window.addConsequence) {
+          window.addConsequence(character, 'criminal_record', { severity: 2, label: 'Asylum Fugitive', note: 'Escaped lawful psychiatric custody' });
+        }
+        return {
+          success: true,
+          title: "Breakout Successful!",
+          message: "You squeezed through the damp laundry vent and vaulted the brick parapet! You are free in the midnight woods, but a hunted fugitive sleeping rough (-Sanity, Marked Fugitive).",
+          effects: { sanity: -5 }
+        };
+      } else {
+        character.stats.vitality = Math.max(1, (character.stats.vitality || 50) - 10);
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 10);
+        if (character.institution) {
+          character.institution.yearsLeft = (character.institution.yearsLeft || 1) + 1;
+        }
+        return {
+          success: true,
+          title: "Cornered by Orderlies!",
+          message: "Whistles blared! Four orderlies tackled you in the brambles, bound you in heavy straps, and extended your commitment by 1 year in solitary confinement (-10% Vitality, -10% Sanity).",
+          effects: { vitality: -10, sanity: -10 }
+        };
+      }
+    }
+  },
+  {
+    id: "prison_yard_workout",
+    name: "Penitentiary Yard Calisthenics",
+    category: "legal",
+    icon: "activity",
+    minAge: 16,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Pump iron weights and do chin-ups in the recreation yard under guard towers.",
+    run: (character) => {
+      character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 7);
+      character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 2);
+      return {
+        success: true,
+        title: "Hardened Body",
+        message: "You pumped rusted iron until cold sweat dripped onto the asphalt. Your muscles hardened against cellblock violence (+7% Vitality, -2% Sanity).",
+        effects: { vitality: 7, sanity: -2 }
+      };
+    }
+  },
+  {
+    id: "prison_library",
+    name: "Study Law & Penal Codes",
+    category: "legal",
+    icon: "book-open",
+    minAge: 16,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Comb through moldy municipal appeals precedent and legal statutes in the prison library.",
+    run: (character) => {
+      character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 6);
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 3);
+      return {
+        success: true,
+        title: "Legal Self-Education",
+        message: "You analyzed municipal penal statutes and studied habeas corpus precedents (+6% Smarts, +3% Sanity).",
+        effects: { smarts: 6, sanity: 3 }
+      };
+    }
+  },
+  {
+    id: "prison_contraband",
+    name: "Trade Cellblock Contraband",
+    category: "crime",
+    icon: "package",
+    minAge: 16,
+    maxAge: 99,
+    maxPerYear: 2,
+    desc: "Barter rolled cigarettes, pain tinctures, and smuggled coffee rations.",
+    run: (character) => {
+      if (Math.random() < 0.70) {
+        const profit = Math.floor(Math.random() * 60) + 40;
+        character.money = (character.money || 0) + profit;
+        return {
+          success: true,
+          title: "Black Market Deal",
+          message: `You passed taped razor blades and tobacco pouches behind the boiler room and tucked away cash (+${profit} cash).`,
+          effects: { money: profit }
+        };
+      } else {
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 6);
+        character.stats.happiness = Math.max(0, (character.stats.happiness || 50) - 8);
+        return {
+          success: true,
+          title: "Shakedown & Solitary",
+          message: "Guards tore open your mattress during inspection and confiscated the stash. Thrown into the isolation hole for a week (-Sanity, -Happiness).",
+          effects: { sanity: -6, happiness: -8 }
+        };
+      }
+    }
+  },
+  {
+    id: "prison_parole_hearing",
+    name: "Plead for Early Parole",
+    category: "legal",
+    icon: "scale",
+    minAge: 16,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Stand before the state parole commissioners and present your record of rehabilitation.",
+    run: (character) => {
+      const paroleChance = 0.35 + ((character.stats.smarts || 50) * 0.004) + ((character.stats.humanity || 50) * 0.003);
+      if (Math.random() < paroleChance) {
+        if (character.institution) {
+          character.institution.active = false;
+        }
+        character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 20);
+        return {
+          success: true,
+          title: "Parole Approved!",
+          message: "The commissioners stamped your dossier approved! You were granted conditional early release and walked out through the penitentiary turnstiles into the rainy city (+20% Happiness).",
+          effects: { happiness: 20 }
+        };
+      } else {
+        character.stats.happiness = Math.max(0, (character.stats.happiness || 50) - 10);
+        character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 5);
+        return {
+          success: true,
+          title: "Parole Denied",
+          message: "The panel cited municipal safety risks and denied your petition. You were handcuffed and returned to your cell (-10% Happiness, -5% Sanity).",
+          effects: { happiness: -10, sanity: -5 }
+        };
+      }
     }
   },
 

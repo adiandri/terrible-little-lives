@@ -806,6 +806,366 @@ const INTERACTIVE_DILEMMAS = [
         effects: { happiness: +10, sanity: +8 }
       }
     ]
+  },
+  {
+    id: "corporate_whistleblower",
+    minAge: 22,
+    maxAge: 45,
+    title: "The Redacted Ledger",
+    prompt: "Working late at the corporate headquarters, you discover duplicate accounting books detailing municipal bribery and toxic waste dumping in the city reservoir.",
+    choices: [
+      {
+        text: "Leak the digital dossier anonymously to investigative journalists.",
+        outcome: "The morning headlines trigger sweeping civic investigations. The syndicate suspects nothing, though you live with gnawing anxiety.",
+        effects: { smarts: 10, humanity: 15, sanity: -4, happiness: -5 }
+      },
+      {
+        text: "Confront the department director and demand a quiet cash settlement.",
+        outcome: "The director pales and slides an envelope containing $1,200 into your palm. You pocket blood money at the expense of your moral core.",
+        effects: { money: 1200, humanity: -15, sanity: -6 }
+      },
+      {
+        text: "Purge the files from your workstation, log out quietly, and keep your head down.",
+        outcome: "You protect your mundane job and safety, watching the rain wash grime against the office windows.",
+        effects: { sanity: 5, happiness: 5, humanity: -4 }
+      }
+    ]
+  },
+  {
+    id: "the_inherited_mortgage",
+    minAge: 24,
+    maxAge: 52,
+    title: "A Foreclosed Inheritance",
+    prompt: "A distant great-uncle leaves you the deed to a decaying three-story brick brownstone in the old foundry district—along with five years of municipal back taxes.",
+    choices: [
+      {
+        text: "Pay the municipal back taxes and claim the historic estate ($600).",
+        outcome: "You wire $600 to clear the court lien. Beneath peeling wallpaper in the study, you discover forgotten occult ledgers and antique silver.",
+        effects: { money: -600, occult: 18, smarts: 8, shillings: 12 }
+      },
+      {
+        text: "Sell the deed at auction to a commercial demolition syndicate.",
+        outcome: "A wrecking ball levels the centuries-old brickwork. You pocket $1,500 from the commercial land transaction.",
+        effects: { money: 1500, occult: -10, humanity: -4 }
+      },
+      {
+        text: "Explore the bricked-off cellar arches before abandoning the deed.",
+        outcome: "Behind crumbling mortar, you uncover a candlelit altar covered in dried wax and heavy ceremonial shillings.",
+        effects: { shillings: 25, occult: 22, sanity: -8 }
+      }
+    ]
+  },
+  {
+    id: "underground_speakeasy_clique",
+    minAge: 21,
+    maxAge: 42,
+    title: "The Cellar Society",
+    prompt: "A brooding colleague slips you an embossed copper token granting entry to 'The Hanged Man', a subterranean salon hidden behind a mortuary basement where bohemians drink absinthe.",
+    choices: [
+      {
+        text: "Sip cloudy green absinthe and debate forbidden metaphysics until dawn.",
+        outcome: "The anise liqueur burns your throat as poets argue about the anatomy of ghosts. Your intellect sparks with dark inspiration.",
+        effects: { smarts: 8, occult: 12, vitality: -4, sanity: 4 }
+      },
+      {
+        text: "Slip into the curtained back parlor where high-stakes card games are played.",
+        outcome: "You read the trembling hands of wealthy patrons and sweep a stack of clean banknotes into your coat.",
+        effects: { money: 450, smarts: 6, humanity: -5 }
+      },
+      {
+        text: "Politely decline and spend the evening reading quietly in your room.",
+        outcome: "You brew warm chamomile tea and fall asleep early, keeping your life free of dangerous artistic obsessions.",
+        effects: { vitality: 5, happiness: 6, sanity: 5 }
+      }
+    ]
+  },
+  {
+    id: "the_unseen_tenant",
+    minAge: 23,
+    maxAge: 50,
+    title: "The Unseen Tenant",
+    prompt: "In your rented apartment, footsteps pace across the floorboards above your bedroom every night at 3:14 AM—despite living on the top floor directly under the flat gravel roof.",
+    choices: [
+      {
+        text: "Climb the fire escape ladder to inspect the roof in the dead of night.",
+        outcome: "Barefoot prints in fresh frost lead directly to the roof ledge and vanish into thin air. A freezing draft brushes past your cheek.",
+        effects: { occult: 16, smarts: 6, sanity: -6 }
+      },
+      {
+        text: "Leave a saucer of salted milk and an unlit beeswax candle on the landing.",
+        outcome: "By morning, the milk has turned black and the candle wick is cleanly bitten in half. The midnight pacing ceases for months.",
+        effects: { occult: 14, humanity: 6, sanity: 8 }
+      },
+      {
+        text: "Wear wax earplugs and drown out the house with white noise radio static.",
+        outcome: "You sleep through the cold hours in oblivious quiet, refusing to feed the uncanny anomaly with your attention.",
+        effects: { sanity: 6, happiness: 6 }
+      }
+    ]
+  },
+  {
+    id: "midlife_existential_divergence",
+    minAge: 36,
+    maxAge: 58,
+    title: "The Midnight Mirror",
+    prompt: "Staring into the bathroom glass at 2:00 AM on a rainy Tuesday, an overwhelming conviction hits you: the person in the reflection is a stranger who stole your youth.",
+    choices: [
+      {
+        text: "Withdraw $500 in savings and book a solitary sleeper train to the coast.",
+        outcome: "Watching salt spray crash against midnight sea cliffs cleanses your suffocating regret and restores your spirit.",
+        effects: { money: -500, sanity: 15, happiness: 15, vitality: 5 }
+      },
+      {
+        text: "Drown the existential dread in strong black coffee and bury yourself in extra work.",
+        outcome: "You complete quarterly spreadsheets until your vision blurs. You earn bonus overtime at the cost of your tired heart.",
+        effects: { money: 400, smarts: 5, vitality: -6, sanity: -4 }
+      },
+      {
+        text: "Perform a mirror-scrying ritual from an antique occult gazetteer.",
+        outcome: "The glass ripples like black oil. A shadowy elder self winks at you from the depths, whispering secrets of impending years.",
+        effects: { occult: 22, shillings: 10, sanity: -8 }
+      }
+    ]
+  },
+  {
+    id: "estranged_sibling_custody",
+    minAge: 35,
+    maxAge: 62,
+    title: "The Estranged Ward",
+    prompt: "A telegram arrives from a provincial sanitarium: an estranged sibling has been committed for violent melancholia, leaving behind a solemn, pale-eyed child who needs a guardian.",
+    choices: [
+      {
+        text: "Sign legal guardianship papers and welcome the quiet child into your home.",
+        outcome: "The child sits silently by your hearth with a sketchpad, drawing intricate labyrinth patterns. Your home feels less hollow.",
+        effects: { humanity: 18, happiness: 10, money: -350, sanity: 5 }
+      },
+      {
+        text: "Refuse custody and instruct the municipal orphanage to take charge.",
+        outcome: "You sign the release waiver and close your door against the rain. The relief is heavy with cold, lingering guilt.",
+        effects: { humanity: -16, sanity: -5, happiness: -6 }
+      },
+      {
+        text: "Investigate the bizarre psychological breakdown that befell your sibling.",
+        outcome: "You discover your sibling was obsessed with a subterranean archaeological dig beneath the municipal reservoir.",
+        effects: { smarts: 12, occult: 16, sanity: -7 }
+      }
+    ]
+  },
+  {
+    id: "syndicate_blackmail",
+    minAge: 30,
+    maxAge: 65,
+    title: "The Slit Manila Folder",
+    prompt: "A courier slips an unmarked envelope under your door containing candid surveillance photos of your daily routine, accompanied by a letter demanding your help laundering counterfeit treasury notes.",
+    choices: [
+      {
+        text: "Bring the surveillance portfolio straight to the municipal police precinct.",
+        outcome: "Detectives place your block on temporary surveillance. The gangsters back off, though shadows linger around your entryway.",
+        effects: { humanity: 12, smarts: 6, sanity: -5, happiness: -4 }
+      },
+      {
+        text: "Play along with the syndicate and facilitate the forged cash transfers.",
+        outcome: "You launder bundles of banknotes through local merchant stalls, pocketing an illicit $1,400 cut.",
+        effects: { money: 1400, humanity: -18, sanity: -8, occult: 6 }
+      },
+      {
+        text: "Burn the photos in the woodstove and reinforce your apartment deadbolts.",
+        outcome: "The ashes crumble to gray dust. You purchase new iron rim deadbolts and stay inside after dusk.",
+        effects: { money: -120, sanity: 6, vitality: 4 }
+      }
+    ]
+  },
+  {
+    id: "the_rejuvenation_clinic",
+    minAge: 45,
+    maxAge: 72,
+    title: "Dr. Morbius's Rejuvenation Therapy",
+    prompt: "A discreet private clinic in the misty hills offers an experimental cellular therapy derived from subterranean lichen and deep-sea mineral extract, promising to restore lost vitality.",
+    choices: [
+      {
+        text: "Pay for the experimental rejuvenation infusion ($800).",
+        outcome: "Cold blue fluid surges through your veins. Gray hair darkens, wrinkles smooth out, and an unnatural vigor fills your limbs.",
+        effects: { money: -800, vitality: 16, looks: 14, humanity: -6, sanity: -4 }
+      },
+      {
+        text: "Sneak into the restricted records dispensary during your consultation.",
+        outcome: "You photograph clinic journals revealing the extract is harvested from living subterranean crypt molds.",
+        effects: { smarts: 14, occult: 14, sanity: -6 }
+      },
+      {
+        text: "Decline politely; rely on brisk walks, black tea, and natural aging.",
+        outcome: "You walk down the hillside in the crisp autumn air, content with the honest passage of mortal seasons.",
+        effects: { sanity: 8, humanity: 6, happiness: 6 }
+      }
+    ]
+  },
+  {
+    id: "haunted_commuter_derailment",
+    minAge: 28,
+    maxAge: 65,
+    title: "The Ghost Train of Platform 9",
+    prompt: "Waiting on a deserted subway platform at midnight, an unlisted wooden train car pulls up in total silence. The destination placard reads 'Limbo Junction'.",
+    choices: [
+      {
+        text: "Step aboard out of grim curiosity before the brass doors shut.",
+        outcome: "Pale passengers in 19th-century attire sit in silence. You gather antique brass tokens and forbidden gossip before jumping off at the first stop.",
+        effects: { occult: 22, shillings: 18, sanity: -10, smarts: 8 }
+      },
+      {
+        text: "Pull another bewildered commuter back from the open doorway.",
+        outcome: "You grab the sleeve of a dazed young clerk just as the doors slam shut and the phantom car dissolves into black mist.",
+        effects: { humanity: 15, sanity: 6, happiness: 8 }
+      },
+      {
+        text: "Turn on your heel and briskly walk up the concrete stairs to the street.",
+        outcome: "You hail a yellow municipal cab under the sodium streetlights, leaving the subterranean anomaly behind.",
+        effects: { sanity: 6, vitality: 4 }
+      }
+    ]
+  },
+  {
+    id: "the_will_and_testament",
+    minAge: 55,
+    maxAge: 85,
+    title: "Drafting the Final Ledger",
+    prompt: "Your aging solicitor arrives at your parlor with a fountain pen and parchment, urging you to formalize your last will and testament before infirmity sets in.",
+    choices: [
+      {
+        text: "Bequeth your worldly savings evenly among surviving family and friends.",
+        outcome: "You sign the notarized testament. A warm sense of filial duty and familial peace settles over your twilight years.",
+        effects: { humanity: 16, happiness: 14, sanity: 8 }
+      },
+      {
+        text: "Endow an occult research fellowship at the municipal antiquarian society.",
+        outcome: "Scholars in black academic robes toast your name in candlelight, preserving your esoteric research for future centuries.",
+        effects: { occult: 20, shillings: 12, smarts: 8, humanity: -6 }
+      },
+      {
+        text: "Bury your gold and silver coins in an iron chest beneath river willow roots.",
+        outcome: "Under a crescent moon, you tamp down the damp earth with a spade. The location of your hoard dies with you alone.",
+        effects: { sanity: 8, smarts: 6, happiness: 6 }
+      }
+    ]
+  },
+  {
+    id: "fading_memories_dementia",
+    minAge: 65,
+    maxAge: 95,
+    title: "The Dissolving Archive",
+    prompt: "You awaken one foggy morning unable to recognize the framed photographs on your mantelpiece or recall the name of the avenue outside your front door.",
+    choices: [
+      {
+        text: "Sit with a fountain pen and painstakingly journal every salvaged memory.",
+        outcome: "Writing by lamplight, you anchor your history across three dense leatherbound volumes. The mental discipline halts the fog.",
+        effects: { smarts: 12, sanity: 10, happiness: 6 }
+      },
+      {
+        text: "Surrender to the quiet haze and let the heavy burdens of past decades drift away.",
+        outcome: "Freed from ancient regrets and bitter feuds, you spend peaceful afternoons listening to radio symphonies.",
+        effects: { happiness: 15, sanity: 8, smarts: -8 }
+      },
+      {
+        text: "Consult an esoteric medium who claims to pin wandering minds to reality.",
+        outcome: "The medium burns dried sage and binds a copper talisman around your neck, speaking with deceased relatives.",
+        effects: { occult: 18, money: -250, sanity: 5, humanity: -4 }
+      }
+    ]
+  },
+  {
+    id: "the_collector_of_debts",
+    minAge: 60,
+    maxAge: 92,
+    title: "The Shadow Creditor",
+    prompt: "A tall stranger in an outdated frock coat and wire-rim spectacles sits at your bedside. He unrolls a yellowed parchment note bearing your ancestral family crest and seal.",
+    choices: [
+      {
+        text: "Settle the supernatural obligation with accumulated occult shillings.",
+        outcome: "You count out 25 cold shillings into his withered gloved hand. He touches his brim, dissolves into smoke, and your breathing eases.",
+        effects: { shillings: -25, vitality: 10, sanity: 14, occult: 10 }
+      },
+      {
+        text: "Dissect the ancient contract clause-by-clause with sharp legal skepticism.",
+        outcome: "You point out three expired municipal jurisdictions and fatal notary omissions. The phantom scowls and vanishes in frustrated defeat.",
+        effects: { smarts: 15, sanity: 6, happiness: 8 }
+      },
+      {
+        text: "Cast salt at the figure and banish him in the name of the living daylight.",
+        outcome: "The specter hisses and disperses, though the metaphysical shock leaves your elderly heart racing violently.",
+        effects: { humanity: 12, vitality: -6, sanity: 4 }
+      }
+    ]
+  },
+  {
+    id: "autumn_retiree_parlor",
+    minAge: 65,
+    maxAge: 95,
+    title: "The Autumn Guild",
+    prompt: "An embossed invitation invites you to join the Venerable Order of the Setting Sun—a society of retired sea captains, scholars, and quiet eccentrics who meet in an oak-paneled salon.",
+    choices: [
+      {
+        text: "Accept membership and spend quiet afternoons playing chess by the roaring hearth.",
+        outcome: "You find camaraderie among old minds who share memories of forgotten decades. Warm tea and cedar woodsmoke soothe your nerves.",
+        effects: { happiness: 14, sanity: 12, smarts: 6 }
+      },
+      {
+        text: "Lead the salon in forbidden research into longevity and ancient burial crypts.",
+        outcome: "The venerable members pool their private libraries and rare artifacts, electing you grand archivist.",
+        effects: { occult: 20, shillings: 15, smarts: 10 }
+      },
+      {
+        text: "Remain solitary in your own armchair, watching rain stream down the glass.",
+        outcome: "You sip warmed port wine in solitude, savoring the undisturbed quietude of your twilight years.",
+        effects: { sanity: 6, vitality: 4, happiness: 6 }
+      }
+    ]
+  },
+  {
+    id: "the_bargain_at_the_threshold",
+    minAge: 75,
+    maxAge: 99,
+    title: "The Whisper at the Threshold",
+    prompt: "A midnight gale blows open your bedroom shutters. A formless voice from the black sky offers to restore ten years of youthful vitality in exchange for a portion of your mortal soul.",
+    choices: [
+      {
+        text: "Sign your name upon the frost of the windowpane and seal the dark pact.",
+        outcome: "A freezing shock surges through your chest! Arthritis vanishes, breath deepens, and your skin firms—but your reflection no longer casts a shadow.",
+        effects: { vitality: 25, occult: 25, humanity: -30, sanity: -10 }
+      },
+      {
+        text: "Spit toward the window and face the natural twilight with unyielding dignity.",
+        outcome: "The howling gale subsides into harmless night rain. You pull up your wool quilt, unbroken in spirit and rich in mortal grace.",
+        effects: { humanity: 25, sanity: 18, happiness: 12 }
+      },
+      {
+        text: "Barter with the presence using ancient riddles and rare occult shillings.",
+        outcome: "You outsmart the shadowy entity, paying 15 shillings to extend your vitality without relinquishing your soul.",
+        effects: { shillings: -15, smarts: 14, vitality: 12, occult: 10 }
+      }
+    ]
+  },
+  {
+    id: "the_crypt_unlocked",
+    minAge: 70,
+    maxAge: 99,
+    title: "The Whispering Mausoleum",
+    prompt: "Walking through the city cemetery grounds at dusk, you find your own family mausoleum door standing ajar. Low, harmonic choral voices echo from the stone steps below.",
+    choices: [
+      {
+        text: "Descend the granite stairs with a brass lantern to greet whoever is inside.",
+        outcome: "Beneath the vaulted ceiling, glowing phosphorescent lichen illuminates ancestral sarcophagi. You uncover ancient heirlooms and feel at one with the departed.",
+        effects: { occult: 24, shillings: 18, smarts: 8, sanity: -6 }
+      },
+      {
+        text: "Heave the heavy bronze door shut and secure it with a heavy iron chain.",
+        outcome: "The heavy metal gate groans shut with finality. You protect the living world from whatever was stirring below.",
+        effects: { sanity: 12, humanity: 10, happiness: 6 }
+      },
+      {
+        text: "Sit on the carved marble bench outside and listen to the haunting melody.",
+        outcome: "The unearthly singing floats into the purple dusk like a lullaby for a long life well-lived.",
+        effects: { happiness: 12, sanity: 8, vitality: 4 }
+      }
+    ]
   }
 ];
 

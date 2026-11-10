@@ -1,5 +1,48 @@
 // Game Engine for Terrible Little Lives (Modern Era, Dual Economy & Careers)
 
+function commitToAsylum(character, years = 2, reason = "Severe psychological collapse") {
+  if (!character) return;
+  character.institution = {
+    type: 'asylum',
+    name: "St. Dymphna's State Asylum",
+    yearsLeft: years,
+    reason: reason,
+    active: true
+  };
+  if (character.job) {
+    character.previousJob = character.job;
+    character.job = null;
+    character.jobTenure = 0;
+    character.jobPerformance = 50;
+  }
+  if (window.addConsequence) {
+    window.addConsequence(character, 'social_stigma', { severity: 2, label: 'Asylum Record', note: reason });
+  }
+}
+
+function sentenceToPrison(character, years = 2, reason = "Conviction in municipal court") {
+  if (!character) return;
+  character.institution = {
+    type: 'prison',
+    name: "Blackthorn Penitentiary",
+    yearsLeft: years,
+    reason: reason,
+    active: true
+  };
+  if (character.job) {
+    character.previousJob = character.job;
+    character.job = null;
+    character.jobTenure = 0;
+    character.jobPerformance = 50;
+  }
+  if (window.addConsequence) {
+    window.addConsequence(character, 'criminal_record', { severity: 3, label: 'Felony Conviction', note: reason });
+  }
+}
+
+window.commitToAsylum = commitToAsylum;
+window.sentenceToPrison = sentenceToPrison;
+
 class TerribleGame {
   constructor() {
     this.character = null;
@@ -1795,17 +1838,71 @@ class TerribleGame {
       eduLogs.forEach(entry => currentYearLog.entries.push(entry));
     }
 
+    // Institutional Confinement Simulation
+    if (this.character.institution && this.character.institution.active) {
+      const inst = this.character.institution;
+      inst.yearsLeft = Math.max(0, (inst.yearsLeft || 1) - 1);
+      if (inst.type === 'asylum') {
+        this.modifyStat('vitality', -2);
+        this.modifyStat('sanity', 6);
+        this.modifyStat('happiness', -5);
+        currentYearLog.entries.push(`[ASYLUM CONFINEMENT] Another year behind the heavy oak doors of ${inst.name}. Daily sedatives, orderlies, and supervised ward walks (-2% Vitality, +6% Sanity, -5% Happiness). ${inst.yearsLeft} year(s) remaining.`);
+        if (inst.yearsLeft <= 0) {
+          inst.active = false;
+          this.modifyStat('happiness', 15);
+          currentYearLog.entries.push(`[DISCHARGED FROM ASYLUM] The clinical review board declared you stabilized! You were handed your civilian clothes and discharged through the front gate.`);
+        }
+      } else if (inst.type === 'prison') {
+        this.modifyStat('vitality', 1);
+        this.modifyStat('sanity', -3);
+        this.modifyStat('happiness', -8);
+        this.modifyStat('humanity', -2);
+        currentYearLog.entries.push(`[PENITENTIARY INCARCERATION] Another year counted in cell wall tallies at ${inst.name}. Iron bars, roll calls, and coarse rations (+1% Vitality, -3% Sanity, -8% Happiness). ${inst.yearsLeft} year(s) remaining.`);
+        if (inst.yearsLeft <= 0) {
+          inst.active = false;
+          this.modifyStat('happiness', 15);
+          currentYearLog.entries.push(`[RELEASED FROM PRISON] Your prison term was served in full. The iron turnstiles unlocked and you stepped back into freedom.`);
+        }
+      }
+    }
+
     // 3. Career / Vocation Performance
-    if (this.character.job) {
+    if (this.character.job && (!this.character.institution || !this.character.institution.active)) {
+      this.character.jobTenure = (this.character.jobTenure || 0) + 1;
+      this.character.jobPerformance = this.character.jobPerformance !== undefined ? this.character.jobPerformance : 50;
+
+      const performanceDrift = Math.floor(((this.character.stats.smarts || 50) - 50) * 0.1) + Math.floor(((this.character.stats.vitality || 50) - 50) * 0.05);
+      this.character.jobPerformance = Math.max(0, Math.min(100, this.character.jobPerformance + performanceDrift));
+
       const base = this.character.job.baseSalary || this.character.job.baseSalaryUSD || 24000;
       const salary = window.getAdjustedSalary(base, this.character.countryCode);
       this.character.money += salary;
-      currentYearLog.entries.push(`Deposited salary: +${window.formatMoney(salary, this.character.countryCode)} working as a ${this.character.job.title}.`);
-      
-      if (this.character.job.stress > 25 && Math.random() < 0.4) {
+      currentYearLog.entries.push(`Deposited salary: +${window.formatMoney(salary, this.character.countryCode)} working as a ${this.character.job.title} (Performance: ${this.character.jobPerformance}%).`);
+
+      // Promotion evaluation
+      const nextPromotion = window.getPromotionForJob ? window.getPromotionForJob(this.character.job) : null;
+      if (nextPromotion && this.character.jobPerformance >= 70 && this.character.jobTenure >= 2) {
+        const oldTitle = this.character.job.title;
+        this.character.job = nextPromotion;
+        this.character.jobTenure = 0;
+        this.character.jobPerformance = 55;
+        this.modifyStat('happiness', 12);
+        this.modifyStat('sanity', 5);
+        currentYearLog.entries.push(`[CAREER PROMOTION] Promoted from ${oldTitle} to ${nextPromotion.title}! Base salary increased to ${window.formatMoney(window.getAdjustedSalary(nextPromotion.baseSalary, this.character.countryCode), this.character.countryCode)}.`);
+      } else if (this.character.jobPerformance <= 20) {
+        const firedTitle = this.character.job.title;
+        this.character.job = null;
+        this.character.jobTenure = 0;
+        this.character.jobPerformance = 50;
+        this.modifyStat('happiness', -12);
+        this.modifyStat('sanity', -6);
+        currentYearLog.entries.push(`[TERMINATED] Due to disastrous performance appraisals, you were formally dismissed from your position as ${firedTitle}.`);
+      }
+
+      if (this.character.job && this.character.job.stress > 25 && Math.random() < 0.4) {
         this.modifyStat('vitality', -1);
       }
-    } else if (this.character.age >= 18 && (!this.character.education || !this.character.education.enrolled)) {
+    } else if (this.character.age >= 18 && (!this.character.education || !this.character.education.enrolled) && (!this.character.institution || !this.character.institution.active)) {
       const unemploymentVignettes = [
         "Lacking full-time employment, you scraped together odd cash errands and gig deliveries.",
         "Submitted electronic resumes to indifferent corporate job portals without response.",
@@ -1822,7 +1919,7 @@ class TerribleGame {
       currentYearLog.entries.push(`Collected +${gig.payoutShillings} s. from occult contract (${gig.title}). The ordeal drained -${gig.sanityCost}% Sanity.`);
     }
 
-    if (this.character.age >= 18) {
+    if (this.character.age >= 18 && (!this.character.institution || !this.character.institution.active)) {
       const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
       const annualRentCost = country.annualLivingCost || 16000;
 
@@ -4922,6 +5019,7 @@ class TerribleGame {
     if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: `activity_${activity?.category || 'general'}`, title: result.title, outcome: result.message, effects: result.effects, engaged: true, investigated: /research|study|record|investigat|explore/i.test(`${activityId} ${result.title} ${result.message}`) });
     if (window.recordEntityEncounter) window.recordEntityEncounter(this.character, { source: 'activity', title: result.title, outcome: result.message, effects: result.effects });
 
+    this.checkMortality();
     this.renderAll();
     this.renderActivitiesList(this.activeActivityCategory);
     this.saveGame();
@@ -4956,8 +5054,27 @@ class TerribleGame {
       return;
     }
     if (this.character.stats.sanity <= 0) {
-      this.die("Mind Shattered", "Total psychological dissolution. Found repeating unrendered unicode strings in a locked room; committed to the state psychiatric ward.");
-      return;
+      if (!this.character.institution || this.character.institution.type !== 'asylum' || !this.character.institution.active) {
+        commitToAsylum(this.character, 3, "Acute psychological collapse and delirium");
+        this.character.stats.sanity = 25;
+        this.modifyStat('vitality', -5);
+        const latestLog = this.logs[this.logs.length - 1];
+        if (latestLog) {
+          latestLog.entries.push(`[INVOLUNTARY COMMITMENT] Your sanity shattered into screaming hallucinations. Orderlies from St. Dymphna's Asylum strapped you into a canvas straitjacket and admitted you under emergency hold (Sanity stabilized at 25%, 3-year commitment).`);
+        }
+        this.openFeedbackModal({
+          tag: 'INVOLUNTARY COMMITMENT',
+          title: "Committed to St. Dymphna's Asylum",
+          icon: 'brain',
+          iconColor: 'text-purple-400',
+          body: "Your mind collapsed under unbearable psychological trauma. Orderlies arrived, administered heavy tranquilizers, and transported you to the closed ward of St. Dymphna's State Asylum under emergency medical detention.",
+          effects: { sanity: 25, vitality: -5 }
+        });
+        return;
+      } else {
+        this.die("Mind Shattered", "Total psychological dissolution within the asylum walls. Slipped into irreversible catatonic silence; physical existence faded away.");
+        return;
+      }
     }
     if (this.character.stats.humanity <= 0) {
       this.die("Transcendence Beyond Flesh", "Humanity expired completely. Walked into the underground subway tunnels at midnight and never returned to the physical world.");
@@ -5113,22 +5230,31 @@ class TerribleGame {
     this.dom.profileLifeSummary.textContent = `Age ${character.age} · ${character.statusTitle}`;
     const country = window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode];
     this.dom.profileLocation.textContent = [character.city, country ? country.name : character.countryCode].filter(Boolean).join(', ');
-    this.dom.profileOccupation.textContent = character.job?.title || character.paranormalGig?.title || character.statusTitle || 'Unoccupied';
+    if (character.institution && character.institution.active) {
+      this.dom.profileOccupation.textContent = character.institution.type === 'asylum' ? 'Involuntary Patient' : 'Penitentiary Inmate';
+    } else {
+      this.dom.profileOccupation.textContent = character.job?.title || character.paranormalGig?.title || character.statusTitle || 'Unoccupied';
+    }
     this.dom.profileTrait.textContent = character.trait?.name || 'None';
     this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
     this.dom.profileShillings.textContent = `${character.shillings} s.`;
     if (this.dom.profileHousing) {
-      const housingLabels = {
-        family_home: 'Family Household',
-        tenement_apartment: 'Rented Tenement',
-        squalor_room: 'Dilapidated Flophouse',
-        homeless: 'Homeless (Rough Sleeper)'
-      };
-      const housingKey = character.housing || (character.age < 18 ? 'family_home' : 'tenement_apartment');
-      const isHomeless = housingKey === 'homeless';
-      const isSqualor = housingKey === 'squalor_room';
-      const color = isHomeless ? 'text-crimson font-bold' : (isSqualor ? 'text-amber-400' : 'text-parchment');
-      this.dom.profileHousing.innerHTML = `<span class="${color}">${housingLabels[housingKey] || housingKey}</span>`;
+      if (character.institution && character.institution.active) {
+        const instColor = character.institution.type === 'asylum' ? 'text-purple-400 font-bold' : 'text-amber-500 font-bold';
+        this.dom.profileHousing.innerHTML = `<span class="${instColor}">${character.institution.name} (${character.institution.yearsLeft}y left)</span>`;
+      } else {
+        const housingLabels = {
+          family_home: 'Family Household',
+          tenement_apartment: 'Rented Tenement',
+          squalor_room: 'Dilapidated Flophouse',
+          homeless: 'Homeless (Rough Sleeper)'
+        };
+        const housingKey = character.housing || (character.age < 18 ? 'family_home' : 'tenement_apartment');
+        const isHomeless = housingKey === 'homeless';
+        const isSqualor = housingKey === 'squalor_room';
+        const color = isHomeless ? 'text-crimson font-bold' : (isSqualor ? 'text-amber-400' : 'text-parchment');
+        this.dom.profileHousing.innerHTML = `<span class="${color}">${housingLabels[housingKey] || housingKey}</span>`;
+      }
     }
     if (this.dom.profileReputation && window.reputationHtml) this.dom.profileReputation.innerHTML = window.reputationHtml(character);
     if (this.dom.profileRumors && window.rumorHtml) this.dom.profileRumors.innerHTML = window.rumorHtml(character);
