@@ -5796,7 +5796,7 @@ class TerribleGame {
       const isActive = theme.id === activeId;
       const card = document.createElement('button');
       card.type = 'button';
-      card.className = `identity-theme-card w-full p-3 rounded-xl border transition-all cursor-pointer text-left ${isActive ? 'bg-cardhover' : 'bg-slatecard hover:bg-cardhover border-leadborder'}`;
+      card.className = `identity-theme-card w-full p-3 rounded-xl border transition-all cursor-pointer text-left active:scale-[0.98] ${isActive ? 'bg-cardhover border-crimson/50 ring-1 ring-crimson/30 shadow-md' : 'bg-slatecard hover:bg-cardhover border-leadborder'}`;
       card.setAttribute('aria-pressed', String(isActive));
 
       const swatchesHtml = `
@@ -5807,19 +5807,22 @@ class TerribleGame {
         </div>
       `;
 
+      const tagLabel = theme.tag || (theme.mode === 'dark' ? 'Dark' : 'Light');
+      const tagStyle = theme.mode === 'dark' ? 'bg-inputbg text-sky-400 border-sky-900/50' : 'bg-[#fef9c3] text-amber-900 border-amber-300';
+
       card.innerHTML = `
         <div class="flex items-center space-x-3 min-w-0">
           ${swatchesHtml}
           <div class="min-w-0 flex-1">
             <div class="flex items-center space-x-1.5">
               <h4 class="font-serif font-bold text-xs text-parchment truncate">${theme.name}</h4>
-              <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border ${theme.mode === 'dark' ? 'bg-[#0f1118] text-sky-400 border-sky-900/50' : 'bg-[#fef9c3] text-amber-900 border-amber-300'}">${theme.mode === 'dark' ? 'Dark' : 'Light'}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${tagStyle}">${tagLabel}</span>
             </div>
             <p class="text-[10px] text-dust mt-1 leading-relaxed">${theme.desc}</p>
           </div>
           ${isActive 
-            ? `<span class="p-1 rounded-full bg-crimson/15 border border-crimson/40 text-crimson flex items-center justify-center shrink-0"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
-            : `<span class="text-[10px] font-mono text-dust/60 shrink-0">Choose</span>`
+            ? `<span class="p-1.5 rounded-full bg-crimson/15 border border-crimson/40 text-crimson flex items-center justify-center shrink-0"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>`
+            : `<span class="text-[10px] font-mono text-dust/60 px-2 py-0.5 rounded bg-inputbg border border-leadborder/60 shrink-0">Select</span>`
           }
         </div>
       `;
