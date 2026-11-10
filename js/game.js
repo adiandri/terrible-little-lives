@@ -215,6 +215,7 @@ class TerribleGame {
       profileTrait: document.getElementById('profile-trait'),
       profileMoney: document.getElementById('profile-money'),
       profileShillings: document.getElementById('profile-shillings'),
+      profileHousing: document.getElementById('profile-housing'),
       profileConsequences: document.getElementById('profile-consequences'),
 
       // Careers Modal
@@ -1619,7 +1620,10 @@ class TerribleGame {
     if (vit < 15 && base > 2) {
       base -= 1;
     }
-    return Math.max(2, base);
+    if (c.housing === 'homeless') {
+      base -= 1;
+    }
+    return Math.max(1, base);
   }
 
   notifyExhausted(customMessage = null) {
@@ -1822,16 +1826,97 @@ class TerribleGame {
       const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
       const annualRentCost = country.annualLivingCost || 16000;
 
-      if (this.character.money >= annualRentCost) {
-        this.character.money -= annualRentCost;
-        currentYearLog.entries.push(`Paid annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
-      } else {
-        const shortfall = annualRentCost - this.character.money;
-        this.character.money = 0;
-        if (window.addDebtConsequence) window.addDebtConsequence(this.character, shortfall, 'annual rent and living expenses');
-        this.modifyStat('happiness', -3);
-        this.modifyStat('vitality', -2);
-        currentYearLog.entries.push(`Struggled to afford rent and groceries in ${this.character.city}. Financial anxiety strained your well-being.`);
+      // Initialize housing on reaching adulthood
+      if (!this.character.housing || this.character.housing === 'family_home') {
+        this.character.housing = 'tenement_apartment';
+      }
+
+      if (this.character.housing === 'tenement_apartment') {
+        if (this.character.money >= annualRentCost) {
+          this.character.money -= annualRentCost;
+          this.character.consecutiveUnpaidRent = 0;
+          currentYearLog.entries.push(`Paid annual apartment rent and living expenses: -${window.formatMoney(annualRentCost, this.character.countryCode)}.`);
+        } else {
+          const shortfall = annualRentCost - this.character.money;
+          this.character.money = 0;
+          if (window.addDebtConsequence) window.addDebtConsequence(this.character, shortfall, 'unpaid apartment rent');
+          this.character.consecutiveUnpaidRent = (this.character.consecutiveUnpaidRent || 0) + 1;
+          
+          if (this.character.consecutiveUnpaidRent === 1) {
+            this.modifyStat('happiness', -8);
+            this.modifyStat('sanity', -5);
+            this.modifyStat('vitality', -3);
+            currentYearLog.entries.push(`[EVICTION WARNING] Fell short on rent. Your landlord posted a 12-month eviction notice and threatened legal bailiffs.`);
+          } else {
+            // Consecutive default -> EVICTED TO THE STREETS
+            this.character.housing = 'homeless';
+            this.character.consecutiveUnpaidRent = 0;
+            this.modifyStat('happiness', -15);
+            this.modifyStat('sanity', -10);
+            this.modifyStat('vitality', -8);
+            currentYearLog.entries.push(`[EVICTION EXECUTED] Unable to pay arrears, bailiffs padlocked your apartment and dumped your belongings into the rainy streets of ${this.character.city}. You are now homeless.`);
+            if (window.observeHorror) window.observeHorror(this.character, { source: 'housing', text: 'Evicted into the streets', classification: 'urban_misery', intensity: 2, engaged: false });
+          }
+        }
+      } else if (this.character.housing === 'squalor_room') {
+        const squalorRent = Math.floor(annualRentCost * 0.3);
+        if (this.character.money >= squalorRent) {
+          this.character.money -= squalorRent;
+          this.character.consecutiveUnpaidRent = 0;
+          this.modifyStat('vitality', -2);
+          this.modifyStat('sanity', -2);
+          currentYearLog.entries.push(`Paid rent for a damp boarding room: -${window.formatMoney(squalorRent, this.character.countryCode)}. Cockroaches and drafts haunt the floorboards (-2% Vitality, -2% Sanity).`);
+          
+          // Automatic upgrade if wealthy enough
+          if (this.character.money >= annualRentCost + 4000) {
+            this.character.housing = 'tenement_apartment';
+            this.modifyStat('happiness', 10);
+            currentYearLog.entries.push(`[HOUSING UPGRADE] With steady savings accumulated, you moved out of the squalid flophouse and signed an apartment lease in ${this.character.city}.`);
+          }
+        } else {
+          this.character.housing = 'homeless';
+          this.character.money = 0;
+          this.modifyStat('happiness', -10);
+          this.modifyStat('vitality', -5);
+          currentYearLog.entries.push(`[EVICTION] The boarding house landlord threw you out into the street for failing to pay the weekly cubicle charge.`);
+        }
+      } else if (this.character.housing === 'homeless') {
+        // Scavenging sustenance costs
+        const scavengeCost = Math.min(this.character.money, Math.floor(annualRentCost * 0.05));
+        this.character.money -= scavengeCost;
+        
+        // Automatic escape if player saved enough
+        if (this.character.money >= annualRentCost + 2000) {
+          this.character.housing = 'tenement_apartment';
+          this.modifyStat('happiness', 15);
+          this.modifyStat('sanity', 10);
+          currentYearLog.entries.push(`[SHELTER SECURED] You accumulated enough cash to sign a proper apartment lease and leave the brutal streets behind.`);
+        } else if (this.character.money >= Math.floor(annualRentCost * 0.3) + 500) {
+          this.character.housing = 'squalor_room';
+          this.modifyStat('happiness', 8);
+          currentYearLog.entries.push(`[SHELTER FOUND] Scraped together enough to secure a dry cubicle in a flophouse, escaping the winter elements.`);
+        } else {
+          // Severe street attrition
+          this.modifyStat('vitality', -5);
+          this.modifyStat('sanity', -5);
+          this.modifyStat('happiness', -8);
+          this.modifyStat('looks', -3);
+          const streetHardships = [
+            `Sleeping rough over subway vents in ${this.character.city}; freezing rain soaked through your second-hand overcoat (-5% Vitality, -5% Sanity).`,
+            `Chased from station doorways by municipal transit officers; winter frost bit deeply into your fingers (-5% Vitality, -8% Happiness).`,
+            `Survived on shelter soup and discarded bakery crusts; relentless cold chipped away at your dignity (-5% Vitality, -3% Looks).`
+          ];
+          currentYearLog.entries.push(`[HOMELESS ATTRITION] ${window.getRandomElement(streetHardships)}`);
+          
+          // Chance of contracting disease from the street
+          if (Math.random() < 0.35 && window.contractAilment) {
+            const ailmentChoice = Math.random() < 0.5 ? 'ailment_consumption' : 'ailment_damp_rot';
+            const contracted = window.contractAilment(this.character, ailmentChoice, 'Exposure to freezing dampness and unsanitary alleyways', 'Homelessness');
+            if (contracted) {
+              currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Exposure to winter squalor resulted in ${contracted.label}!`);
+            }
+          }
+        }
       }
     } else {
       // Minor allowance / home dynamic
@@ -1905,10 +1990,71 @@ class TerribleGame {
       currentYearLog.entries.push(window.getRandomElement(sensoryEvents));
     }
 
-    // Natural vitality & looks age erosion
-    this.modifyStat('vitality', (Math.random() > 0.7 ? -1 : 0));
-    if (this.character.age > 35 && Math.random() < 0.35) {
+    // Atmospheric Sickness & Affliction Contraction Checks
+    if (window.contractAilment) {
+      // Squalor room risks
+      if (this.character.housing === 'squalor_room' && Math.random() < 0.18) {
+        const ailment = Math.random() < 0.5 ? 'ailment_lead_poisoning' : 'ailment_consumption';
+        const res = window.contractAilment(this.character, ailment, 'Toxic flophouse plumbing and moldy ventilation', 'Squalid Living Conditions');
+        if (res) currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Unsanitary lodging caused ${res.label}!`);
+      }
+      // Low sanity breakdown -> Melancholia or Insomnia
+      if (this.character.stats.sanity < 25 && Math.random() < 0.25) {
+        const ailment = Math.random() < 0.5 ? 'ailment_melancholia' : 'ailment_insomnia';
+        const res = window.contractAilment(this.character, ailment, 'Prolonged psychological unraveling and terror', 'Severe Mental Strain');
+        if (res) currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Severe mental strain developed into ${res.label}!`);
+      }
+      // High occult strain -> Spectral Fever
+      if (this.character.stats.occult >= 50 && this.character.stats.sanity < 40 && Math.random() < 0.22) {
+        const res = window.contractAilment(this.character, 'ailment_spectral_fever', 'Deep paranormal exposure without protective wards', 'Spectral Contagion');
+        if (res) currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Thinning of the veil infected you with ${res.label}!`);
+      }
+      // Low vitality collapse -> Consumption
+      if (this.character.stats.vitality < 25 && Math.random() < 0.25) {
+        const res = window.contractAilment(this.character, 'ailment_consumption', 'Compromised bodily constitution and lung inflammation', 'Physical Depletion');
+        if (res) currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Exhaustion led to ${res.label}!`);
+      }
+      // Senior age wear (65+)
+      if (this.character.age >= 65 && Math.random() < 0.15) {
+        const seniorAilment = Math.random() < 0.5 ? 'ailment_consumption' : 'ailment_insomnia';
+        const res = window.contractAilment(this.character, seniorAilment, 'Age-related bodily decline', 'Senescent Frailty');
+        if (res) currentYearLog.entries.push(`[AFFLICTION CONTRACTED] Frailty of old age manifested as ${res.label}.`);
+      }
+    }
+
+    // ==========================================
+    // AGING ATTRITION CURVE & BIOLOGICAL WEAR
+    // ==========================================
+    const currentAge = this.character.age;
+    if (currentAge <= 17) {
+      if (Math.random() < 0.15) this.modifyStat('vitality', 1);
+    } else if (currentAge <= 35) {
+      if (Math.random() < 0.25) this.modifyStat('vitality', -1);
+      if (Math.random() < 0.15) this.modifyStat('looks', -1);
+    } else if (currentAge <= 50) {
+      // Middle age (36-50): First steady biological erosion
+      this.modifyStat('vitality', -1);
+      if (Math.random() < 0.40) this.modifyStat('looks', -1);
+      if (Math.random() < 0.20) this.modifyStat('sanity', -1);
+    } else if (currentAge <= 64) {
+      // Advanced Middle Age (51-64): Accelerated wear
+      this.modifyStat('vitality', -2);
       this.modifyStat('looks', -1);
+      if (Math.random() < 0.35) this.modifyStat('sanity', -1);
+    } else if (currentAge <= 75) {
+      // Senior Decline (65-75): Heavy biological decline
+      const vitLoss = Math.floor(Math.random() * 2) + 2; // -2 to -3
+      this.modifyStat('vitality', -vitLoss);
+      this.modifyStat('looks', -2);
+      if (Math.random() < 0.45) this.modifyStat('sanity', -2);
+      currentYearLog.entries.push(`[SENIOR ATTRITION] The burden of passing years stiffens your limbs and clouds your vision (-${vitLoss}% Vitality, -2% Looks).`);
+    } else {
+      // Deep Elder Decline (76+): Steep decline; every year is a struggle
+      const elderLoss = Math.floor(Math.random() * 3) + 3; // -3 to -5
+      this.modifyStat('vitality', -elderLoss);
+      this.modifyStat('looks', -2);
+      this.modifyStat('sanity', -2);
+      currentYearLog.entries.push(`[DEEP WINTER OF LIFE] Bodily stamina fades rapidly into the twilight of existence (-${elderLoss}% Vitality, -2% Sanity).`);
     }
 
     // Unfinished choices return before unrelated yearly dilemmas.
@@ -4803,12 +4949,62 @@ class TerribleGame {
   }
 
   checkMortality() {
+    if (!this.character || !this.character.isAlive) return;
+
     if (this.character.stats.vitality <= 0) {
-      this.die("Physical Collapse", `Succumbed to bodily injury and extreme hypothermia. Pronounced dead at ${this.character.city} General Hospital.`);
-    } else if (this.character.stats.sanity <= 0) {
+      this.die("Physical Collapse", `Succumbed to bodily injury and extreme physical exhaustion. Pronounced dead at ${this.character.city} General Hospital.`);
+      return;
+    }
+    if (this.character.stats.sanity <= 0) {
       this.die("Mind Shattered", "Total psychological dissolution. Found repeating unrendered unicode strings in a locked room; committed to the state psychiatric ward.");
-    } else if (this.character.stats.humanity <= 0) {
+      return;
+    }
+    if (this.character.stats.humanity <= 0) {
       this.die("Transcendence Beyond Flesh", "Humanity expired completely. Walked into the underground subway tunnels at midnight and never returned to the physical world.");
+      return;
+    }
+
+    // Natural Old Age Mortality Check
+    const age = this.character.age;
+    if (age >= 70) {
+      const vit = this.character.stats.vitality || 0;
+      let deathChance = 0;
+
+      if (age < 76) {
+        if (vit < 40) deathChance = (40 - vit) * 0.012;
+      } else if (age < 85) {
+        const baseRisk = (age - 75) * 0.035;
+        const frailtyRisk = Math.max(0, (60 - vit) * 0.01);
+        deathChance = baseRisk + frailtyRisk;
+      } else if (age < 95) {
+        const baseRisk = 0.35 + (age - 85) * 0.05;
+        const frailtyRisk = Math.max(0, (70 - vit) * 0.008);
+        deathChance = Math.min(0.85, baseRisk + frailtyRisk);
+      } else {
+        deathChance = 0.90;
+      }
+
+      // Dark occult preservation
+      if (this.character.stats.occult > 75) {
+        deathChance *= 0.65;
+      }
+
+      if (Math.random() < deathChance) {
+        let cause = "Old Age";
+        let epitaph = `Drew their final breath quietly at age ${age} in ${this.character.city}. Decades of memories slipped away like fog over cold water.`;
+
+        if (this.character.stats.occult >= 65) {
+          cause = "Withdrawn into Shadow";
+          epitaph = `At age ${age}, their physical form dissolved into dusk mist. Neighbors reported seeing their silhouette pacing the cemetery perimeter.`;
+        } else if (vit < 15) {
+          cause = "Senile Heart Failure";
+          epitaph = `Their exhausted heart ceased beating in their sleep at age ${age}. The physician recorded long-term bodily wear.`;
+        } else if (this.character.stats.sanity < 25) {
+          cause = "Quiet Dementia";
+          epitaph = `Faded gently into twilight dementia at age ${age}, speaking only with voices that no one else could perceive.`;
+        }
+        this.die(cause, epitaph);
+      }
     }
   }
 
@@ -4921,6 +5117,19 @@ class TerribleGame {
     this.dom.profileTrait.textContent = character.trait?.name || 'None';
     this.dom.profileMoney.textContent = window.formatMoney(character.money, character.countryCode);
     this.dom.profileShillings.textContent = `${character.shillings} s.`;
+    if (this.dom.profileHousing) {
+      const housingLabels = {
+        family_home: 'Family Household',
+        tenement_apartment: 'Rented Tenement',
+        squalor_room: 'Dilapidated Flophouse',
+        homeless: 'Homeless (Rough Sleeper)'
+      };
+      const housingKey = character.housing || (character.age < 18 ? 'family_home' : 'tenement_apartment');
+      const isHomeless = housingKey === 'homeless';
+      const isSqualor = housingKey === 'squalor_room';
+      const color = isHomeless ? 'text-crimson font-bold' : (isSqualor ? 'text-amber-400' : 'text-parchment');
+      this.dom.profileHousing.innerHTML = `<span class="${color}">${housingLabels[housingKey] || housingKey}</span>`;
+    }
     if (this.dom.profileReputation && window.reputationHtml) this.dom.profileReputation.innerHTML = window.reputationHtml(character);
     if (this.dom.profileRumors && window.rumorHtml) this.dom.profileRumors.innerHTML = window.rumorHtml(character);
     if (this.dom.profileConsequences && window.consequencesHtml) this.dom.profileConsequences.innerHTML = window.consequencesHtml(character);

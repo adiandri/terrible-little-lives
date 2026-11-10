@@ -8,7 +8,55 @@
     criminal_record: { icon: 'file-warning', color: 'text-red-400', recoveryActivity: 'retain_attorney', recoveryNeeded: 3 },
     rumor: { icon: 'messages-square', color: 'text-orange-400', recoveryActivity: 'group_hangout', recoveryNeeded: 2 },
     debt: { icon: 'landmark', color: 'text-amber-300', recoveryActivity: 'side_gig_oddjobs', recoveryNeeded: 1 },
-    social_stigma: { icon: 'users-round', color: 'text-slate-400', recoveryActivity: 'heart_to_heart_talk', recoveryNeeded: 3 }
+    social_stigma: { icon: 'users-round', color: 'text-slate-400', recoveryActivity: 'heart_to_heart_talk', recoveryNeeded: 3 },
+    ailment_consumption: {
+      icon: 'activity',
+      color: 'text-rose-500',
+      recoveryActivity: 'doctor_general_checkup',
+      recoveryNeeded: 3,
+      statDrain: { vitality: -4, happiness: -2 },
+      symptom: 'wracks your chest with violent midnight coughing spells and bloody sputum'
+    },
+    ailment_lead_poisoning: {
+      icon: 'flask-conical',
+      color: 'text-amber-500',
+      recoveryActivity: 'take_vitamins_tonics',
+      recoveryNeeded: 2,
+      statDrain: { vitality: -3, smarts: -2 },
+      symptom: 'dulls your reflexes with bitter metallic cramps and sluggish fatigue'
+    },
+    ailment_insomnia: {
+      icon: 'moon',
+      color: 'text-indigo-400',
+      recoveryActivity: 'rest_nap',
+      recoveryNeeded: 2,
+      statDrain: { sanity: -3, vitality: -1 },
+      symptom: 'steals your rest with sleep paralysis and whispering shadows at 3 AM'
+    },
+    ailment_melancholia: {
+      icon: 'cloud-rain',
+      color: 'text-slate-400',
+      recoveryActivity: 'psychoanalysis_therapy',
+      recoveryNeeded: 3,
+      statDrain: { happiness: -4, sanity: -2 },
+      symptom: 'envelops your soul in cold existential apathy and hollow grief'
+    },
+    ailment_spectral_fever: {
+      icon: 'ghost',
+      color: 'text-emerald-400',
+      recoveryActivity: 'burn_sage_ward',
+      recoveryNeeded: 2,
+      statDrain: { vitality: -4, sanity: -3, occult: 2 },
+      symptom: 'chills your blood with supernatural tremors and spectral bruising'
+    },
+    ailment_damp_rot: {
+      icon: 'footprints',
+      color: 'text-yellow-600',
+      recoveryActivity: 'doctor_general_checkup',
+      recoveryNeeded: 2,
+      statDrain: { vitality: -3, looks: -2 },
+      symptom: 'spreads stinging frost chilblains and peeling damp sores across your feet'
+    }
   };
 
   function ensureConsequences(character) {
@@ -107,7 +155,15 @@
       }
       item.recoveryProgress = Math.min(item.recoveryNeeded, (item.recoveryProgress || 0) + 1);
       notes.push(`${item.label}: recovery ${item.recoveryProgress}/${item.recoveryNeeded}.`);
-      if (item.recoveryNeeded > 0 && item.recoveryProgress >= item.recoveryNeeded) item.active = false;
+      if (item.recoveryNeeded > 0 && item.recoveryProgress >= item.recoveryNeeded) {
+        item.active = false;
+        if (item.type.startsWith('ailment_')) {
+          notes.push(`The affliction of ${item.label} has been cured! Constitution stabilized.`);
+          if (Array.isArray(character.ailments)) {
+            character.ailments = character.ailments.filter(a => a !== item.type);
+          }
+        }
+      }
     });
     return notes;
   }
@@ -123,6 +179,20 @@
         const interest = Math.max(1, Math.ceil((item.amount || 0) * 0.08));
         item.amount += interest;
         logs.push(`${item.label} accrued $${interest} interest; $${item.amount} remains unpaid.`);
+      } else if (item.active && item.type.startsWith('ailment_')) {
+        const def = DEFINITIONS[item.type];
+        if (def && def.statDrain && character.stats) {
+          if (def.statDrain.vitality) character.stats.vitality = clamp((character.stats.vitality || 0) + def.statDrain.vitality);
+          if (def.statDrain.sanity) character.stats.sanity = clamp((character.stats.sanity || 0) + def.statDrain.sanity);
+          if (def.statDrain.happiness) character.stats.happiness = clamp((character.stats.happiness || 0) + def.statDrain.happiness);
+          if (def.statDrain.smarts) character.stats.smarts = clamp((character.stats.smarts || 0) + def.statDrain.smarts);
+          if (def.statDrain.looks) character.stats.looks = clamp((character.stats.looks || 0) + def.statDrain.looks);
+          if (def.statDrain.occult) character.stats.occult = clamp((character.stats.occult || 0) + def.statDrain.occult);
+        }
+        const drainSummary = def && def.statDrain
+          ? Object.entries(def.statDrain).map(([k, v]) => `${v > 0 ? '+' : ''}${v}% ${k.charAt(0).toUpperCase() + k.slice(1)}`).join(', ')
+          : '';
+        logs.push(`[CHRONIC AFFLICTION] ${item.label} ${def?.symptom || 'flares up'}${drainSummary ? ` (${drainSummary})` : ''}.`);
       } else if (item.active) {
         logs.push(`${item.label} remains active${item.recoveryNeeded ? ` (recovery ${item.recoveryProgress}/${item.recoveryNeeded})` : ''}.`);
       } else {
@@ -138,6 +208,35 @@
     return logs;
   }
 
+  function contractAilment(character, ailmentType, detail = '', source = 'Affliction') {
+    const titles = {
+      ailment_consumption: 'Pulmonary Consumption',
+      ailment_lead_poisoning: 'Lead Water Poisoning',
+      ailment_insomnia: 'Chronic Waking Insomnia',
+      ailment_melancholia: 'Morbid Melancholia',
+      ailment_spectral_fever: 'Spectral Wasting Fever',
+      ailment_damp_rot: 'Trench Foot & Damp Rot'
+    };
+    const def = DEFINITIONS[ailmentType];
+    if (!def) return null;
+    const existing = ensureConsequences(character).find(item => item.active && item.type === ailmentType);
+    if (existing) {
+      existing.severity = Math.min(5, (existing.severity || 1) + 1);
+      return existing;
+    }
+    if (!Array.isArray(character.ailments)) character.ailments = [];
+    if (!character.ailments.includes(ailmentType)) character.ailments.push(ailmentType);
+    return addConsequence(character, {
+      type: ailmentType,
+      label: titles[ailmentType] || ailmentType.replace('ailment_', '').replaceAll('_', ' '),
+      detail: detail || def.symptom,
+      source: source,
+      severity: 3,
+      yearsRemaining: null,
+      recoveryNeeded: def.recoveryNeeded || 2
+    });
+  }
+
   function recordOutcomeConsequences(character, title, outcome, effects = {}) {
     const text = `${title || ''} ${outcome || ''}`.toLowerCase();
     const added = [];
@@ -146,6 +245,12 @@
     if ((effects.sanity || 0) <= -5 || /trauma|terrified|panic/.test(text)) added.push(addConsequence(character, { type: 'trauma', label: 'Unresolved Trauma', detail: outcome, source: title, severity: 2, yearsRemaining: null }));
     if (/arrest|convict|criminal record|police custody/.test(text)) added.push(addConsequence(character, { type: 'criminal_record', label: 'Criminal Record', detail: outcome, source: title, severity: 2, yearsRemaining: null }));
     if (/rumor|gossip|publicly humiliat/.test(text)) added.push(addConsequence(character, { type: 'rumor', label: 'Circulating Rumor', detail: outcome, source: title, severity: 2, yearsRemaining: 3 }));
+    if (/cough|phthisis|tuberculosis|spitting blood|bloody sputum|chest fever/.test(text)) added.push(contractAilment(character, 'ailment_consumption', outcome, title));
+    if (/insomnia|night terror|cannot sleep|sleepless|sleep paralysis/.test(text)) added.push(contractAilment(character, 'ailment_insomnia', outcome, title));
+    if (/spectral fever|ghost wasting|phantom chill|spectral sickness|cold haunting/.test(text)) added.push(contractAilment(character, 'ailment_spectral_fever', outcome, title));
+    if (/lead poison|metallic taste|toxic water|foul pipe/.test(text)) added.push(contractAilment(character, 'ailment_lead_poisoning', outcome, title));
+    if (/deep depression|melancholia|existential despair|numbness/.test(text)) added.push(contractAilment(character, 'ailment_melancholia', outcome, title));
+    if (/trench foot|damp rot|gangrene|frostbitten blister/.test(text)) added.push(contractAilment(character, 'ailment_damp_rot', outcome, title));
     return added;
   }
 
@@ -188,6 +293,8 @@
   window.getActivityRestriction = getActivityRestriction;
   window.applyRecoveryFromActivity = applyRecoveryFromActivity;
   window.tickConsequences = tickConsequences;
+  window.contractAilment = contractAilment;
+  window.AILMENT_DEFINITIONS = DEFINITIONS;
   window.recordOutcomeConsequences = recordOutcomeConsequences;
   window.addDebtConsequence = addDebt;
   window.chooseWeightedDilemma = chooseWeightedDilemma;

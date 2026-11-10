@@ -585,6 +585,63 @@ const ACTIVITIES_LIST = [
       };
     }
   },
+  {
+    id: "secure_housing",
+    name: "Seek Shelter & Lodging",
+    category: "home",
+    icon: "home",
+    minAge: 18,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Search for lodging to escape the freezing streets or upgrade out of a squalid flophouse.",
+    run: (character) => {
+      const housing = character.housing || 'tenement_apartment';
+      if (housing === 'homeless') {
+        if ((character.money || 0) < 500) {
+          return {
+            success: false,
+            title: "Cannot Afford Flophouse",
+            message: "You need at least $500 for a deposit on a boarding house cubicle."
+          };
+        }
+        character.money -= 500;
+        character.housing = 'squalor_room';
+        character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 12);
+        character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 8);
+        return {
+          success: true,
+          title: "Secured Boarding Cubicle",
+          message: "You paid $500 for a lockable room in a damp boarding house. It smells of pipe smoke and cabbage, but you are out of the freezing rain (+12% Happiness, +8% Sanity).",
+          effects: { money: -500, happiness: 12, sanity: 8 }
+        };
+      } else if (housing === 'squalor_room') {
+        if ((character.money || 0) < 3000) {
+          return {
+            success: false,
+            title: "Insufficient Savings",
+            message: "You need at least $3,000 in savings to sign a deposit on a proper tenement apartment."
+          };
+        }
+        character.money -= 3000;
+        character.housing = 'tenement_apartment';
+        character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 16);
+        character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 10);
+        character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 6);
+        return {
+          success: true,
+          title: "Leased Proper Apartment",
+          message: "You signed a lease on a warm tenement apartment with hot water and double-glazed windows (+16% Happiness, +10% Sanity, +6% Vitality).",
+          effects: { money: -3000, happiness: 16, sanity: 10, vitality: 6 }
+        };
+      } else {
+        return {
+          success: false,
+          title: "Already Sheltered",
+          message: "You already have a stable apartment lease. There is no need to seek emergency lodging."
+        };
+      }
+    }
+  },
 
   // ==========================================
   // 2. PEOPLE: RELATIONSHIPS
@@ -1480,6 +1537,26 @@ const ACTIVITIES_LIST = [
         title: "Spiritual Whisper",
         message: "The planchette dragged your fingers smoothly across letters: 'W-E-A-R-E-H-E-R-E' (+Occult, -Sanity).",
         effects: { occult: 6, sanity: -2 }
+      };
+    }
+  },
+  {
+    id: "burn_sage_ward",
+    name: "Burn White Sage & Salt Ward",
+    category: "horror",
+    icon: "shield-alert",
+    minAge: 8,
+    maxAge: 99,
+    maxPerYear: 1,
+    desc: "Cleanse malevolent spectral lingering with smoke from dried white sage and crushed sea salt.",
+    run: (character) => {
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 5);
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + 3);
+      return {
+        success: true,
+        title: "Spiritual Cleansing",
+        message: "Aromatic herbal smoke drove the cold drafts from the room's corners. The pressing phantom weight receded (+5% Sanity, +3% Occult).",
+        effects: { sanity: 5, occult: 3 }
       };
     }
   },

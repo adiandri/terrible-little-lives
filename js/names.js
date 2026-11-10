@@ -569,15 +569,19 @@ function generateCharacter(customConfig = null) {
       paranormalGig: null,
       
       stats: {
-        vitality: customConfig.stats?.vitality ?? 90,
-        smarts: customConfig.stats?.smarts ?? 75,
-        looks: customConfig.stats?.looks ?? 70,
-        happiness: customConfig.stats?.happiness ?? 80,
-        sanity: customConfig.stats?.sanity ?? 85,
-        occult: customConfig.stats?.occult ?? 15,
-        humanity: customConfig.stats?.humanity ?? 95
+        vitality: customConfig.stats?.vitality ?? 68,
+        smarts: customConfig.stats?.smarts ?? 52,
+        looks: customConfig.stats?.looks ?? 55,
+        happiness: customConfig.stats?.happiness ?? 65,
+        sanity: customConfig.stats?.sanity ?? 70,
+        occult: customConfig.stats?.occult ?? 12,
+        humanity: customConfig.stats?.humanity ?? 82
       },
       statusTitle: "Infant",
+      housing: customConfig.housing || "family_home",
+      consecutiveUnpaidRent: 0,
+      ailments: [],
+      debt: 0,
       isAlive: true,
       deathCause: null,
       epitaph: null
@@ -611,15 +615,19 @@ function generateCharacter(customConfig = null) {
     job: null,
     paranormalGig: null,
     stats: {
-      vitality: Math.floor(Math.random() * 15) + 80,
-      smarts: Math.floor(Math.random() * 25) + 65,
-      looks: Math.floor(Math.random() * 25) + 60,
-      happiness: Math.floor(Math.random() * 20) + 75,
-      sanity: Math.floor(Math.random() * 20) + 75,
-      occult: Math.floor(Math.random() * 15) + 10,
-      humanity: Math.floor(Math.random() * 10) + 85
+      vitality: Math.floor(Math.random() * 21) + 55,
+      smarts: Math.floor(Math.random() * 26) + 40,
+      looks: Math.floor(Math.random() * 26) + 45,
+      happiness: Math.floor(Math.random() * 21) + 55,
+      sanity: Math.floor(Math.random() * 21) + 60,
+      occult: Math.floor(Math.random() * 16) + 5,
+      humanity: Math.floor(Math.random() * 16) + 75
     },
     statusTitle: "Infant",
+    housing: "family_home",
+    consecutiveUnpaidRent: 0,
+    ailments: [],
+    debt: 0,
     isAlive: true,
     deathCause: null,
     epitaph: null
