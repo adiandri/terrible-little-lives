@@ -5338,8 +5338,8 @@ class TerribleGame {
       this.dom.btnEndure.disabled = false;
       this.dom.btnEndure.classList.remove('opacity-40', 'cursor-not-allowed');
       this.dom.btnEndure.innerHTML = `
-        <i data-lucide="chevrons-up" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5"></i>
-        <span class="font-serif tracking-widest text-xs font-bold whitespace-nowrap">+ ENDURE</span>
+        <i data-lucide="chevrons-up" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:-translate-y-0.5"></i>
+        <span class="font-serif text-[10px] sm:text-[11px] font-bold whitespace-nowrap leading-none tracking-tight">+ ENDURE</span>
       `;
     }
 

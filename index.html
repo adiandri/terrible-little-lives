@@ -1441,36 +1441,36 @@
       </main>
 
       <!-- BITLIFE-STYLE DOCKED BOTTOM NAVIGATION WITH EMBEDDED CENTER ENDURE PILL -->
-      <footer class="bg-headerbg/95 backdrop-blur-md border-t border-leadborder/70 px-3 py-2 shrink-0 z-20 transition-colors duration-200">
-        <nav class="flex items-center justify-between gap-1 max-w-lg mx-auto" aria-label="Primary game navigation">
+      <footer class="bg-headerbg/95 backdrop-blur-md border-t border-leadborder/70 px-2.5 py-1.5 shrink-0 z-20 transition-colors duration-200">
+        <nav class="grid grid-cols-5 gap-1 items-center max-w-lg mx-auto w-full" aria-label="Primary game navigation">
           <!-- Tab 1: Life / Timeline -->
-          <button id="btn-tab-life" class="core-nav-button is-active flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95" aria-current="page">
+          <button id="btn-tab-life" class="core-nav-button is-active col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95" aria-current="page">
             <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
-            <span class="truncate">Life</span>
+            <span class="truncate max-w-full text-center">Life</span>
           </button>
 
           <!-- Tab 2: People / Kin -->
-          <button id="btn-tab-kin" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+          <button id="btn-tab-kin" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
             <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
-            <span class="truncate">People</span>
+            <span class="truncate max-w-full text-center">People</span>
           </button>
 
-          <!-- Center: Iconic BitLife-Style Large Action Pill -->
-          <button id="btn-endure" class="btn-endure-pill shrink-0 px-5 py-2.5 rounded-full bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-lg border border-red-500/30 ring-2 ring-crimson/20 flex items-center justify-center gap-1.5 group cursor-pointer" title="Advance 1 Year">
-            <i data-lucide="chevrons-up" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5"></i>
-            <span class="font-serif tracking-widest text-xs font-bold whitespace-nowrap">+ ENDURE</span>
+          <!-- Center: Iconic BitLife-Style Compact Action Pill -->
+          <button id="btn-endure" class="btn-endure-pill col-span-1 w-full max-w-[76px] mx-auto py-1.5 px-1 rounded-full bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-md border border-red-500/40 ring-1 ring-crimson/30 flex items-center justify-center gap-1 group cursor-pointer" title="Advance 1 Year">
+            <i data-lucide="chevrons-up" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:-translate-y-0.5"></i>
+            <span class="font-serif text-[10px] sm:text-[11px] font-bold whitespace-nowrap leading-none tracking-tight">+ ENDURE</span>
           </button>
 
           <!-- Tab 3: Activities -->
-          <button id="btn-tab-activities" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+          <button id="btn-tab-activities" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
             <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
-            <span class="truncate">Activities</span>
+            <span class="truncate max-w-full text-center">Activities</span>
           </button>
 
           <!-- Tab 4: Profile / Assets -->
-          <button id="btn-tab-profile" class="core-nav-button flex-1 min-w-0 py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+          <button id="btn-tab-profile" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
             <i data-lucide="user-round" class="w-4 h-4 shrink-0"></i>
-            <span class="truncate">Profile</span>
+            <span class="truncate max-w-full text-center">Profile</span>
           </button>
         </nav>
       </footer>
