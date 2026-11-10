@@ -241,19 +241,23 @@ const ACTIVITIES_LIST = [
     icon: "clock",
     minAge: 18,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Clock in for a grueling night shift to boost your bank account at the expense of sanity.",
     run: (character, attemptIndex = 0) => {
       const country = (window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode]) || { wageMultiplier: 1.0 };
-      const basePay = Math.round((Math.floor(Math.random() * 150) + 120) * (country.wageMultiplier || 1.0));
+      const basePay = Math.round((Math.floor(Math.random() * 120) + 100) * (country.wageMultiplier || 1.0));
       character.money = (character.money || 0) + basePay;
-      character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 3);
-      character.stats.vitality = Math.max(0, (character.stats.vitality || 50) - 2);
+      const sanLoss = attemptIndex === 0 ? -3 : -5;
+      const vitLoss = attemptIndex === 0 ? -2 : -4;
+      character.stats.sanity = Math.max(0, (character.stats.sanity || 50) + sanLoss);
+      character.stats.vitality = Math.max(0, (character.stats.vitality || 50) + vitLoss);
       return {
         success: true,
-        title: "Overtime Completed",
-        message: `You endured a relentless evening shift under flickering fluorescent tubes. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, -Sanity, -Vitality).`,
-        effects: { money: basePay, sanity: -3, vitality: -2 }
+        title: attemptIndex === 0 ? "Overtime Completed" : "Relentless Double Shift",
+        message: attemptIndex === 0
+          ? `You endured a grueling evening shift under flickering tubes. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, -3% Sanity, -2% Vitality).`
+          : `A second grueling shift completely wrecked your nervous system. Earned ${window.formatMoney ? window.formatMoney(basePay, character.countryCode) : '$' + basePay} (+Money, -5% Sanity, -4% Vitality from exhaustion).`,
+        effects: { money: basePay, sanity: sanLoss, vitality: vitLoss }
       };
     }
   },
@@ -264,7 +268,7 @@ const ACTIVITIES_LIST = [
     icon: "hammer",
     minAge: 12,
     maxAge: 18,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Rake dead autumn leaves, shovel snow, or deliver town circulars for pocket money.",
     run: (character, attemptIndex = 0) => {
       const country = (window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode]) || { wageMultiplier: 1.0 };
@@ -286,7 +290,7 @@ const ACTIVITIES_LIST = [
     icon: "coffee",
     minAge: 18,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Join colleagues for black coffee or cheap drinks after hours to trade office politics.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 5);
@@ -310,20 +314,24 @@ const ACTIVITIES_LIST = [
     icon: "graduation-cap",
     minAge: 5,
     maxAge: 25,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Cram textbooks and complete problem sets late into the night.",
     run: (character, attemptIndex = 0) => {
-      const smartsGain = attemptIndex === 0 ? 5 : (attemptIndex === 1 ? 3 : 1);
+      const smartsGain = attemptIndex === 0 ? 3 : 1;
+      const happyLoss = attemptIndex === 0 ? -2 : -4;
+      const gradeGain = attemptIndex === 0 ? 3 : 1;
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + smartsGain);
-      character.stats.happiness = Math.max(0, (character.stats.happiness || 50) - 2);
+      character.stats.happiness = Math.max(0, (character.stats.happiness || 50) + happyLoss);
       if (character.education && character.education.enrolled) {
-        character.education.grades = Math.min(100, (character.education.grades || 60) + 4);
+        character.education.grades = Math.min(100, (character.education.grades || 60) + gradeGain);
       }
       return {
         success: true,
-        title: "Academic Devotion",
-        message: `You reviewed formulas and history dates until 1:00 AM under a buzzing desk lamp (+${smartsGain}% Smarts, -2% Happiness, +Grades).`,
-        effects: { smarts: smartsGain, happiness: -2 }
+        title: attemptIndex === 0 ? "Academic Devotion" : "Academic Burnout",
+        message: attemptIndex === 0
+          ? `You reviewed formulas and history dates late under a buzzing desk lamp (+${smartsGain}% Smarts, -2% Happiness, +Grades).`
+          : `Forcing your bleary eyes through textbooks until dawn left you mentally drained (+${smartsGain}% Smarts, -4% Happiness from burnout).`,
+        effects: { smarts: smartsGain, happiness: happyLoss }
       };
     }
   },
@@ -334,17 +342,19 @@ const ACTIVITIES_LIST = [
     icon: "book-open",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Browse dusty bookshelves, encyclopedias, and regional municipal archives.",
     run: (character, attemptIndex = 0) => {
-      const smartsGain = attemptIndex === 0 ? 5 : 2;
-      const sanGain = attemptIndex === 0 ? 3 : 1;
+      const smartsGain = attemptIndex === 0 ? 3 : 1;
+      const sanGain = attemptIndex === 0 ? 2 : 1;
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + smartsGain);
       character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + sanGain);
       return {
         success: true,
-        title: "Quiet Study",
-        message: `In the silent basement stacks, you read through illustrated encyclopedias of architecture and human biology (+${smartsGain}% Smarts, +${sanGain}% Sanity).`,
+        title: attemptIndex === 0 ? "Quiet Study" : "Dim Archives",
+        message: attemptIndex === 0
+          ? `In the silent basement stacks, you read through illustrated encyclopedias of architecture and human biology (+${smartsGain}% Smarts, +${sanGain}% Sanity).`
+          : `You lingered among crumbling folios as the librarian clicked off the overhead fluorescent lights (+${smartsGain}% Smarts, +${sanGain}% Sanity).`,
         effects: { smarts: smartsGain, sanity: sanGain }
       };
     }
@@ -360,7 +370,7 @@ const ACTIVITIES_LIST = [
     icon: "coins",
     minAge: 4,
     maxAge: 18,
-    maxPerYear: 3,
+    maxPerYear: 1,
     desc: "Put on your most innocent expression and petition your parents for some spending money.",
     run: (character) => {
       const country = (window.COUNTRIES_DATA && window.COUNTRIES_DATA[character.countryCode]) || { wageMultiplier: 1.0 };
@@ -396,7 +406,7 @@ const ACTIVITIES_LIST = [
     icon: "ticket",
     minAge: 18,
     maxAge: 99,
-    maxPerYear: 10,
+    maxPerYear: 1,
     desc: "Spend $10 at the corner kiosk to scratch off silver foil and test your fortunes.",
     run: (character) => {
       if ((character.money || 0) < 10) {
@@ -446,7 +456,7 @@ const ACTIVITIES_LIST = [
     icon: "cup-soda",
     minAge: 0,
     maxAge: 3,
-    maxPerYear: 10,
+    maxPerYear: 2,
     desc: "Drink sweet warm formula from a glass bottle until your eyelids grow pleasantly heavy.",
     run: (character, attemptIndex = 0) => {
       const vitGain = attemptIndex === 0 ? 5 : 2;
@@ -468,7 +478,7 @@ const ACTIVITIES_LIST = [
     icon: "footprints",
     minAge: 0,
     maxAge: 3,
-    maxPerYear: 10,
+    maxPerYear: 2,
     desc: "Pull yourself up against the furniture and take clumsy, wobbling steps across the rug.",
     run: (character, attemptIndex = 0) => {
       const vitGain = attemptIndex === 0 ? 6 : 2;
@@ -490,7 +500,7 @@ const ACTIVITIES_LIST = [
     icon: "message-square",
     minAge: 1,
     maxAge: 4,
-    maxPerYear: 10,
+    maxPerYear: 2,
     desc: "Practice vocal syllables, mimic words you overhear, and try to speak your thoughts.",
     run: (character, attemptIndex = 0) => {
       const smartsGain = attemptIndex === 0 ? 5 : 2;
@@ -511,7 +521,7 @@ const ACTIVITIES_LIST = [
     icon: "brush",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Sweep the dusty floorboards, wash dishes in warm soapy water, and organize your room.",
     run: (character) => {
       character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 2);
@@ -536,16 +546,20 @@ const ACTIVITIES_LIST = [
     icon: "bed",
     minAge: 0,
     maxAge: 99,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Curl beneath heavy wool blankets and let the world drift away in peaceful slumber.",
-    run: (character) => {
-      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 5);
-      character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 4);
+    run: (character, attemptIndex = 0) => {
+      const sanGain = attemptIndex === 0 ? 3 : 1;
+      const vitGain = attemptIndex === 0 ? 2 : 1;
+      character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + sanGain);
+      character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + vitGain);
       return {
         success: true,
-        title: "Peaceful Slumber",
-        message: "You slept for three uninterrupted hours listening to rain tap against the glass (+Sanity, +Vitality).",
-        effects: { sanity: 5, vitality: 4 }
+        title: attemptIndex === 0 ? "Peaceful Slumber" : "Fitful Doze",
+        message: attemptIndex === 0
+          ? "You slept for three uninterrupted hours listening to rain tap against the glass (+3% Sanity, +2% Vitality)."
+          : "You dozed lightly, tossing and turning in heavy blankets (+1% Sanity, +1% Vitality).",
+        effects: { sanity: sanGain, vitality: vitGain }
       };
     }
   },
@@ -556,18 +570,18 @@ const ACTIVITIES_LIST = [
     icon: "key",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Slip past the padlock on the crawlspace door with a sputtering flashlight.",
     run: (character, attemptIndex = 0) => {
-      character.stats.occult = Math.min(100, (character.stats.occult || 0) + 6);
+      character.stats.occult = Math.min(100, (character.stats.occult || 0) + 4);
       character.stats.sanity = Math.max(0, (character.stats.sanity || 50) - 2);
-      const shillings = Math.floor(Math.random() * 3) + 1;
+      const shillings = 1;
       character.shillings = (character.shillings || 0) + shillings;
       return {
         success: true,
         title: "Hidden Casket",
-        message: `Behind an old furnace baffle, you found an antique tin with +${shillings} Paranormal Shillings and cryptic notes (+Occult, -Sanity).`,
-        effects: { occult: 6, sanity: -2, shillings }
+        message: `Behind an old furnace baffle, you found an antique tin with +1 Paranormal Shilling and cryptic notes (+4% Occult, -2% Sanity).`,
+        effects: { occult: 4, sanity: -2, shillings }
       };
     }
   },
@@ -582,7 +596,7 @@ const ACTIVITIES_LIST = [
     icon: "heart",
     minAge: 16,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Meet an acquaintance arranged through mutual connections for coffee and conversation.",
     run: (character) => {
       const looks = character.stats.looks || 50;
@@ -613,7 +627,7 @@ const ACTIVITIES_LIST = [
     icon: "sparkles",
     minAge: 14,
     maxAge: 99,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Polish your demeanor, practice flirtatious banter, and enhance your charisma.",
     run: (character) => {
       character.stats.looks = Math.min(100, (character.stats.looks || 50) + 2);
@@ -637,7 +651,7 @@ const ACTIVITIES_LIST = [
     icon: "heart",
     minAge: 0,
     maxAge: 4,
-    maxPerYear: 10,
+    maxPerYear: 2,
     desc: "Rest your small head against your mother or father's chest, listening to their rhythmic breathing.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 6);
@@ -662,7 +676,7 @@ const ACTIVITIES_LIST = [
     icon: "soup",
     minAge: 4,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Sit around the dinner table with your kin to share warm stew, freshly baked bread, and family news.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 5);
@@ -691,7 +705,7 @@ const ACTIVITIES_LIST = [
     icon: "message-circle",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Confide your deepest worries and hopes to a family elder or sibling.",
     run: (character) => {
       character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 6);
@@ -718,7 +732,7 @@ const ACTIVITIES_LIST = [
     icon: "user-plus",
     minAge: 4,
     maxAge: 25,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Spend the afternoon socializing at the community center, skate park, or schoolyard.",
     run: (character) => {
       if (!character.kin) character.kin = window.generateFamily(character);
@@ -745,7 +759,7 @@ const ACTIVITIES_LIST = [
     icon: "users",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Gather your companions for pizza, bike rides, and nighttime campfire talks.",
     run: (character) => {
       if (!character.kin || !character.kin.friends || character.kin.friends.length === 0) {
@@ -774,7 +788,7 @@ const ACTIVITIES_LIST = [
     icon: "tv",
     minAge: 2,
     maxAge: 14,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Sit cross-legged on the rug with a bowl of sugary cereal, engrossed in animated adventures.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 6);
@@ -793,7 +807,7 @@ const ACTIVITIES_LIST = [
     icon: "film",
     minAge: 12,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Watch a grainy VHS tape of a 1970s occult thriller in the dark with the volume turned low.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 4);
@@ -814,7 +828,7 @@ const ACTIVITIES_LIST = [
     icon: "radio",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Dial between frequencies at 3:14 AM, listening for mysterious number stations.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 6);
@@ -836,7 +850,7 @@ const ACTIVITIES_LIST = [
     icon: "book",
     minAge: 9,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Immerse yourself in tales of lonely moors, ancestral curses, and brooding aristocrats.",
     run: (character) => {
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 3);
@@ -861,7 +875,7 @@ const ACTIVITIES_LIST = [
     icon: "box",
     minAge: 1,
     maxAge: 10,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Build wooden block towers or dress porcelain dolls in your bedroom.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 6);
@@ -881,7 +895,7 @@ const ACTIVITIES_LIST = [
     icon: "palette",
     minAge: 5,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Smudge charcoal across rough paper or mix gloomy watercolors of overcast skies.",
     run: (character) => {
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 3);
@@ -901,7 +915,7 @@ const ACTIVITIES_LIST = [
     icon: "music",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Practice melancholic scales and baroque sonatas until calluses form on your fingertips.",
     run: (character) => {
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 4);
@@ -925,7 +939,7 @@ const ACTIVITIES_LIST = [
     icon: "gamepad-2",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Play pixelated roleplaying games and survival horrors on your console.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 7);
@@ -945,7 +959,7 @@ const ACTIVITIES_LIST = [
     icon: "shield",
     minAge: 7,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Calculate fifteen moves ahead in intense games of strategic chess.",
     run: (character) => {
       character.stats.smarts = Math.min(100, (character.stats.smarts || 50) + 6);
@@ -969,7 +983,7 @@ const ACTIVITIES_LIST = [
     icon: "car",
     minAge: 16,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 1,
     desc: "Drive through autumn fog past crumbling barns and covered bridges.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 8);
@@ -989,7 +1003,7 @@ const ACTIVITIES_LIST = [
     icon: "compass",
     minAge: 12,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 1,
     desc: "Walk along grey pebble beaches watching tide pools beneath sheer chalk cliffs.",
     run: (character) => {
       character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 7);
@@ -1013,7 +1027,7 @@ const ACTIVITIES_LIST = [
     icon: "trees",
     minAge: 4,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Wander along gravel paths, feed ducks in the pond, and enjoy the greenery.",
     run: (character) => {
       character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 4);
@@ -1033,7 +1047,7 @@ const ACTIVITIES_LIST = [
     icon: "map-pin",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 5,
+    maxPerYear: 1,
     desc: "Weave among moss-covered 18th-century headstones and iron crypt gates.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 5);
@@ -1059,7 +1073,7 @@ const ACTIVITIES_LIST = [
     icon: "stethoscope",
     minAge: 0,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 1,
     desc: "Undergo a routine examination by a physician to assess vital organs.",
     run: (character) => {
       character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 8);
@@ -1078,7 +1092,7 @@ const ACTIVITIES_LIST = [
     icon: "pill",
     minAge: 3,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Swallow spoonfuls of bitter blackstrap molasses and iron multivitamins.",
     run: (character) => {
       character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 4);
@@ -1097,7 +1111,7 @@ const ACTIVITIES_LIST = [
     icon: "dumbbell",
     minAge: 12,
     maxAge: 99,
-    maxPerYear: 8,
+    maxPerYear: 2,
     desc: "Lift weights, sprint intervals, and sharpen physical stamina.",
     run: (character) => {
       character.stats.vitality = Math.min(100, (character.stats.vitality || 50) + 6);
@@ -1121,7 +1135,7 @@ const ACTIVITIES_LIST = [
     icon: "brain",
     minAge: 8,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Write your innermost shadows and existential thoughts into a locked journal.",
     run: (character) => {
       character.stats.sanity = Math.min(100, (character.stats.sanity || 50) + 6);
@@ -1141,7 +1155,7 @@ const ACTIVITIES_LIST = [
     icon: "sparkles",
     minAge: 14,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Lie back on a leather divan and discuss recurring nightmares with an analyst.",
     run: (character) => {
       if ((character.money || 0) < 50) {
@@ -1168,7 +1182,7 @@ const ACTIVITIES_LIST = [
     icon: "shopping-bag",
     minAge: 10,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Slip silver pens, chocolate bars, or small tools into your coat lining.",
     run: (character) => {
       if (Math.random() < 0.25) {
@@ -1200,7 +1214,7 @@ const ACTIVITIES_LIST = [
     icon: "pen-tool",
     minAge: 12,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Spray-paint occult symbols and rebellious poetry onto abandoned railway bridges.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 5);
@@ -1224,7 +1238,7 @@ const ACTIVITIES_LIST = [
     icon: "scale",
     minAge: 18,
     maxAge: 99,
-    maxPerYear: 2,
+    maxPerYear: 1,
     desc: "Review your civil status and municipal standings with an experienced barrister.",
     run: (character) => {
       if ((character.money || 0) < 100) {
@@ -1251,7 +1265,7 @@ const ACTIVITIES_LIST = [
     icon: "message-square",
     minAge: 10,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Text weird late-night memes, gothic poems, and school rumors to your contacts.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 4);
@@ -1275,7 +1289,7 @@ const ACTIVITIES_LIST = [
     icon: "smartphone",
     minAge: 12,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Scroll endlessly through feeds of strangers boasting about their manufactured fortunes.",
     run: (character) => {
       if (Math.random() < 0.5) {
@@ -1308,7 +1322,7 @@ const ACTIVITIES_LIST = [
     icon: "globe",
     minAge: 14,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Route your connection through nine relays to inspect bizarre anonymous message boards.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 6);
@@ -1330,7 +1344,7 @@ const ACTIVITIES_LIST = [
     icon: "search",
     minAge: 10,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Search obscure digital archives for forgotten local superstitions and curses.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 5);
@@ -1354,7 +1368,7 @@ const ACTIVITIES_LIST = [
     icon: "cat",
     minAge: 4,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 1,
     desc: "Toss rubber toys, stroke velvet fur, and enjoy the pure company of your animal companions.",
     run: (character) => {
       character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 7);
@@ -1383,7 +1397,7 @@ const ACTIVITIES_LIST = [
     icon: "feather",
     minAge: 4,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Scatter breadcrumbs and roasted peanuts for the watchful black corvids in the cemetery boughs.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 3);
@@ -1412,7 +1426,7 @@ const ACTIVITIES_LIST = [
     icon: "sparkles",
     minAge: 6,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Creep to the iron gates of the municipal graveyard at dusk to capture glowing violet moths.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 5);
@@ -1436,7 +1450,7 @@ const ACTIVITIES_LIST = [
     icon: "flame",
     minAge: 8,
     maxAge: 99,
-    maxPerYear: 3,
+    maxPerYear: 1,
     desc: "Drape a table in dark velvet, light black tapers, and invoke the names of past residents.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 8);
@@ -1456,7 +1470,7 @@ const ACTIVITIES_LIST = [
     icon: "moon",
     minAge: 7,
     maxAge: 99,
-    maxPerYear: 4,
+    maxPerYear: 1,
     desc: "Place your fingertips lightly on the wooden planchette and ask questions to the darkness.",
     run: (character) => {
       character.stats.occult = Math.min(100, (character.stats.occult || 0) + 6);
@@ -1480,7 +1494,7 @@ const ACTIVITIES_LIST = [
     icon: "dices",
     minAge: 0,
     maxAge: 99,
-    maxPerYear: 6,
+    maxPerYear: 2,
     desc: "Surrender your agency to the cosmic lottery of fate and receive an unpredictable destiny roll.",
     run: (character) => {
       const outcomes = [
@@ -1550,7 +1564,7 @@ function performActivity(activityId, character) {
     return {
       success: false,
       title: "Exhausted",
-      message: "You are physically and mentally exhausted for this year (0 Energy left). Endure the year to recover."
+      message: "You are physically and mentally exhausted for this year (0 Focus left). Endure the year to recover."
     };
   }
 
@@ -1567,15 +1581,24 @@ function performActivity(activityId, character) {
     };
   }
 
+  const cost = activity.energyCost || 1;
+  if (character.actionsLeft < cost) {
+    return {
+      success: false,
+      title: "Insufficient Focus",
+      message: `This pursuit requires ${cost} Focus points (you have ${character.actionsLeft} left).`
+    };
+  }
+
   character.activityUses = character.activityUses || {};
   const currentUses = character.activityUses[activityId] || 0;
-  const maxLimit = activity.maxPerYear || 5;
+  const maxLimit = activity.maxPerYear !== undefined ? activity.maxPerYear : 1;
 
   if (currentUses >= maxLimit) {
     return {
       success: false,
       title: "Annual Limit Reached",
-      message: `You have already pursued this activity ${currentUses}/${maxLimit} times this year. Advance the year to pursue it again.`
+      message: `You have already pursued this activity ${currentUses}/${maxLimit} time(s) this year. Advance the year to pursue it again.`
     };
   }
 
@@ -1586,7 +1609,7 @@ function performActivity(activityId, character) {
   }
 
   if (result && result.success !== false) {
-    character.actionsLeft -= 1;
+    character.actionsLeft = Math.max(0, character.actionsLeft - cost);
     character.activityUses[activityId] = currentUses + 1;
   }
 

@@ -1569,9 +1569,10 @@ class TerribleGame {
           if (!this.character.kin) {
             this.character.kin = window.generateFamily(this.character);
           }
-          if (this.character.actionsLeft === undefined || this.character.maxActions < 40) {
-            this.character.actionsLeft = 40;
-            this.character.maxActions = 40;
+          const calculatedMax = this.calculateMaxActions(this.character);
+          if (this.character.actionsLeft === undefined || this.character.maxActions === undefined || this.character.maxActions > 8) {
+            this.character.maxActions = calculatedMax;
+            this.character.actionsLeft = Math.min(this.character.actionsLeft ?? calculatedMax, calculatedMax);
           }
           if (!this.character.activityUses) {
             this.character.activityUses = {};
@@ -1595,11 +1596,48 @@ class TerribleGame {
     this.dom.btnLandingResume.style.display = 'none';
   }
 
+  calculateMaxActions(char = null) {
+    const c = char || this.character;
+    if (!c) return 5;
+    let base = 5;
+    if (c.age <= 2) base = 2;
+    else if (c.age <= 5) base = 3;
+    else if (c.age <= 12) base = 4;
+    else if (c.age <= 55) base = 5;
+    else if (c.age <= 70) base = 4;
+    else base = 3;
+
+    const vit = c.stats ? (c.stats.vitality ?? 80) : 80;
+    const san = c.stats ? (c.stats.sanity ?? 80) : 80;
+
+    if (c.age >= 16 && c.age <= 45 && vit >= 85 && san >= 75) {
+      base += 1;
+    }
+    if (vit < 30 || san < 25) {
+      base -= 1;
+    }
+    if (vit < 15 && base > 2) {
+      base -= 1;
+    }
+    return Math.max(2, base);
+  }
+
+  notifyExhausted(customMessage = null) {
+    this.openFeedbackModal({
+      tag: "FOCUS EXHAUSTED",
+      title: "Exhausted for this Year",
+      icon: "battery-charging",
+      iconColor: "text-amber-400",
+      body: customMessage || "You have exhausted your focus and energy for this year! Tap 'Endure Year' to rest, reflect, and advance time.",
+      effects: {}
+    });
+  }
+
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
     this.character.kin = window.generateFamily(this.character);
-    this.character.actionsLeft = 40;
-    this.character.maxActions = 40;
+    this.character.maxActions = this.calculateMaxActions();
+    this.character.actionsLeft = this.character.maxActions;
     this.character.activityUses = {};
     this.usedDilemmaIds.clear();
 
@@ -1651,9 +1689,9 @@ class TerribleGame {
     this.character.age += 1;
     this.character.year += 1;
 
-    // Replenish annual energy pool & reset activity quotas
-    this.character.maxActions = 40;
-    this.character.actionsLeft = 40;
+    // Replenish annual focus pool & reset activity quotas
+    this.character.maxActions = this.calculateMaxActions();
+    this.character.actionsLeft = this.character.maxActions;
     this.character.activityUses = {};
 
     // Status titles by age
@@ -2559,7 +2597,7 @@ class TerribleGame {
         </div>
         <div class="text-right shrink-0">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
-            Energy: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}
+            Focus: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 5}
           </span>
         </div>
       </div>
@@ -2610,7 +2648,7 @@ class TerribleGame {
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         btn.classList.remove('hover:bg-cardhover');
         if (desc) {
-          desc.textContent = isCapped ? doneLabel : "Exhausted for this year (0 Energy left).";
+          desc.textContent = isCapped ? doneLabel : "Exhausted for this year (0 Focus left).";
         }
       } else {
         btn.disabled = false;
@@ -2871,7 +2909,7 @@ class TerribleGame {
     }
 
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
 
@@ -3138,13 +3176,20 @@ class TerribleGame {
     if (!this.dom.kinAskMoneyModal) return;
 
     if (this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
 
     const askCount = person.actionsDone ? (person.actionsDone.askedMoney || 0) : 0;
-    if (askCount >= 5) {
-      alert(`You have already asked ${person.name} for pocket money 5 times this year. Give them a break!`);
+    if (askCount >= 2) {
+      this.openFeedbackModal({
+        tag: "LIMIT REACHED",
+        title: "Request Denied",
+        icon: "ban",
+        iconColor: "text-rose-400",
+        body: `You have already asked ${person.name} for pocket money twice this year. Give them a break!`,
+        effects: {}
+      });
       return;
     }
 
@@ -3226,8 +3271,8 @@ class TerribleGame {
     }
 
     if (this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
       this.closeAskMoneyModal();
+      this.notifyExhausted();
       return;
     }
 
@@ -3294,13 +3339,20 @@ class TerribleGame {
     if (!this.dom.kinGiftModal) return;
 
     if (this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
 
     const giftCount = person.actionsDone ? (person.actionsDone.gifted || 0) : 0;
-    if (giftCount >= 6) {
-      alert(`You have already given ${person.name} 6 gifts this year. Save some for next year!`);
+    if (giftCount >= 2) {
+      this.openFeedbackModal({
+        tag: "LIMIT REACHED",
+        title: "Too Many Gifts",
+        icon: "gift",
+        iconColor: "text-amber-400",
+        body: `You have already given ${person.name} 2 gifts this year. Save some for next year!`,
+        effects: {}
+      });
       return;
     }
 
@@ -3417,8 +3469,8 @@ class TerribleGame {
     }
 
     if (this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
       this.closeGiftModal();
+      this.notifyExhausted();
       return;
     }
 
@@ -3605,7 +3657,7 @@ class TerribleGame {
 
   triggerFeedMilkChoice(person) {
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
     this.openActionChoiceModal({
@@ -3652,7 +3704,7 @@ class TerribleGame {
 
   handleDirectCustomAction(person, actionDef) {
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
     this.character.actionsLeft -= 1;
@@ -4076,7 +4128,7 @@ class TerribleGame {
     const pet = this.selectedPet;
 
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      alert("You are out of energy for this year! Click 'Endure Year' to proceed and rest.");
+      this.notifyExhausted();
       return;
     }
 
@@ -4388,7 +4440,7 @@ class TerribleGame {
 
   handleCaseAction(action) {
     if (!this.selectedCaseId) return;
-    if (action !== 'conclude' && this.character.actionsLeft <= 0) { alert('You have no energy left to work this case this year.'); return; }
+    if (action !== 'conclude' && this.character.actionsLeft <= 0) { this.notifyExhausted('You have no focus left to work this case this year.'); return; }
     let result;
     if (action === 'investigate_alone') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'alone');
     else if (action === 'investigate_team') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'team');
@@ -4419,7 +4471,7 @@ class TerribleGame {
   }
 
   renderActivitiesHub() {
-    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5} Focus`;
     if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
     const schoolStatus = this.character.education && this.character.education.graduationStatus;
     const educationCard = this.dom.activitiesModal && this.dom.activitiesModal.querySelector('[data-category="education"]');
@@ -4564,7 +4616,7 @@ class TerribleGame {
   }
 
   renderActivitiesList(categoryKey) {
-    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5} Focus`;
     if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
 
     if (!this.dom.activitiesList) return;
@@ -4614,7 +4666,7 @@ class TerribleGame {
       }
 
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
-      const maxUses = act.maxPerYear || 5;
+      const maxUses = act.maxPerYear !== undefined ? act.maxPerYear : 1;
       const isCapped = uses >= maxUses;
       const isDisabled = isLockedByAge || noEnergy || isCapped || !!consequenceRestriction;
 
@@ -4631,6 +4683,7 @@ class TerribleGame {
         ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1"><i data-lucide="lock" class="w-2.5 h-2.5"></i>Req Age ${act.minAge}</span>`
         : `<span class="text-[10px] font-mono text-dust/80">Age ${act.minAge}–${act.maxAge}</span>`;
 
+      const energyCost = act.energyCost || 1;
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5 min-w-0">
@@ -4650,8 +4703,8 @@ class TerribleGame {
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
           <span class="text-[10px] font-mono text-dust/90 flex items-center gap-1">
-            <i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
-            Cost: 1 Energy
+            <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>
+            Cost: ${energyCost} Focus
           </span>
           <button class="btn-do-activity px-3.5 py-1.5 rounded-xl text-xs font-serif font-bold transition-all ${
             isDisabled 
@@ -4680,14 +4733,7 @@ class TerribleGame {
 
   handleActivityClick(activityId) {
     if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.openFeedbackModal({
-        tag: "ENERGY DEPLETED",
-        title: "Exhausted",
-        icon: "battery-charging",
-        iconColor: "text-amber-400",
-        body: "You are physically and mentally exhausted for this year! Click 'Endure Year' to proceed and rest.",
-        effects: {}
-      });
+      this.notifyExhausted();
       return;
     }
 
@@ -4702,7 +4748,14 @@ class TerribleGame {
     }
     const result = window.performActivity(activityId, this.character);
     if (!result || !result.success) {
-      alert(result ? result.message : "Activity could not be performed.");
+      this.openFeedbackModal({
+        tag: "PURSUIT BLOCKED",
+        title: result ? (result.title || "Cannot Proceed") : "Action Denied",
+        icon: "alert-circle",
+        iconColor: "text-amber-400",
+        body: result ? result.message : "Activity could not be performed.",
+        effects: {}
+      });
       return;
     }
 
@@ -6431,14 +6484,7 @@ class TerribleGame {
       return;
     }
     if (this.character.actionsLeft <= 0) {
-      this.openFeedbackModal({
-        tag: "ENERGY EXHAUSTED",
-        title: "No Actions Left",
-        icon: "battery-charging",
-        iconColor: "text-amber-400",
-        body: "You have completely exhausted your daily action points (0/40)! Click Endure Year to advance to the next year.",
-        effects: {}
-      });
+      this.notifyExhausted();
       return;
     }
 
@@ -6508,14 +6554,7 @@ class TerribleGame {
       return;
     }
     if (this.character.actionsLeft <= 0) {
-      this.openFeedbackModal({
-        tag: "ENERGY EXHAUSTED",
-        title: "No Actions Left",
-        icon: "battery-charging",
-        iconColor: "text-amber-400",
-        body: "You have completely exhausted your daily action points (0/40)! Click Endure Year to advance to the next year.",
-        effects: {}
-      });
+      this.notifyExhausted();
       return;
     }
 
@@ -6786,7 +6825,7 @@ class TerribleGame {
       this.dom.darkAltarPlayerShillings.textContent = `${this.character.shillings || 0} s.`;
     }
     if (this.dom.darkAltarPlayerEnergy) {
-      this.dom.darkAltarPlayerEnergy.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 40}`;
+      this.dom.darkAltarPlayerEnergy.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5}`;
     }
     this.renderRitualCabinet();
   }
