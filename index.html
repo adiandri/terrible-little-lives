@@ -161,13 +161,19 @@
     }
 
     .btn-endure-pill {
-      min-width: 56px;
+      min-width: 58px;
+      max-width: 68px;
     }
     .btn-endure-pill span {
-      letter-spacing: 0.06em !important;
+      font-size: 8.5px !important;
+      line-height: 1 !important;
+      letter-spacing: 0.04em !important;
       text-transform: uppercase;
       font-feature-settings: "kern" 1;
     }
+    [data-text-size="small"] .btn-endure-pill span { font-size: 8px !important; }
+    [data-text-size="large"] .btn-endure-pill span { font-size: 9px !important; }
+    [data-text-size="huge"] .btn-endure-pill span { font-size: 9.5px !important; }
 
     /* ==========================================================================
        BITLIFE-STYLE MOTION & TRANSITION ARCHITECTURE
@@ -1690,9 +1696,9 @@
           </button>
 
           <!-- Center: Iconic BitLife-Style Action Button -->
-          <button id="btn-endure" class="btn-endure-pill col-span-1 w-full max-w-[66px] mx-auto py-1 px-1 rounded-2xl bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-md shadow-crimson/25 border border-red-500/40 ring-1 ring-crimson/30 flex flex-col items-center justify-center gap-0.5 group cursor-pointer" title="Advance 1 Year">
+          <button id="btn-endure" class="btn-endure-pill col-span-1 w-full max-w-[68px] mx-auto py-1 px-1.5 rounded-2xl bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-md shadow-crimson/25 border border-red-500/40 ring-1 ring-crimson/30 flex flex-col items-center justify-center gap-0.5 group cursor-pointer" title="Advance 1 Year">
             <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[2.5] text-red-100 group-hover:scale-110 transition-transform shrink-0"></i>
-            <span class="font-serif text-[10px] font-bold whitespace-nowrap leading-none tracking-wider">ENDURE</span>
+            <span class="font-serif text-[8.5px] font-bold whitespace-nowrap leading-none tracking-normal">ENDURE</span>
           </button>
 
           <!-- Tab 3: Activities -->
