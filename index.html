@@ -160,9 +160,234 @@
       transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    button:active, .game-shell-button:active, .core-nav-button:active {
-      transform: scale(0.96);
-      transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1);
+    /* ==========================================================================
+       BITLIFE-STYLE MOTION & TRANSITION ARCHITECTURE
+       ========================================================================== */
+
+    /* Tactile Active Press Feedback for all interactive cards and buttons */
+    button:active,
+    [role="button"]:active,
+    .btn-activity-category:active,
+    .kin-card:active,
+    .career-item:active,
+    .identity-theme-card:active,
+    .choice-occult:active,
+    .game-shell-button:active,
+    .core-nav-button:active,
+    .stat-pill-wrapper:active {
+      transform: scale(0.96) !important;
+      transition: transform 0.08s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    /* Full-Page & Sheet Modal Slide-Up Entrance (BitLife Native Sheet Style) */
+    @keyframes bitlifeSheetSlideUp {
+      0% {
+        transform: translateY(100%);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Sheet Slide-Down Exit */
+    @keyframes bitlifeSheetSlideDown {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100%);
+        opacity: 0.85;
+      }
+    }
+
+    /* Apply Sheet Slide-Up to open full-page / sheet modals */
+    #activities-modal:not(.hidden):not(.modal-closing),
+    #kin-modal:not(.hidden):not(.modal-closing),
+    #kin-detail-modal:not(.hidden):not(.modal-closing),
+    #profile-modal:not(.hidden):not(.modal-closing),
+    #education-modal:not(.hidden):not(.modal-closing),
+    #school-choice-modal:not(.hidden):not(.modal-closing),
+    #school-person-modal:not(.hidden):not(.modal-closing),
+    #careers-modal:not(.hidden):not(.modal-closing),
+    #creatures-modal:not(.hidden):not(.modal-closing),
+    #creature-detail-modal:not(.hidden):not(.modal-closing),
+    #case-detail-modal:not(.hidden):not(.modal-closing),
+    #pets-modal:not(.hidden):not(.modal-closing),
+    #pet-detail-modal:not(.hidden):not(.modal-closing),
+    #dark-altar-modal:not(.hidden):not(.modal-closing),
+    #terriblenet-modal:not(.hidden):not(.modal-closing),
+    #kin-gift-modal:not(.hidden):not(.modal-closing) {
+      animation: bitlifeSheetSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    /* When closing sheet modal */
+    #activities-modal.modal-closing,
+    #kin-modal.modal-closing,
+    #kin-detail-modal.modal-closing,
+    #profile-modal.modal-closing,
+    #education-modal.modal-closing,
+    #school-choice-modal.modal-closing,
+    #school-person-modal.modal-closing,
+    #careers-modal.modal-closing,
+    #creatures-modal.modal-closing,
+    #creature-detail-modal.modal-closing,
+    #case-detail-modal.modal-closing,
+    #pets-modal.modal-closing,
+    #pet-detail-modal.modal-closing,
+    #dark-altar-modal.modal-closing,
+    #terriblenet-modal.modal-closing,
+    #kin-gift-modal.modal-closing {
+      animation: bitlifeSheetSlideDown 0.2s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+      pointer-events: none;
+    }
+
+    /* Dilemma Bottom Sheet Slide Animations */
+    @keyframes bitlifeDilemmaSlideUp {
+      0% {
+        transform: translateY(100%);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+    @keyframes bitlifeDilemmaSlideDown {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(100%);
+      }
+    }
+    #dilemma-modal:not(.hidden):not(.modal-closing) {
+      animation: bitlifeDilemmaSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform;
+    }
+    #dilemma-modal.modal-closing {
+      animation: bitlifeDilemmaSlideDown 0.2s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+      pointer-events: none;
+    }
+
+    /* Popup Spring Dialog Animations (Alerts, Settings, Prompts, Feedback) */
+    @keyframes bitlifeBackdropFadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @keyframes bitlifeBackdropFadeOut {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes bitlifePopupSpringIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.88) translateY(14px);
+      }
+      65% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes bitlifePopupExit {
+      0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.92) translateY(8px);
+      }
+    }
+
+    /* Apply popup backdrop fade-in */
+    #settings-modal:not(.hidden):not(.modal-closing),
+    #kin-ask-money-modal:not(.hidden):not(.modal-closing),
+    #kin-feedback-modal:not(.hidden):not(.modal-closing),
+    #action-choice-modal:not(.hidden):not(.modal-closing),
+    #revelation-modal:not(.hidden):not(.modal-closing),
+    #godmode-modal:not(.hidden):not(.modal-closing),
+    #death-modal:not(.hidden):not(.modal-closing),
+    #dilemma-backdrop:not(.hidden) {
+      animation: bitlifeBackdropFadeIn 0.22s ease-out forwards;
+    }
+
+    /* Apply spring bounce to inner cards of popup dialogs */
+    #settings-modal:not(.hidden):not(.modal-closing) > div,
+    #kin-ask-money-modal:not(.hidden):not(.modal-closing) > div,
+    #kin-feedback-modal:not(.hidden):not(.modal-closing) > div,
+    #action-choice-modal:not(.hidden):not(.modal-closing) > div,
+    #revelation-modal:not(.hidden):not(.modal-closing) > div,
+    #godmode-modal:not(.hidden):not(.modal-closing) > div,
+    #death-modal:not(.hidden):not(.modal-closing) > div {
+      animation: bitlifePopupSpringIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    /* Popup closing transitions */
+    #settings-modal.modal-closing,
+    #kin-ask-money-modal.modal-closing,
+    #kin-feedback-modal.modal-closing,
+    #action-choice-modal.modal-closing,
+    #revelation-modal.modal-closing,
+    #godmode-modal.modal-closing,
+    #death-modal.modal-closing {
+      animation: bitlifeBackdropFadeOut 0.18s ease-in forwards !important;
+      pointer-events: none;
+    }
+    #settings-modal.modal-closing > div,
+    #kin-ask-money-modal.modal-closing > div,
+    #kin-feedback-modal.modal-closing > div,
+    #action-choice-modal.modal-closing > div,
+    #revelation-modal.modal-closing > div,
+    #godmode-modal.modal-closing > div,
+    #death-modal.modal-closing > div {
+      animation: bitlifePopupExit 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+    }
+
+    /* Sub-View Drill-Down & Back Transitions (Activities Hub <-> Detail View) */
+    @keyframes bitlifeDrillRightIn {
+      0% {
+        opacity: 0;
+        transform: translateX(24px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes bitlifeDrillLeftIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-24px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .bitlife-drill-forward {
+      animation: bitlifeDrillRightIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+    .bitlife-drill-backward {
+      animation: bitlifeDrillLeftIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
     }
 
     @keyframes timelineEnter {

@@ -882,7 +882,10 @@ class TerribleGame {
     // Primary navigation. Occupation remains available from Activities.
     if (this.dom.btnTabLife) this.dom.btnTabLife.addEventListener('click', () => {
       window.soundEngine.playClick();
-      this.hideModals();
+      const hadOpen = this.closeActivePrimaryModal();
+      if (!hadOpen) {
+        this.hideModals();
+      }
       this.setPrimaryNav('life');
       if (this.dom.logFeed) this.dom.logFeed.scrollTo({ top: this.dom.logFeed.scrollHeight, behavior: 'smooth' });
     });
@@ -990,10 +993,11 @@ class TerribleGame {
       this.dom.btnCancelSchoolPerson.addEventListener('click', () => this.closeSchoolPersonModal());
     }
 
-    this.dom.btnCloseCareers.addEventListener('click', () => {
-      this.dom.careersModal.classList.add('hidden');
-      this.dom.careersModal.style.display = 'none';
-    });
+    if (this.dom.btnCloseCareers) {
+      this.dom.btnCloseCareers.addEventListener('click', () => {
+        this.closeCareersModal();
+      });
+    }
 
     this.dom.tabCareerMundane.addEventListener('click', () => {
       this.activeCareerTab = 'mundane';
@@ -1012,8 +1016,7 @@ class TerribleGame {
     // Live God Mode Inspector In-Game
     this.dom.btnGameGodmode.addEventListener('click', () => this.openLiveGodmodeInspector());
     this.dom.btnCloseGodmodeModal.addEventListener('click', () => {
-      this.dom.godmodeModal.classList.add('hidden');
-      this.dom.godmodeModal.style.display = 'none';
+      this.animateCloseModal(this.dom.godmodeModal, null, true);
     });
     this.dom.btnApplyLiveGodmode.addEventListener('click', () => this.applyLiveGodmodeTweaks());
 
@@ -2262,7 +2265,7 @@ class TerribleGame {
       displayIndex++;
     });
 
-    this.dom.dilemmaModal.classList.remove('hidden');
+    this.dom.dilemmaModal.classList.remove('modal-closing', 'hidden');
     this.dom.dilemmaModal.style.display = 'flex';
     this.dom.dilemmaBackdrop.classList.remove('hidden');
     this.dom.dilemmaBackdrop.style.display = 'block';
@@ -2326,9 +2329,14 @@ class TerribleGame {
 
   // Careers Modal Logic
   openCareersModal() {
-    this.dom.careersModal.classList.remove('hidden');
+    this.dom.careersModal.classList.remove('modal-closing', 'hidden');
     this.dom.careersModal.style.display = 'flex';
     this.renderCareersList();
+  }
+
+  closeCareersModal() {
+    if (!this.dom.careersModal) return;
+    this.animateCloseModal(this.dom.careersModal);
   }
 
   renderCareersList() {
@@ -2544,9 +2552,10 @@ class TerribleGame {
     if (!this.character.kin) {
       this.character.kin = window.generateFamily(this.character);
     }
+    this.closeOtherPrimaryModals(this.dom.kinModal);
     this.updateFamilyResidenceUI();
     this.setPrimaryNav('people');
-    this.dom.kinModal.classList.remove('hidden');
+    this.dom.kinModal.classList.remove('modal-closing', 'hidden');
     this.dom.kinModal.style.display = 'flex';
     this.renderKinList(this.activeKinFilter);
   }
@@ -2575,9 +2584,10 @@ class TerribleGame {
   }
 
   closeKinModal() {
-    this.dom.kinModal.classList.add('hidden');
-    this.dom.kinModal.style.display = 'none';
-    this.setPrimaryNav('life');
+    if (!this.dom.kinModal) return;
+    this.animateCloseModal(this.dom.kinModal, () => {
+      this.setPrimaryNav('life');
+    });
   }
 
   filterKin(filter) {
@@ -2772,15 +2782,16 @@ class TerribleGame {
   openKinDetailModal(person) {
     const livePerson = this.getAllKinList().find(p => p.id === person.id) || person;
     this.selectedKin = livePerson;
-    this.dom.kinDetailModal.classList.remove('hidden');
+    this.dom.kinDetailModal.classList.remove('modal-closing', 'hidden');
     this.dom.kinDetailModal.style.display = 'flex';
     this.renderKinDetail(livePerson);
   }
 
   closeKinDetailModal() {
-    this.dom.kinDetailModal.classList.add('hidden');
-    this.dom.kinDetailModal.style.display = 'none';
-    this.renderKinList(this.activeKinFilter);
+    if (!this.dom.kinDetailModal) return;
+    this.animateCloseModal(this.dom.kinDetailModal, () => {
+      this.renderKinList(this.activeKinFilter);
+    });
   }
 
   renderKinDetail(person) {
@@ -3346,7 +3357,7 @@ class TerribleGame {
   openRevelationModal(person) {
     this.revelationTarget = person;
     window.soundEngine.playDread();
-    this.dom.revelationModal.classList.remove('hidden');
+    this.dom.revelationModal.classList.remove('modal-closing', 'hidden');
     this.dom.revelationModal.style.display = 'flex';
 
     this.dom.revelationName.textContent = `Unmasked: ${person.name}`;
@@ -3363,8 +3374,7 @@ class TerribleGame {
   handleRevelationChoice(choice) {
     const person = this.revelationTarget;
     if (!person) {
-      this.dom.revelationModal.classList.add('hidden');
-      this.dom.revelationModal.style.display = 'none';
+      this.animateCloseModal(this.dom.revelationModal, null, true);
       return;
     }
 
@@ -3400,10 +3410,10 @@ class TerribleGame {
     }
 
     this.revelationTarget = null;
-    this.dom.revelationModal.classList.add('hidden');
-    this.dom.revelationModal.style.display = 'none';
-    this.renderAll();
-    this.saveGame();
+    this.animateCloseModal(this.dom.revelationModal, () => {
+      this.renderAll();
+      this.saveGame();
+    }, true);
   }
 
   formatCurrency(amount) {
@@ -3468,7 +3478,7 @@ class TerribleGame {
 
     this.updateAskMoneySliderUI(defaultUsd);
 
-    this.dom.kinAskMoneyModal.classList.remove('hidden');
+    this.dom.kinAskMoneyModal.classList.remove('modal-closing', 'hidden');
     this.dom.kinAskMoneyModal.style.display = 'flex';
   }
 
@@ -3500,8 +3510,7 @@ class TerribleGame {
 
   closeAskMoneyModal() {
     if (this.dom.kinAskMoneyModal) {
-      this.dom.kinAskMoneyModal.classList.add('hidden');
-      this.dom.kinAskMoneyModal.style.display = 'none';
+      this.animateCloseModal(this.dom.kinAskMoneyModal, null, true);
     }
     this.askMoneyTarget = null;
   }
@@ -3617,7 +3626,7 @@ class TerribleGame {
 
     this.renderGiftCardsList();
 
-    this.dom.kinGiftModal.classList.remove('hidden');
+    this.dom.kinGiftModal.classList.remove('modal-closing', 'hidden');
     this.dom.kinGiftModal.style.display = 'flex';
   }
 
@@ -3698,8 +3707,7 @@ class TerribleGame {
 
   closeGiftModal() {
     if (this.dom.kinGiftModal) {
-      this.dom.kinGiftModal.classList.add('hidden');
-      this.dom.kinGiftModal.style.display = 'none';
+      this.animateCloseModal(this.dom.kinGiftModal);
     }
     this.giftTarget = null;
   }
@@ -3832,16 +3840,18 @@ class TerribleGame {
       try { window.lucide.createIcons(); } catch (e) {}
     }
 
-    this.dom.kinFeedbackModal.classList.remove('hidden');
+    this.dom.kinFeedbackModal.classList.remove('modal-closing', 'hidden');
     this.dom.kinFeedbackModal.style.display = 'flex';
   }
 
   closeFeedbackModal() {
     if (this.dom.kinFeedbackModal) {
-      this.dom.kinFeedbackModal.classList.add('hidden');
-      this.dom.kinFeedbackModal.style.display = 'none';
+      this.animateCloseModal(this.dom.kinFeedbackModal, () => {
+        this.checkPendingSchoolChoice();
+      }, true);
+    } else {
+      this.checkPendingSchoolChoice();
     }
-    this.checkPendingSchoolChoice();
   }
 
   // ==========================================
@@ -3883,7 +3893,7 @@ class TerribleGame {
       });
     }
 
-    modal.classList.remove('hidden');
+    modal.classList.remove('modal-closing', 'hidden');
     modal.style.display = 'flex';
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -3893,8 +3903,7 @@ class TerribleGame {
   closeActionChoiceModal() {
     const modal = this.dom.actionChoiceModal || document.getElementById('action-choice-modal');
     if (modal) {
-      modal.classList.add('hidden');
-      modal.style.display = 'none';
+      this.animateCloseModal(modal, null, true);
     }
   }
 
@@ -4118,13 +4127,13 @@ class TerribleGame {
       this.refreshPetCandidates();
     }
     this.filterPetAdoptions('mundane');
-    this.dom.petsModal.classList.remove('hidden');
+    this.dom.petsModal.classList.remove('modal-closing', 'hidden');
     this.dom.petsModal.style.display = 'flex';
   }
 
   closePetsModal() {
-    this.dom.petsModal.classList.add('hidden');
-    this.dom.petsModal.style.display = 'none';
+    if (!this.dom.petsModal) return;
+    this.animateCloseModal(this.dom.petsModal);
   }
 
   refreshPetCandidates() {
@@ -4351,7 +4360,7 @@ class TerribleGame {
       }
     }
 
-    modal.classList.remove('hidden');
+    modal.classList.remove('modal-closing', 'hidden');
     modal.style.display = 'flex';
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
@@ -4359,11 +4368,10 @@ class TerribleGame {
   }
 
   closePetDetailModal() {
-    if (this.dom.petDetailModal) {
-      this.dom.petDetailModal.classList.add('hidden');
-      this.dom.petDetailModal.style.display = 'none';
-    }
-    this.renderPetsList();
+    if (!this.dom.petDetailModal) return;
+    this.animateCloseModal(this.dom.petDetailModal, () => {
+      this.renderPetsList();
+    });
   }
 
   handlePetAction(actionType) {
@@ -4437,10 +4445,11 @@ class TerribleGame {
     if (!this.character || !this.dom.creaturesModal) return;
     window.soundEngine.playDread();
     if (window.ensureEntitySystem) window.ensureEntitySystem(this.character);
+    this.closeOtherPrimaryModals(this.dom.creaturesModal);
     this.setPrimaryNav('creatures');
     this.switchArchiveTab('creatures');
     this.renderCreaturesList();
-    this.dom.creaturesModal.classList.remove('hidden');
+    this.dom.creaturesModal.classList.remove('modal-closing', 'hidden');
     this.dom.creaturesModal.style.display = 'flex';
   }
 
@@ -4449,17 +4458,17 @@ class TerribleGame {
       this.dom.creatureDetailModal.classList.add('hidden');
       this.dom.creatureDetailModal.style.display = 'none';
     }
-    if (this.dom.creaturesModal) {
-      this.dom.creaturesModal.classList.add('hidden');
-      this.dom.creaturesModal.style.display = 'none';
-    }
     if (this.dom.caseDetailModal) {
       this.dom.caseDetailModal.classList.add('hidden');
       this.dom.caseDetailModal.style.display = 'none';
     }
     this.selectedEntityId = null;
     this.selectedCaseId = null;
-    this.setPrimaryNav('life');
+    if (this.dom.creaturesModal) {
+      this.animateCloseModal(this.dom.creaturesModal, () => {
+        this.setPrimaryNav('life');
+      });
+    }
   }
 
   renderCreaturesList() {
@@ -4512,17 +4521,17 @@ class TerribleGame {
         <p class="text-[9px] font-mono uppercase tracking-wider text-purple-400">Age ${memory.age} · ${String(memory.action).replace(/_/g, ' ')}</p>
         <p class="text-xs text-dust mt-1 leading-relaxed">${memory.detail}</p>
       </div>`).join('') : '<p class="text-xs text-dust">It has revealed no readable history.</p>';
-    this.dom.creatureDetailModal.classList.remove('hidden');
+    this.dom.creatureDetailModal.classList.remove('modal-closing', 'hidden');
     this.dom.creatureDetailModal.style.display = 'flex';
     if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
   }
 
   closeCreatureDetail() {
     if (!this.dom.creatureDetailModal) return;
-    this.dom.creatureDetailModal.classList.add('hidden');
-    this.dom.creatureDetailModal.style.display = 'none';
-    this.selectedEntityId = null;
-    this.renderCreaturesList();
+    this.animateCloseModal(this.dom.creatureDetailModal, () => {
+      this.selectedEntityId = null;
+      this.renderCreaturesList();
+    });
   }
 
   renderCreatureActions(entity) {
@@ -4623,16 +4632,16 @@ class TerribleGame {
   openCaseDetail(caseId) {
     this.selectedCaseId = caseId;
     this.renderCaseDetail();
-    this.dom.caseDetailModal.classList.remove('hidden');
+    this.dom.caseDetailModal.classList.remove('modal-closing', 'hidden');
     this.dom.caseDetailModal.style.display = 'flex';
   }
 
   closeCaseDetail() {
     if (!this.dom.caseDetailModal) return;
-    this.dom.caseDetailModal.classList.add('hidden');
-    this.dom.caseDetailModal.style.display = 'none';
-    this.selectedCaseId = null;
-    this.renderCaseFiles();
+    this.animateCloseModal(this.dom.caseDetailModal, () => {
+      this.selectedCaseId = null;
+      this.renderCaseFiles();
+    });
   }
 
   renderCaseDetail() {
@@ -4700,17 +4709,19 @@ class TerribleGame {
   // ==========================================
 
   openActivitiesModal() {
+    this.closeOtherPrimaryModals(this.dom.activitiesModal);
     this.setPrimaryNav('activities');
-    this.dom.activitiesModal.classList.remove('hidden');
+    this.dom.activitiesModal.classList.remove('modal-closing', 'hidden');
     this.dom.activitiesModal.style.display = 'flex';
     this.closeActivityCategory(); // Ensure we land on the City Hub
     this.renderActivitiesHub();
   }
 
   closeActivitiesModal() {
-    this.dom.activitiesModal.classList.add('hidden');
-    this.dom.activitiesModal.style.display = 'none';
-    this.setPrimaryNav('life');
+    if (!this.dom.activitiesModal) return;
+    this.animateCloseModal(this.dom.activitiesModal, () => {
+      this.setPrimaryNav('life');
+    });
   }
 
   renderActivitiesHub() {
@@ -4795,9 +4806,12 @@ class TerribleGame {
 
     this.activeActivityCategory = categoryKey;
 
-    // Drill down to detail view
+    // Drill down to detail view with BitLife slide animation
     if (this.dom.activitiesHubView) this.dom.activitiesHubView.classList.add('hidden');
-    if (this.dom.activitiesDetailView) this.dom.activitiesDetailView.classList.remove('hidden');
+    if (this.dom.activitiesDetailView) {
+      this.dom.activitiesDetailView.classList.remove('hidden', 'bitlife-drill-backward');
+      this.dom.activitiesDetailView.classList.add('bitlife-drill-forward');
+    }
     if (this.dom.btnBackActivitiesHub) this.dom.btnBackActivitiesHub.classList.remove('hidden');
 
     if (this.dom.activitiesHeaderTitle) this.dom.activitiesHeaderTitle.textContent = catData.name;
@@ -4847,7 +4861,10 @@ class TerribleGame {
 
   closeActivityCategory() {
     this.activeActivityCategory = null;
-    if (this.dom.activitiesHubView) this.dom.activitiesHubView.classList.remove('hidden');
+    if (this.dom.activitiesHubView) {
+      this.dom.activitiesHubView.classList.remove('hidden', 'bitlife-drill-forward');
+      this.dom.activitiesHubView.classList.add('bitlife-drill-backward');
+    }
     if (this.dom.activitiesDetailView) this.dom.activitiesDetailView.classList.add('hidden');
     if (this.dom.btnBackActivitiesHub) this.dom.btnBackActivitiesHub.classList.add('hidden');
 
@@ -5155,6 +5172,70 @@ class TerribleGame {
     this.dom.deathModal.style.display = 'flex';
   }
 
+  // ==========================================
+  // BITLIFE-STYLE MODAL ANIMATION & NAVIGATION ENGINE
+  // ==========================================
+
+  animateCloseModal(modalEl, onClosed, isPopup = false) {
+    if (!modalEl) {
+      if (onClosed) onClosed();
+      return;
+    }
+    // If already hidden, return immediately
+    if (modalEl.classList.contains('hidden') || modalEl.style.display === 'none') {
+      modalEl.classList.remove('modal-closing');
+      if (onClosed) onClosed();
+      return;
+    }
+    // Prevent double trigger if already closing
+    if (modalEl.classList.contains('modal-closing')) {
+      return;
+    }
+
+    modalEl.classList.add('modal-closing');
+    const delay = isPopup ? 180 : 200;
+
+    setTimeout(() => {
+      modalEl.classList.remove('modal-closing');
+      modalEl.classList.add('hidden');
+      modalEl.style.display = 'none';
+      if (onClosed) onClosed();
+    }, delay);
+  }
+
+  closeOtherPrimaryModals(exceptModal) {
+    const primaryModals = [
+      this.dom.profileModal,
+      this.dom.kinModal,
+      this.dom.activitiesModal,
+      this.dom.creaturesModal
+    ];
+    primaryModals.forEach(m => {
+      if (m && m !== exceptModal && !m.classList.contains('hidden')) {
+        m.classList.add('hidden');
+        m.classList.remove('modal-closing');
+        m.style.display = 'none';
+      }
+    });
+  }
+
+  closeActivePrimaryModal() {
+    const primaryModals = [
+      this.dom.profileModal,
+      this.dom.kinModal,
+      this.dom.activitiesModal,
+      this.dom.creaturesModal
+    ];
+    let animated = false;
+    primaryModals.forEach(m => {
+      if (m && !m.classList.contains('hidden') && m.style.display !== 'none') {
+        this.animateCloseModal(m);
+        animated = true;
+      }
+    });
+    return animated;
+  }
+
   hideModals() {
     const modals = [
       this.dom.dilemmaModal,
@@ -5183,6 +5264,7 @@ class TerribleGame {
 
     modals.forEach(m => {
       if (m) {
+        m.classList.remove('modal-closing');
         m.classList.add('hidden');
         m.style.display = 'none';
       }
@@ -5209,17 +5291,18 @@ class TerribleGame {
   openProfile() {
     if (!this.character || !this.dom.profileModal) return;
     window.soundEngine.playClick();
+    this.closeOtherPrimaryModals(this.dom.profileModal);
     this.renderProfile();
     this.setPrimaryNav('profile');
-    this.dom.profileModal.classList.remove('hidden');
+    this.dom.profileModal.classList.remove('modal-closing', 'hidden');
     this.dom.profileModal.style.display = 'flex';
   }
 
   closeProfile() {
     if (!this.dom.profileModal) return;
-    this.dom.profileModal.classList.add('hidden');
-    this.dom.profileModal.style.display = 'none';
-    this.setPrimaryNav('life');
+    this.animateCloseModal(this.dom.profileModal, () => {
+      this.setPrimaryNav('life');
+    });
   }
 
   renderProfile() {
@@ -5643,7 +5726,7 @@ class TerribleGame {
     const modal = this.dom.settingsModal || this.dom.themeModal;
     if (modal) {
       this.switchSettingsPanel('experience');
-      modal.classList.remove('hidden');
+      modal.classList.remove('modal-closing', 'hidden');
       modal.style.display = 'flex';
     }
     if (window.lucide) {
@@ -5653,12 +5736,10 @@ class TerribleGame {
 
   closeSettingsModal() {
     if (this.dom.settingsModal) {
-      this.dom.settingsModal.classList.add('hidden');
-      this.dom.settingsModal.style.display = 'none';
+      this.animateCloseModal(this.dom.settingsModal, null, true);
     }
     if (this.dom.themeModal && this.dom.themeModal !== this.dom.settingsModal) {
-      this.dom.themeModal.classList.add('hidden');
-      this.dom.themeModal.style.display = 'none';
+      this.animateCloseModal(this.dom.themeModal, null, true);
     }
   }
 
@@ -5964,7 +6045,7 @@ class TerribleGame {
     this.selectSchoolChoiceTrack(this.selectedSchoolTrack);
 
     if (this.dom.schoolChoiceModal) {
-      this.dom.schoolChoiceModal.classList.remove('hidden');
+      this.dom.schoolChoiceModal.classList.remove('modal-closing', 'hidden');
       this.dom.schoolChoiceModal.style.display = 'flex';
     }
 
@@ -5975,8 +6056,7 @@ class TerribleGame {
 
   closeSchoolChoiceModal() {
     if (this.dom.schoolChoiceModal) {
-      this.dom.schoolChoiceModal.classList.add('hidden');
-      this.dom.schoolChoiceModal.style.display = 'none';
+      this.animateCloseModal(this.dom.schoolChoiceModal);
     }
   }
 
@@ -6131,14 +6211,13 @@ class TerribleGame {
 
     this.activeEducationTab = activeTab || 'overview';
     this.renderEducationModal(this.activeEducationTab);
-    this.dom.educationModal.classList.remove('hidden');
+    this.dom.educationModal.classList.remove('modal-closing', 'hidden');
     this.dom.educationModal.style.display = 'flex';
   }
 
   closeEducationModal() {
     if (this.dom.educationModal) {
-      this.dom.educationModal.classList.add('hidden');
-      this.dom.educationModal.style.display = 'none';
+      this.animateCloseModal(this.dom.educationModal);
     }
   }
 
@@ -6720,14 +6799,13 @@ class TerribleGame {
       try { window.lucide.createIcons(); } catch (e) {}
     }
 
-    this.dom.schoolPersonModal.classList.remove('hidden');
+    this.dom.schoolPersonModal.classList.remove('modal-closing', 'hidden');
     this.dom.schoolPersonModal.style.display = 'flex';
   }
 
   closeSchoolPersonModal() {
     if (this.dom.schoolPersonModal) {
-      this.dom.schoolPersonModal.classList.add('hidden');
-      this.dom.schoolPersonModal.style.display = 'none';
+      this.animateCloseModal(this.dom.schoolPersonModal);
     }
   }
 
@@ -7000,15 +7078,14 @@ class TerribleGame {
     if (!this.character?.isAlive || !this.dom.terribleNetModal || !window.ensureTerribleNet) return;
     this.closeActivitiesModal();
     window.ensureTerribleNet(this.character);
-    this.dom.terribleNetModal.classList.remove('hidden');
+    this.dom.terribleNetModal.classList.remove('modal-closing', 'hidden');
     this.dom.terribleNetModal.style.display = 'flex';
     this.renderTerribleNet(this.activeTerribleNetTab || 'platforms');
   }
 
   closeTerribleNetModal() {
     if (!this.dom.terribleNetModal) return;
-    this.dom.terribleNetModal.classList.add('hidden');
-    this.dom.terribleNetModal.style.display = 'none';
+    this.animateCloseModal(this.dom.terribleNetModal);
   }
 
   escapeNet(value) {
@@ -7170,14 +7247,13 @@ class TerribleGame {
       try { window.lucide.createIcons(); } catch (e) {}
     }
 
-    this.dom.darkAltarModal.classList.remove('hidden');
+    this.dom.darkAltarModal.classList.remove('modal-closing', 'hidden');
     this.dom.darkAltarModal.style.display = 'flex';
   }
 
   closeDarkAltarModal() {
     if (this.dom.darkAltarModal) {
-      this.dom.darkAltarModal.classList.add('hidden');
-      this.dom.darkAltarModal.style.display = 'none';
+      this.animateCloseModal(this.dom.darkAltarModal);
     }
   }
 
