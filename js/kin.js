@@ -263,6 +263,417 @@ const FAMILY_ATMOSPHERES = {
   }
 };
 
+// Household Atmosphere Milestones Catalog (Ages 1 to 17)
+const FAMILY_MILESTONES = {
+  loving: {
+    age1: [
+      "Turned 1 year old. You took your first wobbly steps across warm braided rugs, collapsing into your mother's laughing embrace.",
+      "Turned 1 year old. You learned to pull yourself up by the armchair, babbling happily as your father clapped his hands in delight."
+    ],
+    toddler: [
+      "Turned {age}. You spent peaceful afternoons building crooked block towers with your parents, rewarded with warm cups of milk and bedtime lullabies.",
+      "Turned {age}. Learned to speak in eager, bright sentences, chattering endlessly while your mother baked fresh bread in the sunlit kitchen.",
+      "Turned {age}. Tucked into bed under thick wool quilts while your father read stories of brave sailors until you drifted off."
+    ],
+    earlyChild: [
+      "Turned {age}. Walked hand-in-hand to kindergarten, proudly carrying a painted lunch tin with little love notes tucked inside.",
+      "Turned {age}. Came home with finger-paintings of your family; your parents proudly taped them to the center of the refrigerator.",
+      "Turned {age}. Spent rainy autumn afternoons playing board games on the living room rug, wrapped in genuine warmth and comfort."
+    ],
+    elementary: [
+      "Turned {age}. Attended municipal primary school in {city}. Your parents helped you with spelling words and celebrated every gold star on your papers.",
+      "Turned {age}. Spent weekends riding a patched bicycle through the neighborhood park, knowing a warm family supper was waiting at dusk.",
+      "Turned {age}. When you caught a nasty winter chest cold, your parents took turns sitting by your bed with hot herbal broth and soothing songs.",
+      "Turned {age}. Your parents showed up to cheer for you at the school recital, their clapping loud and unmistakable in the auditorium."
+    ],
+    middleSchool: [
+      "Turned {age}. Navigated middle school with steady encouragement at home; your parents listened patiently to your awkward worries over dinner.",
+      "Turned {age}. Even as school hallways grew louder and rougher, home remained an unshakeable sanctuary of trust and kindness.",
+      "Turned {age}. Your parents noticed your changing interests and surprised you with a thoughtful birthday gift from the town bookstore."
+    ],
+    adolescent: [
+      "Turned {age}. High school brought new stresses, but honest talks around the evening table kept you grounded through teenage turbulence.",
+      "Turned {age}. Your parents supported your emerging independence, treating your opinions with respect while leaving the porch light on for you.",
+      "Turned {age}. Preparing for the threshold of adulthood with a deep sense of security, surrounded by steady parental affection."
+    ]
+  },
+  religious: {
+    age1: [
+      "Turned 1 year old. You learned to fold your tiny hands before every meal while gentle church chorales played from the wooden radio console.",
+      "Turned 1 year old. You took your first steps toward the mantelpiece, reaching toward the framed Sunday school print of the Good Shepherd."
+    ],
+    toddler: [
+      "Turned {age}. Taught to bow your head and whisper grace before touching porridge, learning that angels record every good and bad deed.",
+      "Turned {age}. Listened quietly on the hard church pew each Sunday, clutching a wooden sheep while the pastor preached about righteous living.",
+      "Turned {age}. Recited your first simple bedtime prayer: 'If I should die before I wake, I pray the Lord my soul to take.'"
+    ],
+    earlyChild: [
+      "Turned {age}. Attended church kindergarten; you practiced calligraphy by copying Bible verses onto ruled paper while rain tapped the stained glass.",
+      "Turned {age}. Learned the catechism alongside other neighborhood children, wearing clean, modest clothes and polishing your Sunday shoes.",
+      "Turned {age}. Sang along with the children's choir on choir practice evenings, the sweet harmonium music echoing through the cold chapel."
+    ],
+    elementary: [
+      "Turned {age}. Attended municipal school in {city}, keeping scripture cards in your pencil box and trying to be an honest, quiet pupil.",
+      "Turned {age}. Spent Saturdays sweeping church aisles and washing brass altar candleholders alongside your family.",
+      "Turned {age}. Felt a quiet pang of unease whenever schoolmates swore or told vulgar jokes behind the gymnasium.",
+      "Turned {age}. Endured seasonal fasts and meatless Fridays with quiet discipline, taught that sacrifice cleanses the mortal heart."
+    ],
+    middleSchool: [
+      "Turned {age}. Reached confirmation age; spent long hours studying doctrinal texts under the rector's earnest supervision.",
+      "Turned {age}. Felt increasingly torn between the modest piety of your household and the rebellious chatter of your public school peers.",
+      "Turned {age}. Your parents gently confiscated a secular teen magazine you brought home, reminding you of the spiritual traps of vanity."
+    ],
+    adolescent: [
+      "Turned {age}. High school tested your faith; you navigated peer pressure while carrying your family's quiet, pious expectations.",
+      "Turned {age}. Volunteered at parish soup kitchens in {city}, observing the misery of the needy through the lens of duty and mercy.",
+      "Turned {age}. Stood before the congregation at youth fellowship, quietly wondering how much of your faith was your own and how much was habit."
+    ]
+  },
+  deeply_religious: {
+    age1: [
+      "Turned 1 year old. You crawled toward the heavy cast-iron crucifix by the hearth, tasting cold brass while evening penitence prayers droned overhead.",
+      "Turned 1 year old. You took your first steps in the flickering glow of tallow votives, startled into crying by your father's booming prayers."
+    ],
+    toddler: [
+      "Turned {age}. Taught to kneel on bare floorboards until your knees throbbed, warned that wicked children are carried off into eternal fire.",
+      "Turned {age}. Terrified of the dark in your bedroom; your mother burned bitter holy sage and sprinkled salt across your windowsill to repel demons.",
+      "Turned {age}. Cried from nightmares of horned shadows, only to be made to recite the Seven Penitential Psalms before being allowed back in bed."
+    ],
+    earlyChild: [
+      "Turned {age}. Kept away from secular playmates; spent your days copying warnings of damnation and hearing graphic descriptions of purgatory.",
+      "Turned {age}. Accused of bearing sinful pride when you smiled into a mirror; the glass was turned to the wall and your toys confiscated for a week.",
+      "Turned {age}. Attended midnight vigils with your parents, kneeling in freezing chapel drafts while elders wept aloud for the sins of the city."
+    ],
+    elementary: [
+      "Turned {age}. Sent to school in austere, buttoned-to-the-throat garments; classmates mocked you as 'the church creep' behind the bicycle shed.",
+      "Turned {age}. Scrutinized every private thought for mortal sin, terrified that an unconfessed stray thought would damn you if you died in your sleep.",
+      "Turned {age}. When you brought home a library fairy tale book, your father threw it into the woodstove, proclaiming it devil's deceit.",
+      "Turned {age}. Endured strict disciplinary fasts on bread and water whenever your grades slipped below perfection or your eyes wandered during sermons."
+    ],
+    middleSchool: [
+      "Turned {age}. The onset of puberty brought intense spiritual crisis; every natural impulse was treated as demonic temptation requiring vigils.",
+      "Turned {age}. Forced to confess your minor infractions before the family elders every Sunday evening, sobbing into cold floorboards.",
+      "Turned {age}. Concealed a battered walkman and secular cassettes under a loose floorboard beneath your bed, heart pounding at every floor creak."
+    ],
+    adolescent: [
+      "Turned {age}. Suffocating under zealous surveillance; mail opened, room searched, and any sign of independent thought labeled apostasy.",
+      "Turned {age}. High school became a battlefield between the modern world outside and the apocalyptic dread dominating your home.",
+      "Turned {age}. Standing on the brink of adulthood, torn between genuine dread of eternal hellfire and a desperate hunger to break free."
+    ]
+  },
+  extremely_strict: {
+    age1: [
+      "Turned 1 year old. You were placed on a rigid schedule for standing drills; your knees were dusted clean the moment you touched the rug.",
+      "Turned 1 year old. Crying was met with stern, folded arms and silence; you quickly learned that tears yielded no comfort in this house."
+    ],
+    toddler: [
+      "Turned {age}. Toys were limited to strictly fifteen minutes of educational play per day, after which each item had to be aligned in its exact drawer.",
+      "Turned {age}. Subjected to daily posture checks at the dinner table; speaking without permission earned a sharp tap on the knuckles with a wooden ruler.",
+      "Turned {age}. Trained to sit still in total silence for half-hour intervals, your small hands folded rigidly in your lap."
+    ],
+    earlyChild: [
+      "Turned {age}. Drilled on arithmetic tables and cursive handwriting before breakfast; mistakes were erased and rewritten until the paper wore thin.",
+      "Turned {age}. Kindergarten was treated as a competitive arena; receiving a 'satisfactory' rather than 'excellent' resulted in weekend confinement.",
+      "Turned {age}. Your bedroom was inspected daily with white gloves; bed corners had to be folded with military hospital corners."
+    ],
+    elementary: [
+      "Turned {age}. Attended municipal school in {city} under intense parental scrutiny; report cards with a 93% average brought stern lectures on complacency.",
+      "Turned {age}. Scheduled every hour from 6:00 AM to 9:00 PM: chores, violin practice, advanced mathematics, and zero idle leisure.",
+      "Turned {age}. Grounded for two weeks after a teacher noted you were 'daydreaming out the window' during geography class.",
+      "Turned {age}. Learned to walk with silent, measured steps, hiding any sign of exhaustion or emotional weakness behind a disciplined mask."
+    ],
+    middleSchool: [
+      "Turned {age}. Curfews were enforced down to the minute; arriving home at 5:04 instead of 5:00 meant losing door privileges for a month.",
+      "Turned {age}. Your bedroom door had its lock removed for surprise inspections; diaries were forbidden and personal notes confiscated.",
+      "Turned {age}. Constantly compared to superior peers, family cousins, and academic prodigies, reinforcing that your best was never enough."
+    ],
+    adolescent: [
+      "Turned {age}. High school was an exhausting marathon of college entrance prep, private tutors, and cold parental demands for perfection.",
+      "Turned {age}. Secretly rebelled in subtle ways—studying forbidden books under blankets with a penlight while maintaining a spotless facade.",
+      "Turned {age}. Reached your senior year with high academic standing, but with nerves wound as tight as piano wire under parental pressure."
+    ]
+  },
+  alcoholic: {
+    age1: [
+      "Turned 1 year old. You learned to crawl with cautious, silent instincts, instinctively steering clear of overturned boots and broken amber glass under the table.",
+      "Turned 1 year old. You learned that loud crying caused angry shouting; you developed a quiet, wide-eyed stare from your wooden crib."
+    ],
+    toddler: [
+      "Turned {age}. Learned to interpret the sound of keys rattling in the front door latch—heavy, fumbling footsteps meant run to the bedroom closet.",
+      "Turned {age}. Huddled under sofa cushions with your siblings, whispering quiet nonsense to drown out violent shouting and crashing ceramics.",
+      "Turned {age}. Wandered into the kitchen in the morning to find spilled whiskey, stale cigarette butts, and an empty breadbox."
+    ],
+    earlyChild: [
+      "Turned {age}. Came to kindergarten in stained, mismatched clothes; you learned to lie smoothly to teachers about where your bruises came from.",
+      "Turned {age}. Learned how to pour water into liquor bottles to dilute them, hoping the adults wouldn't notice and the screaming would end earlier.",
+      "Turned {age}. Spent evenings watching shadows flicker on the ceiling while drunken arguments vibrated through the thin apartment drywall."
+    ],
+    elementary: [
+      "Turned {age}. Attended municipal primary school in {city} with a rumbling stomach, hoarding cafeteria crackers in your jacket pockets.",
+      "Turned {age}. Parent-teacher night came and went; you sat on the school steps until the custodian locked the doors, your parents passed out at home.",
+      "Turned {age}. Stepped over an unconscious parent sprawled across the hallway carpet to make yourself a dinner of dry soda crackers and tap water.",
+      "Turned {age}. Hid your small savings in the lining of a winter boot, knowing loose money on the dresser disappeared into the corner tavern."
+    ],
+    middleSchool: [
+      "Turned {age}. The role reversal hardened: you managed utility bills, hid car keys from drunken hands, and kept younger siblings fed.",
+      "Turned {age}. Neighbors called the police during a violent midnight brawl; you sat on the curb in the rain while patrol sirens flashed red and blue.",
+      "Turned {age}. Developed an eerie sixth sense for slurred speech, predicting whether the night would end in weeping remorse or broken furniture."
+    ],
+    adolescent: [
+      "Turned {age}. Worked odd after-school errands just to buy your own groceries and school clothes, avoiding the house until late at night.",
+      "Turned {age}. Had to physically pull a drunken parent out of the street gutter behind the tavern, enduring slurred insults all the way home.",
+      "Turned {age}. Spent your high school years counting the days until your eighteenth birthday, harboring deep scars and hypervigilant survival instincts."
+    ]
+  },
+  eccentric_occult: {
+    age1: [
+      "Turned 1 year old. You pulled yourself up against a heavy claw-footed bookcase, fixated on dark silhouettes dancing across the ceiling that had no cast shadows.",
+      "Turned 1 year old. Your nursery was draped with dried belladonna and rowan twigs; you learned to babble to empty corners that whispered back."
+    ],
+    toddler: [
+      "Turned {age}. Played with carved bone runes and dried ravens' feet on the oriental rug, laughing when candle flames bent without any draft.",
+      "Turned {age}. Sung strange, ancient nursery rhymes in dead tongues that made the house cats freeze and stare with dilated pupils.",
+      "Turned {age}. Wandered into the parlor during an evening séance; watched pale vapor coil above the velvet table before your mother carried you away."
+    ],
+    earlyChild: [
+      "Turned {age}. Drew intricate spiral sigils in kindergarten chalk that unsettled your teachers; they asked your parents about your 'unusual home life.'",
+      "Turned {age}. Learned that certain family heirlooms in locked glass cabinets must never be touched, especially during the new moon.",
+      "Turned {age}. Found dead starlings arranged in a geometric circle on your bedroom windowsill; your mother nodded approvingly at the omen."
+    ],
+    elementary: [
+      "Turned {age}. Attended municipal school in {city}, wearing a talisman of blackened pewter beneath your shirt that grew warm during storms.",
+      "Turned {age}. Classmates avoided your house on Halloween, whispering that strange violet lights flickered in your attic past midnight.",
+      "Turned {age}. Helped your family harvest nightshade and wormwood from the overgrown garden by the light of the waning crescent.",
+      "Turned {age}. Caught glimpses of figures standing in your hallway at night who matched the faded sepia portraits of ancestors who died in 1892."
+    ],
+    middleSchool: [
+      "Turned {age}. Began formal instruction in family occult records; deciphering cursive notes on astrological alignments and spirit invocations.",
+      "Turned {age}. The house seemed to breathe during autumn gales; you learned to recognize when the veil between realms was dangerously thin.",
+      "Turned {age}. Accidentally spoke a word of power during a school argument; the classroom fluorescent bulb exploded in a shower of sparks."
+    ],
+    adolescent: [
+      "Turned {age}. Permitted into the cellar sanctum for the winter solstice rites, smelling myrrh, sulfur, and ancient damp parchment.",
+      "Turned {age}. High school peers thought you were brooding and gothic, completely unaware that the shadows in your bedroom truly had voices.",
+      "Turned {age}. Approaching adulthood with deep occult sensitivity, realizing your lineage is bound to forces far older and darker than the city."
+    ]
+  },
+  cold_detached: {
+    age1: [
+      "Turned 1 year old. You learned to crawl across vast, echoing parquet floorboards beneath towering ancestral portraits that never looked down.",
+      "Turned 1 year old. You were cared for primarily by hired nursery maids; parental contact was limited to a polite nod before evening dinner."
+    ],
+    toddler: [
+      "Turned {age}. Played in solitary silence in an immaculate nursery, arranging silver toy soldiers according to strict military protocol.",
+      "Turned {age}. Learned that emotional displays—crying, shouting, hugging—were considered vulgar and caused adults to leave the room.",
+      "Turned {age}. Meals were served on porcelain plates with linen napkins; you learned to use fish forks correctly before you could tie your shoes."
+    ],
+    earlyChild: [
+      "Turned {age}. Driven to an elite preparatory academy in a polished town car; polite handshakes replaced hugs at the school gate.",
+      "Turned {age}. Received expensive, mechanical imported toys for your birthday, accompanied by a typewritten card signed with your parents' initials.",
+      "Turned {age}. Wandered through the echoing corridors of your large home, speaking to your own reflection in tall gilded pier glasses."
+    ],
+    elementary: [
+      "Turned {age}. Attended prestigious academy classes in {city}. Peers kept their distance, viewing you as aristocratic, aloof, and untouchable.",
+      "Turned {age}. Family dinners were eaten in ceremonial silence beneath crystal chandeliers; questions were answered in terse, measured sentences.",
+      "Turned {age}. When you fell from a stone terrace and broke your arm, your parents sent for the private surgeon without ever embracing you.",
+      "Turned {age}. Awarded academic medals at school; your father examined the certificate, nodded once without smiling, and filed it away."
+    ],
+    middleSchool: [
+      "Turned {age}. Educated on family trust funds, lineage pedigrees, and social standing; taught that personal feelings are dangerous liabilities.",
+      "Turned {age}. Communication with parents dwindled to weekly formal interviews and written itineraries left on the hall console table.",
+      "Turned {age}. Felt a hollow chill in your chest watching common families laughing together on the municipal tram."
+    ],
+    adolescent: [
+      "Turned {age}. Suffocating under aristocratic expectations; groomed for prestigious professions while your emotional life froze over.",
+      "Turned {age}. High school debates and boarding school prep dominated your days; you learned to hide all vulnerability behind polished sarcasm.",
+      "Turned {age}. Standing on the brink of adulthood with immense pedigree and refined composure, but utterly isolated from human warmth."
+    ]
+  },
+  working_class: {
+    age1: [
+      "Turned 1 year old. You toddled around your father's soot-covered work boots by the hissing copper radiator, chewing on a clean wooden bobbin.",
+      "Turned 1 year old. Carried on your mother's hip while she scrubbed laundry, lulled to sleep by the rhythm of the washboard and factory whistles."
+    ],
+    toddler: [
+      "Turned {age}. Played with tin cans and wooden scrap blocks beneath the kitchen table while parents counted coins into rent envelopes.",
+      "Turned {age}. Shared a narrow mattress with your siblings, kept warm by a heavy patchwork quilt stitched from old wool coats.",
+      "Turned {age}. Your father made shadow puppets against the peeling wallpaper with his calloused, grease-stained hands to make you laugh."
+    ],
+    earlyChild: [
+      "Turned {age}. Started municipal kindergarten in hand-me-down shoes with cardboard soles, proud of a pencil case your brother passed down.",
+      "Turned {age}. Learned early that money doesn't grow on trees; you never asked for candy in shop windows, knowing how hard your parents worked.",
+      "Turned {age}. Sat by the open oven door on freezing winter evenings to stay warm while parents worked overtime evening shifts."
+    ],
+    elementary: [
+      "Turned {age}. Attended neighborhood primary school in {city}, walking through slush in leaky rubber boots with your older sibling holding your hand.",
+      "Turned {age}. Defended your younger sibling from neighborhood bullies behind the tenement coal bins, earning bruised knuckles and pride.",
+      "Turned {age}. Family meals were simple—potato soup, cabbage, and day-old bakery bread—eaten with loud chatter and fierce solidarity.",
+      "Turned {age}. Collected discarded copper wire and glass soda bottles after school to turn in for deposit pennies to buy school notebooks."
+    ],
+    middleSchool: [
+      "Turned {age}. Took on odd neighborhood jobs: delivering morning papers in freezing drizzle or sweeping sawdust in the local repair garage.",
+      "Turned {age}. Watched your parents' backs bend and coughs deepen from decades of factory shifts, feeling a burning urge to help provide.",
+      "Turned {age}. Even when the electricity was shut off for three days, your family gathered around tallow candles to share stories and laughs."
+    ],
+    adolescent: [
+      "Turned {age}. Balanced high school classes with evening warehouse shifts; coming home exhausted to slip your pay into the family grocery jar.",
+      "Turned {age}. Faced down class snobbery from wealthier students, holding your head high in patched coats and worn work boots.",
+      "Turned {age}. Nearing graduation with grit, resilience, and calloused hands, ready to fight for every scrap of survival in {city}."
+    ]
+  }
+};
+
+// Household Living Dynamics Catalog (Under Age 18)
+const FAMILY_HOME_DYNAMICS = {
+  loving: [
+    "A warm pot of chicken and vegetable stew simmered on the stove; your parents tucked you in with stories on stormy winter nights.",
+    "Sunday mornings were filled with the aroma of freshly toasted bread and easy family laughter around the kitchen table.",
+    "Chores were shared with good humor; your parents rewarded your help with hot cocoa and movie nights.",
+    "Your home was a cozy sanctuary where your bedroom door could stay open and you always felt safe from the outside world.",
+    "Quiet evenings spent together by the living room hearth, listening to music while rain tapped gently against the windows."
+  ],
+  religious: [
+    "Modest, peaceful meals preceded by sincere blessings. Saturday evenings were reserved for polishing church shoes and pressing Sunday clothes.",
+    "The wooden radio played sacred choir hymns each morning while your family ate plain oatmeal in reverent silence.",
+    "Household chores were performed diligently as an offering of service; scripture cards hung framed in every hallway.",
+    "Evenings concluded with quiet family prayer around the table, thanking Providence for daily bread and protection from wickedness.",
+    "Fasting days and religious feast days dictated the kitchen pantry, keeping the household rhythm steady and disciplined."
+  ],
+  deeply_religious: [
+    "Lenten fasts, hours of kneeling on bare floorboards, and austere broth marked the household routine. The television remained strictly locked away.",
+    "The scent of bitter frankincense and burning wax permeated the hallway; mirrors remained covered on penitential Fridays.",
+    "Dinners were accompanied by readings from apocalyptic scriptures, reminding everyone that judgment could fall at any hour.",
+    "Any noise or laughter after 8:00 PM was reprimanded as idle folly; you learned to move in ghostly, penitent silence.",
+    "Holy water fonts were replenished at every doorway; you crossed yourself before entering every room to ward off wandering spirits."
+  ],
+  extremely_strict: [
+    "Spotless floorboards, white-glove dust inspections, and a daily study schedule pinned to your bedroom door. Any infraction cost weekend privileges.",
+    "Meals were served promptly at 6:30 PM; tardiness by even thirty seconds meant going to bed without supper.",
+    "Personal belongings had assigned positions on shelves; unmade beds or scuffed shoes resulted in demerit points and extra chores.",
+    "A silent, regimented household where footsteps were monitored and leisure was considered a moral deficiency.",
+    "Every household chore was graded like an exam; your mother re-scrubbed the floorboards if a single corner showed water streaks."
+  ],
+  alcoholic: [
+    "You navigated the hallway on nervous tiptoes, tracking how many empty gin bottles accumulated in the bins and keeping spare bread hidden in your dresser.",
+    "Evenings were a lottery of moods: some nights filled with weeping declarations of love, others with slammed doors and shattered glassware.",
+    "The sour reek of stale beer and stale smoke clung to the curtains; you learned to cook simple meals alone when adults were incapacitated.",
+    "Sudden late-night shouting jolted you awake; you stayed frozen beneath your blanket until the floorboards stopped creaking.",
+    "You learned to recognize the rattle of the tavern ice bucket and stayed out of sight until the inevitable blackout settled over the apartment."
+  ],
+  eccentric_occult: [
+    "Dried mugwort and yarrow hung from the kitchen beams. You learned to ignore the rhythmic tapping beneath the pantry floorboards after midnight.",
+    "Odd visitors in dark overcoats arrived for late-night parlor consultations; the scent of sulfur and old leather lingered until dawn.",
+    "Certain cabinets were sealed with wax seals and red cord; the household cats refused to enter the east corridor.",
+    "Meals featured peculiar bitter herbs from the root cellar; you learned to check your salt circles whenever autumn gales blew.",
+    "Ancestral brass bells jingled on doorframes when drafts blew through; your family treated shadows in the parlor as familiar guests."
+  ],
+  cold_detached: [
+    "Catered dinners were eaten in ceremonial silence across the polished mahogany table; family updates were communicated through typed memos on the marble hall stand.",
+    "The grand rooms were spotless, drafty, and devoid of clutter; emotional warmth was treated as an embarrassing lack of composure.",
+    "Household staff attended to laundry and meals with polite efficiency, while your parents remained preoccupied with social calendars and investments.",
+    "You spent hours in the library or music room in total solitude, the ticking of the antique grandfather clock the only company.",
+    "A polite, chilling tranquility filled the high-ceilinged rooms; no voices were ever raised, and no hugs were ever given."
+  ],
+  working_class: [
+    "Heavy sweaters worn indoors to save on heating oil; dinners of boiled potatoes and sausage shared around the humming radiator with genuine camaraderie.",
+    "Factory whistles marked the changing of shifts; your mother mended worn socks by lamplight while your father rested swollen feet.",
+    "The small kitchen was always bustling, crowded, and loud with jokes, shared gripes about landlords, and mutual loyalty.",
+    "Money was tight and envelopes for rent and power sat on the mantel, but the family always found a way to share what little food was on the table.",
+    "Washing hung drying across the living room lines, smelling of cheap lye soap and steam, while family stories filled the evening."
+  ]
+};
+
+// Kin Inactive Fallback Vignettes (When no family tragedy occurs)
+const FAMILY_KIN_VIGNETTES = {
+  loving: [
+    "Your family shared warm, peaceful evening meals beneath the kitchen light.",
+    "A tranquil, comforting year passed within your close-knit family circle.",
+    "Gentle household routines and shared laughter kept family bonds strong and reassuring."
+  ],
+  religious: [
+    "The household observed church holy days and weekly services in quiet devotion, free from scandal.",
+    "A quiet, devout year passed with regular Sunday sermons and modest home routines.",
+    "Your family went about their parish duties and neighborhood devotions in peaceful harmony."
+  ],
+  deeply_religious: [
+    "The household observed all fasts and holy days in somber devotion, guarding against the corruptions of the city.",
+    "No demons breached the threshold this year; penitent prayers kept the home in stern spiritual order.",
+    "A tense, prayerful year elapsed beneath the unblinking watch of the parlor crucifix."
+  ],
+  extremely_strict: [
+    "Conduct ledgers remained clean; chores and inspections passed without red demerits.",
+    "The year proceeded according to strict schedule with zero breaches of household discipline.",
+    "A regimented, quiet year elapsed within your family home; rules were followed to the letter."
+  ],
+  alcoholic: [
+    "A relatively quiet year at home—fewer slammed doors, though the sour tang of spirits still lingered in the hallway.",
+    "Tensions simmered beneath the surface, but no major police visits disturbed the household this year.",
+    "Muted arguments and uneasy truces passed through the apartment; everyone kept to their own corners."
+  ],
+  eccentric_occult: [
+    "The floorboards creaked in cadence with the autumn winds, but no malevolent entities disturbed the household rites.",
+    "Ancestral spirits remained calm in the shadows; the family grimoria remained undisturbed on their stands.",
+    "A quiet year of occult study and herbal drying elapsed under pale moonlight."
+  ],
+  cold_detached: [
+    "Punctual decorum and polite emotional distance governed the household without disruption.",
+    "An uneventful year passed behind tall wrought-iron gates; social obligations were fulfilled with aristocratic precision.",
+    "Polite silence prevailed through the high-ceilinged corridors of your family estate."
+  ],
+  working_class: [
+    "Both shifts ran steadily without factory layoffs; your family pulled through the year with scraped elbows and stubborn grit.",
+    "Bills were paid just in the nick of time; the household held together through honest labor.",
+    "Tired but resilient, your family weathered the year together around the humming kitchen radiator."
+  ]
+};
+
+function getFamilyMilestone(character) {
+  if (!character) return null;
+  const atmoId = (character.kin && character.kin.atmosphere && character.kin.atmosphere.id) || 'loving';
+  const atmoPools = (FAMILY_MILESTONES && FAMILY_MILESTONES[atmoId]) || FAMILY_MILESTONES.loving;
+  if (!atmoPools) return null;
+
+  let pool = null;
+  if (character.age === 1) {
+    pool = atmoPools.age1;
+  } else if (character.age <= 3) {
+    pool = atmoPools.toddler;
+  } else if (character.age <= 5) {
+    pool = atmoPools.earlyChild;
+  } else if (character.age <= 10) {
+    pool = atmoPools.elementary;
+  } else if (character.age <= 13) {
+    pool = atmoPools.middleSchool;
+  } else if (character.age <= 17) {
+    pool = atmoPools.adolescent;
+  }
+
+  if (!pool || pool.length === 0) return null;
+  const raw = window.getRandomElement(pool);
+  const city = character.city || 'the city';
+  return raw.replace(/\{age\}/g, character.age).replace(/\{city\}/g, city);
+}
+
+function getFamilyHomeDynamic(character) {
+  if (!character) return null;
+  const atmoId = (character.kin && character.kin.atmosphere && character.kin.atmosphere.id) || 'loving';
+  const list = (FAMILY_HOME_DYNAMICS && FAMILY_HOME_DYNAMICS[atmoId]) || FAMILY_HOME_DYNAMICS.loving;
+  if (!list || list.length === 0) return null;
+  const raw = window.getRandomElement(list);
+  const city = character.city || 'the city';
+  return raw.replace(/\{city\}/g, city);
+}
+
+function getFamilyKinVignette(character) {
+  if (!character) return null;
+  const atmoId = (character.kin && character.kin.atmosphere && character.kin.atmosphere.id) || 'loving';
+  const list = (FAMILY_KIN_VIGNETTES && FAMILY_KIN_VIGNETTES[atmoId]) || FAMILY_KIN_VIGNETTES.loving;
+  if (!list || list.length === 0) return null;
+  const raw = window.getRandomElement(list);
+  const city = character.city || 'the city';
+  return raw.replace(/\{city\}/g, city);
+}
+
 function generateFamily(character) {
   const countryCode = character.countryCode || "USA";
   const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
@@ -2874,6 +3285,9 @@ function tickKinYear(character) {
   const logs = [];
   const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
   const kin = character.kin;
+  const atmoId = (kin.atmosphere && kin.atmosphere.id) || 'loving';
+  let alcoholicEventFired = false;
+  let strictStipendHandled = false;
 
   // 1. Tick Parents
   kin.parents.forEach(p => {
@@ -2905,12 +3319,96 @@ function tickKinYear(character) {
       return;
     }
 
-    // Passive Allowance for minors (Ages 5-18)
-    if (character.age >= 5 && character.age <= 18 && p.relationship > 55) {
-      const baseUSD = Math.floor(Math.random() * 20) + 10; // $10-$30 weekly equivalent
-      const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
-      character.money += totalAllowance;
-      logs.push(`Received ${window.formatMoney(totalAllowance, character.countryCode)} in yearly pocket allowance from your ${p.role.toLowerCase()}, ${p.name}.`);
+    // Atmosphere-driven Allowance for minors (Ages 5-17)
+    if (character.age >= 5 && character.age <= 17) {
+      if (atmoId === 'alcoholic') {
+        if (!alcoholicEventFired) {
+          alcoholicEventFired = true;
+          const roll = Math.random();
+          if (roll < 0.15) {
+            // Theft from minor's piggy bank
+            if (character.money > 0) {
+              const stolen = Math.min(character.money, Math.max(5, Math.round((Math.floor(Math.random() * 15) + 5) * country.wageMultiplier * 2)));
+              character.money -= stolen;
+              character.stats.happiness = Math.max(0, character.stats.happiness - 5);
+              logs.push(`[PIGGY BANK RAID] Your ${p.role.toLowerCase()}, ${p.name}, snuck into your room while you were out and took ${window.formatMoney(stolen, character.countryCode)} from your savings for late-night liquor (-5% Happiness).`);
+            } else {
+              logs.push(`Your ${p.role.toLowerCase()}, ${p.name}, rummaged through your bedroom drawers hunting for spare coins to buy alcohol, cursing when they found nothing.`);
+            }
+          } else if (roll < 0.70) {
+            // 55% chance: missed allowance
+            logs.push(`No allowance this year from your ${p.role.toLowerCase()}, ${p.name}; grocery and pocket money was lost to tavern tabs and liquor runs.`);
+          } else {
+            // 30% chance: remorseful crumpled bill
+            const baseUSD = Math.floor(Math.random() * 15) + 5;
+            const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+            character.money += totalAllowance;
+            logs.push(`Your ${p.role.toLowerCase()}, ${p.name}, tearfully pressed a crumpled, alcohol-scented ${window.formatMoney(totalAllowance, character.countryCode)} into your palm, slurring an apology for last week's shouting.`);
+          }
+        } else if (p.dynamicTrait && p.dynamicTrait.includes('Weary') && p.relationship > 50) {
+          // Weary parent secretly slips a small bill
+          const baseUSD = Math.floor(Math.random() * 8) + 4;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Your weary ${p.role.toLowerCase()}, ${p.name}, secretly slipped ${window.formatMoney(totalAllowance, character.countryCode)} into your coat pocket when no one was looking.`);
+        }
+      } else if (atmoId === 'extremely_strict') {
+        if (!strictStipendHandled) {
+          strictStipendHandled = true;
+          if (character.stats.smarts >= 60) {
+            const baseUSD = Math.floor(Math.random() * 20) + 10;
+            const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+            character.money += totalAllowance;
+            logs.push(`[ACADEMIC STIPEND] Your ${p.role.toLowerCase()}, ${p.name}, inspected your school marks and grudgingly released your ${window.formatMoney(totalAllowance, character.countryCode)} conduct stipend.`);
+          } else {
+            character.stats.happiness = Math.max(0, character.stats.happiness - 2);
+            logs.push(`[STIPEND WITHHELD] Your ${p.role.toLowerCase()}, ${p.name}, withheld your yearly allowance due to unsatisfactory academic marks and discipline (-2% Happiness).`);
+          }
+        }
+      } else if (atmoId === 'cold_detached') {
+        if (p.relationship > 40) {
+          const baseUSD = Math.floor(Math.random() * 25) + 15;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Received a quarterly ${window.formatMoney(totalAllowance, character.countryCode)} allowance from your ${p.role.toLowerCase()}, ${p.name}, accompanied by a formal bank deposit receipt.`);
+        }
+      } else if (atmoId === 'working_class') {
+        if (p.relationship > 45) {
+          const baseUSD = Math.floor(Math.random() * 10) + 5;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Your ${p.role.toLowerCase()}, ${p.name}, handed you ${window.formatMoney(totalAllowance, character.countryCode)} in carefully counted coins saved from overtime shifts, apologizing that it couldn't be more.`);
+        }
+      } else if (atmoId === 'deeply_religious') {
+        if (p.relationship > 45) {
+          const baseUSD = Math.floor(Math.random() * 15) + 8;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Received ${window.formatMoney(totalAllowance, character.countryCode)} in allowance from your ${p.role.toLowerCase()}, ${p.name}, with a stern reminder that at least ten percent belongs in the parish alms box.`);
+        }
+      } else if (atmoId === 'religious') {
+        if (p.relationship > 50) {
+          const baseUSD = Math.floor(Math.random() * 16) + 10;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Received ${window.formatMoney(totalAllowance, character.countryCode)} pocket allowance from your ${p.role.toLowerCase()}, ${p.name}, with a gentle reminder to spend it honestly and avoid vanity.`);
+        }
+      } else if (atmoId === 'eccentric_occult') {
+        if (p.relationship > 50) {
+          const baseUSD = Math.floor(Math.random() * 20) + 10;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Received ${window.formatMoney(totalAllowance, character.countryCode)} allowance from your ${p.role.toLowerCase()}, ${p.name}, slipped inside an envelope marked with curious astrological symbols.`);
+        }
+      } else {
+        // loving and fallback
+        if (p.relationship > 50) {
+          const baseUSD = Math.floor(Math.random() * 22) + 12;
+          const totalAllowance = Math.round(baseUSD * country.wageMultiplier * 10);
+          character.money += totalAllowance;
+          logs.push(`Received ${window.formatMoney(totalAllowance, character.countryCode)} in generous pocket allowance for sweets and books from your loving ${p.role.toLowerCase()}, ${p.name}.`);
+        }
+      }
     }
   });
 
@@ -3094,3 +3592,9 @@ window.FAMILY_ATMOSPHERES = FAMILY_ATMOSPHERES;
 window.PARENT_OCCUPATIONS_DATA = PARENT_OCCUPATIONS_DATA;
 window.HOUSEHOLD_RESIDENCES = HOUSEHOLD_RESIDENCES;
 window.createEmptyActionsDone = createEmptyActionsDone;
+window.FAMILY_MILESTONES = FAMILY_MILESTONES;
+window.FAMILY_HOME_DYNAMICS = FAMILY_HOME_DYNAMICS;
+window.FAMILY_KIN_VIGNETTES = FAMILY_KIN_VIGNETTES;
+window.getFamilyMilestone = getFamilyMilestone;
+window.getFamilyHomeDynamic = getFamilyHomeDynamic;
+window.getFamilyKinVignette = getFamilyKinVignette;

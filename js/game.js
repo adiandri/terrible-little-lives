@@ -1900,43 +1900,48 @@ class TerribleGame {
     // ==========================================
 
     // 1. Life Stage & Developmental Milestone
-    if (this.character.age === 1) {
-      currentYearLog.entries.push(`Turned 1 year old. You learned to crawl across cold hardwood floorboards, watching dust motes spin in pale sunlight.`);
-    } else if (this.character.age <= 3) {
-      const toddlerMilestones = [
-        `Turned ${this.character.age}. You learned to speak in fragmented sentences, pointing out shadows that lingered too long in the corners.`,
-        `Turned ${this.character.age}. You spent hours stacking wooden blocks, knocking them over whenever footsteps passed the doorway.`,
-        `Turned ${this.character.age}. Your nursery window stayed damp with winter frost; you learned to recognize passing siren wails.`
-      ];
-      currentYearLog.entries.push(window.getRandomElement(toddlerMilestones));
-    } else if (this.character.age <= 5) {
-      const kindergartenMilestones = [
-        `Turned ${this.character.age}. Practiced letters and counting in kindergarten while rain tapped against the classroom windows.`,
-        `Turned ${this.character.age}. Shared crayons and picture books during circle time, avoiding the chair nobody else seemed to notice.`,
-        `Turned ${this.character.age}. Learned playground rules and carried home a finger-painting that looked different after sunset.`
-      ];
-      currentYearLog.entries.push(window.getRandomElement(kindergartenMilestones));
-    } else if (this.character.age <= 10) {
-      const elementaryMilestones = [
-        `Turned ${this.character.age}. Attended municipal primary school in ${this.character.city}. Fluorescent bulbs hummed steadily over chalkboards.`,
-        `Turned ${this.character.age}. Traded pencil erasers and horror comics with classmates beneath the playground stairwell.`,
-        `Turned ${this.character.age}. Handed in school homework while rumors circulated about stray animals vanishing around the city reservoir.`
-      ];
-      currentYearLog.entries.push(window.getRandomElement(elementaryMilestones));
-    } else if (this.character.age <= 13) {
-      const middleSchoolMilestones = [
-        `Turned ${this.character.age}. Navigated middle-school timetables, new teachers, and friendships that changed without warning.`,
-        `Turned ${this.character.age}. Carried heavier textbooks through crowded corridors while lockers clicked open on their own.`,
-        `Turned ${this.character.age}. Stayed late for a group assignment as footsteps paced the empty floor above.`
-      ];
-      currentYearLog.entries.push(window.getRandomElement(middleSchoolMilestones));
-    } else if (this.character.age <= 17) {
-      const adolescentMilestones = [
-        `Turned ${this.character.age}. Navigated high school corridors, peer cliques, and the suffocating pressure of an uncertain future.`,
-        `Turned ${this.character.age}. Late night study sessions in ${this.character.city} accompanied by distant freight trains and sirens.`,
-        `Turned ${this.character.age}. High school rumors whispered about students slipping into the drainage tunnels after dark.`
-      ];
-      currentYearLog.entries.push(window.getRandomElement(adolescentMilestones));
+    if (this.character.age <= 17 && window.getFamilyMilestone) {
+      const milestone = window.getFamilyMilestone(this.character);
+      if (milestone) {
+        currentYearLog.entries.push(milestone);
+      } else if (this.character.age === 1) {
+        currentYearLog.entries.push(`Turned 1 year old. You learned to crawl across cold hardwood floorboards, watching dust motes spin in pale sunlight.`);
+      } else if (this.character.age <= 3) {
+        const toddlerMilestones = [
+          `Turned ${this.character.age}. You learned to speak in fragmented sentences, pointing out shadows that lingered too long in the corners.`,
+          `Turned ${this.character.age}. You spent hours stacking wooden blocks, knocking them over whenever footsteps passed the doorway.`,
+          `Turned ${this.character.age}. Your nursery window stayed damp with winter frost; you learned to recognize passing siren wails.`
+        ];
+        currentYearLog.entries.push(window.getRandomElement(toddlerMilestones));
+      } else if (this.character.age <= 5) {
+        const kindergartenMilestones = [
+          `Turned ${this.character.age}. Practiced letters and counting in kindergarten while rain tapped against the classroom windows.`,
+          `Turned ${this.character.age}. Shared crayons and picture books during circle time, avoiding the chair nobody else seemed to notice.`,
+          `Turned ${this.character.age}. Learned playground rules and carried home a finger-painting that looked different after sunset.`
+        ];
+        currentYearLog.entries.push(window.getRandomElement(kindergartenMilestones));
+      } else if (this.character.age <= 10) {
+        const elementaryMilestones = [
+          `Turned ${this.character.age}. Attended municipal primary school in ${this.character.city}. Fluorescent bulbs hummed steadily over chalkboards.`,
+          `Turned ${this.character.age}. Traded pencil erasers and horror comics with classmates beneath the playground stairwell.`,
+          `Turned ${this.character.age}. Handed in school homework while rumors circulated about stray animals vanishing around the city reservoir.`
+        ];
+        currentYearLog.entries.push(window.getRandomElement(elementaryMilestones));
+      } else if (this.character.age <= 13) {
+        const middleSchoolMilestones = [
+          `Turned ${this.character.age}. Navigated middle-school timetables, new teachers, and friendships that changed without warning.`,
+          `Turned ${this.character.age}. Carried heavier textbooks through crowded corridors while lockers clicked open on their own.`,
+          `Turned ${this.character.age}. Stayed late for a group assignment as footsteps paced the empty floor above.`
+        ];
+        currentYearLog.entries.push(window.getRandomElement(middleSchoolMilestones));
+      } else {
+        const adolescentMilestones = [
+          `Turned ${this.character.age}. Navigated high school corridors, peer cliques, and the suffocating pressure of an uncertain future.`,
+          `Turned ${this.character.age}. Late night study sessions in ${this.character.city} accompanied by distant freight trains and sirens.`,
+          `Turned ${this.character.age}. High school rumors whispered about students slipping into the drainage tunnels after dark.`
+        ];
+        currentYearLog.entries.push(window.getRandomElement(adolescentMilestones));
+      }
     } else if (this.character.age <= 29) {
       currentYearLog.entries.push(`Turned ${this.character.age}. Confronting the harsh grind of young adulthood in ${this.character.city}.`);
     } else if (this.character.age <= 59) {
@@ -2130,24 +2135,40 @@ class TerribleGame {
       }
     } else {
       // Minor allowance / home dynamic
-      const homeDynamics = [
-        "Family household groceries were paid for by your parents; the refrigerator remained stocked with basic staples.",
-        "Helped with chores around the house in exchange for dinner and a warm bed.",
-        "Listened to parental discussions about the rising cost of municipal electricity and heating oil."
-      ];
-      currentYearLog.entries.push(window.getRandomElement(homeDynamics));
+      let homeDyn = null;
+      if (this.character.age < 18 && window.getFamilyHomeDynamic) {
+        homeDyn = window.getFamilyHomeDynamic(this.character);
+      }
+      if (homeDyn) {
+        currentYearLog.entries.push(homeDyn);
+      } else {
+        const homeDynamics = [
+          "Family household groceries were paid for by your parents; the refrigerator remained stocked with basic staples.",
+          "Helped with chores around the house in exchange for dinner and a warm bed.",
+          "Listened to parental discussions about the rising cost of municipal electricity and heating oil."
+        ];
+        currentYearLog.entries.push(window.getRandomElement(homeDynamics));
+      }
     }
 
     // 4. Kin Dynamics, Allowances & Family Mortality
     if (kinLogs.length > 0) {
       kinLogs.forEach(kl => currentYearLog.entries.push(kl));
     } else {
-      const kinVignettes = [
-        "Your family shared quiet evening meals beneath the yellow kitchen light.",
-        "Your acquaintances and friends went about their normal routines across the district.",
-        "A peaceful, uneventful year passed within your immediate family circle."
-      ];
-      currentYearLog.entries.push(window.getRandomElement(kinVignettes));
+      let atmoVignette = null;
+      if (this.character.age < 18 && window.getFamilyKinVignette) {
+        atmoVignette = window.getFamilyKinVignette(this.character);
+      }
+      if (atmoVignette) {
+        currentYearLog.entries.push(atmoVignette);
+      } else {
+        const kinVignettes = [
+          "Your family shared quiet evening meals beneath the yellow kitchen light.",
+          "Your acquaintances and friends went about their normal routines across the district.",
+          "A peaceful, uneventful year passed within your immediate family circle."
+        ];
+        currentYearLog.entries.push(window.getRandomElement(kinVignettes));
+      }
     }
 
     // 4a. Pets & Companions Simulation (Aging, upkeep, hunger, illness, eerie omens)
