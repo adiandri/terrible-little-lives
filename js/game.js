@@ -4579,10 +4579,26 @@ class TerribleGame {
   }
 
   triggerFeedMilkChoice(person) {
+    const atmo = (this.character.kin && this.character.kin.atmosphere) ? this.character.kin.atmosphere.id : 'loving';
+    let prompt = `${person.name} tilts a warm bottle toward your cradle with a quiet, watchful gaze. How do you feed?`;
+    if (atmo === 'cold_detached') {
+      prompt = `${person.name} holds the glass bottle at a rigid, sterile angle with immaculate posture, checking a gold pocket watch. How do you feed?`;
+    } else if (atmo === 'deeply_religious') {
+      prompt = `${person.name} whispers a solemn blessing over the bottle before leaning close, watching for any sign of sinful fussing. How do you feed?`;
+    } else if (atmo === 'extremely_strict') {
+      prompt = `${person.name} holds the measured bottle firmly, ensuring you drink every single ounce without spilling. How do you feed?`;
+    } else if (atmo === 'alcoholic') {
+      prompt = `${person.name} fumbles with the bottle, hands trembling slightly in the dim kitchen, reeking faintly of stale spirits. How do you feed?`;
+    } else if (atmo === 'eccentric_occult') {
+      prompt = `${person.name} cradles the dark glass bottle, murmuring strange protective nursery runes into the steam. How do you feed?`;
+    } else if (atmo === 'working_class') {
+      prompt = `${person.name} sits by the humming radiator in soot-stained work clothes, patiently holding the warm bottle for you. How do you feed?`;
+    }
+
     this.openActionChoiceModal({
       icon: 'cup-soda',
       title: 'Warm Milk Formula',
-      prompt: `${person.name} tilts a warm bottle toward your cradle with a quiet, watchful gaze. How do you feed?`,
+      prompt,
       choices: [
         {
           label: 'Drink Sweet Honey Milk',

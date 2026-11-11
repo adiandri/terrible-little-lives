@@ -167,7 +167,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Gentle Caring Mother',
     siblingRoles: ['Devoted Companion', 'Playful Ally', 'Gentle Teammate'],
     grandRole: 'The Warm Hearthkeeper',
-    parentMod: { strictness: 25, generosity: 75, relationshipBonus: 15, sobriety: 'sober', temperament: 'warm' }
+    parentMod: { strictness: 25, generosity: 75, relationshipBonus: 15, sobriety: 'sober', temperament: 'warm' },
+    relRanges: { dad: [78, 92], mom: [82, 96], sib: [65, 90], grand: [80, 95] }
   },
   religious: {
     id: 'religious',
@@ -179,7 +180,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Devout Hymn-Singing Mother',
     siblingRoles: ['Pious Choir Singer', 'Secret Doubter', 'Tattling Moralist'],
     grandRole: 'The Scripture Patriarch',
-    parentMod: { strictness: 65, generosity: 45, relationshipBonus: 0, sobriety: 'sober', temperament: 'pious', devotion: 85 }
+    parentMod: { strictness: 65, generosity: 45, relationshipBonus: 0, sobriety: 'sober', temperament: 'pious', devotion: 85 },
+    relRanges: { dad: [55, 72], mom: [60, 78], sib: [48, 70], grand: [70, 88] }
   },
   deeply_religious: {
     id: 'deeply_religious',
@@ -191,7 +193,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Strict Penitent Mother',
     siblingRoles: ['Zealous Devotee', 'Terrified Penitent', 'Secret Blasphemer'],
     grandRole: 'The Holy Inquisitor Grandparent',
-    parentMod: { strictness: 88, generosity: 30, relationshipBonus: -10, sobriety: 'sober', temperament: 'fanatical', devotion: 98 }
+    parentMod: { strictness: 88, generosity: 30, relationshipBonus: -10, sobriety: 'sober', temperament: 'fanatical', devotion: 98 },
+    relRanges: { dad: [35, 55], mom: [45, 62], sib: [38, 60], grand: [60, 78] }
   },
   extremely_strict: {
     id: 'extremely_strict',
@@ -203,7 +206,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Demanding Perfectionist Mother',
     siblingRoles: ['The Golden Child', 'The Sneaky Rebel', 'The Exhausted Scapegoat'],
     grandRole: 'The Unbending Traditionalist',
-    parentMod: { strictness: 92, generosity: 35, relationshipBonus: -8, sobriety: 'sober', temperament: 'stern' }
+    parentMod: { strictness: 92, generosity: 35, relationshipBonus: -8, sobriety: 'sober', temperament: 'stern' },
+    relRanges: { dad: [38, 58], mom: [50, 65], sib: [40, 62], grand: [55, 72] }
   },
   alcoholic: {
     id: 'alcoholic',
@@ -215,7 +219,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Weary Resigned Mother',
     siblingRoles: ['Trauma-Bonded Protector', 'Quiet Hider', 'Bitter Brawler'],
     grandRole: 'The Weary Relieved Haven',
-    parentMod: { strictness: 35, generosity: 25, relationshipBonus: -15, sobriety: 'alcoholic', temperament: 'volatile' }
+    parentMod: { strictness: 35, generosity: 25, relationshipBonus: -15, sobriety: 'alcoholic', temperament: 'volatile' },
+    relRanges: { dad: [22, 44], mom: [50, 68], sib: [50, 75], grand: [70, 88] }
   },
   eccentric_occult: {
     id: 'eccentric_occult',
@@ -227,7 +232,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Cryptic Herbalist Mother',
     siblingRoles: ['Shadow Whisperer', 'Effigy Carver', 'Bone Collector'],
     grandRole: 'The Cryptic Keeper of Old Bones',
-    parentMod: { strictness: 50, generosity: 50, relationshipBonus: 5, sobriety: 'sober', temperament: 'esoteric', occultKnowledge: 85 }
+    parentMod: { strictness: 50, generosity: 50, relationshipBonus: 5, sobriety: 'sober', temperament: 'esoteric', occultKnowledge: 85 },
+    relRanges: { dad: [55, 72], mom: [58, 76], sib: [55, 74], grand: [68, 82] }
   },
   cold_detached: {
     id: 'cold_detached',
@@ -239,7 +245,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Distant Formal Mother',
     siblingRoles: ['Rival Heir', 'Silent Shadow', 'Estranged Sibling'],
     grandRole: 'The Stern Dynasty Matriarch',
-    parentMod: { strictness: 60, generosity: 40, relationshipBonus: -20, sobriety: 'sober', temperament: 'aloof' }
+    parentMod: { strictness: 60, generosity: 40, relationshipBonus: -20, sobriety: 'sober', temperament: 'aloof' },
+    relRanges: { dad: [28, 45], mom: [32, 50], sib: [35, 55], grand: [60, 78] }
   },
   working_class: {
     id: 'working_class',
@@ -251,7 +258,8 @@ const FAMILY_ATMOSPHERES = {
     momTrait: 'Hardworking Seamstress Mother',
     siblingRoles: ['Protective Older Sibling', 'Resourceful Scavenger', 'Shared-Bunk Sibling'],
     grandRole: 'The Tenement Storyteller',
-    parentMod: { strictness: 45, generosity: 50, relationshipBonus: 8, sobriety: 'sober', temperament: 'tired_loving' }
+    parentMod: { strictness: 45, generosity: 50, relationshipBonus: 8, sobriety: 'sober', temperament: 'tired_loving' },
+    relRanges: { dad: [60, 78], mom: [65, 82], sib: [58, 76], grand: [72, 88] }
   }
 };
 
@@ -305,12 +313,19 @@ function generateFamily(character) {
   const dadFullName = surname ? `${dadFirst} ${surname}` : dadFirst;
   const momFullName = surname ? `${momFirst} ${surname}` : momFirst;
 
+  const rollRelRange = (range, fallbackMin, fallbackMax) => {
+    if (range && Array.isArray(range) && range.length >= 2) {
+      return Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+    }
+    return Math.floor(Math.random() * (fallbackMax - fallbackMin + 1)) + fallbackMin;
+  };
+
   const dadStrictness = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + atmosphere.parentMod.strictness));
   const momStrictness = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + Math.round(atmosphere.parentMod.strictness * 0.9)));
   const dadGenerosity = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + atmosphere.parentMod.generosity));
   const momGenerosity = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + Math.round(atmosphere.parentMod.generosity * 1.05)));
-  const dadRel = Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 70 + atmosphere.parentMod.relationshipBonus));
-  const momRel = Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 75 + atmosphere.parentMod.relationshipBonus));
+  const dadRel = atmosphere.relRanges ? rollRelRange(atmosphere.relRanges.dad, 60, 85) : Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 70 + atmosphere.parentMod.relationshipBonus));
+  const momRel = atmosphere.relRanges ? rollRelRange(atmosphere.relRanges.mom, 65, 90) : Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 75 + atmosphere.parentMod.relationshipBonus));
 
   const parents = [
     {
@@ -383,9 +398,10 @@ function generateFamily(character) {
     const sFullName = surname ? `${sFirst} ${surname}` : sFirst;
 
     const sibRole = window.getRandomElement(atmosphere.siblingRoles);
-    let sibRel = Math.floor(Math.random() * 40) + 55;
-    if (sibRole === 'The Golden Child' || sibRole === 'Rival Heir') sibRel = Math.max(30, sibRel - 18);
-    else if (sibRole === 'Trauma-Bonded Protector' || sibRole === 'Devoted Companion') sibRel = Math.min(100, sibRel + 16);
+    const baseSibRel = atmosphere.relRanges ? rollRelRange(atmosphere.relRanges.sib, 50, 75) : (Math.floor(Math.random() * 40) + 55);
+    let sibRel = baseSibRel;
+    if (sibRole === 'The Golden Child' || sibRole === 'Rival Heir') sibRel = Math.max(15, sibRel - 16);
+    else if (sibRole === 'Trauma-Bonded Protector' || sibRole === 'Devoted Companion') sibRel = Math.min(100, sibRel + 14);
 
     siblings.push({
       id: 'sibling_' + Date.now() + '_' + i,
@@ -437,7 +453,7 @@ function generateFamily(character) {
       alive: true,
       deathYear: null,
       deathCause: null,
-      relationship: Math.floor(Math.random() * 20) + 75,
+      relationship: atmosphere.relRanges ? rollRelRange(atmosphere.relRanges.grand, 70, 90) : (Math.floor(Math.random() * 20) + 75),
       generosity: Math.floor(Math.random() * 30) + 65,
       pensionUSD: Math.floor(Math.random() * 15000) + 20000,
       salaryUSD: 0,
@@ -619,36 +635,151 @@ function spendTimeToKin(person, character) {
   const relGain = count === 0 ? (Math.floor(Math.random() * 6) + 10) : (count <= 2 ? (Math.floor(Math.random() * 4) + 5) : 3);
   person.relationship = Math.min(100, person.relationship + relGain);
 
-  let message = "";
-  const effects = { happiness: +5, relationship: +relGain };
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+  const isParent = person.role === 'Father' || person.role === 'Mother';
+  const isSibling = person.role.includes('Brother') || person.role.includes('Sister');
+  const isGrand = person.role.includes('Grand');
 
-  if (person.role === 'Father' || person.role === 'Mother') {
-    const activities = [
-      `went to a roadside diner for pancakes with ${person.name}.`,
-      `helped ${person.name} fix the weather-stripping on the drafty front door.`,
-      `sat together listening to rain drum against the living room window while ${person.name} read the paper.`,
-      `drove to the municipal supermarket and picked out sweet pastries together.`
-    ];
-    message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
-  } else if (person.role.includes('Brother') || person.role.includes('Sister')) {
-    const activities = [
-      `played a marathon session of split-screen arcade games with your ${person.role.toLowerCase()} ${person.name}.`,
-      `built a fort out of heavy wool blankets in the hallway with ${person.name}.`,
-      `shared secret snacks after midnight while whispering about school rumors with ${person.name}.`
-    ];
-    message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
-  } else if (person.role.includes('Grand')) {
-    message = `You spent the afternoon having warm tea and ginger biscuits with ${person.name}. They showed you faded black-and-white family portraits (+${relGain}% Closeness).`;
+  let message = "";
+  let effects = { happiness: +5, relationship: +relGain };
+
+  if (isFamily) {
+    if (atmo === 'cold_detached') {
+      if (isParent) {
+        const coldActs = [
+          `sat in complete silence in the drafty study while ${person.name} reviewed bond ledgers without uttering a single word.`,
+          `accompanied ${person.name} on a stiff, formal promenade through the manicured city park, walking two paces behind.`,
+          `ate a sterile, perfectly portioned dinner across the long mahogany table with ${person.name} in absolute quiet.`
+        ];
+        message = `You ${window.getRandomElement(coldActs)} (+${relGain}% Closeness, +Smarts, -3% Happiness).`;
+        effects = { relationship: Math.max(1, Math.round(relGain * 0.6)), smarts: +4, happiness: -3 };
+      } else if (isSibling) {
+        message = `You studied side-by-side with ${person.name} at opposite ends of the cherrywood desk in immaculate, polite silence (+${relGain}% Closeness, +Smarts).`;
+        effects = { relationship: Math.max(1, Math.round(relGain * 0.7)), smarts: +4, happiness: -2 };
+      } else if (isGrand) {
+        message = `You sat stiffly on velvet antique settees while ${person.name} lectured you on dynastic decorum and ancestral honor (+${relGain}% Closeness, +Smarts).`;
+        effects = { relationship: relGain, smarts: +4, happiness: -1 };
+      }
+    } else if (atmo === 'deeply_religious') {
+      if (isParent) {
+        const piousActs = [
+          `spent the afternoon kneeling on cold hardwood polishing church candelabras and reciting penitent psalms with ${person.name}.`,
+          `accompanied ${person.name} to distribute austere charity bread at the parish mission in the freezing drizzle.`,
+          `sat beside ${person.name} while they copied verses of divine judgment into the family ledger by candlelight.`
+        ];
+        message = `You ${window.getRandomElement(piousActs)} (+${relGain}% Closeness, +Humanity, -4% Happiness).`;
+        effects = { relationship: relGain, humanity: +5, sanity: -2, happiness: -4 };
+      } else if (isSibling) {
+        message = `You whispered quiet catechism verses under the stairwell with ${person.name}, dreading evening inspection (+${relGain}% Closeness, +Humanity).`;
+        effects = { relationship: relGain, humanity: +4, sanity: -1 };
+      } else if (isGrand) {
+        message = `You sat by the heavy iron stove while ${person.name} read terrifying sermons about brimstone and the unfaithful (+${relGain}% Closeness, -3% Sanity, +Humanity).`;
+        effects = { relationship: relGain, humanity: +4, sanity: -3 };
+      }
+    } else if (atmo === 'extremely_strict') {
+      if (isParent) {
+        const strictActs = [
+          `sat under a bright desk lamp while ${person.name} audited your homework ledgers with a red grease pencil.`,
+          `drilled flashcards, mental arithmetic, and Latin grammar for two straight hours under ${person.name}'s watchful scowl.`,
+          `stood at attention while ${person.name} inspected your bed corners, closet hangers, and polished shoes.`
+        ];
+        message = `You ${window.getRandomElement(strictActs)} (+${relGain}% Closeness, +Smarts, -5% Happiness).`;
+        effects = { relationship: Math.round(relGain * 0.8), smarts: +6, happiness: -5 };
+      } else if (isSibling) {
+        message = `You raced through mandatory household inspections with ${person.name}, both terrified of failing room check (+${relGain}% Closeness, +Smarts).`;
+        effects = { relationship: Math.round(relGain * 0.8), smarts: +4, happiness: -2 };
+      } else if (isGrand) {
+        message = `You stood at attention while ${person.name} inspected your posture, diction, and shoe polish (+${relGain}% Closeness, +Smarts).`;
+        effects = { relationship: relGain, smarts: +4 };
+      }
+    } else if (atmo === 'alcoholic') {
+      if (isParent) {
+        const alcActs = [
+          `walked to the corner grocery store with ${person.name} while they leaned heavily on your shoulder and slurred old regrets.`,
+          `helped ${person.name} find their mislaid keys and shoes in the cluttered living room before they lost their temper.`,
+          `sat in the dim kitchen boiling black coffee while ${person.name} stared out at the rainy alleyway in sullen silence.`
+        ];
+        message = `You ${window.getRandomElement(alcActs)} (+${relGain}% Closeness, -4% Happiness, +Smarts).`;
+        effects = { relationship: relGain, smarts: +3, happiness: -4, sanity: -2 };
+      } else if (isSibling) {
+        message = `You built a pillow fort in the back of the bedroom closet with ${person.name}, hiding until the shouting downstairs quieted down (+${relGain}% Closeness, +Humanity, +Sanity).`;
+        effects = { relationship: relGain, humanity: +5, sanity: +3 };
+      } else if (isGrand) {
+        message = `You sat on the front porch with ${person.name}, who gave you fresh peppermint candies and told you not to worry about home (+${relGain}% Closeness, +Happiness, +Sanity).`;
+        effects = { relationship: relGain, happiness: +8, sanity: +4 };
+      }
+    } else if (atmo === 'eccentric_occult') {
+      if (isParent) {
+        const occActs = [
+          `helped ${person.name} gather strange nocturnal fungi and dried belladonna leaves in the foggy woods.`,
+          `sat cross-legged on the floorboards with ${person.name}, deciphering copper engravings in an uncataloged grimoire.`,
+          `assisted ${person.name} in blending sweet smelling grave-dust with lavender oils over the gas stove.`
+        ];
+        message = `You ${window.getRandomElement(occActs)} (+${relGain}% Closeness, +Occult, +Smarts).`;
+        effects = { relationship: relGain, occult: +5, smarts: +3, sanity: -1 };
+      } else if (isSibling) {
+        message = `You carved protective runes into chalk pebbles near the creek with ${person.name} (+${relGain}% Closeness, +Occult).`;
+        effects = { relationship: relGain, occult: +4, happiness: +3 };
+      } else if (isGrand) {
+        message = `You drank bitter wormwood tea with ${person.name} while inspecting antique bone-handled cutlery (+${relGain}% Closeness, +Occult).`;
+        effects = { relationship: relGain, occult: +4, sanity: +2 };
+      }
+    } else if (atmo === 'religious') {
+      if (isParent) {
+        message = `You helped ${person.name} prepare baked goods for the parish mission, humming peaceful hymns together (+${relGain}% Closeness, +Humanity, +Happiness).`;
+        effects = { relationship: relGain, humanity: +4, happiness: +4 };
+      } else if (isSibling) {
+        message = `You practiced choir hymns under the porch with ${person.name}, sharing sweet butterscotch drops (+${relGain}% Closeness, +Happiness).`;
+        effects = { relationship: relGain, happiness: +5, humanity: +2 };
+      } else if (isGrand) {
+        message = `You sat in the garden while ${person.name} told you stories of parish miracles and honest saints (+${relGain}% Closeness, +Sanity).`;
+        effects = { relationship: relGain, sanity: +4, humanity: +3 };
+      }
+    } else if (atmo === 'working_class') {
+      if (isParent) {
+        message = `You helped ${person.name} mend worn boot soles and patch heavy canvas jackets by the warm radiator (+${relGain}% Closeness, +Vitality, +Happiness).`;
+        effects = { relationship: relGain, vitality: +4, happiness: +4 };
+      } else if (isSibling) {
+        message = `You scavenged copper scrap and wire from the trainyard with ${person.name}, splitting a cold soda on the curb (+${relGain}% Closeness, +Smarts, +Happiness).`;
+        effects = { relationship: relGain, smarts: +4, happiness: +5 };
+      } else if (isGrand) {
+        message = `You peeled potatoes at the chipped enamel kitchen table with ${person.name}, listening to tall tales of old strikes and harbor barges (+${relGain}% Closeness, +Happiness).`;
+        effects = { relationship: relGain, happiness: +6, vitality: +2 };
+      }
+    } else {
+      // Loving default
+      if (isParent) {
+        const activities = [
+          `went to a roadside diner for pancakes with ${person.name}.`,
+          `helped ${person.name} fix the weather-stripping on the drafty front door.`,
+          `sat together listening to rain drum against the living room window while ${person.name} read the paper.`,
+          `drove to the municipal supermarket and picked out sweet pastries together.`
+        ];
+        message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
+      } else if (isSibling) {
+        const activities = [
+          `played a marathon session of split-screen arcade games with your ${person.role.toLowerCase()} ${person.name}.`,
+          `built a fort out of heavy wool blankets in the hallway with ${person.name}.`,
+          `shared secret snacks after midnight while whispering about school rumors with ${person.name}.`
+        ];
+        message = `You ${window.getRandomElement(activities)} (+${relGain}% Closeness, +5% Happiness).`;
+      } else if (isGrand) {
+        message = `You spent the afternoon having warm tea and ginger biscuits with ${person.name}. They showed you faded black-and-white family portraits (+${relGain}% Closeness, +5% Happiness).`;
+      }
+      effects = { relationship: relGain, happiness: +5 };
+    }
   } else {
-    // Friend
+    // Non-family / Friend
     if (person.entityType === 'disguised_mimic' && person.loyalty === 'loyal') {
       message = `You sat behind the abandoned bleachers with ${person.name}. You kept watch while they ate cold marrow bones in peace (+${relGain}% Closeness, +5% Occult).`;
-      effects.occult = +5;
+      effects = { relationship: relGain, occult: +5 };
     } else if (person.entityType === 'anomaly') {
       message = `You and ${person.name} explored the damp drainage canal. Their breath didn't fog up once in the chilly wind (+${relGain}% Closeness, +3% Smarts).`;
-      effects.smarts = +3;
+      effects = { relationship: relGain, smarts: +3 };
     } else {
       message = `You and ${person.name} shared a basket of hot french fries under the flickering neon sign of the corner bowling alley (+${relGain}% Closeness, +5% Happiness).`;
+      effects = { relationship: relGain, happiness: +5 };
     }
   }
 
@@ -667,18 +798,34 @@ function talkToKin(person, character) {
                   (count < 5 ? 2 : 1));
   person.relationship = Math.min(100, person.relationship + relGain);
 
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+
   let quote = "";
-  const effects = { relationship: +relGain };
+  let effects = { relationship: +relGain };
 
   if (count >= 2) {
     // 3rd+ talk of the year is lighter conversation
-    const lightChats = [
+    let lightChats = [
       `You and ${person.name} chatted idly about the changing autumn weather and distant sirens.`,
       `You exchanged casual neighborhood rumors about the strange tenant on the third floor.`,
       `You shared a brief, comfortable silence watching rain pool on the asphalt outside.`,
       `You discussed recent radio broadcasts and municipal road construction near the harbor.`,
       `You talked about funny childhood memories and old family recipes.`
     ];
+    if (isFamily && atmo === 'cold_detached') {
+      lightChats = [
+        `You and ${person.name} exchanged three formal sentences regarding municipal tax levies.`,
+        `You shared an austere, unbroken silence while the mantel clock ticked rhythmically.`,
+        `A brief, polite nod was exchanged over the morning newspaper.`
+      ];
+    } else if (isFamily && atmo === 'deeply_religious') {
+      lightChats = [
+        `You recited a minor vesper verse together in low, solemn tones.`,
+        `You discussed the pastor's sermon and the impending winter freeze.`,
+        `A brief murmur of mutual prayer ended the short exchange.`
+      ];
+    }
     return {
       success: true,
       message: `${window.getRandomElement(lightChats)} (+${relGain}% Closeness).`,
@@ -700,17 +847,105 @@ function talkToKin(person, character) {
     effects.occult = +6;
     effects.sanity = -2;
   } else if (person.role === 'Father' || person.role === 'Mother') {
-    const parentQuotes = [
-      `"${person.name} told you: 'Make sure your bedroom lock is fastened tonight. The neighborhood watch reported another stray dog pack near the culvert.'"`,
-      `"${person.name} said: 'Study hard and save your money. When you grow up, this city doesn't give second chances.'"`,
-      `"${person.name} looked tired and said: 'Did you hear that low frequency humming in the pipes again? The city water department claims everything is normal.'"`,
-      `"${person.name} smiled gently and said: 'I'm proud of how resilient you are, even when the house feels cold.'"`
-    ];
-    quote = window.getRandomElement(parentQuotes);
-    effects.sanity = +3;
+    if (atmo === 'cold_detached') {
+      const coldQuotes = [
+        `"${person.name} adjusted their cuffs and said: 'In this world, sentimental attachments are liabilities. Cultivate poise, silence, and fiscal independence.'"`,
+        `"${person.name} gave a cool, measured nod: 'Do not expect comfort from others. A person of breeding stands entirely alone.'"`,
+        `"${person.name} looked over their ledger: 'Emotion is an indulgence for those who have nothing substantial to manage.'"`
+      ];
+      quote = window.getRandomElement(coldQuotes);
+      effects.smarts = +3;
+      effects.happiness = -2;
+    } else if (atmo === 'deeply_religious') {
+      const piousQuotes = [
+        `"${person.name} gripped your shoulder with intense solemnity: 'Guard your thoughts day and night. A single unconfessed sin will invite the worm into this entire household.'"`,
+        `"${person.name} whispered: 'Every misfortune is the Lord's rod against secret wickedness. Pray until your knees bleed, child.'"`,
+        `"${person.name} warned: 'The worldly pleasures of this city are ashes and sulfur. Keep your eyes lowered and fear the pit.'"`
+      ];
+      quote = window.getRandomElement(piousQuotes);
+      effects.humanity = +4;
+      effects.sanity = -2;
+    } else if (atmo === 'extremely_strict') {
+      const strictQuotes = [
+        `"${person.name} slammed a pen onto the desk: 'Excuses are the currency of failures. In this family, ninety-nine percent is an insult to our name.'"`,
+        `"${person.name} stared hard: 'Discipline is the only bridge between survival and destruction in this city. Never let me catch you idling.'"`,
+        `"${person.name} stated flatly: 'Punctuality, precision, and obedience. Master those three, or you will be swept into the gutter.'"`
+      ];
+      quote = window.getRandomElement(strictQuotes);
+      effects.smarts = +4;
+      effects.happiness = -3;
+    } else if (atmo === 'alcoholic') {
+      const alcQuotes = [
+        `"${person.name} exhaled whiskey-sour breath: 'Look at me, kid... don't ever end up like this city made me. It grinds you down until you're hollow inside.'"`,
+        `"${person.name} slurred with bitter cynicism: 'Everyone in this town is looking for an angle to cheat you. Keep your back to the wall and trust nobody.'"`,
+        `"${person.name} blinked away dark tears: 'I was gonna be somebody once, before the night shifts crushed my spirit. Don't look at me like that.'"`
+      ];
+      quote = window.getRandomElement(alcQuotes);
+      effects.smarts = +2;
+      effects.sanity = -2;
+    } else if (atmo === 'eccentric_occult') {
+      const occQuotes = [
+        `"${person.name} whispered: 'The shadows beneath the floorboards have ancient names. If you hear them calling, answer with numbers, never words.'"`,
+        `"${person.name} murmured: 'The veil is thin as spider silk in this house. Never sweep away the salt ring around your bedstead.'"`,
+        `"${person.name} touched your temple: 'Our blood has always carried the Sight. Do not fear the figure standing in the mirror's blind corner.'"`
+      ];
+      quote = window.getRandomElement(occQuotes);
+      effects.occult = +4;
+      effects.sanity = -1;
+    } else if (atmo === 'religious') {
+      const relQuotes = [
+        `"${person.name} smiled gently: 'Walk in honesty, humility, and faith. The Lord will guide your path through the darkest valley.'"`,
+        `"${person.name} reminded you: 'A clean conscience is the softest pillow. Always do right by your neighbors.'"`
+      ];
+      quote = window.getRandomElement(relQuotes);
+      effects.humanity = +3;
+      effects.sanity = +2;
+    } else if (atmo === 'working_class') {
+      const workQuotes = [
+        `"${person.name} said firmly: 'Keep your knuckles greased and your boots dry. A person who knows an honest trade will never starve.'"`,
+        `"${person.name} clapped your back: 'We don't have gold or fancy silver, but we've got our dignity. In this house, family comes before everything.'"`
+      ];
+      quote = window.getRandomElement(workQuotes);
+      effects.vitality = +2;
+      effects.happiness = +2;
+    } else {
+      // Loving default
+      const parentQuotes = [
+        `"${person.name} told you: 'Make sure your bedroom lock is fastened tonight. The neighborhood watch reported another stray dog pack near the culvert.'"`,
+        `"${person.name} said: 'Study hard and save your money. When you grow up, this city doesn't give second chances.'"`,
+        `"${person.name} looked tired and said: 'Did you hear that low frequency humming in the pipes again? The city water department claims everything is normal.'"`,
+        `"${person.name} smiled gently and said: 'I'm proud of how resilient you are, even when the house feels cold.'"`
+      ];
+      quote = window.getRandomElement(parentQuotes);
+      effects.sanity = +3;
+    }
   } else if (person.role.includes('Grand')) {
-    quote = `"${person.name} told you: 'Our lineage survived the black floods of '74. Don't trust anyone who knocks on your window twice without a lantern.'"`;
-    effects.occult = +4;
+    if (atmo === 'cold_detached') {
+      quote = `"${person.name} told you: 'Remember your lineage. Never let the lower orders see you sweat or stumble.'"`;
+      effects.smarts = +3;
+    } else if (atmo === 'deeply_religious') {
+      quote = `"${person.name} told you: 'The martyrs endured fire and irons without flinching. Cling to the cross when tempests howl.'"`;
+      effects.humanity = +4;
+    } else if (atmo === 'extremely_strict') {
+      quote = `"${person.name} told you: 'Sloth is the poison of youth. Rise before dawn and earn your bread.'"`;
+      effects.smarts = +3;
+    } else if (atmo === 'alcoholic') {
+      quote = `"${person.name} told you: 'Don't hold your parents' failings against them, child. The city's winter has broken stronger folk than them. You stay strong for all of us.'"`;
+      effects.sanity = +3;
+      effects.happiness = +3;
+    } else if (atmo === 'eccentric_occult') {
+      quote = `"${person.name} told you: 'Our lineage survived the black floods of '74. Don't trust anyone who knocks on your window twice without a lantern.'"`;
+      effects.occult = +4;
+    } else if (atmo === 'religious') {
+      quote = `"${person.name} told you: 'A kind word turns away wrath, child. Keep your heart gentle.'"`;
+      effects.sanity = +3;
+    } else if (atmo === 'working_class') {
+      quote = `"${person.name} told you: 'I worked forty years in the rail yards. Stand with your fellows and you'll never be broken.'"`;
+      effects.vitality = +3;
+    } else {
+      quote = `"${person.name} told you: 'Always keep a kettle on and a warm heart. Hard times pass, but love endures.'"`;
+      effects.happiness = +4;
+    }
   } else {
     quote = window.getRandomElement(NORMAL_FRIEND_QUOTES);
     effects.happiness = +4;
@@ -731,8 +966,11 @@ function complimentKin(person, character) {
                   (count <= 2 ? (Math.floor(Math.random() * 3) + 4) : 2);
   person.relationship = Math.min(100, person.relationship + relGain);
 
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+
   let message = "";
-  const effects = { relationship: +relGain, happiness: +3 };
+  let effects = { relationship: +relGain, happiness: +3 };
 
   if (person.isRevealed && person.entityType !== 'human') {
     const entityCompliments = [
@@ -742,24 +980,82 @@ function complimentKin(person, character) {
     message = window.getRandomElement(entityCompliments);
     effects.occult = +3;
   } else if (person.role === 'Father' || person.role === 'Mother') {
-    const parentCompliments = [
-      `You told ${person.name} you admire their unwavering resilience and how hard they work for the family. They looked touched and embraced you warmly (+${relGain}% Closeness, +3% Happiness).`,
-      `You remarked that ${person.name} makes the drafty house feel like a real sanctuary. A gentle smile broke across their tired face (+${relGain}% Closeness).`,
-      `You praised their practical wisdom. ${person.name} chuckled softly and thanked you (+${relGain}% Closeness).`
-    ];
-    message = window.getRandomElement(parentCompliments);
+    if (atmo === 'cold_detached') {
+      message = `You complimented ${person.name}'s immaculate decorum and dignified bearing. They adjusted a cufflink with a slight, measured inclination of the head: "Flattery is unnecessary, but an appreciation of proper standards is noted." (+${relGain}% Closeness, +3% Smarts)`;
+      effects = { relationship: Math.max(1, Math.round(relGain * 0.7)), smarts: +3 };
+    } else if (atmo === 'deeply_religious') {
+      message = `You praised ${person.name}'s unwavering piety and devotion. They lowered their gaze in solemn chastisement: "Give all praise to the Almighty, child; we are merely dust and clay. Do not let pride tempt your tongue." (+${relGain}% Closeness, +3% Humanity)`;
+      effects = { relationship: relGain, humanity: +3 };
+    } else if (atmo === 'extremely_strict') {
+      message = `You commended ${person.name}'s iron principles and high standards. A razor-thin smirk of approval touched their lips: "Good. You are beginning to understand why mediocrity is unacceptable." (+${relGain}% Closeness, +3% Smarts)`;
+      effects = { relationship: Math.round(relGain * 0.8), smarts: +3 };
+    } else if (atmo === 'alcoholic') {
+      message = `You told ${person.name} that you believe in them and love them anyway. Their eyes welled with sudden, messy tears; they turned away toward the sink to wipe their face, deeply shaken: "You're too good for me, kid." (+${relGain}% Closeness, +4% Humanity, -2% Sanity)`;
+      effects = { relationship: relGain, humanity: +4, sanity: -2 };
+    } else if (atmo === 'eccentric_occult') {
+      message = `You praised ${person.name}'s profound esoteric knowledge. A strange, knowing gleam sparked in their eyes: "The unseen currents hum around you, little seeker. You recognize the true architecture of things." (+${relGain}% Closeness, +3% Occult)`;
+      effects = { relationship: relGain, occult: +3 };
+    } else if (atmo === 'religious') {
+      message = `You complimented ${person.name}'s gentle patience and faith. They beamed warmly and touched your shoulder: "Bless your sweet heart, child. You bring warmth to this home." (+${relGain}% Closeness, +4% Happiness)`;
+      effects = { relationship: relGain, happiness: +4 };
+    } else if (atmo === 'working_class') {
+      message = `You told ${person.name} they are the toughest, hardest working person in the city. They let out a hearty belly laugh, ruffling your hair: "Someone's gotta keep the coal in the bin!" (+${relGain}% Closeness, +4% Happiness)`;
+      effects = { relationship: relGain, happiness: +4 };
+    } else {
+      // Loving default
+      const parentCompliments = [
+        `You told ${person.name} you admire their unwavering resilience and how hard they work for the family. They looked touched and embraced you warmly (+${relGain}% Closeness, +3% Happiness).`,
+        `You remarked that ${person.name} makes the drafty house feel like a real sanctuary. A gentle smile broke across their tired face (+${relGain}% Closeness).`,
+        `You praised their practical wisdom. ${person.name} chuckled softly and thanked you (+${relGain}% Closeness).`
+      ];
+      message = window.getRandomElement(parentCompliments);
+    }
   } else if (person.role.includes('Brother') || person.role.includes('Sister')) {
-    const siblingCompliments = [
-      `You praised your ${person.role.toLowerCase()}'s quick wit and style. They puffed their chest with pride and smiled (+${relGain}% Closeness).`,
-      `You told ${person.name} that nobody makes you laugh like they do. They grinned from ear to ear (+${relGain}% Closeness).`
-    ];
-    message = window.getRandomElement(siblingCompliments);
+    if (atmo === 'cold_detached') {
+      message = `You praised your ${person.role.toLowerCase()}'s flawless academic scores. They gave a cool, competitive smirk: "Naturally. Do try to keep up." (+${relGain}% Closeness, +2% Smarts)`;
+      effects = { relationship: Math.max(1, Math.round(relGain * 0.7)), smarts: +2 };
+    } else if (atmo === 'deeply_religious') {
+      message = `You complimented your ${person.role.toLowerCase()}'s quiet conduct in chapel. They gave a relieved whisper: "Thanks... I was terrified father was going to yell at me." (+${relGain}% Closeness, +2% Humanity)`;
+      effects = { relationship: relGain, humanity: +2 };
+    } else if (atmo === 'extremely_strict') {
+      message = `You praised your ${person.role.toLowerCase()}'s perfect inspection report. They sighed in relief: "We survived another week. Don't let your guard down." (+${relGain}% Closeness, +2% Smarts)`;
+      effects = { relationship: Math.round(relGain * 0.8), smarts: +2 };
+    } else if (atmo === 'alcoholic') {
+      message = `You told your ${person.role.toLowerCase()} that you're proud to be their sibling. They squeezed your hand with fierce, protective loyalty: "We stick together, no matter what happens down there." (+${relGain}% Closeness, +3% Humanity)`;
+      effects = { relationship: relGain, humanity: +3 };
+    } else if (atmo === 'eccentric_occult') {
+      message = `You praised your ${person.role.toLowerCase()}'s clever shadow puppets. They showed you a secret sigil drawn under their sleeve (+${relGain}% Closeness, +2% Occult)`;
+      effects = { relationship: relGain, occult: +2 };
+    } else {
+      const siblingCompliments = [
+        `You praised your ${person.role.toLowerCase()}'s quick wit and style. They puffed their chest with pride and smiled (+${relGain}% Closeness).`,
+        `You told ${person.name} that nobody makes you laugh like they do. They grinned from ear to ear (+${relGain}% Closeness).`
+      ];
+      message = window.getRandomElement(siblingCompliments);
+    }
   } else if (person.role.includes('Grand')) {
-    const grandCompliments = [
-      `You told ${person.name} that their ancient stories and heritage mean the world to you. Their eyes misted with fond memories (+${relGain}% Closeness, +3% Happiness).`,
-      `You complimented their timeless elegance. They laughed warmly and offered you an extra sweet (+${relGain}% Closeness).`
-    ];
-    message = window.getRandomElement(grandCompliments);
+    if (atmo === 'cold_detached') {
+      message = `You complimented ${person.name}'s timeless aristocratic pedigree. They offered a crisp nod: "Blood will tell. Always carry yourself as a rightful heir." (+${relGain}% Closeness, +3% Smarts)`;
+      effects = { relationship: relGain, smarts: +3 };
+    } else if (atmo === 'deeply_religious') {
+      message = `You praised ${person.name}'s holy faith. They gripped their rosary and murmured: "May heaven count it toward our redemption, little lamb." (+${relGain}% Closeness, +3% Humanity)`;
+      effects = { relationship: relGain, humanity: +3 };
+    } else if (atmo === 'extremely_strict') {
+      message = `You complimented ${person.name}'s uncompromising discipline. They nodded firmly: "A backbone of iron will serve you when softer youths collapse." (+${relGain}% Closeness, +3% Smarts)`;
+      effects = { relationship: relGain, smarts: +3 };
+    } else if (atmo === 'alcoholic') {
+      message = `You told ${person.name} they are the sweetest haven in your whole world. Tears shone in their weathered eyes as they kissed your forehead and pressed a warm butterscotch into your hand (+${relGain}% Closeness, +5% Happiness).`;
+      effects = { relationship: relGain, happiness: +5 };
+    } else if (atmo === 'eccentric_occult') {
+      message = `You complimented ${person.name}'s ancient collection of spirit jars and bone charms. They cackled softly with wicked delight (+${relGain}% Closeness, +3% Occult).`;
+      effects = { relationship: relGain, occult: +3 };
+    } else {
+      const grandCompliments = [
+        `You told ${person.name} that their ancient stories and heritage mean the world to you. Their eyes misted with fond memories (+${relGain}% Closeness, +3% Happiness).`,
+        `You complimented their timeless elegance. They laughed warmly and offered you an extra sweet (+${relGain}% Closeness).`
+      ];
+      message = window.getRandomElement(grandCompliments);
+    }
   } else {
     // Friend
     const friendCompliments = [
@@ -2181,26 +2477,141 @@ function cuddleKin(person, character) {
   const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 10) : (count <= 2 ? 6 : 3);
   person.relationship = Math.min(100, person.relationship + relGain);
 
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+  const isMother = person.role.includes('Mother');
+  const isFather = person.role.includes('Father');
+  const isGrand = person.role.includes('Grand');
+  const isSibling = person.role.includes('Brother') || person.role.includes('Sister') || person.role.includes('Sibling');
+
   let message = "";
-  if (person.role.includes('Mother')) {
-    message = `You curled into your mother's warm embrace. She stroked your hair and rocked you gently until your breathing steadied.`;
-  } else if (person.role.includes('Father')) {
-    message = `Your father hoisted you onto his shoulder, patting your back with his large, calloused hand until you relaxed.`;
-  } else if (person.role.includes('Grand')) {
-    message = `${person.name} held you close in their knitted cardigan, humming a faint antique tune that smelled of lavender and old wool.`;
+  let effects = { relationship: relGain, happiness: +8, vitality: +3, sanity: +3 };
+
+  if (person.isRevealed && person.entityType !== 'human') {
+    message = `You curled near ${person.name}'s side. A strange, glacial chill radiated through their garments, but their disguised arm curled gently around you (+${relGain}% Closeness, +4% Occult, -2% Sanity).`;
+    effects = { relationship: relGain, occult: +4, sanity: -2, vitality: +2 };
+  } else if (!isFamily) {
+    message = `You leaned into ${person.name}'s side. They held your hand gently and let you rest against their arm (+${relGain}% Closeness, +5% Happiness).`;
+    effects = { relationship: relGain, happiness: +5, sanity: +2 };
+  } else if (atmo === 'cold_detached') {
+    if (isFather) {
+      message = `You crawled close and leaned against your father's trouser leg. He sat motionless as an icy granite statue, glancing down with mild, formal detachment before tapping your forehead with his fountain pen: "Composure, child. Even in infancy, self-command is necessary."`;
+    } else if (isMother) {
+      message = `You reached up toward your mother's silk gown. She paused, stiff and unyielding, offering only two delicate fingers for you to hold so her pressed cuffs wouldn't wrinkle.`;
+    } else if (isSibling) {
+      message = `You tried leaning against ${person.name}'s shoulder. They carefully adjusted their immaculate collar and edged away on the sofa, offering only a brief, chilly nod.`;
+    } else if (isGrand) {
+      message = `${person.name} allowed you to sit beside their velvet armchair, resting a dry, liver-spotted hand atop your head for exactly ten measured seconds before returning to their genealogy ledger.`;
+    } else {
+      message = `${person.name} offered a polite, distant pat on your shoulder with immaculate posture.`;
+    }
+    effects = { relationship: Math.max(1, Math.round(relGain * 0.6)), smarts: +2, sanity: +1, happiness: -3 };
+  } else if (atmo === 'deeply_religious') {
+    if (isFather) {
+      message = `Your father held you tightly against his coarse black wool jacket, but his brow was furrowed with solemn anxiety. He murmured urgent prayers against demonic contagion into your hair, clutching an iron cross against your ribs.`;
+    } else if (isMother) {
+      message = `Your mother held you to her chest, rocking in the flickering candlelight. Tears dripped onto your cheeks as she wept, whispering: "Lord, wash the stain of original sin from this frail vessel."`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} pulled you into a tight, trembling embrace under the heavy wool blanket, both of you listening fearfully to the chapel bell tolling through the dark.`;
+    } else if (isGrand) {
+      message = `${person.name} wrapped you in a coarse ceremonial shawl smelling of frankincense and beeswax, chanting solemn benedictions to keep night-fiends away.`;
+    } else {
+      message = `${person.name} held you while reciting a verse of divine judgment over your brow.`;
+    }
+    effects = { relationship: relGain, humanity: +4, sanity: -2, happiness: +2 };
+  } else if (atmo === 'religious') {
+    if (isFather) {
+      message = `Your father hoisted you onto his shoulder, humming a quiet church hymn as rain drummed against the stained glass.`;
+    } else if (isMother) {
+      message = `Your mother embraced you warmly, stroking your forehead while reciting a peaceful psalm until your breathing slowed.`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} cuddled beside you on the pew bench, sharing body heat in the drafty hall.`;
+    } else if (isGrand) {
+      message = `${person.name} held you close, humming ancient liturgical chants that smelled of dried roses and beeswax.`;
+    } else {
+      message = `${person.name} embraced you peacefully with quiet prayers of thanksgiving.`;
+    }
+    effects = { relationship: relGain, humanity: +3, sanity: +3, happiness: +4 };
+  } else if (atmo === 'extremely_strict') {
+    if (isFather) {
+      message = `Your father permitted you to lean against his knee for a few moments, posture rigid. He checked his pocket watch: "A momentary respite is permitted, but pampering breeds weakness. Stand tall now."`;
+    } else if (isMother) {
+      message = `Your mother gave you a firm, disciplined embrace, straightening your posture with practiced hands: "Affection must be earned through excellence, little one."`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} hugged you quickly and looked nervously at the door, making sure neither of you were caught slacking on chores.`;
+    } else if (isGrand) {
+      message = `${person.name} gave your shoulder three firm, precise pats before gesturing for you to sit properly on your stool.`;
+    } else {
+      message = `${person.name} patted your back rhythmically and reminded you that discipline precedes comfort.`;
+    }
+    effects = { relationship: Math.round(relGain * 0.8), smarts: +3, happiness: -2, sanity: +2 };
+  } else if (atmo === 'alcoholic') {
+    if (isFather) {
+      const isHarsh = Math.random() < 0.5;
+      if (isHarsh) {
+        message = `You crawled toward your father's armchair, but his heavy arm swung out blindly, pushing you back onto the carpet: "Not now, kid... my head's throbbing. Leave me be."`;
+        effects = { relationship: -2, happiness: -5, sanity: -3 };
+      } else {
+        message = `Your father scooped you into his lap with sudden, desperate remorse. His woolen sweater smelled pungently of cheap whiskey, but his tears wet your hair: "You're all that's pure in this rotten city, kiddo."`;
+        effects = { relationship: relGain, happiness: +4, sanity: -1 };
+      }
+    } else if (isMother) {
+      message = `Your mother pulled you into a tight, exhausted embrace, burying her face into your neck as if clinging to a life raft in a storm.`;
+      effects = { relationship: relGain, happiness: +4, sanity: +1, humanity: +3 };
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} scooped you up and held you tight in the back of the bedroom closet, muffling your sobs while shouting echoed downstairs.`;
+      effects = { relationship: relGain, humanity: +5, sanity: +2 };
+    } else if (isGrand) {
+      message = `${person.name} wrapped their trembling arms around you, kissing your forehead: "You're safe with grandma/grandpa now, darling. Pay no mind to the shouting."`;
+      effects = { relationship: relGain, happiness: +10, sanity: +5, vitality: +3 };
+    } else {
+      message = `${person.name} hugged you quickly, casting an uneasy glance down the hallway.`;
+      effects = { relationship: relGain, sanity: -1, happiness: +2 };
+    }
+  } else if (atmo === 'eccentric_occult') {
+    if (isFather) {
+      message = `Your father gathered you into his velvet robes, smelling of sage and dried nightshade. He gently pressed an obsidian amulet to your forehead, humming in strange harmonic intervals.`;
+    } else if (isMother) {
+      message = `Your mother rocked you by the black scrying basin, tracing protective sigils across your spine with cold, scented oils.`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} curled under the heavy black velvet tapestry with you, whispering secrets about the spirits nesting in the baseboards.`;
+    } else if (isGrand) {
+      message = `${person.name} held you against their frail chest, where an antique bone talisman clicked softly with every slow, deliberate heartbeat.`;
+    } else {
+      message = `${person.name} held you close while burning fragrant lavender incense.`;
+    }
+    effects = { relationship: relGain, occult: +4, sanity: +2, happiness: +3 };
+  } else if (atmo === 'working_class') {
+    if (isFather) {
+      message = `Your father scooped you into his muscular, soot-stained arms. Despite aching muscles from a twelve-hour blast furnace shift, he grinned and let you rest your head on his broad shoulder.`;
+    } else if (isMother) {
+      message = `Your mother bundled you into her faded flannel apron, kissing your temple while humming a lively dockside labor tune.`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} wrapped an oversized hand-me-down coat around both of you, sharing warmth by the whistling radiator.`;
+    } else if (isGrand) {
+      message = `${person.name} tucked you under a thick patchwork quilt, rubbing your cold feet until warmth returned.`;
+    } else {
+      message = `${person.name} gave you a big, hearty squeeze and shared their woolen scarf with you.`;
+    }
+    effects = { relationship: relGain, happiness: +6, vitality: +4 };
   } else {
-    message = `You leaned into ${person.name}'s side. They held your hand gently and let you rest against their arm.`;
+    // Loving default
+    if (isMother) {
+      message = `You curled into your mother's warm embrace. She stroked your hair and rocked you gently until your breathing steadied.`;
+    } else if (isFather) {
+      message = `Your father hoisted you onto his shoulder, patting your back with his large, calloused hand until you relaxed.`;
+    } else if (isGrand) {
+      message = `${person.name} held you close in their knitted cardigan, humming a faint antique tune that smelled of lavender and old wool.`;
+    } else {
+      message = `You leaned into ${person.name}'s side. They held your hand gently and let you rest against their arm.`;
+    }
+    effects = { relationship: relGain, happiness: +8, vitality: +3, sanity: +3 };
   }
 
   return {
     success: true,
     message,
-    effects: {
-      relationship: relGain,
-      happiness: +8,
-      vitality: +3,
-      sanity: +3
-    }
+    effects
   };
 }
 
@@ -2213,25 +2624,140 @@ function babbleToKin(person, character) {
   const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 8) : (count <= 2 ? 5 : 2);
   person.relationship = Math.min(100, person.relationship + relGain);
 
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+  const isMother = person.role.includes('Mother');
+  const isFather = person.role.includes('Father');
+  const isGrand = person.role.includes('Grand');
+  const isSibling = person.role.includes('Brother') || person.role.includes('Sister') || person.role.includes('Sibling');
+
+  const words = ["'Ma-ma'", "'Da-da'", "'Mi-lk'", "'No-no'", "'Up-up'"];
+  const chosen = window.getRandomElement(words);
+
   let message = "";
+  let effects = { relationship: relGain, smarts: +5, happiness: +5 };
+
   if (person.entityType && person.entityType !== 'human' && person.isRevealed) {
     message = `You pointed your tiny finger at ${person.name} and let out rhythmic clicks. Its pupils dilated in cold, amused fascination.`;
-  } else if (person.role.includes('Mother') || person.role.includes('Father')) {
-    const words = ["'Ma-ma'", "'Da-da'", "'Mi-lk'", "'No-no'", "'Up-up'"];
-    const chosen = window.getRandomElement(words);
-    message = `You pointed at ${person.name} and tried to say ${chosen}. Their eyes lit up with pride as they gently coached your syllables.`;
-  } else {
+    effects = { relationship: relGain, occult: +5, sanity: -2 };
+  } else if (!isFamily) {
     message = `You babbled animatedly at ${person.name}, waving your arms. They smiled and repeated silly words back to you.`;
+    effects = { relationship: relGain, smarts: +4, happiness: +4 };
+  } else if (atmo === 'cold_detached') {
+    if (isFather) {
+      message = `You pointed your tiny hand at your father and babbled ${chosen}. He lowered his financial broadsheet an inch, observed your mouth movements with detached clinical scrutiny, uttered an indifferent "Mm," and went back to reading without touching you.`;
+    } else if (isMother) {
+      message = `You reached toward your mother, cooing ${chosen}. She gave a dry, polite nod: "Articulate syllables are expected of our pedigree. Refrain from dribbling on the Persian rug."`;
+    } else if (isSibling) {
+      message = `You gurgled and waved at your ${person.role.toLowerCase()} ${person.name}. They gave you a stiff, formal glance across the drawing room, returning immediately to their private violin study.`;
+    } else if (isGrand) {
+      message = `${person.name} peered down their gold-rimmed pince-nez: "Adequate diction. The vocal cords appear free of vulgar defects."`;
+    } else {
+      message = `You babbled at ${person.name}. They observed your efforts with cool, impassive composure.`;
+    }
+    effects = { relationship: Math.max(1, Math.round(relGain * 0.5)), smarts: +5, happiness: -3 };
+  } else if (atmo === 'deeply_religious') {
+    if (isFather) {
+      message = `You pointed at your father and babbled ${chosen}. He frowned and pressed a heavy index finger to your lips: "Quiet, child. The evening examination of conscience is at hand. Idle chatter invites wickedness into the throat."`;
+    } else if (isMother) {
+      message = `You cooed ${chosen} from your crib. Your mother bowed her head over a carved rosary: "May that young tongue learn holy scripture before the devil teaches it worldly vanity."`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} knelt beside your crib and nervously whispered: "Say 'A-men', say 'A-men'! If you make noise during prayer hour, father will fetch the ruler!"`;
+    } else if (isGrand) {
+      message = `${person.name} anointed your tongue with a drop of bitter holy water, murmuring prayers to seal your infant speech against blasphemies.`;
+    } else {
+      message = `You babbled holy sounds while ${person.name} whispered solemn prayers over your cradle.`;
+    }
+    effects = { relationship: relGain, smarts: +3, sanity: -2, humanity: +4 };
+  } else if (atmo === 'religious') {
+    if (isFather) {
+      message = `You pointed at your father and babbled ${chosen}. A serene smile crossed his face: "God willing, those little lips will speak words of truth and peace."`;
+    } else if (isMother) {
+      message = `Your mother beamed and clapped her hands: "Praise heaven! Listen to those sweet first words!"`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} held up an illustrated catechism card, cheering as you mimicked the syllables.`;
+    } else if (isGrand) {
+      message = `${person.name} chuckled warmly, whispering proverbs as you made playful baby sounds.`;
+    } else {
+      message = `You babbled happily at ${person.name}, who thanked the heavens for your bright voice.`;
+    }
+    effects = { relationship: relGain, smarts: +4, humanity: +3, happiness: +3 };
+  } else if (atmo === 'extremely_strict') {
+    if (isFather) {
+      message = `You stammered ${chosen} toward your father. His eyes narrowed critically: "Do not mumble. Enunciate the consonant clearly. In this world, lazy speech reflects a lazy mind."`;
+    } else if (isMother) {
+      message = `Your mother corrected your posture with a firm hand: "Repeat it properly. Precision and discipline begin before you can walk."`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} hissed in panic: "Shh! Keep your voice down! If mother hears you yelling, we'll both get extra math drills!"`;
+    } else if (isGrand) {
+      message = `${person.name} tapped the arm of their mahogany chair: "Standards must be upheld. No baby gibberish at this table."`;
+    } else {
+      message = `You babbled at ${person.name}, who strictly corrected your pronunciation.`;
+    }
+    effects = { relationship: Math.round(relGain * 0.7), smarts: +6, happiness: -3 };
+  } else if (atmo === 'alcoholic') {
+    if (isFather) {
+      const isIrritable = Math.random() < 0.5;
+      if (isIrritable) {
+        message = `You squeaked ${chosen} and rattled your spoon. Your father flinched, clutching his throbbing temples, and snarled groggily: "Shut it! Can't a working man get five minutes without that shrieking?!"`;
+        effects = { relationship: -2, happiness: -5, smarts: +2 };
+      } else {
+        message = `You babbled ${chosen} at your father. His bleary, bloodshot eyes softened with sudden, mournful wonder. He let out a ragged breath and patted your hair: "Look at you... you're smarter than your old man already."`;
+        effects = { relationship: relGain, smarts: +4, happiness: +3 };
+      }
+    } else if (isMother) {
+      message = `Your mother managed a faint, tired smile, wiping a stray tear as she whispered: "You're my only sunshine in this dark house, little one."`;
+      effects = { relationship: relGain, happiness: +5, smarts: +3 };
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} rushed over and popped a pacifier into your mouth, whispering: "Quiet, quiet! They're still passed out on the rug!"`;
+      effects = { relationship: relGain, smarts: +3, sanity: -1 };
+    } else if (isGrand) {
+      message = `${person.name} sighed with ancient sorrow, cradling you away from the doorway: "Don't you fret, angel. Babble all you like with grandfolk."`;
+      effects = { relationship: relGain, happiness: +7, sanity: +3 };
+    } else {
+      message = `You babbled at ${person.name}, who gave a quick, anxious shush toward the living room.`;
+      effects = { relationship: relGain, smarts: +2, sanity: -1 };
+    }
+  } else if (atmo === 'eccentric_occult') {
+    if (isFather) {
+      message = `You pointed your tiny finger at your father and let out rhythmic clicks and vowels. His eyes flared with fascination: "Fascinating... the cadence matches the third cipher in the Book of Eibon. Say it once more."`;
+    } else if (isMother) {
+      message = `Your mother leaned over your cradle, eyes wide with esoteric delight: "The child remembers the pre-human tongue of the well! Listen how it hums!"`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} shook a rattle of dried snake vertebrae, chanting weird syllables in harmony with your babble.`;
+    } else if (isGrand) {
+      message = `${person.name} closed their eyes, divining portents from the pitch of your baby squeals.`;
+    } else {
+      message = `You babbled strange syllables at ${person.name}, who listened with occult reverence.`;
+    }
+    effects = { relationship: relGain, smarts: +4, occult: +5, sanity: -2 };
+  } else if (atmo === 'working_class') {
+    if (isFather) {
+      message = `You reached up from your crib toward your father, shouting ${chosen}. He let out a booming belly laugh, wiping grease from his nose: "That's my tough little scrapper! Tell the whole street about it!"`;
+    } else if (isMother) {
+      message = `Your mother laughed warmly over her sewing machine, kissing your forehead: "Such a loud, strong voice! You'll never be pushed around."`;
+    } else if (isSibling) {
+      message = `Your ${person.role.toLowerCase()} ${person.name} cheered and made funny faces, coaching you to say silly slang.`;
+    } else if (isGrand) {
+      message = `${person.name} clapped their weathered hands, humming along to your babbling by the warm stove.`;
+    } else {
+      message = `You babbled loudly with ${person.name}, who cheered your strong lungs.`;
+    }
+    effects = { relationship: relGain, smarts: +5, happiness: +6 };
+  } else {
+    // Loving default
+    if (isMother || isFather) {
+      message = `You pointed at ${person.name} and tried to say ${chosen}. Their eyes lit up with pride as they gently coached your syllables.`;
+    } else {
+      message = `You babbled animatedly at ${person.name}, waving your arms. They smiled and repeated silly words back to you.`;
+    }
+    effects = { relationship: relGain, smarts: +5, happiness: +5 };
   }
 
   return {
     success: true,
     message,
-    effects: {
-      relationship: relGain,
-      smarts: +5,
-      happiness: +5
-    }
+    effects
   };
 }
 
@@ -2244,15 +2770,44 @@ function feedMilkFromKin(person, character) {
   const relGain = count === 0 ? (Math.floor(Math.random() * 3) + 7) : (count <= 2 ? 5 : 2);
   person.relationship = Math.min(100, person.relationship + relGain);
 
-  let message = `${person.name} prepared a warm bottle and gently supported your head while you drank, rocking you until you were full and sleepy.`;
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+
+  let message = "";
+  let effects = { relationship: relGain, vitality: +6, sanity: +4 };
+
+  if (!isFamily) {
+    message = `${person.name} prepared a warm bottle and gently supported your head while you drank, rocking you until you were full and sleepy.`;
+  } else if (atmo === 'cold_detached') {
+    message = `${person.name} held the calibrated glass bottle at a rigid, sterile angle with immaculate posture, checking a pocket watch every few sips until you finished in solemn silence.`;
+    effects = { relationship: Math.max(1, Math.round(relGain * 0.6)), vitality: +5, sanity: +2, happiness: -2 };
+  } else if (atmo === 'deeply_religious') {
+    message = `${person.name} whispered an earnest blessing over the formula, watching your face with intense, solemn vigilance as you drank, ensuring you gave thanks in your heart.`;
+    effects = { relationship: relGain, vitality: +5, humanity: +3, sanity: +2 };
+  } else if (atmo === 'religious') {
+    message = `${person.name} blessed the warm ceramic bottle and gently cradled your head, singing peaceful hymns until your tummy was full and your eyelids grew heavy.`;
+    effects = { relationship: relGain, vitality: +6, sanity: +4, humanity: +2 };
+  } else if (atmo === 'extremely_strict') {
+    message = `${person.name} supported the bottle firmly at a precise forty-five degree angle, watching the volume markings closely to ensure you drank every ounce without dribbling or pausing.`;
+    effects = { relationship: Math.round(relGain * 0.8), vitality: +6, smarts: +3 };
+  } else if (atmo === 'alcoholic') {
+    message = `${person.name} held the lukewarm bottle with trembling hands, swaying slightly on the creaking floorboards while smelling of stale gin, relieved when you finally finished drinking.`;
+    effects = { relationship: relGain, vitality: +4, sanity: -1 };
+  } else if (atmo === 'eccentric_occult') {
+    message = `${person.name} fed you warm goat's milk steeped with chamomile and nightshade honey, humming ancient nursery runes into the rising steam until your dreams were deep and strange.`;
+    effects = { relationship: relGain, vitality: +6, occult: +3, sanity: +3 };
+  } else if (atmo === 'working_class') {
+    message = `${person.name} sat in tired overalls beside the humming radiator, patiently holding the warm bottle until you drank your fill and burped contentedly against their shoulder.`;
+    effects = { relationship: relGain, vitality: +7, happiness: +5 };
+  } else {
+    // Loving default
+    message = `${person.name} prepared a warm bottle and gently supported your head while you drank, rocking you until you were full and sleepy.`;
+  }
+
   return {
     success: true,
     message,
-    effects: {
-      relationship: relGain,
-      vitality: +6,
-      sanity: +4
-    }
+    effects
   };
 }
 
@@ -2265,15 +2820,50 @@ function peekabooWithKin(person, character) {
   const relGain = count === 0 ? (Math.floor(Math.random() * 4) + 8) : (count <= 2 ? 5 : 2);
   person.relationship = Math.min(100, person.relationship + relGain);
 
-  let message = `${person.name} covered their face with both hands, waited two seconds, and shouted 'PEEK-A-BOO!' with a funny grin, sending you into fits of giggles.`;
+  const atmo = (character.kin && character.kin.atmosphere) ? character.kin.atmosphere.id : 'loving';
+  const isFamily = person.category === 'family';
+
+  let message = "";
+  let effects = { relationship: relGain, happiness: +8, vitality: +2 };
+
+  if (!isFamily) {
+    message = `${person.name} covered their face with both hands, waited two seconds, and shouted 'PEEK-A-BOO!' with a funny grin, sending you into fits of giggles.`;
+  } else if (atmo === 'cold_detached') {
+    message = `${person.name} raised a crisp linen napkin before their face, lowered it after two seconds with an utterly unblinking, impassive stare, and stated: "I have returned. Demonstrating object permanence is fundamental." You blinked back in quiet bafflement.`;
+    effects = { relationship: Math.max(1, Math.round(relGain * 0.5)), smarts: +3, happiness: -2 };
+  } else if (atmo === 'deeply_religious') {
+    message = `${person.name} held an ornate leather hymnbook before their eyes, lowered it with a solemn, unsmiling gaze, and whispered: "The eyes of God never hide, child. Even when darkness covers the face, all secrets remain visible." A chill ran down your tiny spine.`;
+    effects = { relationship: relGain, humanity: +3, sanity: -2 };
+  } else if (atmo === 'religious') {
+    message = `${person.name} hid behind an embroidered linen cloth and popped out with a bright, gentle smile, tickling your tummy and praising heaven for your happy laughter.`;
+    effects = { relationship: relGain, happiness: +6, humanity: +2 };
+  } else if (atmo === 'extremely_strict') {
+    message = `${person.name} held a stiff cardboard folder before their eyes, lowered it after exactly three seconds by the kitchen clock, and noted: "Focus test passed. Target tracking: acceptable. No unseemly squirming."`;
+    effects = { relationship: Math.round(relGain * 0.7), smarts: +4, happiness: -1 };
+  } else if (atmo === 'alcoholic') {
+    const isSlumped = Math.random() < 0.5;
+    if (isSlumped) {
+      message = `${person.name} slumped forward, burying their face in their hands... and stayed frozen like that for a long, alarming minute, groaning into their palms while you sat waiting in silence.`;
+      effects = { relationship: -1, happiness: -4, sanity: -2 };
+    } else {
+      message = `${person.name} ducked behind a tattered cardigan and jumped out with an exaggerated, drunken wobble, making you burst into giggles before they stumbled against the radiator.`;
+      effects = { relationship: relGain, happiness: +5, sanity: -1 };
+    }
+  } else if (atmo === 'eccentric_occult') {
+    message = `${person.name} covered their face with pale, slender fingers. When they parted their hands, their eyes reflected an unearthly violet luminescence that wasn't in the room, making you clap your hands in eerie delight.`;
+    effects = { relationship: relGain, occult: +4, happiness: +4 };
+  } else if (atmo === 'working_class') {
+    message = `${person.name} ducked behind the evening newspaper, sprang out with a ridiculous monster face, and blew a loud, ticklish raspberry on your tummy that sent you into roaring giggles.`;
+    effects = { relationship: relGain, happiness: +8, vitality: +3 };
+  } else {
+    // Loving default
+    message = `${person.name} covered their face with both hands, waited two seconds, and shouted 'PEEK-A-BOO!' with a funny grin, sending you into fits of giggles.`;
+  }
+
   return {
     success: true,
     message,
-    effects: {
-      relationship: relGain,
-      happiness: +8,
-      vitality: +2
-    }
+    effects
   };
 }
 
