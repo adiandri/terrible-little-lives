@@ -76,7 +76,28 @@ function createEmptyActionsDone() {
     pranked: 0,
     listenedFolktale: 0,
     askedGrandMoney: 0,
-    inheritedKeepsake: 0
+    inheritedKeepsake: 0,
+    // Phase 1: Extended Family Actions
+    helpedChores: 0,
+    beggedPet: 0,
+    askedDriving: 0,
+    discussedCollege: 0,
+    requestedLoan: 0,
+    caredElder: 0,
+    siblingAlibi: 0,
+    siblingBrawl: 0,
+    siblingDrinks: 0,
+    exploredAttic: 0,
+    visitedNursing: 0,
+    // Phase 2: Romance & Lover Actions
+    datedLover: 0,
+    flirtedKissed: 0,
+    confessedFeelings: 0,
+    movedInTogether: 0,
+    proposedMarriage: 0,
+    plannedWedding: 0,
+    conceivedChild: 0,
+    brokenUp: 0
   };
 }
 
@@ -320,6 +341,8 @@ function generateFamily(character) {
     siblings,
     grandparents,
     friends: [], // Starts empty at age 0
+    lovers: [],  // Starts empty at age 0
+    children: [], // Starts empty
     householdIncome: totalCombinedIncome,
     householdIncomeUSD: totalCombinedIncomeUSD,
     wealthTier,
@@ -371,6 +394,76 @@ function generateNewFriend(character, context = 'Neighborhood') {
     suspicion: 0,
     isRevealed: entityType === 'human', // Humans are already "revealed" as humans
     loyalty: 'neutral', // 'neutral' | 'loyal' | 'reported'
+    actionsDone: createEmptyActionsDone()
+  };
+}
+
+function generateLoverCandidate(character, context = 'Encounter') {
+  const countryCode = character.countryCode || "USA";
+  // Preference: opposite gender of character (or random)
+  const isMale = character.gender === 'Female' ? true : (character.gender === 'Male' ? false : Math.random() > 0.5);
+  const loverGender = isMale ? 'Male' : 'Female';
+
+  let loverName = "";
+  if (window.generateCharacterName) {
+    loverName = window.generateCharacterName({ countryCode, gender: loverGender }).fullName;
+  } else {
+    const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
+    const first = isMale ? window.getRandomElement(country.firstNamesMale) : window.getRandomElement(country.firstNamesFemale);
+    const surname = window.getRandomElement(country.surnames);
+    loverName = surname ? `${first} ${surname}` : first;
+  }
+
+  const ageDiff = Math.floor(Math.random() * 5) - 2; // -2 to +2 years
+  const age = Math.max(14, character.age + ageDiff);
+  const isTeen = age < 18;
+
+  let occupation = "High School Student";
+  let salaryUSD = 0;
+  let incomeTier = "modest";
+
+  if (!isTeen) {
+    const job = window.getRandomElement(PARENT_OCCUPATIONS_DATA);
+    occupation = job.title;
+    salaryUSD = job.salaryUSD;
+    incomeTier = job.tier;
+  }
+
+  // Entity probability: 82% human, 11% anomaly, 5% disguised mimic, 2% blatant entity
+  const roll = Math.random();
+  let entityType = 'human';
+  if (roll < 0.02) entityType = 'blatant_entity';
+  else if (roll < 0.07) entityType = 'disguised_mimic';
+  else if (roll < 0.18) entityType = 'anomaly';
+
+  const role = isMale ? 'Boyfriend' : 'Girlfriend';
+
+  return {
+    id: 'lover_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+    category: 'lover',
+    role,
+    name: loverName,
+    gender: loverGender,
+    age,
+    origin: context,
+    alive: true,
+    deathYear: null,
+    deathCause: null,
+    occupation,
+    salaryUSD,
+    incomeTier,
+    relationship: Math.floor(Math.random() * 25) + 65, // 65-90%
+    fidelity: Math.floor(Math.random() * 40) + 60,
+    generosity: Math.floor(Math.random() * 50) + 40,
+    sanity: Math.floor(Math.random() * 35) + 60,
+    entityType,
+    suspicion: 0,
+    isRevealed: entityType === 'human',
+    cohabitating: false,
+    engaged: false,
+    married: false,
+    anniversaryYear: character.year,
+    avatar: generateKinAvatar(role, loverGender, age, incomeTier),
     actionsDone: createEmptyActionsDone()
   };
 }
@@ -835,6 +928,726 @@ function listenGrandparentFolktale(person, character) {
   };
 }
 
+// ============================================================================
+// PHASE 1: EXTENDED FAMILY ACTIONS (AGE-GATED & MEANINGFUL)
+// ============================================================================
+
+// PARENTS: Help With Household Chores (Age 6+)
+function helpWithChores(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only help parents with household chores." };
+  }
+  const count = getActionCount(person, 'helpedChores');
+  if (count >= 5) {
+    return { success: false, reason: "You have helped with all the chores for this year!" };
+  }
+  person.actionsDone.helpedChores = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 6;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'humanity', 3);
+  applyKinStatEffect(character, 'vitality', 2);
+
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
+  let tip = 0;
+  if (Math.random() < 0.65) {
+    const baseTip = person.incomeTier === 'affluent' ? (Math.floor(Math.random() * 20) + 15) : (Math.floor(Math.random() * 10) + 5);
+    tip = Math.round(baseTip * mult);
+    character.money = (character.money || 0) + tip;
+  }
+
+  const choreList = [
+    `You scrubbed the soot from the coal stove and washed the heavy iron skillets for ${person.name}. They gave you a proud smile${tip > 0 ? ` and slipped you ${window.formatMoney(tip, character.countryCode)} for your honest effort` : ''} (+${relGain}% Closeness, +Humanity).`,
+    `You gathered the damp laundry and helped ${person.name} beat dust from the winter rugs in the courtyard. They thanked you warmly${tip > 0 ? ` and handed you ${window.formatMoney(tip, character.countryCode)} pocket money` : ''} (+${relGain}% Closeness).`,
+    `You swept the creaking front hallway and shoveled frost from the front steps before ${person.name} returned from work${tip > 0 ? `, earning a ${window.formatMoney(tip, character.countryCode)} reward` : ''} (+${relGain}% Closeness).`
+  ];
+
+  return {
+    success: true,
+    title: `Helped ${person.name} with Chores`,
+    message: window.getRandomElement(choreList),
+    effects: { relationship: relGain, humanity: 3, vitality: 2, money: tip }
+  };
+}
+
+// PARENTS: Beg For a Pet / Toy (Age 7+)
+function begForPetOrToy(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only plead with parents for a companion or plaything." };
+  }
+  const count = getActionCount(person, 'beggedPet');
+  if (count >= 2) {
+    return { success: false, reason: "You have already pleaded your case enough this year." };
+  }
+  person.actionsDone.beggedPet = count + 1;
+  const strict = person.strictness || 50;
+  const generous = person.generosity || 50;
+  const rel = person.relationship || 50;
+  const roll = (rel * 0.4) + (generous * 0.4) - (strict * 0.3) + (Math.random() * 30);
+
+  if (roll >= 45) {
+    person.relationship = Math.min(100, person.relationship + 5);
+    applyKinStatEffect(character, 'happiness', 12);
+    if (window.generateStrayPet && (!character.pets || character.pets.length === 0) && Math.random() < 0.45) {
+      const pet = window.generateStrayPet(character);
+      character.pets = character.pets || [];
+      character.pets.push(pet);
+      return {
+        success: true,
+        title: `Plea Granted! A New Pet!`,
+        message: `${person.name} sighed, looked into your pleading eyes, and brought home a stray ${pet.species}: ${pet.name}! (+Happiness, +Closeness)`,
+        effects: { relationship: 5, happiness: 12 }
+      };
+    }
+    return {
+      success: true,
+      title: `Plea Granted!`,
+      message: `${person.name} gave in to your persistence and bought you a beautiful antique wooden puzzle toy and sweet treats (+12% Happiness, +5% Closeness).`,
+      effects: { relationship: 5, happiness: 12 }
+    };
+  } else {
+    person.relationship = Math.max(0, person.relationship - 4);
+    applyKinStatEffect(character, 'happiness', -4);
+    return {
+      success: true,
+      title: `Plea Denied`,
+      message: `${person.name} firmly crossed their arms: 'We cannot afford frivolous luxuries or extra mouths to feed in this house. Absolutely not.' (-4% Happiness, -4% Closeness).`,
+      effects: { relationship: -4, happiness: -4 }
+    };
+  }
+}
+
+// PARENTS: Ask for Driving Lessons (Age 15+)
+function askForDrivingLessons(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "Only parents can provide licensed behind-the-wheel instruction." };
+  }
+  const count = getActionCount(person, 'askedDriving');
+  if (count >= 3) {
+    return { success: false, reason: "You've practiced driving enough with them for this year!" };
+  }
+  person.actionsDone.askedDriving = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 5;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'smarts', 4);
+  applyKinStatEffect(character, 'sanity', 2);
+  character.drivingLessons = (character.drivingLessons || 0) + 1;
+
+  const scenarios = [
+    `You practiced parallel parking between municipal delivery trucks while ${person.name} nervously gripped the dashboard handle (+Smarts, +Closeness).`,
+    `${person.name} guided you down fog-shrouded municipal avenues, teaching you how to feather the clutch on steep cobblestone hills (+Smarts, +Sanity).`,
+    `You navigated the industrial bypass at night. ${person.name} praised your steady hands and spatial awareness (+Smarts, +Closeness).`
+  ];
+
+  return {
+    success: true,
+    title: `Driving Practice with ${person.name}`,
+    message: window.getRandomElement(scenarios),
+    effects: { relationship: relGain, smarts: 4, sanity: 2 }
+  };
+}
+
+// PARENTS: Discuss College & Future Plans (Age 16+)
+function discussCollegePlans(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only plan your higher education with parents." };
+  }
+  const count = getActionCount(person, 'discussedCollege');
+  if (count >= 3) {
+    return { success: false, reason: "You've discussed your future plans thoroughly for this year." };
+  }
+  person.actionsDone.discussedCollege = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 6;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'smarts', 4);
+  applyKinStatEffect(character, 'sanity', 3);
+
+  const canPromiseTuition = (person.incomeTier === 'comfortable' || person.incomeTier === 'affluent') && person.relationship >= 65;
+  if (canPromiseTuition && !character.parentTuitionPromise) {
+    character.parentTuitionPromise = true;
+    return {
+      success: true,
+      title: `Tuition Pledge Secured!`,
+      message: `"${person.name} reviewed your ambitions and nodded solemnly: 'You have worked hard. When you graduate, we will fund your university tuition.' (Parent Tuition Promise Active!) (+Smarts, +Closeness)"`,
+      effects: { relationship: relGain, smarts: 4, sanity: 3 }
+    };
+  }
+
+  const adviceQuotes = [
+    `"${person.name} studied the university catalogues with you: 'Choose a vocation that withstands hard times. Society always needs medicine, law, and people who can read old blueprints.' (+Smarts, +Sanity)"`,
+    `"${person.name} poured two mugs of tea: 'Whatever path you choose, make sure you can look at yourself in the mirror every morning.' (+Smarts, +Closeness)"`
+  ];
+
+  return {
+    success: true,
+    title: `Future Planning with ${person.name}`,
+    message: window.getRandomElement(adviceQuotes),
+    effects: { relationship: relGain, smarts: 4, sanity: 3 }
+  };
+}
+
+// PARENTS & SIBLINGS: Request Family Loan (Age 18+)
+function requestFamilyLoan(person, character, requestedAmount = 1000) {
+  const isFamily = person.category === 'family' && (person.role.includes('Father') || person.role.includes('Mother') || person.role.includes('Brother') || person.role.includes('Sister'));
+  if (!isFamily) {
+    return { success: false, reason: "You can only request substantial financial loans from close family." };
+  }
+  const count = getActionCount(person, 'requestedLoan');
+  if (count >= 2) {
+    return { success: false, reason: "You have already requested a loan from them this year." };
+  }
+  person.actionsDone.requestedLoan = count + 1;
+
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
+  const amount = Math.round(requestedAmount);
+
+  const generous = person.generosity || 50;
+  const rel = person.relationship || 50;
+  const wealth = person.incomeTier === 'affluent' ? 30 : (person.incomeTier === 'comfortable' ? 10 : -25);
+  const score = (rel * 0.4) + (generous * 0.3) + wealth - (amount / (500 * mult));
+
+  if (score >= 25) {
+    character.money = (character.money || 0) + amount;
+    person.familyDebt = (person.familyDebt || 0) + amount;
+    person.relationship = Math.max(0, person.relationship - 2);
+    return {
+      success: true,
+      granted: true,
+      title: `Family Loan Approved`,
+      message: `${person.name} counted out ${window.formatMoney(amount, character.countryCode)}: "Take this to get yourself on your feet. Repay me when your harvest comes in." (Debt Recorded: ${window.formatMoney(person.familyDebt, character.countryCode)})`,
+      effects: { money: amount, relationship: -2 }
+    };
+  } else {
+    person.relationship = Math.max(0, person.relationship - 6);
+    return {
+      success: true,
+      granted: false,
+      title: `Loan Request Denied`,
+      message: `${person.name} shook their head: "I cannot risk ${window.formatMoney(amount, character.countryCode)}. Money lent to kin often burns the bridge between them." (-6% Closeness).`,
+      effects: { relationship: -6 }
+    };
+  }
+}
+
+// PARENTS: Care For Aging Parent (Age 30+)
+function careForAgingParent(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only provide elder care for aging parents." };
+  }
+  const count = getActionCount(person, 'caredElder');
+  if (count >= 4) {
+    return { success: false, reason: "You have already attended to their medical and living needs this year." };
+  }
+  person.actionsDone.caredElder = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'humanity', 5);
+  applyKinStatEffect(character, 'sanity', 3);
+  person.caredThisYear = true;
+
+  const scenarios = [
+    `You accompanied ${person.name} to the municipal clinic, reviewing their prescription tinctures and holding their frail hand (+${relGain}% Closeness, +Humanity).`,
+    `You repaired the insulation around their bedroom sash windows and cooked three batches of nourishing broth for ${person.name} (+${relGain}% Closeness, +Sanity).`,
+    `You spent the Sunday afternoon organizing their household ledgers and reading old correspondence aloud (+${relGain}% Closeness).`
+  ];
+
+  return {
+    success: true,
+    title: `Cared for Aging ${person.role}`,
+    message: window.getRandomElement(scenarios),
+    effects: { relationship: relGain, humanity: 5, sanity: 3 }
+  };
+}
+
+// SIBLINGS: Cover Sibling Alibi (Age 8+)
+function coverSiblingAlibi(person, character) {
+  if (!person.role.includes('Brother') && !person.role.includes('Sister')) {
+    return { success: false, reason: "You can only forge alibis and cover secrets with siblings." };
+  }
+  const count = getActionCount(person, 'siblingAlibi');
+  if (count >= 3) {
+    return { success: false, reason: "You've covered for them enough times this year!" };
+  }
+  person.actionsDone.siblingAlibi = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 12;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  person.siblingLoyalty = 'unshakeable';
+  applyKinStatEffect(character, 'humanity', 3);
+
+  return {
+    success: true,
+    title: `Covered for ${person.name}`,
+    message: `When parents investigated the broken latch and missing rations, you took the heat and fabricated an airtight alibi. Your ${person.role.toLowerCase()} squeezed your arm with tearful gratitude (+${relGain}% Closeness, Loyalty: Unshakeable).`,
+    effects: { relationship: relGain, humanity: 3 }
+  };
+}
+
+// SIBLINGS: Intense Sibling Brawl (Age 12+)
+function siblingBrawl(person, character) {
+  if (!person.role.includes('Brother') && !person.role.includes('Sister')) {
+    return { success: false, reason: "You can only engage in sibling rivalry brawls." };
+  }
+  const count = getActionCount(person, 'siblingBrawl');
+  if (count >= 3) {
+    return { success: false, reason: "You've bruised each other enough for this year." };
+  }
+  person.actionsDone.siblingBrawl = count + 1;
+  const relLoss = Math.floor(Math.random() * 8) + 10;
+  person.relationship = Math.max(0, person.relationship - relLoss);
+  applyKinStatEffect(character, 'happiness', -5);
+  applyKinStatEffect(character, 'vitality', -3);
+
+  return {
+    success: true,
+    title: `Heated Sibling Brawl`,
+    message: `A vicious dispute over jealousy and past slights boiled over into a physical fight in the courtyard. You traded heavy blows before slamming doors in bitter fury (-${relLoss}% Closeness, -Vitality, -Happiness).`,
+    effects: { relationship: -relLoss, happiness: -5, vitality: -3 }
+  };
+}
+
+// SIBLINGS & FRIENDS: Adult Drinks & Dinner (Age 18+)
+function siblingDrinks(person, character) {
+  const count = getActionCount(person, 'siblingDrinks');
+  if (count >= 5) {
+    return { success: false, reason: "You've shared enough drinks together this year." };
+  }
+  person.actionsDone.siblingDrinks = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 7;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'happiness', 6);
+  applyKinStatEffect(character, 'sanity', 3);
+
+  const venues = [
+    `You and ${person.name} sat at a dark mahogany booth in the neighborhood pub, sharing draft ales and laughing over ridiculous family history (+${relGain}% Closeness, +Happiness).`,
+    `You split hot ramen and cold cider under glowing red paper lanterns with ${person.name}, catching up on work, heartaches, and city rumors (+${relGain}% Closeness, +Sanity).`
+  ];
+
+  return {
+    success: true,
+    title: `Drinks & Dinner with ${person.name}`,
+    message: window.getRandomElement(venues),
+    effects: { relationship: relGain, happiness: 6, sanity: 3 }
+  };
+}
+
+// GRANDPARENTS: Explore Old Attic Trunks (Age 8+)
+function exploreGrandparentAttic(person, character) {
+  if (!person.role.includes('Grand')) {
+    return { success: false, reason: "Only grandparents maintain dusty attics filled with centuries of relics." };
+  }
+  const count = getActionCount(person, 'exploredAttic');
+  if (count >= 3) {
+    return { success: false, reason: "You have rummaged through the attic trunks enough this year." };
+  }
+  person.actionsDone.exploredAttic = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 6;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'smarts', 3);
+  applyKinStatEffect(character, 'occult', 4);
+
+  const findings = [
+    `Together with ${person.name}, you pried open a heavy brass steamer trunk and uncovered pre-war topographical maps showing vanished city streets (+Smarts, +Occult).`,
+    `Beneath moth-eaten velvet coats, you found a tintype portrait from 1894. ${person.name} pointed out the figure in the background whose eyes were drawn with white ink (+Occult, +Closeness).`,
+    `You uncovered a cedar box containing silver fountain pens and an uncashed promissory note from the old municipal foundry (+Smarts, +Closeness).`
+  ];
+
+  return {
+    success: true,
+    title: `Attic Expedition with ${person.name}`,
+    message: window.getRandomElement(findings),
+    effects: { relationship: relGain, smarts: 3, occult: 4 }
+  };
+}
+
+// GRANDPARENTS: Inherit Ancestral Keepsake (Age 14+)
+function inheritGrandparentKeepsake(person, character) {
+  if (!person.role.includes('Grand')) {
+    return { success: false, reason: "Only grandparents bestow ancestral keepsakes." };
+  }
+  if (person.inheritedKeepsake) {
+    return { success: false, reason: `${person.name} has already gifted you their sacred family heirloom.` };
+  }
+  person.inheritedKeepsake = true;
+  person.relationship = Math.min(100, person.relationship + 15);
+  applyKinStatEffect(character, 'sanity', 6);
+  applyKinStatEffect(character, 'occult', 8);
+
+  const keepsakes = [
+    { name: "Ancestral Obsidian Pocket Watch (1888)", buff: "Protects against Sanity erosion during night frights." },
+    { name: "Tarnished Silver Signet Ring", buff: "Commanding presence when dealing with municipal magistrates." },
+    { name: "Hand-Bound Grimoire of Household Wards", buff: "Contains ancient protective salt recipes." }
+  ];
+  const chosen = window.getRandomElement(keepsakes);
+  character.keepsakes = character.keepsakes || [];
+  character.keepsakes.push(chosen.name);
+
+  return {
+    success: true,
+    title: `Heirloom Received: ${chosen.name}`,
+    message: `${person.name} unlocked an iron safe beneath the floorboards and placed the ${chosen.name} into your trembling hands: "This kept me alive through the dark winter of '62. Wear it close, and never let a stranger touch it." (${chosen.buff}) (+15% Closeness, +8% Occult, +6% Sanity).`,
+    effects: { relationship: 15, sanity: 6, occult: 8 }
+  };
+}
+
+// GRANDPARENTS: Visit at Nursing Home / Sickbed (Age 16+)
+function visitNursingHome(person, character) {
+  if (!person.role.includes('Grand')) {
+    return { success: false, reason: "You can only attend to grandparents in convalescence." };
+  }
+  const count = getActionCount(person, 'visitedNursing');
+  if (count >= 4) {
+    return { success: false, reason: "You have already spent quality time at their bedside this year." };
+  }
+  person.actionsDone.visitedNursing = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 10;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'humanity', 5);
+  applyKinStatEffect(character, 'sanity', 3);
+
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  let secretCash = 0;
+  if (Math.random() < 0.5) {
+    secretCash = Math.round((Math.floor(Math.random() * 50) + 40) * (country.wageMultiplier || 1));
+    character.money = (character.money || 0) + secretCash;
+  }
+
+  return {
+    success: true,
+    title: `Bedside Visit with ${person.name}`,
+    message: `You brought fresh tea and lavender biscuits to ${person.name}'s bedside. They smiled weakly through the window fog, holding your hand${secretCash > 0 ? ` and secretly pressing ${window.formatMoney(secretCash, character.countryCode)} into your palm` : ''} (+${relGain}% Closeness, +Humanity, +Sanity).`,
+    effects: { relationship: relGain, humanity: 5, sanity: 3, money: secretCash }
+  };
+}
+
+// ============================================================================
+// PHASE 2: ROMANCE & LOVER ACTIONS
+// ============================================================================
+
+// 1. Romantic Date (Age 14+)
+function dateLover(person, character, dateType = 'casual') {
+  if (person.category !== 'lover' && person.category !== 'friend') {
+    return { success: false, reason: "You can only go on romantic dates with partners or close friends." };
+  }
+  const count = getActionCount(person, 'datedLover');
+  if (count >= 6) {
+    return { success: false, reason: "You have already gone on plenty of romantic dates together this year!" };
+  }
+  person.actionsDone.datedLover = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'happiness', 7);
+  applyKinStatEffect(character, 'sanity', 3);
+
+  const dates = [
+    `You and ${person.name} shared a booth at a neon-lit diner, sipping cherry milkshakes and laughing until the waitress turned off the sign (+${relGain}% Closeness, +Happiness).`,
+    `You took a midnight stroll along the desolate canal pier with ${person.name}, watching distant foghorns sound across the water as they rested their head on your shoulder (+${relGain}% Closeness, +Sanity).`,
+    `You caught a late-night double feature at the vintage cinema with ${person.name}, sharing buttery popcorn in the dim velvet balcony (+${relGain}% Closeness, +Happiness).`
+  ];
+
+  return {
+    success: true,
+    title: `Romantic Date with ${person.name}`,
+    message: window.getRandomElement(dates),
+    effects: { relationship: relGain, happiness: 7, sanity: 3 }
+  };
+}
+
+// 2. Flirt & Kiss / Passion (Age 14+)
+function flirtKissLover(person, character) {
+  if (person.category !== 'lover') {
+    return { success: false, reason: "You can only share intimate romance with a partner." };
+  }
+  const count = getActionCount(person, 'flirtedKissed');
+  if (count >= 6) {
+    return { success: false, reason: "You've shared plenty of intimate moments for this year!" };
+  }
+  person.actionsDone.flirtedKissed = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'happiness', 8);
+  applyKinStatEffect(character, 'sanity', 4);
+
+  const moments = [
+    `Under the flickering streetlight, ${person.name} pulled you close and kissed you deeply in the autumn breeze (+${relGain}% Closeness, +Happiness).`,
+    `You whispered sweet promises to ${person.name} in the dark, feeling their heartbeat sync with your own (+${relGain}% Closeness, +Sanity).`
+  ];
+
+  return {
+    success: true,
+    title: `Passion with ${person.name}`,
+    message: window.getRandomElement(moments),
+    effects: { relationship: relGain, happiness: 8, sanity: 4 }
+  };
+}
+
+// 3. Confess Romantic Feelings to Friend (Age 14+)
+function confessToFriend(person, character) {
+  if (person.category !== 'friend') {
+    return { success: false, reason: "You can only confess romantic feelings to a friend." };
+  }
+  const count = getActionCount(person, 'confessedFeelings');
+  if (count >= 1) {
+    return { success: false, reason: "You have already confessed your feelings to them this year." };
+  }
+  person.actionsDone.confessedFeelings = count + 1;
+
+  const rel = person.relationship || 50;
+  if (rel >= 65 && Math.random() < 0.75) {
+    person.category = 'lover';
+    person.role = person.gender === 'Female' ? 'Girlfriend' : 'Boyfriend';
+    person.anniversaryYear = character.year;
+    person.relationship = Math.min(100, person.relationship + 18);
+    applyKinStatEffect(character, 'happiness', 15);
+    character.kin.lovers = character.kin.lovers || [];
+    if (!character.kin.lovers.some(l => l.id === person.id)) {
+      character.kin.lovers.push(person);
+    }
+    character.kin.friends = (character.kin.friends || []).filter(f => f.id !== person.id);
+
+    return {
+      success: true,
+      accepted: true,
+      title: `Feelings Reciprocated!`,
+      message: `With trembling hands, you confessed your love to ${person.name}. Their face flushed with joy as they threw their arms around your neck: "I've waited so long for you to say that!" (${person.name} is now your ${person.role}!) (+15% Happiness, +18% Closeness).`,
+      effects: { relationship: 18, happiness: 15 }
+    };
+  } else {
+    person.relationship = Math.max(0, person.relationship - 12);
+    applyKinStatEffect(character, 'happiness', -10);
+    return {
+      success: true,
+      accepted: false,
+      title: `Gentle Rejection`,
+      message: `${person.name} looked down awkwardly and sighed: "You mean the world to me as a friend, but I don't see us that way. I'm sorry." The silence between you grew painfully heavy (-10% Happiness, -12% Closeness).`,
+      effects: { relationship: -12, happiness: -10 }
+    };
+  }
+}
+
+// 4. Move In Together / Cohabitation (Age 18+)
+function askMoveInTogether(person, character) {
+  if (person.category !== 'lover') {
+    return { success: false, reason: "You can only move in with your romantic partner." };
+  }
+  if (person.cohabitating) {
+    return { success: false, reason: "You already live together!" };
+  }
+  const count = getActionCount(person, 'movedInTogether');
+  if (count >= 1) {
+    return { success: false, reason: "You have already asked them to move in this year." };
+  }
+  person.actionsDone.movedInTogether = count + 1;
+
+  if (person.relationship >= 70) {
+    person.cohabitating = true;
+    person.relationship = Math.min(100, person.relationship + 12);
+    applyKinStatEffect(character, 'happiness', 10);
+    applyKinStatEffect(character, 'sanity', 5);
+    return {
+      success: true,
+      agreed: true,
+      title: `Moved in Together!`,
+      message: `${person.name} excitedly packed their cardboard boxes and moved into your flat! Domestic bills will now be shared equally (+10% Happiness, +12% Closeness).`,
+      effects: { relationship: 12, happiness: 10, sanity: 5 }
+    };
+  } else {
+    person.relationship = Math.max(0, person.relationship - 5);
+    return {
+      success: true,
+      agreed: false,
+      title: `Not Ready Yet`,
+      message: `${person.name} hesitated: "I love you, but our relationship needs more time before taking such a serious leap." (-5% Closeness).`,
+      effects: { relationship: -5 }
+    };
+  }
+}
+
+// 5. Propose Marriage (Age 18+)
+function proposeMarriage(person, character, ringTier = 'silver') {
+  if (person.category !== 'lover') {
+    return { success: false, reason: "You can only propose marriage to your partner." };
+  }
+  if (person.engaged || person.married) {
+    return { success: false, reason: "You are already engaged or married!" };
+  }
+  const count = getActionCount(person, 'proposedMarriage');
+  if (count >= 1) {
+    return { success: false, reason: "Give your partner time to reflect before proposing again." };
+  }
+  person.actionsDone.proposedMarriage = count + 1;
+
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
+
+  const ringCosts = {
+    cheap: Math.round(150 * mult),
+    silver: Math.round(600 * mult),
+    gold_diamond: Math.round(2800 * mult),
+    antique_heirloom: 0
+  };
+  const cost = ringCosts[ringTier] || 0;
+  if (character.money < cost) {
+    return { success: false, reason: `You cannot afford this ring (${window.formatMoney(cost, character.countryCode)}).` };
+  }
+  character.money -= cost;
+
+  const ringBonus = ringTier === 'gold_diamond' ? 25 : (ringTier === 'antique_heirloom' ? 20 : (ringTier === 'silver' ? 10 : 0));
+  const roll = (person.relationship * 0.5) + ringBonus + (Math.random() * 25);
+
+  if (roll >= 50) {
+    person.engaged = true;
+    person.role = person.gender === 'Female' ? 'Fiancée' : 'Fiancé';
+    person.relationship = Math.min(100, person.relationship + 20);
+    applyKinStatEffect(character, 'happiness', 20);
+    applyKinStatEffect(character, 'sanity', 6);
+    return {
+      success: true,
+      accepted: true,
+      title: `SHE/HE SAID YES!`,
+      message: `Down on one knee in the lamplight, you presented the ring. Tears filled ${person.name}'s eyes as they gasped: "YES! A thousand times, yes!" (${person.name} is now your ${person.role}!) (+20% Happiness, +20% Closeness).`,
+      effects: { relationship: 20, happiness: 20, sanity: 6, money: -cost }
+    };
+  } else {
+    person.relationship = Math.max(0, person.relationship - 15);
+    applyKinStatEffect(character, 'happiness', -12);
+    return {
+      success: true,
+      accepted: false,
+      title: `Proposal Rejected`,
+      message: `${person.name} stepped backward, looking pained: "I can't wear this. We aren't ready for marriage." The rejection cuts deep (-12% Happiness, -15% Closeness).`,
+      effects: { relationship: -15, happiness: -12, money: -cost }
+    };
+  }
+}
+
+// 6. Plan Wedding Ceremony (Engaged Lovers)
+function planWeddingCeremony(person, character, venueType = 'courthouse') {
+  if (!person.engaged || person.married) {
+    return { success: false, reason: "You must be engaged before holding a wedding ceremony." };
+  }
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
+
+  const costs = {
+    courthouse: Math.round(150 * mult),
+    chapel: Math.round(2200 * mult),
+    grand_estate: Math.round(9500 * mult)
+  };
+  const cost = costs[venueType] || costs.courthouse;
+  if (character.money < cost) {
+    return { success: false, reason: `You need ${window.formatMoney(cost, character.countryCode)} for this wedding venue.` };
+  }
+  character.money -= cost;
+
+  person.married = true;
+  person.engaged = false;
+  person.role = person.gender === 'Female' ? 'Wife' : 'Husband';
+  person.anniversaryYear = character.year;
+  person.cohabitating = true;
+  person.relationship = 100;
+  applyKinStatEffect(character, 'happiness', 25);
+  applyKinStatEffect(character, 'sanity', 8);
+
+  const venues = {
+    courthouse: `In a quiet municipal registry office with two witnesses, you and ${person.name} signed the marriage register and exchanged simple golden bands.`,
+    chapel: `Beneath stained-glass archways smelling of incense and wax, you and ${person.name} took sacred vows before family and friends.`,
+    grand_estate: `At a breathtaking private manor overlooking the lake, you celebrated an opulent wedding gala with orchestra and champagne.`
+  };
+
+  return {
+    success: true,
+    title: `Just Married!`,
+    message: `${venues[venueType] || venues.courthouse} You are officially married to your ${person.role}, ${person.name}! (+25% Happiness, 100% Closeness).`,
+    effects: { relationship: 25, happiness: 25, sanity: 8, money: -cost }
+  };
+}
+
+// 7. Conceive a Child (Age 18+ Lovers / Spouses)
+function conceiveChildWithLover(person, character) {
+  if (person.category !== 'lover') {
+    return { success: false, reason: "You can only conceive children with a romantic partner." };
+  }
+  const count = getActionCount(person, 'conceivedChild');
+  if (count >= 2) {
+    return { success: false, reason: "You have already tried to expand your family this year!" };
+  }
+  person.actionsDone.conceivedChild = count + 1;
+
+  if (Math.random() < 0.65) {
+    const isMale = Math.random() > 0.5;
+    const gender = isMale ? 'Male' : 'Female';
+    const countryCode = character.countryCode || 'USA';
+    const babyName = window.generateCharacterName ? window.generateCharacterName({ countryCode, gender }).first : (isMale ? 'Alexander' : 'Eleanor');
+    const surname = character.name.split(' ')[1] || '';
+    const fullName = surname ? `${babyName} ${surname}` : babyName;
+
+    const child = {
+      id: 'child_' + Date.now(),
+      category: 'family',
+      role: isMale ? 'Son' : 'Daughter',
+      name: fullName,
+      gender,
+      age: 0,
+      alive: true,
+      relationship: 100,
+      avatar: window.generateKinAvatar ? window.generateKinAvatar('Child', gender, 0, 'comfortable', character.avatar, person.avatar) : null,
+      actionsDone: createEmptyActionsDone()
+    };
+
+    character.kin.children = character.kin.children || [];
+    character.kin.children.push(child);
+    applyKinStatEffect(character, 'happiness', 20);
+    applyKinStatEffect(character, 'humanity', 10);
+
+    return {
+      success: true,
+      conceived: true,
+      title: `A New Soul is Born!`,
+      message: `A healthy baby ${child.role.toLowerCase()} was welcomed into the world: ${child.name}! You and ${person.name} wept with profound joy (+20% Happiness, +10% Humanity).`,
+      effects: { happiness: 20, humanity: 10, relationship: 15 }
+    };
+  } else {
+    return {
+      success: true,
+      conceived: false,
+      title: `No News Yet`,
+      message: `You and ${person.name} spent intimate evenings hoping to conceive, but this year brought no new addition. You held each other tenderly.`,
+      effects: { relationship: 3 }
+    };
+  }
+}
+
+// 8. Break Up / Divorce (Lovers)
+function breakupWithLover(person, character) {
+  if (person.category !== 'lover') {
+    return { success: false, reason: "You can only break up with an active partner." };
+  }
+  const wasMarried = !!person.married;
+  person.married = false;
+  person.engaged = false;
+  person.cohabitating = false;
+  person.role = wasMarried ? (person.gender === 'Female' ? 'Ex-Wife' : 'Ex-Husband') : 'Ex-Partner';
+  person.relationship = Math.max(5, person.relationship - 45);
+  applyKinStatEffect(character, 'happiness', -18);
+  applyKinStatEffect(character, 'sanity', -5);
+
+  let settlement = 0;
+  if (wasMarried && character.money > 2000) {
+    settlement = Math.round(character.money * 0.25);
+    character.money -= settlement;
+  }
+
+  return {
+    success: true,
+    title: wasMarried ? `Divorce Finalized` : `Relationship Ended`,
+    message: wasMarried
+      ? `After bitter court arguments, the marriage was legally dissolved. Assets were split and ${person.name} walked out of your life${settlement > 0 ? ` (Settlement Paid: ${window.formatMoney(settlement, character.countryCode)})` : ''} (-18% Happiness, -5% Sanity).`
+      : `You and ${person.name} had a tearful, heartbreaking conversation and packed your separate bags. You are no longer together (-18% Happiness).`,
+    effects: { relationship: -45, happiness: -18, sanity: -5, money: -settlement }
+  };
+}
+
 
 function argueWithKin(person, character) {
   const count = getActionCount(person, 'argued');
@@ -1129,7 +1942,78 @@ function tickKinYear(character) {
     f.relationship = Math.max(5, f.relationship - Math.floor(Math.random() * 4)); // friends drift faster
   });
 
-  // 5. Automatic Friend Discovery Chance (Ages 5 to 17)
+  // 5. Tick Lovers / Partners
+  if (!kin.lovers) kin.lovers = [];
+  kin.lovers.forEach(l => {
+    if (!l.alive) return;
+    l.age += 1;
+    l.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(l);
+    
+    // Slight relationship drift
+    l.relationship = Math.max(5, l.relationship - Math.floor(Math.random() * 2));
+
+    // If cohabitating or married, partner contributes to household finances
+    if ((l.cohabitating || l.married) && !l.role.includes('Ex')) {
+      const baseSalary = l.salaryUSD || 25000;
+      const annualShare = Math.round((baseSalary * 0.15) * country.wageMultiplier);
+      if (annualShare > 0) {
+        character.money += annualShare;
+        logs.push(`💼 Your partner ${l.name} contributed ${window.formatMoney(annualShare, character.countryCode)} to the shared household.`);
+      }
+    }
+
+    // Milestones / Anniversaries
+    if (l.anniversaryYear && !l.role.includes('Ex')) {
+      const yearsTogether = character.year - l.anniversaryYear;
+      if (yearsTogether > 0 && yearsTogether % 5 === 0) {
+        logs.push(`💖 You and ${l.name} celebrated your ${yearsTogether}-year anniversary together! (+10% Happiness)`);
+        character.stats.happiness = Math.min(100, character.stats.happiness + 10);
+      }
+    }
+
+    // Partner mortality (elderly)
+    const deathChance = l.age > 80 ? 0.08 : (l.age > 70 ? 0.03 : (l.age > 60 ? 0.01 : 0.002));
+    if (Math.random() < deathChance) {
+      l.alive = false;
+      l.deathYear = character.year;
+      l.deathCause = "Passed away from complications of sudden illness.";
+      logs.push(`[TRAGEDY] Your partner, ${l.name}, passed away at age ${l.age}. ${l.deathCause}`);
+      character.stats.happiness = Math.max(0, character.stats.happiness - 35);
+      character.stats.sanity = Math.max(0, character.stats.sanity - 15);
+    }
+  });
+
+  // 6. Tick Children
+  if (!kin.children) kin.children = [];
+  kin.children.forEach(c => {
+    if (!c.alive) return;
+    c.age += 1;
+    c.actionsDone = createEmptyActionsDone();
+    if (window.ageNpcMemories) window.ageNpcMemories(c);
+    c.relationship = Math.max(10, c.relationship - Math.floor(Math.random() * 2));
+
+    if (c.age === 6) {
+      logs.push(`🎒 Your ${c.role.toLowerCase()} ${c.name} started elementary school! (+5% Happiness)`);
+      character.stats.happiness = Math.min(100, character.stats.happiness + 5);
+    } else if (c.age === 18) {
+      logs.push(`🎓 Your ${c.role.toLowerCase()} ${c.name} turned 18 and stepped into adulthood! (+8% Happiness)`);
+      character.stats.happiness = Math.min(100, character.stats.happiness + 8);
+    }
+  });
+
+  // 7. Automatic Romance Discovery Chance (Ages 16 to 45)
+  if (character.age >= 16 && character.age <= 45) {
+    const activeLovers = kin.lovers.filter(l => l.alive && !l.role.includes('Ex'));
+    if (activeLovers.length === 0 && Math.random() < 0.22) {
+      const contexts = ["Workplace Breakroom", "Evening Coffeehouse", "Subway Platform", "Public Library", "Local Neighborhood Walk"];
+      const candidate = generateLoverCandidate(character, window.getRandomElement(contexts));
+      kin.lovers.push(candidate);
+      logs.push(`💖 You crossed paths with ${candidate.name} (${candidate.role}, Age ${candidate.age}) at the ${candidate.origin}. Sparks flew and you started dating!`);
+    }
+  }
+
+  // 8. Automatic Friend Discovery Chance (Ages 5 to 17)
   if (character.age >= 5 && character.age <= 17 && kin.friends.length < 5) {
     if (Math.random() < 0.35) {
       const contexts = ["Primary School Recess", "Neighborhood Alley", "Local Public Library", "Youth Soccer Pitch"];
@@ -1144,6 +2028,7 @@ function tickKinYear(character) {
 
 window.generateFamily = generateFamily;
 window.generateNewFriend = generateNewFriend;
+window.generateLoverCandidate = generateLoverCandidate;
 window.spendTimeToKin = spendTimeToKin;
 window.talkToKin = talkToKin;
 window.complimentKin = complimentKin;
@@ -1161,6 +2046,26 @@ window.askAdviceFromParent = askAdviceFromParent;
 window.bickerWithSibling = bickerWithSibling;
 window.shareSecretWithSibling = shareSecretWithSibling;
 window.listenGrandparentFolktale = listenGrandparentFolktale;
+window.helpWithChores = helpWithChores;
+window.begForPetOrToy = begForPetOrToy;
+window.askForDrivingLessons = askForDrivingLessons;
+window.discussCollegePlans = discussCollegePlans;
+window.requestFamilyLoan = requestFamilyLoan;
+window.careForAgingParent = careForAgingParent;
+window.coverSiblingAlibi = coverSiblingAlibi;
+window.siblingBrawl = siblingBrawl;
+window.siblingDrinks = siblingDrinks;
+window.exploreGrandparentAttic = exploreGrandparentAttic;
+window.inheritGrandparentKeepsake = inheritGrandparentKeepsake;
+window.visitNursingHome = visitNursingHome;
+window.dateLover = dateLover;
+window.flirtKissLover = flirtKissLover;
+window.confessToFriend = confessToFriend;
+window.askMoveInTogether = askMoveInTogether;
+window.proposeMarriage = proposeMarriage;
+window.planWeddingCeremony = planWeddingCeremony;
+window.conceiveChildWithLover = conceiveChildWithLover;
+window.breakupWithLover = breakupWithLover;
 window.PARENT_OCCUPATIONS_DATA = PARENT_OCCUPATIONS_DATA;
 window.HOUSEHOLD_RESIDENCES = HOUSEHOLD_RESIDENCES;
 window.createEmptyActionsDone = createEmptyActionsDone;

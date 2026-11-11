@@ -419,6 +419,26 @@ class TerribleGame {
       btnKinBicker: document.getElementById('btn-kin-bicker'),
       btnKinSecret: document.getElementById('btn-kin-secret'),
       btnKinFolktale: document.getElementById('btn-kin-folktale'),
+      btnKinChores: document.getElementById('btn-kin-chores'),
+      btnKinBegPet: document.getElementById('btn-kin-beg-pet'),
+      btnKinDriving: document.getElementById('btn-kin-driving'),
+      btnKinCollege: document.getElementById('btn-kin-college'),
+      btnKinLoan: document.getElementById('btn-kin-loan'),
+      btnKinElderCare: document.getElementById('btn-kin-elder-care'),
+      btnKinSiblingBrawl: document.getElementById('btn-kin-sibling-brawl'),
+      btnKinAlibi: document.getElementById('btn-kin-alibi'),
+      btnKinSiblingDrinks: document.getElementById('btn-kin-sibling-drinks'),
+      btnKinAttic: document.getElementById('btn-kin-attic'),
+      btnKinKeepsake: document.getElementById('btn-kin-keepsake'),
+      btnKinNursing: document.getElementById('btn-kin-nursing'),
+      btnKinConfess: document.getElementById('btn-kin-confess'),
+      btnKinDate: document.getElementById('btn-kin-date'),
+      btnKinFlirt: document.getElementById('btn-kin-flirt'),
+      btnKinMoveIn: document.getElementById('btn-kin-move-in'),
+      btnKinPropose: document.getElementById('btn-kin-propose'),
+      btnKinWedding: document.getElementById('btn-kin-wedding'),
+      btnKinConceive: document.getElementById('btn-kin-conceive'),
+      btnKinBreakup: document.getElementById('btn-kin-breakup'),
 
       // Activities Modal ("City of Buttons")
       btnTabActivities: document.getElementById('btn-tab-activities'),
@@ -1104,6 +1124,66 @@ class TerribleGame {
     }
     if (this.dom.btnKinFolktale) {
       this.dom.btnKinFolktale.addEventListener('click', () => this.handleKinAction('grandparent_folktale'));
+    }
+    if (this.dom.btnKinChores) {
+      this.dom.btnKinChores.addEventListener('click', () => this.handleKinAction('parent_chores'));
+    }
+    if (this.dom.btnKinBegPet) {
+      this.dom.btnKinBegPet.addEventListener('click', () => this.handleKinAction('parent_beg_pet'));
+    }
+    if (this.dom.btnKinDriving) {
+      this.dom.btnKinDriving.addEventListener('click', () => this.handleKinAction('parent_driving'));
+    }
+    if (this.dom.btnKinCollege) {
+      this.dom.btnKinCollege.addEventListener('click', () => this.handleKinAction('parent_college'));
+    }
+    if (this.dom.btnKinLoan) {
+      this.dom.btnKinLoan.addEventListener('click', () => this.handleKinAction('parent_loan'));
+    }
+    if (this.dom.btnKinElderCare) {
+      this.dom.btnKinElderCare.addEventListener('click', () => this.handleKinAction('parent_elder_care'));
+    }
+    if (this.dom.btnKinSiblingBrawl) {
+      this.dom.btnKinSiblingBrawl.addEventListener('click', () => this.handleKinAction('sibling_brawl'));
+    }
+    if (this.dom.btnKinAlibi) {
+      this.dom.btnKinAlibi.addEventListener('click', () => this.handleKinAction('sibling_alibi'));
+    }
+    if (this.dom.btnKinSiblingDrinks) {
+      this.dom.btnKinSiblingDrinks.addEventListener('click', () => this.handleKinAction('sibling_drinks'));
+    }
+    if (this.dom.btnKinAttic) {
+      this.dom.btnKinAttic.addEventListener('click', () => this.handleKinAction('grandparent_attic'));
+    }
+    if (this.dom.btnKinKeepsake) {
+      this.dom.btnKinKeepsake.addEventListener('click', () => this.handleKinAction('grandparent_keepsake'));
+    }
+    if (this.dom.btnKinNursing) {
+      this.dom.btnKinNursing.addEventListener('click', () => this.handleKinAction('grandparent_nursing'));
+    }
+    if (this.dom.btnKinConfess) {
+      this.dom.btnKinConfess.addEventListener('click', () => this.handleKinAction('friend_confess'));
+    }
+    if (this.dom.btnKinDate) {
+      this.dom.btnKinDate.addEventListener('click', () => this.handleKinAction('lover_date'));
+    }
+    if (this.dom.btnKinFlirt) {
+      this.dom.btnKinFlirt.addEventListener('click', () => this.handleKinAction('lover_flirt'));
+    }
+    if (this.dom.btnKinMoveIn) {
+      this.dom.btnKinMoveIn.addEventListener('click', () => this.handleKinAction('lover_move_in'));
+    }
+    if (this.dom.btnKinPropose) {
+      this.dom.btnKinPropose.addEventListener('click', () => this.handleKinAction('lover_propose'));
+    }
+    if (this.dom.btnKinWedding) {
+      this.dom.btnKinWedding.addEventListener('click', () => this.handleKinAction('lover_wedding'));
+    }
+    if (this.dom.btnKinConceive) {
+      this.dom.btnKinConceive.addEventListener('click', () => this.handleKinAction('lover_conceive'));
+    }
+    if (this.dom.btnKinBreakup) {
+      this.dom.btnKinBreakup.addEventListener('click', () => this.handleKinAction('lover_breakup'));
     }
 
     // Action Choice Modal Controls
@@ -2606,15 +2686,19 @@ class TerribleGame {
 
   getAllKinList() {
     if (!this.character || !this.character.kin) return [];
-    const { parents = [], siblings = [], grandparents = [], friends = [] } = this.character.kin;
+    const { parents = [], siblings = [], grandparents = [], friends = [], lovers = [], children = [] } = this.character.kin;
     parents.forEach(p => { if (!p.category) p.category = 'family'; });
     siblings.forEach(s => { if (!s.category) s.category = 'family'; });
     grandparents.forEach(g => { if (!g.category) g.category = 'family'; });
     friends.forEach(f => { if (!f.category) f.category = 'friend'; });
+    lovers.forEach(l => { if (!l.category) l.category = 'lover'; });
+    children.forEach(c => { if (!c.category) c.category = 'family'; });
     return [
       ...parents,
       ...siblings,
       ...grandparents,
+      ...lovers,
+      ...children,
       ...friends
     ];
   }
@@ -2637,10 +2721,25 @@ class TerribleGame {
     const filtered = all.filter(p => {
       if (filter === 'family') return p.category === 'family';
       if (filter === 'friends') return p.category === 'friend';
+      if (filter === 'lovers') return p.category === 'lover';
       return true;
     });
 
     if (filtered.length === 0) {
+      if (filter === 'lovers') {
+        this.dom.kinList.innerHTML = `
+          <div class="text-center py-10 px-4 space-y-3 bg-inputbg/40 border border-leadborder/60 rounded-2xl">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl shadow-xs">
+              💔
+            </div>
+            <div class="font-serif font-bold text-sm text-parchment">No Romantic Partner</div>
+            <p class="text-dust text-xs leading-relaxed max-w-xs mx-auto font-serif">
+              You are currently single. Look for love through spontaneous encounters as you age, blind dates in Activities, or by confessing feelings to a friend!
+            </p>
+          </div>
+        `;
+        return;
+      }
       this.dom.kinList.innerHTML = `
         <div class="text-center py-8 text-dust/70 text-xs italic font-serif">
           No acquaintances found under this category.
@@ -2671,6 +2770,18 @@ class TerribleGame {
       } else if (person.isRevealed && person.entityType !== 'human') {
         const entityLabel = person.entityType === 'disguised_mimic' ? 'Disguised Mimic' : (person.entityType === 'blatant_entity' ? 'Abyssal Entity' : 'Anomaly');
         statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40 animate-pulse">👁️ ${entityLabel}</span>`;
+      } else if (person.category === 'lover') {
+        if (person.married) {
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-500/30">💍 Spouse</span>`;
+        } else if (person.engaged) {
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-pink-950/40 text-pink-300 border border-pink-500/30">💍 Fiancé</span>`;
+        } else if (person.cohabitating) {
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">🏠 Cohabitating</span>`;
+        } else if (person.role.includes('Ex')) {
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard text-dust border border-leadborder">💔 Ex</span>`;
+        } else {
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-500/30">💖 Partner</span>`;
+        }
       } else if (person.suspicion > 30) {
         statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">Suspicion: ${person.suspicion}%</span>`;
       }
@@ -3132,6 +3243,330 @@ class TerribleGame {
       }
     }
 
+    // 5. Parent Only: Help With Household Chores (Age 6+)
+    if (this.dom.btnKinChores) {
+      if (!isParent) {
+        this.dom.btnKinChores.classList.add('hidden');
+        this.dom.btnKinChores.style.display = 'none';
+      } else if (age < 6) {
+        this.dom.btnKinChores.classList.remove('hidden');
+        this.dom.btnKinChores.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinChores, "Help with Chores", "Too young to safely handle household brooms, dishes, or stoves (Unlocks at Age 6).", 6);
+      } else {
+        this.dom.btnKinChores.classList.remove('hidden');
+        this.dom.btnKinChores.style.display = 'flex';
+        setupBtn(this.dom.btnKinChores, getCount('helpedChores'), 5, "Mop floors, wash dishes, or stack firewood to earn praise. (1 Action)", "Chores completed for this year (5/5).");
+      }
+    }
+
+    // 6. Parent Only: Beg for Pet or Toy (Ages 5 - 14)
+    if (this.dom.btnKinBegPet) {
+      if (!isParent || age > 14) {
+        this.dom.btnKinBegPet.classList.add('hidden');
+        this.dom.btnKinBegPet.style.display = 'none';
+      } else if (age < 5) {
+        this.dom.btnKinBegPet.classList.remove('hidden');
+        this.dom.btnKinBegPet.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinBegPet, "Beg for Pet / Toy", "Too young to plead articulately for a family companion (Unlocks at Age 5).", 5);
+      } else {
+        this.dom.btnKinBegPet.classList.remove('hidden');
+        this.dom.btnKinBegPet.style.display = 'flex';
+        setupBtn(this.dom.btnKinBegPet, getCount('beggedPet'), 3, "Plead for a cat, hound, or clockwork toy with puppy eyes. (1 Action)", "You've pleaded enough for this year (3/3).");
+      }
+    }
+
+    // 7. Parent Only: Ask for Driving Lessons (Ages 15 - 18)
+    if (this.dom.btnKinDriving) {
+      if (!isParent || age > 18) {
+        this.dom.btnKinDriving.classList.add('hidden');
+        this.dom.btnKinDriving.style.display = 'none';
+      } else if (age < 15) {
+        this.dom.btnKinDriving.classList.remove('hidden');
+        this.dom.btnKinDriving.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinDriving, "Ask for Driving Lessons", "Cannot reach the pedals or hold a learner permit (Unlocks at Age 15).", 15);
+      } else {
+        this.dom.btnKinDriving.classList.remove('hidden');
+        this.dom.btnKinDriving.style.display = 'flex';
+        setupBtn(this.dom.btnKinDriving, getCount('askedDriving'), 4, "Practice clutch control, mirrors, and street navigation. (1 Action)", "Driving lessons finished for this year (4/4).");
+      }
+    }
+
+    // 8. Parent Only: Discuss College / Career Plans (Ages 16 - 22)
+    if (this.dom.btnKinCollege) {
+      if (!isParent || age > 22) {
+        this.dom.btnKinCollege.classList.add('hidden');
+        this.dom.btnKinCollege.style.display = 'none';
+      } else if (age < 16) {
+        this.dom.btnKinCollege.classList.remove('hidden');
+        this.dom.btnKinCollege.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinCollege, "Discuss College / Career Plans", "Too early to plan academic applications or trade apprenticeships (Unlocks at Age 16).", 16);
+      } else {
+        this.dom.btnKinCollege.classList.remove('hidden');
+        this.dom.btnKinCollege.style.display = 'flex';
+        setupBtn(this.dom.btnKinCollege, getCount('discussedCollege'), 4, "Seek tuition assistance, moral support, and career guidance. (1 Action)", "College plans reviewed for this year (4/4).");
+      }
+    }
+
+    // 9. Parent Only: Request Family Loan (Age 18+)
+    if (this.dom.btnKinLoan) {
+      if (!isParent) {
+        this.dom.btnKinLoan.classList.add('hidden');
+        this.dom.btnKinLoan.style.display = 'none';
+      } else if (age < 18) {
+        this.dom.btnKinLoan.classList.remove('hidden');
+        this.dom.btnKinLoan.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinLoan, "Request Family Loan", "Minors cannot negotiate adult financial loans (Unlocks at Age 18).", 18);
+      } else {
+        this.dom.btnKinLoan.classList.remove('hidden');
+        this.dom.btnKinLoan.style.display = 'flex';
+        setupBtn(this.dom.btnKinLoan, getCount('requestedLoan'), 2, "Ask for a substantial family loan based on trust and wealth. (1 Action)", "Family loans capped for this year (2/2).");
+      }
+    }
+
+    // 10. Parent Only: Care for Aging Parent (Age 25+, Parent Age 55+)
+    if (this.dom.btnKinElderCare) {
+      if (!isParent || person.age < 55) {
+        this.dom.btnKinElderCare.classList.add('hidden');
+        this.dom.btnKinElderCare.style.display = 'none';
+      } else if (age < 25) {
+        this.dom.btnKinElderCare.classList.remove('hidden');
+        this.dom.btnKinElderCare.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinElderCare, "Care for Aging Parent", "Available once you establish adult stability (Unlocks at Age 25).", 25);
+      } else {
+        this.dom.btnKinElderCare.classList.remove('hidden');
+        this.dom.btnKinElderCare.style.display = 'flex';
+        setupBtn(this.dom.btnKinElderCare, getCount('caredElder'), 4, "Help them with medications, groceries, and medical appointments. (1 Action)", "Elder care provided for this year (4/4).");
+      }
+    }
+
+    // Sibling: Rivalry Brawl (Age 10+)
+    if (this.dom.btnKinSiblingBrawl) {
+      if (!isSibling) {
+        this.dom.btnKinSiblingBrawl.classList.add('hidden');
+        this.dom.btnKinSiblingBrawl.style.display = 'none';
+      } else if (age < 10) {
+        this.dom.btnKinSiblingBrawl.classList.remove('hidden');
+        this.dom.btnKinSiblingBrawl.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinSiblingBrawl, "Sibling Rivalry Brawl", "Childish tussles are handled via Play Games & Bicker (Unlocks at Age 10).", 10);
+      } else {
+        this.dom.btnKinSiblingBrawl.classList.remove('hidden');
+        this.dom.btnKinSiblingBrawl.style.display = 'flex';
+        setupBtn(this.dom.btnKinSiblingBrawl, getCount('siblingBrawl'), 3, "Engage in an intense brawl over deep-seated rivalry. (1 Action)", "No more sibling brawling for this year (3/3).");
+      }
+    }
+
+    // Sibling: Cover Sibling Alibi (Age 12+)
+    if (this.dom.btnKinAlibi) {
+      if (!isSibling) {
+        this.dom.btnKinAlibi.classList.add('hidden');
+        this.dom.btnKinAlibi.style.display = 'none';
+      } else if (age < 12) {
+        this.dom.btnKinAlibi.classList.remove('hidden');
+        this.dom.btnKinAlibi.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinAlibi, "Cover Sibling's Alibi", "Too young to orchestrate coordinated cover stories (Unlocks at Age 12).", 12);
+      } else {
+        this.dom.btnKinAlibi.classList.remove('hidden');
+        this.dom.btnKinAlibi.style.display = 'flex';
+        setupBtn(this.dom.btnKinAlibi, getCount('siblingAlibi'), 3, "Lie to parents or authorities to protect your sibling's mischief. (1 Action)", "Cover stories maxed out for this year (3/3).");
+      }
+    }
+
+    // Sibling: Adult Drinks & Reminisce (Age 18+)
+    if (this.dom.btnKinSiblingDrinks) {
+      if (!isSibling) {
+        this.dom.btnKinSiblingDrinks.classList.add('hidden');
+        this.dom.btnKinSiblingDrinks.style.display = 'none';
+      } else if (age < 18) {
+        this.dom.btnKinSiblingDrinks.classList.remove('hidden');
+        this.dom.btnKinSiblingDrinks.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinSiblingDrinks, "Adult Drinks & Reminisce", "Must reach legal drinking age to hit the local tavern (Unlocks at Age 18).", 18);
+      } else {
+        this.dom.btnKinSiblingDrinks.classList.remove('hidden');
+        this.dom.btnKinSiblingDrinks.style.display = 'flex';
+        setupBtn(this.dom.btnKinSiblingDrinks, getCount('siblingDrinks'), 4, "Head to a dimly lit bar, clink glasses, and share old tales. (1 Action)", "Had plenty of drinks together this year (4/4).");
+      }
+    }
+
+    // Grandparent: Explore Dusty Attic & Relics (Age 7+)
+    if (this.dom.btnKinAttic) {
+      if (!isGrand) {
+        this.dom.btnKinAttic.classList.add('hidden');
+        this.dom.btnKinAttic.style.display = 'none';
+      } else if (age < 7) {
+        this.dom.btnKinAttic.classList.remove('hidden');
+        this.dom.btnKinAttic.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinAttic, "Explore Dusty Attic & Relics", "Too small and fragile to climb the rickety attic pull-down ladder (Unlocks at Age 7).", 7);
+      } else {
+        this.dom.btnKinAttic.classList.remove('hidden');
+        this.dom.btnKinAttic.style.display = 'flex';
+        setupBtn(this.dom.btnKinAttic, getCount('exploredAttic'), 3, "Rummage through trunks of old heirlooms and forgotten letters. (1 Action)", "Attic thoroughly explored for this year (3/3).");
+      }
+    }
+
+    // Grandparent: Ask for Family Keepsake (Age 12+)
+    if (this.dom.btnKinKeepsake) {
+      if (!isGrand) {
+        this.dom.btnKinKeepsake.classList.add('hidden');
+        this.dom.btnKinKeepsake.style.display = 'none';
+      } else if (age < 12) {
+        this.dom.btnKinKeepsake.classList.remove('hidden');
+        this.dom.btnKinKeepsake.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinKeepsake, "Ask for Family Keepsake", "Too young to be entrusted with fragile generational relics (Unlocks at Age 12).", 12);
+      } else {
+        this.dom.btnKinKeepsake.classList.remove('hidden');
+        this.dom.btnKinKeepsake.style.display = 'flex';
+        setupBtn(this.dom.btnKinKeepsake, getCount('inheritGrandparentKeepsake'), 2, "Inquire about inheriting an ancestral pocket watch or ring. (1 Action)", "No more heirlooms requested this year (2/2).");
+      }
+    }
+
+    // Grandparent: Visit Bedside / Care Home (Age 14+)
+    if (this.dom.btnKinNursing) {
+      if (!isGrand || person.age < 70) {
+        this.dom.btnKinNursing.classList.add('hidden');
+        this.dom.btnKinNursing.style.display = 'none';
+      } else if (age < 14) {
+        this.dom.btnKinNursing.classList.remove('hidden');
+        this.dom.btnKinNursing.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinNursing, "Visit Bedside / Care Home", "Must be mature enough for solemn geriatric visits (Unlocks at Age 14).", 14);
+      } else {
+        this.dom.btnKinNursing.classList.remove('hidden');
+        this.dom.btnKinNursing.style.display = 'flex';
+        setupBtn(this.dom.btnKinNursing, getCount('visitedNursing'), 4, "Sit by their bedside, hold their frail hands, and read aloud. (1 Action)", "Bedside visits concluded for this year (4/4).");
+      }
+    }
+
+    // Friend: Confess Romantic Feelings (Age 13+)
+    if (this.dom.btnKinConfess) {
+      if (person.category !== 'friend' || (person.isRevealed && person.entityType !== 'human')) {
+        this.dom.btnKinConfess.classList.add('hidden');
+        this.dom.btnKinConfess.style.display = 'none';
+      } else if (age < 13) {
+        this.dom.btnKinConfess.classList.remove('hidden');
+        this.dom.btnKinConfess.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinConfess, "Confess Romantic Feelings", "Too young to navigate awkward romance (Unlocks at Age 13).", 13);
+      } else {
+        this.dom.btnKinConfess.classList.remove('hidden');
+        this.dom.btnKinConfess.style.display = 'flex';
+        setupBtn(this.dom.btnKinConfess, getCount('confessedFeelings'), 2, "Pour your heart out and ask to transition from friends to lovers. (1 Action)", "Already confessed feelings this year (2/2).");
+      }
+    }
+
+    // LOVERS / PARTNERS ACTIONS
+    const isLover = person.category === 'lover';
+    const isEx = isLover && person.role && person.role.includes('Ex');
+
+    // Lover: Romantic Date (Age 14+)
+    if (this.dom.btnKinDate) {
+      if (!isLover || isEx) {
+        this.dom.btnKinDate.classList.add('hidden');
+        this.dom.btnKinDate.style.display = 'none';
+      } else if (age < 14) {
+        this.dom.btnKinDate.classList.remove('hidden');
+        this.dom.btnKinDate.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinDate, "Go on a Romantic Date", "Too young for dates (Unlocks at Age 14).", 14);
+      } else {
+        this.dom.btnKinDate.classList.remove('hidden');
+        this.dom.btnKinDate.style.display = 'flex';
+        setupBtn(this.dom.btnKinDate, getCount('datedLover'), 5, "Take your partner out for coffee, dinner, or a night in the city. (1 Action)", "Gone on enough dates this year (5/5).");
+      }
+    }
+
+    // Lover: Passionate Flirt & Kiss (Age 14+)
+    if (this.dom.btnKinFlirt) {
+      if (!isLover || isEx) {
+        this.dom.btnKinFlirt.classList.add('hidden');
+        this.dom.btnKinFlirt.style.display = 'none';
+      } else if (age < 14) {
+        this.dom.btnKinFlirt.classList.remove('hidden');
+        this.dom.btnKinFlirt.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinFlirt, "Passionate Flirt & Kiss", "Too young for passion (Unlocks at Age 14).", 14);
+      } else {
+        this.dom.btnKinFlirt.classList.remove('hidden');
+        this.dom.btnKinFlirt.style.display = 'flex';
+        setupBtn(this.dom.btnKinFlirt, getCount('flirtedKissed'), 6, "Whisper sweet things, hold hands, or share a passionate embrace. (1 Action)", "Plenty of affection shared for this year (6/6).");
+      }
+    }
+
+    // Lover: Move In Together (Age 18+)
+    if (this.dom.btnKinMoveIn) {
+      if (!isLover || isEx || person.cohabitating || person.married) {
+        this.dom.btnKinMoveIn.classList.add('hidden');
+        this.dom.btnKinMoveIn.style.display = 'none';
+      } else if (age < 18) {
+        this.dom.btnKinMoveIn.classList.remove('hidden');
+        this.dom.btnKinMoveIn.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinMoveIn, "Move In Together", "Must be an adult to sign a lease together (Unlocks at Age 18).", 18);
+      } else {
+        this.dom.btnKinMoveIn.classList.remove('hidden');
+        this.dom.btnKinMoveIn.style.display = 'flex';
+        setupBtn(this.dom.btnKinMoveIn, getCount('movedInTogether'), 2, "Propose moving into a shared apartment to split living costs. (1 Action)", "Already discussed moving in this year (2/2).");
+      }
+    }
+
+    // Lover: Propose Marriage (Age 18+)
+    if (this.dom.btnKinPropose) {
+      if (!isLover || isEx || person.married) {
+        this.dom.btnKinPropose.classList.add('hidden');
+        this.dom.btnKinPropose.style.display = 'none';
+      } else if (person.engaged) {
+        this.dom.btnKinPropose.classList.remove('hidden');
+        this.dom.btnKinPropose.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinPropose, "Already Engaged", "You are already happily engaged! Time to plan the wedding ceremony.", 18);
+      } else if (age < 18) {
+        this.dom.btnKinPropose.classList.remove('hidden');
+        this.dom.btnKinPropose.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinPropose, "Propose Marriage", "Must be of legal marriage age to propose (Unlocks at Age 18).", 18);
+      } else {
+        this.dom.btnKinPropose.classList.remove('hidden');
+        this.dom.btnKinPropose.style.display = 'flex';
+        setupBtn(this.dom.btnKinPropose, getCount('proposedMarriage'), 2, "Get down on one knee with a ring and pop the question. (1 Action)", "Marriage proposal made this year (2/2).");
+      }
+    }
+
+    // Lover: Plan Wedding Ceremony (Age 18+, Engaged only)
+    if (this.dom.btnKinWedding) {
+      if (!isLover || isEx || !person.engaged || person.married) {
+        this.dom.btnKinWedding.classList.add('hidden');
+        this.dom.btnKinWedding.style.display = 'none';
+      } else {
+        this.dom.btnKinWedding.classList.remove('hidden');
+        this.dom.btnKinWedding.style.display = 'flex';
+        setupBtn(this.dom.btnKinWedding, getCount('plannedWedding'), 1, "Exchange vows at the town hall or grand cathedral. (1 Action)", "Wedding ceremony concluded for this year (1/1).");
+      }
+    }
+
+    // Lover: Conceive / Have a Baby (Age 18 - 50)
+    if (this.dom.btnKinConceive) {
+      if (!isLover || isEx || age > 50) {
+        this.dom.btnKinConceive.classList.add('hidden');
+        this.dom.btnKinConceive.style.display = 'none';
+      } else if (age < 18) {
+        this.dom.btnKinConceive.classList.remove('hidden');
+        this.dom.btnKinConceive.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinConceive, "Conceive / Have a Baby", "Adult responsibility begins at age 18 (Unlocks at Age 18).", 18);
+      } else {
+        this.dom.btnKinConceive.classList.remove('hidden');
+        this.dom.btnKinConceive.style.display = 'flex';
+        setupBtn(this.dom.btnKinConceive, getCount('conceivedChild'), 3, "Try to conceive a child and start growing your family. (1 Action)", "Conception attempts concluded for this year (3/3).");
+      }
+    }
+
+    // Lover: Break Up / Divorce (Age 14+)
+    if (this.dom.btnKinBreakup) {
+      if (!isLover || isEx) {
+        this.dom.btnKinBreakup.classList.add('hidden');
+        this.dom.btnKinBreakup.style.display = 'none';
+      } else {
+        this.dom.btnKinBreakup.classList.remove('hidden');
+        this.dom.btnKinBreakup.style.display = 'flex';
+        const label = person.married ? "File for Divorce & Split Assets" : "Break Up / End Relationship";
+        const desc = person.married ? "Dissolve marriage legally and separate shared belongings." : "End the relationship and go your separate ways.";
+        setupBtn(this.dom.btnKinBreakup, 0, 1, desc, "");
+        const titleEl = this.dom.btnKinBreakup.querySelector('.text-xs');
+        if (titleEl) titleEl.textContent = label;
+      }
+    }
+
     // Paranormal Hex / Dark Deed Action (Available Age 6+)
     if (this.dom.btnKinHex) {
       if (age < 6) {
@@ -3230,6 +3665,53 @@ class TerribleGame {
       result = window.shareSecretWithSibling ? window.shareSecretWithSibling(person, this.character) : null;
     } else if (actionType === 'grandparent_folktale') {
       result = window.listenGrandparentFolktale ? window.listenGrandparentFolktale(person, this.character) : null;
+    } else if (actionType === 'parent_chores') {
+      result = window.helpWithChores ? window.helpWithChores(person, this.character) : null;
+    } else if (actionType === 'parent_beg_pet') {
+      result = window.begForPetOrToy ? window.begForPetOrToy(person, this.character) : null;
+    } else if (actionType === 'parent_driving') {
+      result = window.askForDrivingLessons ? window.askForDrivingLessons(person, this.character) : null;
+    } else if (actionType === 'parent_college') {
+      result = window.discussCollegePlans ? window.discussCollegePlans(person, this.character) : null;
+    } else if (actionType === 'parent_loan') {
+      result = window.requestFamilyLoan ? window.requestFamilyLoan(person, this.character) : null;
+    } else if (actionType === 'parent_elder_care') {
+      result = window.careForAgingParent ? window.careForAgingParent(person, this.character) : null;
+    } else if (actionType === 'sibling_brawl') {
+      result = window.siblingBrawl ? window.siblingBrawl(person, this.character) : null;
+    } else if (actionType === 'sibling_alibi') {
+      result = window.coverSiblingAlibi ? window.coverSiblingAlibi(person, this.character) : null;
+    } else if (actionType === 'sibling_drinks') {
+      result = window.siblingDrinks ? window.siblingDrinks(person, this.character) : null;
+    } else if (actionType === 'grandparent_attic') {
+      result = window.exploreGrandparentAttic ? window.exploreGrandparentAttic(person, this.character) : null;
+    } else if (actionType === 'grandparent_keepsake') {
+      result = window.inheritGrandparentKeepsake ? window.inheritGrandparentKeepsake(person, this.character) : null;
+    } else if (actionType === 'grandparent_nursing') {
+      result = window.visitNursingHome ? window.visitNursingHome(person, this.character) : null;
+    } else if (actionType === 'friend_confess') {
+      result = window.confessToFriend ? window.confessToFriend(person, this.character) : null;
+    } else if (actionType === 'lover_date') {
+      result = window.dateLover ? window.dateLover(person, this.character) : null;
+    } else if (actionType === 'lover_flirt') {
+      result = window.flirtKissLover ? window.flirtKissLover(person, this.character) : null;
+    } else if (actionType === 'lover_move_in') {
+      result = window.askMoveInTogether ? window.askMoveInTogether(person, this.character) : null;
+    } else if (actionType === 'lover_propose') {
+      result = window.proposeMarriage ? window.proposeMarriage(person, this.character) : null;
+    } else if (actionType === 'lover_wedding') {
+      result = window.planWeddingCeremony ? window.planWeddingCeremony(person, this.character) : null;
+    } else if (actionType === 'lover_conceive') {
+      result = window.conceiveChildWithLover ? window.conceiveChildWithLover(person, this.character) : null;
+    } else if (actionType === 'lover_breakup') {
+      const confirmMsg = person.married 
+        ? `Are you certain you wish to divorce ${person.name}? Assets may be split.`
+        : `Are you sure you want to end your relationship with ${person.name}?`;
+      if (confirm(confirmMsg)) {
+        result = window.breakupWithLover ? window.breakupWithLover(person, this.character) : null;
+      } else {
+        return;
+      }
     }
 
     if (!result || !result.success) {
@@ -3291,7 +3773,31 @@ class TerribleGame {
       cuddle: 'Nurturing Cuddle',
       babble: 'Baby First Words',
       feed_milk: 'Warm Bottle Feeding',
-      peekaboo: 'Playful Peek-a-Boo'
+      peekaboo: 'Playful Peek-a-Boo',
+      parent_advice: 'Parental Guidance',
+      parent_chores: 'Household Chores',
+      parent_beg_pet: 'Beg for Pet / Toy',
+      parent_driving: 'Driving Lessons',
+      parent_college: 'College & Future Plans',
+      parent_loan: 'Family Loan',
+      parent_elder_care: 'Elder Care',
+      sibling_bicker: 'Sibling Bickering',
+      sibling_secret: 'Dark Secret Shared',
+      sibling_brawl: 'Sibling Rivalry Brawl',
+      sibling_alibi: 'Cover Sibling Alibi',
+      sibling_drinks: 'Adult Drinks & Reminisce',
+      grandparent_folktale: 'Grim Folktale',
+      grandparent_attic: 'Attic Relic Search',
+      grandparent_keepsake: 'Ancestral Keepsake',
+      grandparent_nursing: 'Care Home Bedside Visit',
+      friend_confess: 'Confession of Love',
+      lover_date: 'Romantic Date',
+      lover_flirt: 'Passion & Kiss',
+      lover_move_in: 'Move In Together',
+      lover_propose: 'Marriage Proposal',
+      lover_wedding: 'Wedding Ceremony',
+      lover_conceive: 'Family Planning',
+      lover_breakup: 'Breakup / Divorce'
     };
     const actionIcons = {
       spend_time: 'heart-handshake',
@@ -3305,7 +3811,31 @@ class TerribleGame {
       cuddle: 'heart',
       babble: 'message-circle',
       feed_milk: 'cup-soda',
-      peekaboo: 'smile'
+      peekaboo: 'smile',
+      parent_advice: 'lightbulb',
+      parent_chores: 'sparkles',
+      parent_beg_pet: 'dog',
+      parent_driving: 'car',
+      parent_college: 'graduation-cap',
+      parent_loan: 'banknote',
+      parent_elder_care: 'heart',
+      sibling_bicker: 'swords',
+      sibling_secret: 'key',
+      sibling_brawl: 'swords',
+      sibling_alibi: 'shield',
+      sibling_drinks: 'wine',
+      grandparent_folktale: 'scroll',
+      grandparent_attic: 'box',
+      grandparent_keepsake: 'gem',
+      grandparent_nursing: 'stethoscope',
+      friend_confess: 'heart',
+      lover_date: 'utensils',
+      lover_flirt: 'flame',
+      lover_move_in: 'home',
+      lover_propose: 'sparkles',
+      lover_wedding: 'bell',
+      lover_conceive: 'baby',
+      lover_breakup: 'heart-crack'
     };
     const actionColors = {
       spend_time: 'text-rose-400',
@@ -3319,7 +3849,31 @@ class TerribleGame {
       cuddle: 'text-rose-400',
       babble: 'text-sky-400',
       feed_milk: 'text-amber-400',
-      peekaboo: 'text-emerald-400'
+      peekaboo: 'text-emerald-400',
+      parent_advice: 'text-indigo-400',
+      parent_chores: 'text-emerald-400',
+      parent_beg_pet: 'text-amber-400',
+      parent_driving: 'text-sky-400',
+      parent_college: 'text-blue-400',
+      parent_loan: 'text-emerald-400',
+      parent_elder_care: 'text-rose-400',
+      sibling_bicker: 'text-orange-400',
+      sibling_secret: 'text-violet-400',
+      sibling_brawl: 'text-red-400',
+      sibling_alibi: 'text-slate-400',
+      sibling_drinks: 'text-amber-400',
+      grandparent_folktale: 'text-amber-500',
+      grandparent_attic: 'text-amber-400',
+      grandparent_keepsake: 'text-yellow-400',
+      grandparent_nursing: 'text-teal-400',
+      friend_confess: 'text-rose-400',
+      lover_date: 'text-rose-400',
+      lover_flirt: 'text-pink-400',
+      lover_move_in: 'text-emerald-400',
+      lover_propose: 'text-amber-400',
+      lover_wedding: 'text-rose-400',
+      lover_conceive: 'text-sky-400',
+      lover_breakup: 'text-red-400'
     };
     const actionTags = {
       spend_time: 'FAMILY BOND',
@@ -3333,7 +3887,31 @@ class TerribleGame {
       cuddle: 'NURTURING EMBRACE',
       babble: 'BABY FIRST WORDS',
       feed_milk: 'BOTTLE FEEDING',
-      peekaboo: 'PLAYFUL GIGGLES'
+      peekaboo: 'PLAYFUL GIGGLES',
+      parent_advice: 'PARENTAL GUIDANCE',
+      parent_chores: 'CHORES & RESPONSIBILITY',
+      parent_beg_pet: 'FAMILY PET PETITION',
+      parent_driving: 'DRIVER TRAINING',
+      parent_college: 'FUTURE ACADEMICS',
+      parent_loan: 'FAMILY FINANCE',
+      parent_elder_care: 'ELDER DUTY',
+      sibling_bicker: 'SIBLING PLAY',
+      sibling_secret: 'DARK CONFESSION',
+      sibling_brawl: 'SIBLING BRAWL',
+      sibling_alibi: 'COVER STORY',
+      sibling_drinks: 'SIBLING BONDING',
+      grandparent_folktale: 'ANCESTRAL FOLKLORE',
+      grandparent_attic: 'ATTIC EXPEDITION',
+      grandparent_keepsake: 'FAMILY HEIRLOOM',
+      grandparent_nursing: 'BEDSIDE COMFORT',
+      friend_confess: 'ROMANTIC CONFESSION',
+      lover_date: 'ROMANTIC DATE',
+      lover_flirt: 'INTIMACY & PASSION',
+      lover_move_in: 'DOMESTIC PARTNERSHIP',
+      lover_propose: 'MARRIAGE PROPOSAL',
+      lover_wedding: 'HOLY MATRIMONY',
+      lover_conceive: 'CHILD CONCEPTION',
+      lover_breakup: 'RELATIONSHIP DISSOLVED'
     };
 
     this.openFeedbackModal({

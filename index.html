@@ -2786,6 +2786,7 @@
         <div class="flex gap-1.5 bg-inputbg p-1 rounded-xl border border-leadborder shrink-0 overflow-x-auto custom-scroll">
           <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all whitespace-nowrap" data-filter="all">All</button>
           <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap" data-filter="family">Family</button>
+          <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap" data-filter="lovers">💖 Lovers</button>
           <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap" data-filter="friends">Friends</button>
           <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap" data-filter="connect">Connect</button>
           <button class="kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap" data-filter="circles">School & Work</button>
@@ -3025,6 +3026,90 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
           </button>
 
+          <!-- Parents: Help With Household Chores -->
+          <button id="btn-kin-chores" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🧹</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Help with Chores</div>
+                <div class="text-[10px] text-dust">Mop floors, wash dishes, or stack firewood to earn praise.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Parents: Beg for Pet or Toy -->
+          <button id="btn-kin-beg-pet" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🐶</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Beg for Pet / Toy</div>
+                <div class="text-[10px] text-dust">Plead for a cat, hound, or clockwork toy with puppy eyes.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Parents: Ask for Driving Lessons -->
+          <button id="btn-kin-driving" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🚗</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-sky-300 transition-colors">Ask for Driving Lessons</div>
+                <div class="text-[10px] text-dust">Practice clutch control, mirrors, and street navigation.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Parents: Discuss College / Career Plans -->
+          <button id="btn-kin-college" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🎓</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-blue-300 transition-colors">Discuss College / Career Plans</div>
+                <div class="text-[10px] text-dust">Seek tuition assistance, moral support, and career guidance.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Parents: Request Family Loan -->
+          <button id="btn-kin-loan" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💰</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Request Family Loan</div>
+                <div class="text-[10px] text-dust">Ask for a substantial family loan based on trust and wealth.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Parents: Care for Aging Parent -->
+          <button id="btn-kin-elder-care" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>👵</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-rose-300 transition-colors">Care for Aging Parent</div>
+                <div class="text-[10px] text-dust">Help them with medications, groceries, and medical appointments.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
           <!-- Siblings Only: Play & Bicker -->
           <button id="btn-kin-bicker" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
             <div class="flex items-center space-x-3">
@@ -3034,6 +3119,20 @@
               <div>
                 <div class="text-xs font-bold text-parchment group-hover:text-orange-300 transition-colors">Play Games & Bicker</div>
                 <div class="text-[10px] text-dust">Wrestle over toys, race in the corridor, or trade petty barbs.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Siblings: Sibling Rivalry Brawl -->
+          <button id="btn-kin-sibling-brawl" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🥊</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-red-300 transition-colors">Sibling Rivalry Brawl</div>
+                <div class="text-[10px] text-dust">Engage in an intense brawl over deep-seated rivalry.</div>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
@@ -3053,6 +3152,34 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
           </button>
 
+          <!-- Siblings: Cover Alibi -->
+          <button id="btn-kin-alibi" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-slate-500/10 border border-slate-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🤫</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-slate-300 transition-colors">Cover Sibling's Alibi</div>
+                <div class="text-[10px] text-dust">Lie to parents or authorities to protect your sibling's mischief.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Siblings: Adult Drinks & Reminisce -->
+          <button id="btn-kin-sibling-drinks" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🍻</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Adult Drinks & Reminisce</div>
+                <div class="text-[10px] text-dust">Head to a dimly lit bar, clink glasses, and share old tales.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
           <!-- Grandparents Only: Listen to Grim Folktale -->
           <button id="btn-kin-folktale" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
             <div class="flex items-center space-x-3">
@@ -3062,6 +3189,160 @@
               <div>
                 <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Listen to Grim Folktale</div>
                 <div class="text-[10px] text-dust">Huddle close as they recount unsettling ancestral warnings and lore.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Grandparents: Explore Dusty Attic -->
+          <button id="btn-kin-attic" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-700/10 border border-amber-700/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🗝️</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Explore Dusty Attic & Relics</div>
+                <div class="text-[10px] text-dust">Rummage through trunks of old heirlooms and forgotten letters.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Grandparents: Ask for Family Heirloom -->
+          <button id="btn-kin-keepsake" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💍</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-yellow-300 transition-colors">Ask for Family Keepsake</div>
+                <div class="text-[10px] text-dust">Inquire about inheriting an ancestral pocket watch or ring.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Grandparents: Visit at Bedside / Care Home -->
+          <button id="btn-kin-nursing" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🏥</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-teal-300 transition-colors">Visit Bedside / Care Home</div>
+                <div class="text-[10px] text-dust">Sit by their bedside, hold their frail hands, and read aloud.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Friends: Confess Romantic Feelings -->
+          <button id="btn-kin-confess" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💌</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-rose-300 transition-colors">Confess Romantic Feelings</div>
+                <div class="text-[10px] text-dust">Pour your heart out and ask to transition from friends to lovers.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Romantic Date -->
+          <button id="btn-kin-date" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🍷</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-rose-300 transition-colors">Go on a Romantic Date</div>
+                <div class="text-[10px] text-dust">Take your partner out for coffee, dinner, or a night in the city.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Passionate Flirt & Kiss -->
+          <button id="btn-kin-flirt" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💋</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-pink-300 transition-colors">Passionate Flirt & Kiss</div>
+                <div class="text-[10px] text-dust">Whisper sweet things, hold hands, or share a passionate embrace.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Move In Together -->
+          <button id="btn-kin-move-in" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🏡</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Move In Together</div>
+                <div class="text-[10px] text-dust">Propose moving into a shared apartment to split living costs.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Propose Marriage -->
+          <button id="btn-kin-propose" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💍</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Propose Marriage</div>
+                <div class="text-[10px] text-dust">Get down on one knee with a ring and pop the question.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Plan Wedding Ceremony -->
+          <button id="btn-kin-wedding" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💒</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-rose-300 transition-colors">Plan Wedding Ceremony</div>
+                <div class="text-[10px] text-dust">Exchange vows at the town hall or grand cathedral.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Conceive / Have a Baby -->
+          <button id="btn-kin-conceive" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>👶</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-sky-300 transition-colors">Conceive / Have a Baby</div>
+                <div class="text-[10px] text-dust">Try to conceive a child and start growing your family.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Lovers: Break Up / Divorce -->
+          <button id="btn-kin-breakup" class="hidden w-full text-left p-3 rounded-xl bg-red-950/20 hover:bg-red-900/30 border border-red-800/30 flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>💔</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-red-300 group-hover:text-red-200 transition-colors">Break Up / End Relationship</div>
+                <div class="text-[10px] text-dust">End the romance or file for legal divorce.</div>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>

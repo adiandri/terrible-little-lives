@@ -663,10 +663,22 @@ const ACTIVITIES_LIST = [
       const successChance = looks / 100 * 0.7 + 0.3;
       if (Math.random() < successChance) {
         character.stats.happiness = Math.min(100, (character.stats.happiness || 50) + 10);
+        let partnerAdded = null;
+        if (window.generateLoverCandidate) {
+          character.kin = character.kin || {};
+          character.kin.lovers = character.kin.lovers || [];
+          const activeLover = character.kin.lovers.find(l => l.alive && !l.role.includes('Ex'));
+          if (!activeLover) {
+            partnerAdded = window.generateLoverCandidate(character, "Blind Date");
+            character.kin.lovers.push(partnerAdded);
+          }
+        }
         return {
           success: true,
           title: "Charming Date",
-          message: "You shared quiet laughter over tea. Sparks flew across the candlelit table (+10% Happiness).",
+          message: partnerAdded
+            ? `You shared quiet laughter over tea with ${partnerAdded.name} (${partnerAdded.role}, Age ${partnerAdded.age}). Sparks flew across the candlelit table and you began dating! (+10% Happiness)`
+            : "You shared quiet laughter over tea. Sparks flew across the candlelit table (+10% Happiness).",
           effects: { happiness: 10 }
         };
       } else {
