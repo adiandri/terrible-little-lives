@@ -439,6 +439,10 @@ class TerribleGame {
       btnKinWedding: document.getElementById('btn-kin-wedding'),
       btnKinConceive: document.getElementById('btn-kin-conceive'),
       btnKinBreakup: document.getElementById('btn-kin-breakup'),
+      btnKinPray: document.getElementById('btn-kin-pray'),
+      btnKinEggshells: document.getElementById('btn-kin-eggshells'),
+      btnKinCommendation: document.getElementById('btn-kin-commendation'),
+      btnKinGrandparentHaven: document.getElementById('btn-kin-grandparent-haven'),
 
       // Activities Modal ("City of Buttons")
       btnTabActivities: document.getElementById('btn-tab-activities'),
@@ -1185,6 +1189,18 @@ class TerribleGame {
     if (this.dom.btnKinBreakup) {
       this.dom.btnKinBreakup.addEventListener('click', () => this.handleKinAction('lover_breakup'));
     }
+    if (this.dom.btnKinPray) {
+      this.dom.btnKinPray.addEventListener('click', () => this.handleKinAction('family_pray'));
+    }
+    if (this.dom.btnKinEggshells) {
+      this.dom.btnKinEggshells.addEventListener('click', () => this.handleKinAction('family_eggshells'));
+    }
+    if (this.dom.btnKinCommendation) {
+      this.dom.btnKinCommendation.addEventListener('click', () => this.handleKinAction('family_commendation'));
+    }
+    if (this.dom.btnKinGrandparentHaven) {
+      this.dom.btnKinGrandparentHaven.addEventListener('click', () => this.handleKinAction('grandparent_haven'));
+    }
 
     // Action Choice Modal Controls
     if (this.dom.btnCancelActionChoice) {
@@ -1766,6 +1782,17 @@ class TerribleGame {
   startNewLife(customConfig = null) {
     this.character = window.generateCharacter(customConfig);
     this.character.kin = window.generateFamily(this.character);
+
+    // Apply family upbringing / atmosphere stat effects meaningfully
+    if (this.character.kin && this.character.kin.atmosphere && this.character.kin.atmosphere.statEffects) {
+      const se = this.character.kin.atmosphere.statEffects;
+      Object.keys(se).forEach(statKey => {
+        if (typeof this.character.stats[statKey] === 'number') {
+          this.character.stats[statKey] = Math.max(0, Math.min(100, this.character.stats[statKey] + se[statKey]));
+        }
+      });
+    }
+
     this.character.maxActions = this.calculateMaxActions();
     this.character.actionsLeft = this.character.maxActions;
     this.character.activityUses = {};
@@ -1774,6 +1801,9 @@ class TerribleGame {
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
 
     const familySummary = [];
+    if (this.character.kin && this.character.kin.atmosphere) {
+      familySummary.push(`Household Upbringing: ${this.character.kin.atmosphere.emoji} ${this.character.kin.atmosphere.name} — ${this.character.kin.atmosphere.desc}`);
+    }
     if (this.character.kin.parents && this.character.kin.parents.length > 0) {
       familySummary.push(`Parents: ${this.character.kin.parents.map(p => `${p.name} (${p.occupation})`).join(', ')}.`);
     }
@@ -2253,7 +2283,8 @@ class TerribleGame {
     const availableDilemmas = dilemmaPool.filter(d => 
       this.character.age >= d.minAge && 
       this.character.age <= d.maxAge && 
-      !this.usedDilemmaIds.has(d.id)
+      !this.usedDilemmaIds.has(d.id) &&
+      (!d.condition || d.condition(this.character))
     );
 
     const milestoneAges = [1, 2, 3, 4, 5, 7, 9, 11, 14, 16, 18];
@@ -2644,11 +2675,17 @@ class TerribleGame {
     const kin = this.character.kin;
     if (!kin) return;
     const res = kin.residence;
+    const atmosBadge = document.getElementById('family-atmosphere-badge');
+    const atmosDesc = document.getElementById('family-atmosphere-desc');
     const wealthBadge = document.getElementById('family-wealth-badge');
     const resName = document.getElementById('residence-name');
     const resDesc = document.getElementById('residence-desc');
     const famIncome = document.getElementById('family-income-val');
     
+    if (kin.atmosphere) {
+      if (atmosBadge) atmosBadge.textContent = `${kin.atmosphere.emoji} ${kin.atmosphere.name}`;
+      if (atmosDesc) atmosDesc.textContent = kin.atmosphere.desc || '';
+    }
     if (wealthBadge && kin.wealthTier) {
       wealthBadge.textContent = kin.wealthTier.replace('_', ' ').toUpperCase();
     }
@@ -2796,7 +2833,7 @@ class TerribleGame {
             </div>
             <div class="truncate">
               <h4 class="font-serif font-bold text-xs text-parchment truncate">${person.name}</h4>
-              <p class="text-[10px] text-dust font-mono">${person.role} • Age ${person.age} ${person.occupation ? `• ${person.occupation}` : ''}</p>
+              <p class="text-[10px] text-dust font-mono truncate">${person.role} • Age ${person.age} ${person.dynamicTrait ? `• <span class="text-amber-400 font-semibold">${person.dynamicTrait}</span>` : (person.occupation ? `• ${person.occupation}` : '')}</p>
             </div>
           </div>
           <div class="shrink-0 flex items-center space-x-1.5">
@@ -2956,7 +2993,7 @@ class TerribleGame {
           </div>
           <div class="min-w-0">
             <h4 class="font-serif font-bold text-sm text-parchment truncate">${person.name}</h4>
-            <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age}</p>
+            <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age} ${person.dynamicTrait ? `• <span class="text-amber-400 font-semibold">${person.dynamicTrait}</span>` : ''}</p>
             ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5 truncate">Employed: ${person.occupation} ${person.salaryUSD ? `<span class="text-emerald-400 font-bold not-italic">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
           </div>
         </div>
@@ -3047,6 +3084,7 @@ class TerribleGame {
     const isSibling = person.role.includes('Brother') || person.role.includes('Sister') || person.role.includes('Sibling');
     const isGrand = person.role.includes('Grand');
     const isParentOrGrand = isParent || isGrand;
+    const familyAtmosphere = (this.character.kin && this.character.kin.atmosphere) ? this.character.kin.atmosphere.id : null;
 
     // 1. Cuddle & Be Held (Ages 0 - 4, Family)
     if (this.dom.btnKinCuddle) {
@@ -3275,6 +3313,57 @@ class TerribleGame {
       }
     }
 
+    // Dynamic: Pray & Recite Scripture (Devout / Deeply Religious, Parents / Grandparents, Age 5+)
+    if (this.dom.btnKinPray) {
+      const isReligiousHousehold = familyAtmosphere === 'deeply_religious' || familyAtmosphere === 'religious' || (person.dynamicTrait && (person.dynamicTrait.includes('Pious') || person.dynamicTrait.includes('Puritan') || person.dynamicTrait.includes('Religious')));
+      if (!isParentOrGrand || !isReligiousHousehold) {
+        this.dom.btnKinPray.classList.add('hidden');
+        this.dom.btnKinPray.style.display = 'none';
+      } else if (age < 5) {
+        this.dom.btnKinPray.classList.remove('hidden');
+        this.dom.btnKinPray.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinPray, "Pray & Recite Scripture", "Too young to read hymns or kneel in silence (Unlocks at Age 5).", 5);
+      } else {
+        this.dom.btnKinPray.classList.remove('hidden');
+        this.dom.btnKinPray.style.display = 'flex';
+        setupBtn(this.dom.btnKinPray, getCount('prayedTogether'), 4, "Kneel on cold floorboards, clasp hands, and recite solemn hymns. (1 Action)", "Prayer devotions concluded for this year (4/4).");
+      }
+    }
+
+    // Dynamic: Walk on Eggshells / Quietly Tiptoe (Alcoholic / Volatile Parents, Age 6+)
+    if (this.dom.btnKinEggshells) {
+      const isAlcoholicHousehold = familyAtmosphere === 'alcoholic' || person.sobriety === 'volatile_alcoholic' || (person.dynamicTrait && person.dynamicTrait.includes('Alcoholic'));
+      if (!isParent || !isAlcoholicHousehold) {
+        this.dom.btnKinEggshells.classList.add('hidden');
+        this.dom.btnKinEggshells.style.display = 'none';
+      } else if (age < 6) {
+        this.dom.btnKinEggshells.classList.remove('hidden');
+        this.dom.btnKinEggshells.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinEggshells, "Walk on Eggshells / Tiptoe", "Too naive to recognize volatile domestic warning signs (Unlocks at Age 6).", 6);
+      } else {
+        this.dom.btnKinEggshells.classList.remove('hidden');
+        this.dom.btnKinEggshells.style.display = 'flex';
+        setupBtn(this.dom.btnKinEggshells, getCount('walkedEggshells'), 4, "Quietly stay unseen, clean up bottles, and prevent domestic fury. (1 Action)", "You have kept low profile enough this year (4/4).");
+      }
+    }
+
+    // Dynamic: Present Report Card / Commendation (Extremely Strict Parents, Ages 6 - 18)
+    if (this.dom.btnKinCommendation) {
+      const isStrictHousehold = familyAtmosphere === 'extremely_strict' || person.strictness >= 70 || (person.dynamicTrait && person.dynamicTrait.includes('Strict'));
+      if (!isParent || !isStrictHousehold || age > 18) {
+        this.dom.btnKinCommendation.classList.add('hidden');
+        this.dom.btnKinCommendation.style.display = 'none';
+      } else if (age < 6) {
+        this.dom.btnKinCommendation.classList.remove('hidden');
+        this.dom.btnKinCommendation.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinCommendation, "Present Report Card", "Not yet enrolled in graded schooling (Unlocks at Age 6).", 6);
+      } else {
+        this.dom.btnKinCommendation.classList.remove('hidden');
+        this.dom.btnKinCommendation.style.display = 'flex';
+        setupBtn(this.dom.btnKinCommendation, getCount('presentedReport'), 3, "Hand over academic marks and conduct ledger for strict inspection. (1 Action)", "Report card evaluations finished for this year (3/3).");
+      }
+    }
+
     // 7. Parent Only: Ask for Driving Lessons (Ages 15 - 18)
     if (this.dom.btnKinDriving) {
       if (!isParent || age > 18) {
@@ -3432,6 +3521,22 @@ class TerribleGame {
         this.dom.btnKinNursing.classList.remove('hidden');
         this.dom.btnKinNursing.style.display = 'flex';
         setupBtn(this.dom.btnKinNursing, getCount('visitedNursing'), 4, "Sit by their bedside, hold their frail hands, and read aloud. (1 Action)", "Bedside visits concluded for this year (4/4).");
+      }
+    }
+
+    // Dynamic: Seek Sanctuary at Grandparent's (All Living Grandparents, Age 4+)
+    if (this.dom.btnKinGrandparentHaven) {
+      if (!isGrand) {
+        this.dom.btnKinGrandparentHaven.classList.add('hidden');
+        this.dom.btnKinGrandparentHaven.style.display = 'none';
+      } else if (age < 4) {
+        this.dom.btnKinGrandparentHaven.classList.remove('hidden');
+        this.dom.btnKinGrandparentHaven.style.display = 'flex';
+        setupLockedBtn(this.dom.btnKinGrandparentHaven, "Seek Sanctuary at Grandparent's", "Too small to wander over to your grandparent's sanctuary (Unlocks at Age 4).", 4);
+      } else {
+        this.dom.btnKinGrandparentHaven.classList.remove('hidden');
+        this.dom.btnKinGrandparentHaven.style.display = 'flex';
+        setupBtn(this.dom.btnKinGrandparentHaven, getCount('visitedGrandHaven'), 3, "Escape household tension for warm tea, fresh biscuits, and calm stories. (1 Action)", "Spent peaceful sanctuary visits here this year (3/3).");
       }
     }
 
@@ -3667,6 +3772,14 @@ class TerribleGame {
       result = window.listenGrandparentFolktale ? window.listenGrandparentFolktale(person, this.character) : null;
     } else if (actionType === 'parent_chores') {
       result = window.helpWithChores ? window.helpWithChores(person, this.character) : null;
+    } else if (actionType === 'family_pray') {
+      result = window.prayWithFamily ? window.prayWithFamily(person, this.character) : null;
+    } else if (actionType === 'family_eggshells') {
+      result = window.walkOnEggshells ? window.walkOnEggshells(person, this.character) : null;
+    } else if (actionType === 'family_commendation') {
+      result = window.presentReportCard ? window.presentReportCard(person, this.character) : null;
+    } else if (actionType === 'grandparent_haven') {
+      result = window.seekGrandparentHaven ? window.seekGrandparentHaven(person, this.character) : null;
     } else if (actionType === 'parent_beg_pet') {
       result = window.begForPetOrToy ? window.begForPetOrToy(person, this.character) : null;
     } else if (actionType === 'parent_driving') {
@@ -3776,6 +3889,10 @@ class TerribleGame {
       peekaboo: 'Playful Peek-a-Boo',
       parent_advice: 'Parental Guidance',
       parent_chores: 'Household Chores',
+      family_pray: 'Devout Prayer & Hymns',
+      family_eggshells: 'Tiptoeing on Eggshells',
+      family_commendation: 'Academic Commendation',
+      grandparent_haven: 'Grandparent Sanctuary',
       parent_beg_pet: 'Beg for Pet / Toy',
       parent_driving: 'Driving Lessons',
       parent_college: 'College & Future Plans',
@@ -3814,6 +3931,10 @@ class TerribleGame {
       peekaboo: 'smile',
       parent_advice: 'lightbulb',
       parent_chores: 'sparkles',
+      family_pray: 'flame',
+      family_eggshells: 'footprints',
+      family_commendation: 'award',
+      grandparent_haven: 'coffee',
       parent_beg_pet: 'dog',
       parent_driving: 'car',
       parent_college: 'graduation-cap',
@@ -3852,6 +3973,10 @@ class TerribleGame {
       peekaboo: 'text-emerald-400',
       parent_advice: 'text-indigo-400',
       parent_chores: 'text-emerald-400',
+      family_pray: 'text-indigo-400',
+      family_eggshells: 'text-amber-400',
+      family_commendation: 'text-sky-400',
+      grandparent_haven: 'text-amber-300',
       parent_beg_pet: 'text-amber-400',
       parent_driving: 'text-sky-400',
       parent_college: 'text-blue-400',
@@ -3890,6 +4015,10 @@ class TerribleGame {
       peekaboo: 'PLAYFUL GIGGLES',
       parent_advice: 'PARENTAL GUIDANCE',
       parent_chores: 'CHORES & RESPONSIBILITY',
+      family_pray: 'SCRIPTURE & HYMNS',
+      family_eggshells: 'DOMESTIC CAUTION',
+      family_commendation: 'ACADEMIC INSPECTION',
+      grandparent_haven: 'WARM SANCTUARY',
       parent_beg_pet: 'FAMILY PET PETITION',
       parent_driving: 'DRIVER TRAINING',
       parent_college: 'FUTURE ACADEMICS',

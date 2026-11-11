@@ -2765,17 +2765,21 @@
 
       <!-- Main Scrollable Body -->
       <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
-        <!-- Household Living Residence & Financial Banner -->
-        <div id="family-residence-banner" class="bg-inputbg border border-leadborder rounded-xl p-3 shrink-0 space-y-1">
+        <!-- Household Living Residence, Dynamic & Financial Banner -->
+        <div id="family-residence-banner" class="bg-inputbg border border-leadborder rounded-xl p-3 shrink-0 space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-[9px] font-mono text-dust uppercase tracking-wider font-bold">Household Residence</span>
-            <span id="family-wealth-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard border border-leadborder text-dust font-bold uppercase">Working Class</span>
+            <span class="text-[9px] font-mono text-dust uppercase tracking-wider font-bold">Household & Upbringing</span>
+            <div class="flex items-center gap-1.5">
+              <span id="family-atmosphere-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard border border-leadborder text-dust font-bold">🏡 Loving Home</span>
+              <span id="family-wealth-badge" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard border border-leadborder text-dust font-bold uppercase">Working Class</span>
+            </div>
           </div>
           <div class="flex items-center space-x-2 text-xs font-serif font-bold text-parchment">
             <i id="residence-icon" data-lucide="home" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
             <span id="residence-name" class="truncate">3rd-Floor Walk-up Flat</span>
           </div>
           <p id="residence-desc" class="text-[10px] text-dust leading-snug">A cramped brick tenement with whistling copper steam radiators.</p>
+          <p id="family-atmosphere-desc" class="text-[10px] text-dust/80 italic font-serif leading-snug pt-0.5">Warm hearth, patient laughter, and bedtime tales under knitted blankets.</p>
           <div class="flex items-center justify-between pt-1 border-t border-leadborder/50 text-[10px] font-mono">
             <span class="text-dust">Combined Family Income:</span>
             <span id="family-income-val" class="font-bold text-emerald-400">~$58,000 / yr</span>
@@ -3110,6 +3114,48 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
           </button>
 
+          <!-- Dynamic: Pray & Recite Scripture (Devout / Deeply Religious) -->
+          <button id="btn-kin-pray" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🕯️</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-indigo-300 transition-colors">Pray & Recite Scripture</div>
+                <div class="text-[10px] text-dust">Kneel on cold floorboards, clasp hands, and recite solemn hymns.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Dynamic: Walk on Eggshells / Quietly Tiptoe (Volatile & Alcoholic) -->
+          <button id="btn-kin-eggshells" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🤫</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Walk on Eggshells / Tiptoe</div>
+                <div class="text-[10px] text-dust">Quietly stay unseen, clean up bottles, and prevent domestic fury.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Dynamic: Present Report Card / Commendation (Extremely Strict) -->
+          <button id="btn-kin-commendation" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>📜</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-sky-300 transition-colors">Present Report Card</div>
+                <div class="text-[10px] text-dust">Hand over academic marks and conduct ledger for strict inspection.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
           <!-- Siblings Only: Play & Bicker -->
           <button id="btn-kin-bicker" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
             <div class="flex items-center space-x-3">
@@ -3231,6 +3277,20 @@
               <div>
                 <div class="text-xs font-bold text-parchment group-hover:text-teal-300 transition-colors">Visit Bedside / Care Home</div>
                 <div class="text-[10px] text-dust">Sit by their bedside, hold their frail hands, and read aloud.</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+          </button>
+
+          <!-- Dynamic: Seek Sanctuary at Grandparent's (All Families, Age 4+) -->
+          <button id="btn-kin-grandparent-haven" class="hidden w-full text-left p-3 rounded-xl bg-ebon/30 hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <span>🫖</span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-parchment group-hover:text-amber-300 transition-colors">Seek Sanctuary at Grandparent's</div>
+                <div class="text-[10px] text-dust">Escape household tension for warm tea, fresh biscuits, and calm stories.</div>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>

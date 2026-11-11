@@ -97,7 +97,12 @@ function createEmptyActionsDone() {
     proposedMarriage: 0,
     plannedWedding: 0,
     conceivedChild: 0,
-    brokenUp: 0
+    brokenUp: 0,
+    // Phase 4: Family Dynamic Actions
+    prayedTogether: 0,
+    walkedEggshells: 0,
+    presentedReport: 0,
+    visitedGrandHaven: 0
   };
 }
 
@@ -150,10 +155,124 @@ function generateKinAvatar(role, gender, age, occupationTier, parentA = null, pa
 }
 window.generateKinAvatar = generateKinAvatar;
 
+// Household Atmosphere & Family Dynamics Catalog
+const FAMILY_ATMOSPHERES = {
+  loving: {
+    id: 'loving',
+    name: 'Loving & Nurturing',
+    emoji: '🏡',
+    desc: 'A warm sanctuary of patient laughter, hearty soups, and bedtime stories under thick wool blankets.',
+    statEffects: { happiness: 12, sanity: 6, humanity: 6 },
+    dadTrait: 'Devoted Father',
+    momTrait: 'Gentle Caring Mother',
+    siblingRoles: ['Devoted Companion', 'Playful Ally', 'Gentle Teammate'],
+    grandRole: 'The Warm Hearthkeeper',
+    parentMod: { strictness: 25, generosity: 75, relationshipBonus: 15, sobriety: 'sober', temperament: 'warm' }
+  },
+  religious: {
+    id: 'religious',
+    name: 'Devout & Pious',
+    emoji: '⛪',
+    desc: 'Morning scriptures and bowed heads over plain porridge. The shadow of divine judgment watches every deed.',
+    statEffects: { humanity: 10, smarts: 4, sanity: 2, happiness: -5 },
+    dadTrait: 'Pious Churchwarden Father',
+    momTrait: 'Devout Hymn-Singing Mother',
+    siblingRoles: ['Pious Choir Singer', 'Secret Doubter', 'Tattling Moralist'],
+    grandRole: 'The Scripture Patriarch',
+    parentMod: { strictness: 65, generosity: 45, relationshipBonus: 0, sobriety: 'sober', temperament: 'pious', devotion: 85 }
+  },
+  deeply_religious: {
+    id: 'deeply_religious',
+    name: 'Deeply Religious & Zealot',
+    emoji: '🕯️',
+    desc: 'Candlelit vigils before heavy iron crucifixes, weeping confessions, and an unyielding terror of eternal damnation.',
+    statEffects: { humanity: 14, sanity: -6, happiness: -12, occult: -10 },
+    dadTrait: 'Fanatical Preacher Father',
+    momTrait: 'Strict Penitent Mother',
+    siblingRoles: ['Zealous Devotee', 'Terrified Penitent', 'Secret Blasphemer'],
+    grandRole: 'The Holy Inquisitor Grandparent',
+    parentMod: { strictness: 88, generosity: 30, relationshipBonus: -10, sobriety: 'sober', temperament: 'fanatical', devotion: 98 }
+  },
+  extremely_strict: {
+    id: 'extremely_strict',
+    name: 'Extremely Strict & Authoritarian',
+    emoji: '📏',
+    desc: 'Spotless floors, rigid curfews, razor-sharp discipline, and severe reprimands for the slightest imperfection.',
+    statEffects: { smarts: 12, happiness: -14, sanity: -6 },
+    dadTrait: 'Strict Disciplinarian Father',
+    momTrait: 'Demanding Perfectionist Mother',
+    siblingRoles: ['The Golden Child', 'The Sneaky Rebel', 'The Exhausted Scapegoat'],
+    grandRole: 'The Unbending Traditionalist',
+    parentMod: { strictness: 92, generosity: 35, relationshipBonus: -8, sobriety: 'sober', temperament: 'stern' }
+  },
+  alcoholic: {
+    id: 'alcoholic',
+    name: 'Volatile & Alcoholic',
+    emoji: '🍾',
+    desc: 'Slammed corridor doors, slurred late-night shouts, shattered amber bottles, and walking on nervous eggshells.',
+    statEffects: { happiness: -16, sanity: -12, occult: 6 },
+    dadTrait: 'Volatile Alcoholic Father',
+    momTrait: 'Weary Resigned Mother',
+    siblingRoles: ['Trauma-Bonded Protector', 'Quiet Hider', 'Bitter Brawler'],
+    grandRole: 'The Weary Relieved Haven',
+    parentMod: { strictness: 35, generosity: 25, relationshipBonus: -15, sobriety: 'alcoholic', temperament: 'volatile' }
+  },
+  eccentric_occult: {
+    id: 'eccentric_occult',
+    name: 'Occult & Peculiar',
+    emoji: '🔮',
+    desc: 'Dried belladonna wreaths, whispering floorboards, blackened grimoria, and ancestors who never truly left.',
+    statEffects: { occult: 18, sanity: -10, humanity: -4 },
+    dadTrait: 'Esoteric Relic Hunter Father',
+    momTrait: 'Cryptic Herbalist Mother',
+    siblingRoles: ['Shadow Whisperer', 'Effigy Carver', 'Bone Collector'],
+    grandRole: 'The Cryptic Keeper of Old Bones',
+    parentMod: { strictness: 50, generosity: 50, relationshipBonus: 5, sobriety: 'sober', temperament: 'esoteric', occultKnowledge: 85 }
+  },
+  cold_detached: {
+    id: 'cold_detached',
+    name: 'Cold & Detached',
+    emoji: '🧊',
+    desc: 'Polite aristocratic silence, formal handshakes, and an unbridgeable emotional distance across empty banquet tables.',
+    statEffects: { humanity: -8, smarts: 6, happiness: -10 },
+    dadTrait: 'Aloof Aristocratic Father',
+    momTrait: 'Distant Formal Mother',
+    siblingRoles: ['Rival Heir', 'Silent Shadow', 'Estranged Sibling'],
+    grandRole: 'The Stern Dynasty Matriarch',
+    parentMod: { strictness: 60, generosity: 40, relationshipBonus: -20, sobriety: 'sober', temperament: 'aloof' }
+  },
+  working_class: {
+    id: 'working_class',
+    name: 'Overburdened Working-Class',
+    emoji: '🛠️',
+    desc: 'Exhausted parents working midnight shifts, shared boots, scraped knuckles, and fierce family solidarity.',
+    statEffects: { vitality: 6, smarts: 4, happiness: -4 },
+    dadTrait: 'Exhausted Foundry Worker Father',
+    momTrait: 'Hardworking Seamstress Mother',
+    siblingRoles: ['Protective Older Sibling', 'Resourceful Scavenger', 'Shared-Bunk Sibling'],
+    grandRole: 'The Tenement Storyteller',
+    parentMod: { strictness: 45, generosity: 50, relationshipBonus: 8, sobriety: 'sober', temperament: 'tired_loving' }
+  }
+};
+
 function generateFamily(character) {
   const countryCode = character.countryCode || "USA";
   const country = window.COUNTRIES_DATA[countryCode] || window.COUNTRIES_DATA.USA;
   const mult = country.wageMultiplier || 1.0;
+
+  // Weighted roll for family atmosphere
+  const atmoKeys = [
+    'loving', 'loving',
+    'religious', 'religious',
+    'deeply_religious',
+    'extremely_strict', 'extremely_strict',
+    'alcoholic',
+    'eccentric_occult',
+    'cold_detached',
+    'working_class'
+  ];
+  const chosenAtmoKey = window.getRandomElement(atmoKeys);
+  const atmosphere = { ...FAMILY_ATMOSPHERES[chosenAtmoKey] };
 
   // Extract surname or determine for family
   const parts = character.name.split(' ');
@@ -186,6 +305,13 @@ function generateFamily(character) {
   const dadFullName = surname ? `${dadFirst} ${surname}` : dadFirst;
   const momFullName = surname ? `${momFirst} ${surname}` : momFirst;
 
+  const dadStrictness = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + atmosphere.parentMod.strictness));
+  const momStrictness = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + Math.round(atmosphere.parentMod.strictness * 0.9)));
+  const dadGenerosity = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + atmosphere.parentMod.generosity));
+  const momGenerosity = Math.min(100, Math.max(10, Math.floor(Math.random() * 20) + Math.round(atmosphere.parentMod.generosity * 1.05)));
+  const dadRel = Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 70 + atmosphere.parentMod.relationshipBonus));
+  const momRel = Math.min(100, Math.max(25, Math.floor(Math.random() * 20) + 75 + atmosphere.parentMod.relationshipBonus));
+
   const parents = [
     {
       id: 'father_' + Date.now() + '_1',
@@ -201,10 +327,13 @@ function generateFamily(character) {
       salary: dadSalary,
       salaryUSD: dadJobObj.salaryUSD,
       incomeTier: dadJobObj.tier,
-      relationship: Math.floor(Math.random() * 25) + 70, // 70-95%
-      generosity: Math.floor(Math.random() * 50) + 40,   // 40-90%
-      strictness: Math.floor(Math.random() * 50) + 30,
+      relationship: dadRel,
+      generosity: dadGenerosity,
+      strictness: dadStrictness,
       sanity: Math.floor(Math.random() * 30) + 65,
+      temperament: atmosphere.parentMod.temperament,
+      sobriety: atmosphere.parentMod.sobriety || 'sober',
+      dynamicTrait: atmosphere.dadTrait,
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
@@ -225,10 +354,13 @@ function generateFamily(character) {
       salary: momSalary,
       salaryUSD: momJobObj.salaryUSD,
       incomeTier: momJobObj.tier,
-      relationship: Math.floor(Math.random() * 25) + 75, // 75-100%
-      generosity: Math.floor(Math.random() * 40) + 50,   // 50-90%
-      strictness: Math.floor(Math.random() * 50) + 25,
+      relationship: momRel,
+      generosity: momGenerosity,
+      strictness: momStrictness,
       sanity: Math.floor(Math.random() * 30) + 70,
+      temperament: atmosphere.parentMod.temperament,
+      sobriety: atmosphere.parentMod.sobriety || 'sober',
+      dynamicTrait: atmosphere.momTrait,
       entityType: 'human',
       suspicion: 0,
       isRevealed: true,
@@ -250,6 +382,11 @@ function generateFamily(character) {
     const role = isMale ? (ageDiff > 0 ? 'Older Brother' : 'Younger Brother') : (ageDiff > 0 ? 'Older Sister' : 'Younger Sister');
     const sFullName = surname ? `${sFirst} ${surname}` : sFirst;
 
+    const sibRole = window.getRandomElement(atmosphere.siblingRoles);
+    let sibRel = Math.floor(Math.random() * 40) + 55;
+    if (sibRole === 'The Golden Child' || sibRole === 'Rival Heir') sibRel = Math.max(30, sibRel - 18);
+    else if (sibRole === 'Trauma-Bonded Protector' || sibRole === 'Devoted Companion') sibRel = Math.min(100, sibRel + 16);
+
     siblings.push({
       id: 'sibling_' + Date.now() + '_' + i,
       category: 'family',
@@ -260,7 +397,8 @@ function generateFamily(character) {
       alive: true,
       deathYear: null,
       deathCause: null,
-      relationship: Math.floor(Math.random() * 40) + 55, // 55-95%
+      relationship: sibRel,
+      dynamicTrait: sibRole,
       entityType: Math.random() < 0.04 ? 'anomaly' : 'human',
       suspicion: 0,
       isRevealed: false,
@@ -306,6 +444,7 @@ function generateFamily(character) {
       incomeTier: 'comfortable',
       strictness: Math.floor(Math.random() * 35) + 15,
       sanity: Math.floor(Math.random() * 30) + 60,
+      dynamicTrait: atmosphere.grandRole,
       entityType: Math.random() < 0.05 ? 'anomaly' : 'human',
       suspicion: 0,
       isRevealed: false,
@@ -343,6 +482,7 @@ function generateFamily(character) {
     friends: [], // Starts empty at age 0
     lovers: [],  // Starts empty at age 0
     children: [], // Starts empty
+    atmosphere,
     householdIncome: totalCombinedIncome,
     householdIncomeUSD: totalCombinedIncomeUSD,
     wealthTier,
@@ -813,20 +953,71 @@ function askAdviceFromParent(person, character) {
   const relGain = Math.floor(Math.random() * 4) + 6;
   person.relationship = Math.min(100, person.relationship + relGain);
 
-  const adviceList = [
-    `"${person.name} took a sip of black coffee and advised: 'In this city, never sign a document you haven't read thrice by daylight. And stay clear of the old aqueducts after sundown.' (+Smarts, +Sanity)"`,
-    `"${person.name} placed a comforting hand on your shoulder: 'People will test your boundaries. Keep your ledger balanced and your door bolted.' (+Smarts, +Closeness)"`,
-    `"${person.name} looked into the dim street outside: 'Trust is hard-won and easily shattered. Stand tall, no matter what shadows whisper.' (+Sanity, +Closeness)"`
-  ];
+  const atmoId = character.kin?.atmosphere?.id;
+  let adviceList = [];
+  let smartsGain = 3;
+  let sanityGain = 2;
 
-  applyKinStatEffect(character, 'smarts', 3);
-  applyKinStatEffect(character, 'sanity', 3);
+  if (atmoId === 'religious' || atmoId === 'deeply_religious') {
+    adviceList = [
+      `"${person.name} touched the cold iron cross at their throat: 'Do not barter with midnight shadows, child. Sin leaves a stench that even cemetery soil cannot bury. Keep your thoughts chaste.' (+Humanity, +Sanity)"`,
+      `"${person.name} stared sternly through candle smoke: 'The righteous are tested in fire. When wicked folk whisper in your ear, remember the pit that awaits them.' (+Humanity, -Happiness)"`,
+      `"${person.name} held your hand in a firm, praying clasp: 'Guard your tongue, honor your elders, and kneel before sleeping. The Lord watches your every step.' (+Humanity, +Closeness)"`
+    ];
+    applyKinStatEffect(character, 'humanity', 4);
+    applyKinStatEffect(character, 'sanity', 2);
+  } else if (atmoId === 'extremely_strict') {
+    adviceList = [
+      `"${person.name} tapped their ledger firmly: 'Excuses are the currency of failures. In this town, weakness is punishable by ruin. Out-work them, out-study them, and never show fear.' (+Smarts, +Discipline)"`,
+      `"${person.name} glared with flinty resolve: 'A spotless reputation is the only shield between you and the workhouse. Keep your posture rigid and your ledger clean.' (+Smarts, -Sanity)"`,
+      `"${person.name} inspected your fingernails for grime: 'Tears will not buy bread. Stand straight, speak clearly, and never let them see you falter.' (+Smarts, -Humanity)"`
+    ];
+    applyKinStatEffect(character, 'smarts', 4);
+    applyKinStatEffect(character, 'sanity', -1);
+    smartsGain = 4;
+    sanityGain = -1;
+  } else if (atmoId === 'alcoholic') {
+    adviceList = [
+      `"${person.name} exhaled a harsh, alcohol-soaked sigh: 'Never let anyone see you bleed, kid. The world is a den of hungry dogs; the second you limp, they tear off your skin.' (+Street Smarts, -Sanity)"`,
+      `"${person.name} stared into the half-empty amber tumbler: 'Run while you have youth left. This city drinks you down until you are nothing but marrow and ash.' (+Street Smarts, -Happiness)"`,
+      `"${person.name} gripped your shoulder with trembling, bruised fingers: 'Promise me you won't turn out like me. Keep moving, don't look back, and trust no one.' (+Sanity, +Humanity)"`
+    ];
+    applyKinStatEffect(character, 'smarts', 3);
+    applyKinStatEffect(character, 'sanity', -2);
+    sanityGain = -2;
+  } else if (atmoId === 'eccentric_occult') {
+    adviceList = [
+      `"${person.name} turned an antique silver mirror away from the door: 'Never answer a knock that comes in threes after midnight. And if your shadow moves before you do, bite your tongue.' (+Occult, -Sanity)"`,
+      `"${person.name} tied a knot in black thread: 'The dead do not hate us, child; they simply envy the warmth of our blood. Keep salt in your left pocket.' (+Occult, +Smarts)"`,
+      `"${person.name} pointed to the damp cellar floorboards: 'When the floorboards hum like a cello, do not light a lamp. Silence is your only true sanctuary.' (+Occult, -Sanity)"`
+    ];
+    applyKinStatEffect(character, 'occult', 5);
+    applyKinStatEffect(character, 'sanity', -2);
+    sanityGain = -2;
+  } else if (atmoId === 'cold_detached') {
+    adviceList = [
+      `"${person.name} turned a page of the newspaper without glancing up: 'Sentimentality is an expensive liability. Rely only on contracts, leverage, and your own wit.' (+Smarts, -Humanity)"`,
+      `"${person.name} adjusted their cufflink coldly: 'Never explain yourself to inferiors. Politeness is a weapon; wield it with distance.' (+Smarts, -Happiness)"`
+    ];
+    applyKinStatEffect(character, 'smarts', 3);
+    applyKinStatEffect(character, 'humanity', -2);
+  } else {
+    // Loving / Standard
+    adviceList = [
+      `"${person.name} took a sip of hot tea and advised: 'In this city, never sign a document you haven't read thrice by daylight. And stay clear of the old aqueducts after sundown.' (+Smarts, +Sanity)"`,
+      `"${person.name} placed a comforting hand on your shoulder: 'People will test your boundaries. Keep your ledger balanced and your door bolted.' (+Smarts, +Closeness)"`,
+      `"${person.name} kissed your forehead gently: 'Whatever happens in the streets or at school, this house is your safe harbor. Be kind and stand tall.' (+Happiness, +Sanity)"`
+    ];
+    applyKinStatEffect(character, 'smarts', 3);
+    applyKinStatEffect(character, 'sanity', 3);
+    sanityGain = 3;
+  }
 
   return {
     success: true,
     title: `Parental Advice from ${person.name}`,
     message: window.getRandomElement(adviceList),
-    effects: { relationship: relGain, smarts: 3, sanity: 3 }
+    effects: { relationship: relGain, smarts: smartsGain, sanity: sanityGain }
   };
 }
 
@@ -841,7 +1032,44 @@ function bickerWithSibling(person, character) {
   }
   person.actionsDone.bickered = count + 1;
 
+  const role = person.dynamicTrait || '';
   const roll = Math.random();
+
+  if (role === 'The Golden Child' || role === 'Tattling Moralist') {
+    if (roll < 0.5) {
+      const relLoss = Math.floor(Math.random() * 4) + 6;
+      person.relationship = Math.max(0, person.relationship - relLoss);
+      applyKinStatEffect(character, 'happiness', -5);
+      return {
+        success: true,
+        title: `Tattled by ${person.name}!`,
+        message: `During a mild disagreement, ${person.name} immediately burst into theatrical tears and screamed for your parents, claiming you shoved them! You were harshly reprimanded (-${relLoss}% Closeness, -5% Happiness).`,
+        effects: { relationship: -relLoss, happiness: -5 }
+      };
+    }
+  } else if (role === 'The Sneaky Rebel') {
+    const relGain = Math.floor(Math.random() * 4) + 6;
+    person.relationship = Math.min(100, person.relationship + relGain);
+    applyKinStatEffect(character, 'happiness', 5);
+    applyKinStatEffect(character, 'smarts', 2);
+    return {
+      success: true,
+      title: `Secret Pact with ${person.name}`,
+      message: `You and ${person.name} wrestled in the hallway until the coats fell. They grinned with a split lip and slipped a contraband peppermint into your palm: "Don't let them hear us." (+${relGain}% Closeness, +Smarts).`,
+      effects: { relationship: relGain, happiness: 5, smarts: 2 }
+    };
+  } else if (role === 'Trauma-Bonded Protector') {
+    const relGain = Math.floor(Math.random() * 4) + 6;
+    person.relationship = Math.min(100, person.relationship + relGain);
+    applyKinStatEffect(character, 'sanity', 3);
+    return {
+      success: true,
+      title: `Quiet Truce with ${person.name}`,
+      message: `A sudden petty squabble ended when an angry shout echoed from upstairs. You and ${person.name} instantly fell silent, huddling shoulder to shoulder in the dim corridor (+${relGain}% Closeness, +Sanity).`,
+      effects: { relationship: relGain, sanity: 3 }
+    };
+  }
+
   if (roll < 0.65) {
     // Playful tussle
     const relGain = Math.floor(Math.random() * 4) + 4;
@@ -956,11 +1184,43 @@ function helpWithChores(person, character) {
     character.money = (character.money || 0) + tip;
   }
 
-  const choreList = [
-    `You scrubbed the soot from the coal stove and washed the heavy iron skillets for ${person.name}. They gave you a proud smile${tip > 0 ? ` and slipped you ${window.formatMoney(tip, character.countryCode)} for your honest effort` : ''} (+${relGain}% Closeness, +Humanity).`,
-    `You gathered the damp laundry and helped ${person.name} beat dust from the winter rugs in the courtyard. They thanked you warmly${tip > 0 ? ` and handed you ${window.formatMoney(tip, character.countryCode)} pocket money` : ''} (+${relGain}% Closeness).`,
-    `You swept the creaking front hallway and shoveled frost from the front steps before ${person.name} returned from work${tip > 0 ? `, earning a ${window.formatMoney(tip, character.countryCode)} reward` : ''} (+${relGain}% Closeness).`
-  ];
+  const atmoId = character.kin?.atmosphere?.id;
+  let choreList = [];
+
+  if (atmoId === 'religious' || atmoId === 'deeply_religious') {
+    choreList = [
+      `You scraped melted tallow from the prayer pews and polished the heavy iron crucifix for ${person.name}. They nodded solemnly: "The Lord sees quiet service"${tip > 0 ? ` and handed you ${window.formatMoney(tip, character.countryCode)} for the church collection` : ''} (+${relGain}% Closeness, +Humanity).`,
+      `You scrubbed the communion linen in cold lye water and ironed black mourning vestments for ${person.name}. A quiet, austere peace settled over the house (+${relGain}% Closeness, +Humanity).`,
+      `You swept snow from the chapel pathway and arranged prayer hymnals under ${person.name}'s strict supervision (+${relGain}% Closeness, +Vitality).`
+    ];
+  } else if (atmoId === 'extremely_strict') {
+    choreList = [
+      `You scrubbed the hallway parquet on your knees with carbolic soap. ${person.name} inspected every baseboard with a white handkerchief before offering a curt, stiff nod (+${relGain}% Closeness, +Discipline, -Happiness).`,
+      `You sorted years of domestic receipts and wiped the mahogany study shelves in absolute silence for ${person.name}${tip > 0 ? `, receiving a strict ${window.formatMoney(tip, character.countryCode)} performance stipend` : ''} (+${relGain}% Closeness, +Smarts).`
+    ];
+    applyKinStatEffect(character, 'smarts', 2);
+    applyKinStatEffect(character, 'happiness', -2);
+  } else if (atmoId === 'alcoholic') {
+    choreList = [
+      `You quietly swept up shattered amber gin bottles from the linoleum and wiped sour spilled malt before ${person.name} awoke. They rubbed their bloodshot temples in weary relief${tip > 0 ? ` and guiltily pressed ${window.formatMoney(tip, character.countryCode)} into your coat pocket` : ''} (+${relGain}% Closeness, +Street Smarts, -Sanity).`,
+      `You washed stained glasses and cleared heavy ashtrays while ${person.name} slept off a blackout on the sofa, keeping the morning peaceful (+${relGain}% Closeness, +Sanity preservation).`
+    ];
+    applyKinStatEffect(character, 'sanity', -2);
+  } else if (atmoId === 'eccentric_occult') {
+    choreList = [
+      `You helped ${person.name} string dried belladonna and wormwood from the cellar rafters, sweeping bone meal into iron urns. Their eyes gleamed with strange pride (+${relGain}% Closeness, +Occult, -Sanity).`,
+      `You scraped dried tallow and odd salt glyphs from the threshold stones for ${person.name}. They patted your cheek with cold, pale fingers (+${relGain}% Closeness, +Occult).`
+    ];
+    applyKinStatEffect(character, 'occult', 4);
+    applyKinStatEffect(character, 'sanity', -2);
+  } else {
+    // Loving / Standard
+    choreList = [
+      `You scrubbed the soot from the coal stove and washed the heavy iron skillets for ${person.name}. They gave you a proud smile${tip > 0 ? ` and slipped you ${window.formatMoney(tip, character.countryCode)} for your honest effort` : ''} (+${relGain}% Closeness, +Humanity).`,
+      `You gathered the damp laundry and helped ${person.name} beat dust from the winter rugs in the courtyard. They thanked you warmly${tip > 0 ? ` and handed you ${window.formatMoney(tip, character.countryCode)} pocket money` : ''} (+${relGain}% Closeness).`,
+      `You swept the creaking front hallway and shoveled frost from the front steps before ${person.name} returned from work${tip > 0 ? `, earning a ${window.formatMoney(tip, character.countryCode)} reward` : ''} (+${relGain}% Closeness).`
+    ];
+  }
 
   return {
     success: true,
@@ -1246,17 +1506,187 @@ function exploreGrandparentAttic(person, character) {
   applyKinStatEffect(character, 'smarts', 3);
   applyKinStatEffect(character, 'occult', 4);
 
-  const findings = [
-    `Together with ${person.name}, you pried open a heavy brass steamer trunk and uncovered pre-war topographical maps showing vanished city streets (+Smarts, +Occult).`,
-    `Beneath moth-eaten velvet coats, you found a tintype portrait from 1894. ${person.name} pointed out the figure in the background whose eyes were drawn with white ink (+Occult, +Closeness).`,
-    `You uncovered a cedar box containing silver fountain pens and an uncashed promissory note from the old municipal foundry (+Smarts, +Closeness).`
-  ];
+  const atmoId = character.kin?.atmosphere?.id;
+  let findings = [];
+
+  if (atmoId === 'religious' || atmoId === 'deeply_religious') {
+    findings = [
+      `Beneath yellowed hymnals, you found a silver reliquary containing a splinter of petrified cedar and a Latin prayer against nocturnal specters (+Humanity, +Occult, +Smarts).`,
+      `You and ${person.name} opened a cedar chest lined with black velvet, finding a heavy family Bible with dates of ancestors who died in plague winters (+Smarts, +Closeness).`
+    ];
+  } else if (atmoId === 'eccentric_occult') {
+    findings = [
+      `In a padlocked trunk behind dusty velvet drapes, you found a blackened bronze scrying mirror wrapped in sheepskin. When you touched it, your candle flame snuffed out (+Occult, -Sanity).`,
+      `You uncovered an apothecary jar filled with unrendered animal incisors and yellowed parchment tags marked with your great-grandfather's glyphs (+Occult, +Shillings).`
+    ];
+  } else if (atmoId === 'extremely_strict') {
+    findings = [
+      `You uncovered leather-bound school ledgers from 1902 showing flawless marks from four generations of ancestors. ${person.name} tapped the parchment: "The standard was set long before you." (+Smarts, +Discipline).`,
+      `Beneath brass drafting instruments, you found an antique iron seal stamped with the city's old guild insignia (+Smarts, +Closeness).`
+    ];
+  } else if (atmoId === 'alcoholic' || atmoId === 'working_class') {
+    findings = [
+      `You found an old cigar tin containing pawnshop receipts and strike badges from the harsh winter of '74. ${person.name} touched the faded ink with a wistful sigh (+Smarts, +Closeness).`,
+      `Beneath canvas tarps, you uncovered an iron lockbox containing three uncashed coal scrip tokens and a hand-carved wooden sparrow (+Closeness, +Smarts).`
+    ];
+  } else {
+    findings = [
+      `Together with ${person.name}, you pried open a heavy brass steamer trunk and uncovered pre-war topographical maps showing vanished city streets (+Smarts, +Occult).`,
+      `Beneath moth-eaten velvet coats, you found a tintype portrait from 1894. ${person.name} pointed out the figure in the background whose eyes were drawn with white ink (+Occult, +Closeness).`,
+      `You uncovered a cedar box containing silver fountain pens and an uncashed promissory note from the old municipal foundry (+Smarts, +Closeness).`
+    ];
+  }
 
   return {
     success: true,
     title: `Attic Expedition with ${person.name}`,
     message: window.getRandomElement(findings),
     effects: { relationship: relGain, smarts: 3, occult: 4 }
+  };
+}
+
+// ============================================================================
+// PHASE 4: FAMILY DYNAMICS & UPBRINGING ACTIONS
+// ============================================================================
+
+// 1. Devout / Deeply Religious: Pray & Recite Scripture Together (Age 5+)
+function prayWithFamily(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother') && !person.role.includes('Grand')) {
+    return { success: false, reason: "You can only pray together with parents or grandparents." };
+  }
+  const count = getActionCount(person, 'prayedTogether');
+  if (count >= 5) {
+    return { success: false, reason: "You have completed your daily devotions and prayers for this year." };
+  }
+  person.actionsDone.prayedTogether = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 8;
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  const charOccult = (character.stats.occult || 0);
+  let sanityDelta = 3;
+  let text = "";
+
+  if (charOccult > 25) {
+    sanityDelta = -5;
+    text = `You knelt on the cold hardwood beside ${person.name}, bowing before the dark iron crucifix. As you murmured the holy verses, your occult senses burned like lye; shadows coiled along the baseboard, repelled by the prayer (+${relGain}% Closeness, +Humanity, -5% Sanity).`;
+  } else {
+    text = `You knelt in solemn silence beside ${person.name}, hands clasped as candlelight flickered against old scripture pages. A deep, tranquil stillness settled over the household (+${relGain}% Closeness, +Humanity, +Sanity).`;
+  }
+
+  applyKinStatEffect(character, 'humanity', 5);
+  applyKinStatEffect(character, 'sanity', sanityDelta);
+
+  return {
+    success: true,
+    title: `Solemn Prayer with ${person.name}`,
+    message: text,
+    effects: { relationship: relGain, humanity: 5, sanity: sanityDelta }
+  };
+}
+
+// 2. Volatile / Alcoholic: Walk on Eggshells / Quietly Tiptoe (Age 6+)
+function walkOnEggshells(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only tiptoe around volatile parents." };
+  }
+  const count = getActionCount(person, 'walkedEggshells');
+  if (count >= 5) {
+    return { success: false, reason: "You've stayed out of their way as much as humanly possible this year." };
+  }
+  person.actionsDone.walkedEggshells = count + 1;
+  const relGain = Math.floor(Math.random() * 4) + 5;
+  person.relationship = Math.min(100, person.relationship + relGain);
+
+  applyKinStatEffect(character, 'smarts', 2);
+  applyKinStatEffect(character, 'sanity', -3);
+  applyKinStatEffect(character, 'happiness', -4);
+
+  const scenarios = [
+    `Hearing ${person.name}'s heavy, erratic boots outside the doorway, you held your breath, slid silently behind the sofa, and waited until they slumped into an armchair. Crisis averted, though your chest ached with anxiety (+${relGain}% Closeness, +Smarts, -3% Sanity).`,
+    `You quietly cleared away shattered gin bottles and aired out the sour malt fumes before ${person.name} could wake into a raging hangover. The morning passed without a single shouted curse (+${relGain}% Closeness, -4% Happiness).`,
+    `You spoke only in soft, gentle whispers and quickly served ${person.name} black coffee without making eye contact. Their volatile temper softened into exhausted silence (+${relGain}% Closeness, +Smarts, -3% Sanity).`
+  ];
+
+  return {
+    success: true,
+    title: `Walked on Eggshells around ${person.name}`,
+    message: window.getRandomElement(scenarios),
+    effects: { relationship: relGain, smarts: 2, sanity: -3, happiness: -4 }
+  };
+}
+
+// 3. Extremely Strict: Present Report Card / Commendation (Ages 6 - 18)
+function presentReportCard(person, character) {
+  if (!person.role.includes('Father') && !person.role.includes('Mother')) {
+    return { success: false, reason: "You can only present your report card to parents." };
+  }
+  const count = getActionCount(person, 'presentedReport');
+  if (count >= 3) {
+    return { success: false, reason: "Your marks and conduct ledger have already been audited for this year." };
+  }
+  person.actionsDone.presentedReport = count + 1;
+
+  const smarts = character.stats.smarts || 50;
+  const country = window.COUNTRIES_DATA[character.countryCode] || window.COUNTRIES_DATA.USA;
+  const mult = country.wageMultiplier || 1.0;
+
+  if (smarts >= 60) {
+    const relGain = Math.floor(Math.random() * 6) + 12;
+    person.relationship = Math.min(100, person.relationship + relGain);
+    const bonusUSD = Math.floor(Math.random() * 25) + 20;
+    const bonus = Math.round(bonusUSD * mult);
+    character.money = (character.money || 0) + bonus;
+    applyKinStatEffect(character, 'happiness', 8);
+    applyKinStatEffect(character, 'smarts', 3);
+
+    return {
+      success: true,
+      title: `Academic Inspection: Approved`,
+      message: `${person.name} adjusted their spectacles and scrutinized your ledger line by line. A rare, crisp nod of genuine approval followed: "Exemplary. You are upholding our family standard." They handed you a ${window.formatMoney(bonus, character.countryCode)} academic commendation (+${relGain}% Closeness, +Happiness).`,
+      effects: { relationship: relGain, happiness: 8, smarts: 3, money: bonus }
+    };
+  } else {
+    const relLoss = Math.floor(Math.random() * 5) + 8;
+    person.relationship = Math.max(0, person.relationship - relLoss);
+    applyKinStatEffect(character, 'happiness', -12);
+    applyKinStatEffect(character, 'sanity', -5);
+
+    return {
+      success: true,
+      title: `Academic Inspection: Severe Reprimand`,
+      message: `${person.name} slammed your report card down onto the mahogany desk with a thunderous crack: "Mediocre! Shameful! In this city, weakness is ground to dust. No privileges until these numbers improve!" (-${relLoss}% Closeness, -12% Happiness, -5% Sanity).`,
+      effects: { relationship: -relLoss, happiness: -12, sanity: -5 }
+    };
+  }
+}
+
+// 4. All Families: Seek Sanctuary at Grandparent's (Age 4+)
+function seekGrandparentHaven(person, character) {
+  if (!person.role.includes('Grand')) {
+    return { success: false, reason: "You can only seek safe sanctuary at a grandparent's home." };
+  }
+  const count = getActionCount(person, 'visitedGrandHaven');
+  if (count >= 4) {
+    return { success: false, reason: "You have already spent plenty of weekends at your grandparent's sanctuary this year." };
+  }
+  person.actionsDone.visitedGrandHaven = count + 1;
+  const relGain = Math.floor(Math.random() * 5) + 10;
+  person.relationship = Math.min(100, person.relationship + relGain);
+  applyKinStatEffect(character, 'happiness', 14);
+  applyKinStatEffect(character, 'sanity', 8);
+  applyKinStatEffect(character, 'vitality', 4);
+
+  const havMessages = [
+    `You fled the bitter shouting and cold rules at home to ${person.name}'s parlor. They tucked you into a plush velvet armchair, wrapped a thick wool blanket around you, and gave you hot spiced tea with buttered biscuits (+14% Happiness, +8% Sanity).`,
+    `${person.name} smiled with ancient warmth as you walked in. "Let the world howl outside, child; you are safe by this hearth." They hummed old gentle tunes until your heartbeat slowed (+14% Happiness, +8% Sanity).`,
+    `You spent the weekend sleeping in ${person.name}'s lavender-scented guest room, far from household strife. You awoke refreshed and full of calm resolve (+14% Happiness, +Vitality).`
+  ];
+
+  return {
+    success: true,
+    title: `Sanctuary with ${person.name}`,
+    message: window.getRandomElement(havMessages),
+    effects: { relationship: relGain, happiness: 14, sanity: 8, vitality: 4 }
   };
 }
 
@@ -2066,6 +2496,11 @@ window.proposeMarriage = proposeMarriage;
 window.planWeddingCeremony = planWeddingCeremony;
 window.conceiveChildWithLover = conceiveChildWithLover;
 window.breakupWithLover = breakupWithLover;
+window.prayWithFamily = prayWithFamily;
+window.walkOnEggshells = walkOnEggshells;
+window.presentReportCard = presentReportCard;
+window.seekGrandparentHaven = seekGrandparentHaven;
+window.FAMILY_ATMOSPHERES = FAMILY_ATMOSPHERES;
 window.PARENT_OCCUPATIONS_DATA = PARENT_OCCUPATIONS_DATA;
 window.HOUSEHOLD_RESIDENCES = HOUSEHOLD_RESIDENCES;
 window.createEmptyActionsDone = createEmptyActionsDone;

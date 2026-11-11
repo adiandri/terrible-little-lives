@@ -581,6 +581,159 @@ const INTERACTIVE_DILEMMAS = [
     ]
   },
   // ==========================================
+  // FAMILY UPBRINGING & ATMOSPHERE DILEMMAS (AGES 4 - 15)
+  // ==========================================
+  {
+    id: "dilemma_religious_confession",
+    minAge: 6,
+    maxAge: 12,
+    condition: (char) => char.kin && char.kin.atmosphere && (char.kin.atmosphere.id === 'religious' || char.kin.atmosphere.id === 'deeply_religious'),
+    title: "The Midnight Scripture & The Locked Vestry",
+    prompt: "Following evening vespers, your guardian leads you into the unheated parish side room. A heavy calfskin Bible lies open under a lone wax taper. 'A wicked child conceals dark thoughts, inviting corruption into the family,' they intone solemnly, staring into your soul. 'Confess the transgressions you harbored during prayer.'",
+    choices: [
+      {
+        text: "Kneel, weep, and recite the 23rd Psalm flawlessly from memory.",
+        outcome: "Your voice quivers through the cold stones. Your guardian's rigid posture softens into solemn approval, placing a heavy, blessing hand upon your head.",
+        effects: { humanity: +6, sanity: +3, happiness: -4 }
+      },
+      {
+        text: "Confess that you daydreamed about candle wax burning through the communion cloth.",
+        outcome: "A stern lecture on reverence echoes off the stone pillars, followed by an hour of kneeling on gravel. Your discipline hardens, though your knees throb.",
+        effects: { humanity: +8, sanity: -3, smarts: +4 }
+      },
+      {
+        text: "Remain silent and murmur the low vibration you heard humming under the stone altar.",
+        outcome: "The candle flame flares a sickly violet before sputtering out. Your guardian recoils in pure, unmasked dread, backing away while clutching an iron medallion.",
+        effects: { occult: +18, sanity: -4, humanity: -2, shillings: +2 }
+      }
+    ]
+  },
+  {
+    id: "dilemma_alcoholic_broken_glass",
+    minAge: 5,
+    maxAge: 12,
+    condition: (char) => char.kin && char.kin.atmosphere && char.kin.atmosphere.id === 'alcoholic',
+    title: "Midnight Crash in the Hallway",
+    prompt: "At 2:40 AM, the deafening shatter of amber glass echoes from downstairs, followed by slurred swearing and the heavy thud of an unsteady body collapsing against the drywall. Your younger sibling pulls the bedsheets over their head, shivering in terror.",
+    choices: [
+      {
+        text: "Tiptoe downstairs with a broom and wet rag to clean the shards in silence.",
+        outcome: "You sweep up the sharp glass by moonlight without making a single sound. You drape a woolen coat over the snoring figure before retreating upstairs like a phantom.",
+        effects: { smarts: +6, sanity: -3, happiness: -5, humanity: +4 }
+      },
+      {
+        text: "Lock your bedroom door, hold your sibling's hand, and whisper calm stories.",
+        outcome: "You sit side-by-side in the dark until the violent muttering ceases. Your sibling falls asleep against your shoulder, safe in your quiet protection.",
+        effects: { happiness: +5, sanity: +4, humanity: +8 }
+      },
+      {
+        text: "Slip out the ground-floor window into the foggy nocturnal alleyway until sunrise.",
+        outcome: "The freezing night air stings your cheeks. You huddle behind a warm bakery exhaust flue, finding two brass shillings discarded in a brick crack.",
+        effects: { vitality: -4, smarts: +8, shillings: +2, sanity: -2 }
+      }
+    ]
+  },
+  {
+    id: "dilemma_strict_forged_signature",
+    minAge: 7,
+    maxAge: 14,
+    condition: (char) => char.kin && char.kin.atmosphere && char.kin.atmosphere.id === 'extremely_strict',
+    title: "The Red-Inked Ledger",
+    prompt: "You scored a 78% on your arithmetic examination. In your household, anything beneath a 95% is considered moral corruption punishable by three weeks of grounding and copying encyclopedias on your knees. Tomorrow morning, a parental signature is strictly due.",
+    choices: [
+      {
+        text: "Hand it over with lowered eyes and brace yourself for the severe reprimand.",
+        outcome: "The lecture lasts until past midnight. You spend the rest of the week drilling equations by flashlight. Your academic precision sharpens through sheer terror.",
+        effects: { smarts: +10, happiness: -12, sanity: -4 }
+      },
+      {
+        text: "Carefully trace their austere cursive signature against the sunlit window.",
+        outcome: "Your hand does not shake. The teacher accepts the homework sheet without a second glance. You survived the day, heart racing like a thief's.",
+        effects: { smarts: +6, sanity: +2, happiness: +4, humanity: -2 }
+      },
+      {
+        text: "Bury the examination paper beneath the dark roots of the garden weeping willow.",
+        outcome: "The moist soil consumes the ink. That night, you swear you hear the willow leaves whispering percentages in your father's voice.",
+        effects: { occult: +12, sanity: -5, happiness: -2 }
+      }
+    ]
+  },
+  {
+    id: "dilemma_occult_night_whisper",
+    minAge: 6,
+    maxAge: 13,
+    condition: (char) => char.kin && char.kin.atmosphere && char.kin.atmosphere.id === 'eccentric_occult',
+    title: "The Parlor Seance",
+    prompt: "Thick lavender smoke and dried belladonna incense curl through your family's Victorian parlor. Your elders sit cross-legged around a polished obsidian water bowl under flickering tallow tapers. 'Come, child,' your guardian beckons gently. 'Tonight the veil is thin as spiderweb silk. Dip your finger in the well and name what you see.'",
+    choices: [
+      {
+        text: "Dip your fingertip into the black water and speak the names rippling beneath.",
+        outcome: "The water turns freezing cold as a low chorus of disembodied voices floods your mind. The elders gaze at you with fervent, reverent awe.",
+        effects: { occult: +22, sanity: -6, humanity: -3, shillings: +3 }
+      },
+      {
+        text: "Politely bow, decline, and offer to brew fresh lavender chamomile tea in the scullery.",
+        outcome: "Your guardian chuckles indulgently at your earthly caution and kisses your forehead: 'There is time yet, little one.' The warm tea grounds your soul.",
+        effects: { humanity: +6, sanity: +6, happiness: +4 }
+      },
+      {
+        text: "Secretly drop a cold iron nail into the obsidian bowl to break the ward.",
+        outcome: "A sharp hiss like steam erupts from the liquid! The candles gutter and the guests gasp in disorientation. You slip away with a cunning smirk.",
+        effects: { smarts: +8, sanity: +4, occult: -4 }
+      }
+    ]
+  },
+  {
+    id: "dilemma_loving_broken_heirloom",
+    minAge: 5,
+    maxAge: 11,
+    condition: (char) => char.kin && char.kin.atmosphere && char.kin.atmosphere.id === 'loving',
+    title: "The Shattered Porcelain Robin",
+    prompt: "While twirling playfully around the living room to music from the radio, your elbow clips your mother's beloved porcelain robin music box—her grandmother's treasured heirloom. It crashes against the brick hearth, splintering into painted ceramic feathers.",
+    choices: [
+      {
+        text: "Confess immediately with tear-stained cheeks, offering your piggy bank pennies.",
+        outcome: "Your parents rush to embrace you before you can even finish stammering. 'Things can be mended or grieved, but you are irreplaceable,' your mother soothes softly.",
+        effects: { happiness: +12, sanity: +8, humanity: +10 }
+      },
+      {
+        text: "Try painstakingly gluing the porcelain feathers together with library paste.",
+        outcome: "The robin looks crooked and lopsided, its beak glued upside down. When your family discovers it, they burst into affectionate, tearful laughter and display it proudly.",
+        effects: { smarts: +4, happiness: +8, sanity: +4 }
+      },
+      {
+        text: "Wrap the pieces in a velvet handkerchief and bury them in the garden with a pebble marker.",
+        outcome: "You hold a tiny funeral under the lilac bush. The solemn ritual leaves you with a quiet, bittersweet understanding of mortality and loss.",
+        effects: { sanity: +4, humanity: +6, smarts: +2 }
+      }
+    ]
+  },
+  {
+    id: "dilemma_cold_empty_dinner",
+    minAge: 7,
+    maxAge: 15,
+    condition: (char) => char.kin && char.kin.atmosphere && char.kin.atmosphere.id === 'cold_detached',
+    title: "The Echoing Dining Room",
+    prompt: "Dinner is served promptly at 6:30 PM. The polished mahogany table is vast and immaculate, but your parents dine in absolute, frigid silence, separated by newspapers and financial ledgers. The only sound in the great hall is silver cutlery scraping fine china.",
+    choices: [
+      {
+        text: "Clear your throat and proudly share your drawing of the city's gothic skyline.",
+        outcome: "A polite, sterile glance is spared over the top of the newspaper. 'Adequate perspective. Focus on your penmanship,' your father remarks before returning to the ledger.",
+        effects: { smarts: +6, happiness: -4, sanity: -2 }
+      },
+      {
+        text: "Finish your roasted meat in stoic silence, fold your linen napkin, and excuse yourself.",
+        outcome: "You walk silently up the carpeted staircase to your solitary quarters. You have learned that in this house, self-reliance is the only armor.",
+        effects: { smarts: +8, humanity: -4, sanity: +3 }
+      },
+      {
+        text: "Deliberately drop your silver butter knife onto the marble floor with a ringing clatter.",
+        outcome: "The piercing clang echoes off the chandelier. Two pairs of cold eyes stare at you across the candelabra with icy, cutting disdain.",
+        effects: { sanity: -3, happiness: -6, smarts: +3 }
+      }
+    ]
+  },
+  // ==========================================
   // CHILDHOOD & ELEMENTARY SCHOOL (AGES 6 - 12)
   // ==========================================
   {
