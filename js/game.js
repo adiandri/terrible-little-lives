@@ -2370,7 +2370,7 @@ class TerribleGame {
         const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
 
         const card = document.createElement('div');
-        card.className = `p-3.5 rounded-xl border transition-all ${
+        card.className = `career-item p-3.5 rounded-xl border transition-all ${
           isEmployed 
             ? 'bg-fiatbg border-fiat/60 ring-1 ring-fiat/40 shadow-sm' 
             : 'bg-inputbg hover:bg-cardhover border-leadborder shadow-xs'
@@ -2422,7 +2422,7 @@ class TerribleGame {
         const check = window.checkJobEligibility(this.character, gig);
 
         const card = document.createElement('div');
-        card.className = `p-3.5 rounded-xl border transition-all ${
+        card.className = `career-item p-3.5 rounded-xl border transition-all ${
           isContracted 
             ? 'bg-shillingbg border-shilling/60 ring-1 ring-shilling/40 shadow-sm' 
             : 'bg-inputbg hover:bg-cardhover border-leadborder shadow-xs'
@@ -2653,7 +2653,7 @@ class TerribleGame {
       const card = document.createElement('div');
       const isAlive = person.alive;
 
-      card.className = `p-3 rounded-xl border transition-all ${
+      card.className = `kin-card p-3 rounded-xl border transition-all ${
         isAlive 
           ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
           : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
@@ -4005,7 +4005,7 @@ class TerribleGame {
     pets.forEach(pet => {
       const card = document.createElement('div');
       const isAlive = pet.alive !== false;
-      card.className = `p-3 rounded-xl border transition-all ${
+      card.className = `pet-card p-3 rounded-xl border transition-all ${
         isAlive 
           ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
           : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
@@ -4858,9 +4858,9 @@ class TerribleGame {
       card.dataset.actId = act.id;
       
       if (isLockedByAge) {
-        card.className = "p-3.5 rounded-2xl border bg-inputbg/40 border-leadborder/40 opacity-60 transition-all space-y-2.5 shadow-xs";
+        card.className = "activity-card p-3.5 rounded-2xl border bg-inputbg/40 border-leadborder/40 opacity-60 transition-all space-y-2.5 shadow-xs";
       } else {
-        card.className = "p-3.5 rounded-2xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2.5 shadow-xs";
+        card.className = "activity-card p-3.5 rounded-2xl border bg-inputbg hover:bg-cardhover border-leadborder transition-all space-y-2.5 shadow-xs";
       }
 
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;

@@ -75,10 +75,16 @@
       --accent-shilling: #f59e0b;
       --accent-shilling-bg: #16120d;
       --color-scheme: dark;
+      --box-gradient-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 45%, rgba(0, 0, 0, 0.15) 100%);
+      --box-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
     }
 
     [data-mode="light"] {
       color-scheme: light;
+      --box-gradient-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 45%, rgba(0, 0, 0, 0.03) 100%);
+      --box-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
     [data-mode="dark"] {
       color-scheme: dark;
@@ -135,17 +141,57 @@
       transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
     }
 
+    /* ==========================================================================
+       MODERN BOX & CARD GRADIENT ARCHITECTURE
+       ========================================================================== */
+
+    /* Universal tactile gradient surface for rounded boxes and cards */
+    .rounded-xl.bg-slatecard,
+    .rounded-2xl.bg-slatecard,
+    .rounded-xl.bg-inputbg,
+    .rounded-2xl.bg-inputbg,
+    .rounded-xl.bg-headerbg,
+    .rounded-2xl.bg-headerbg,
+    .activity-card,
+    .kin-card,
+    .pet-card,
+    .career-item {
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.01) 45%, rgba(0, 0, 0, 0.14) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 2px 8px rgba(0, 0, 0, 0.22);
+    }
+
+    [data-mode="light"] .rounded-xl.bg-slatecard,
+    [data-mode="light"] .rounded-2xl.bg-slatecard,
+    [data-mode="light"] .rounded-xl.bg-inputbg,
+    [data-mode="light"] .rounded-2xl.bg-inputbg,
+    [data-mode="light"] .rounded-xl.bg-headerbg,
+    [data-mode="light"] .rounded-2xl.bg-headerbg,
+    [data-mode="light"] .activity-card,
+    [data-mode="light"] .kin-card,
+    [data-mode="light"] .pet-card,
+    [data-mode="light"] .career-item {
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.2) 45%, rgba(0, 0, 0, 0.02) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Stat Pill Wrappers in Integrated Dock */
     .stat-pill-wrapper {
-      background: var(--bg-card);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(0, 0, 0, 0.16) 100%), var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 0.65rem;
-      padding: 0.35rem 0.5rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-      transition: transform 0.15s ease, border-color 0.2s ease;
+      border-radius: 0.75rem;
+      padding: 0.38rem 0.52rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0,0,0,0.18);
+      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .stat-pill-wrapper:hover {
       border-color: var(--border-main);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 8px rgba(0,0,0,0.28);
     }
+    [data-mode="light"] .stat-pill-wrapper {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(0, 0, 0, 0.03) 100%), var(--bg-card);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 4px rgba(0,0,0,0.06);
+    }
+
     .stat-track-modern {
       height: 6px;
       width: 100%;
@@ -153,6 +199,7 @@
       border-radius: 9999px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     }
     .stat-bar-smooth {
       height: 100%;
@@ -160,9 +207,29 @@
       transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Top Bar Currency Badges with Glass Gradients */
+    .currency-badge-fiat {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0.04) 100%), var(--bg-input);
+      border: 1px solid rgba(16, 185, 129, 0.3) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+    .currency-badge-shilling {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.04) 100%), var(--bg-input);
+      border: 1px solid rgba(245, 158, 11, 0.3) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
+    /* The Iconic + Endure Action Pill with Crimson Gradient */
     .btn-endure-pill {
       min-width: 58px;
       max-width: 68px;
+      background: linear-gradient(145deg, #dc2626 0%, #991b1b 58%, #7f1d1d 100%) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 12px rgba(185, 28, 28, 0.35) !important;
+      border: 1px solid rgba(254, 202, 202, 0.3) !important;
+    }
+    .btn-endure-pill:hover {
+      background: linear-gradient(145deg, #ef4444 0%, #b91c1c 58%, #991b1b 100%) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 6px 16px rgba(220, 38, 38, 0.45) !important;
     }
     .btn-endure-pill span {
       font-size: 8.5px !important;
@@ -174,6 +241,187 @@
     [data-text-size="small"] .btn-endure-pill span { font-size: 8px !important; }
     [data-text-size="large"] .btn-endure-pill span { font-size: 9px !important; }
     [data-text-size="huge"] .btn-endure-pill span { font-size: 9.5px !important; }
+
+    /* Thematic Category Gradient Cards for Activities Hub */
+    .btn-activity-category {
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 14px rgba(0, 0, 0, 0.24);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .btn-activity-category::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      opacity: 0.85;
+      transition: opacity 0.2s ease, height 0.2s ease;
+    }
+    .btn-activity-category:hover {
+      transform: translateY(-2px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 22px rgba(0, 0, 0, 0.32);
+    }
+    .btn-activity-category:hover::before {
+      opacity: 1;
+      height: 4px;
+    }
+
+    /* 8 Bespoke Category Personality Gradients (Dark Modes) */
+    .btn-activity-category[data-category="occupation"] {
+      background: linear-gradient(145deg, rgba(37, 99, 235, 0.18) 0%, rgba(15, 23, 42, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+    .btn-activity-category[data-category="occupation"]::before {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    }
+    .btn-activity-category[data-category="occupation"]:hover {
+      border-color: rgba(96, 165, 250, 0.55);
+      background: linear-gradient(145deg, rgba(37, 99, 235, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="daily_life"] {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.18) 0%, rgba(6, 44, 34, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .btn-activity-category[data-category="daily_life"]::before {
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+    .btn-activity-category[data-category="daily_life"]:hover {
+      border-color: rgba(52, 211, 153, 0.55);
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.28) 0%, rgba(6, 44, 34, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="leisure"] {
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.18) 0%, rgba(69, 26, 3, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .btn-activity-category[data-category="leisure"]::before {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    .btn-activity-category[data-category="leisure"]:hover {
+      border-color: rgba(251, 191, 36, 0.55);
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.28) 0%, rgba(69, 26, 3, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="explore"] {
+      background: linear-gradient(145deg, rgba(244, 63, 94, 0.18) 0%, rgba(76, 5, 25, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+    .btn-activity-category[data-category="explore"]::before {
+      background: linear-gradient(90deg, #f43f5e, #fb7185);
+    }
+    .btn-activity-category[data-category="explore"]:hover {
+      border-color: rgba(251, 113, 133, 0.55);
+      background: linear-gradient(145deg, rgba(244, 63, 94, 0.28) 0%, rgba(76, 5, 25, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="wellbeing"] {
+      background: linear-gradient(145deg, rgba(14, 165, 233, 0.18) 0%, rgba(8, 47, 73, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(14, 165, 233, 0.35);
+    }
+    .btn-activity-category[data-category="wellbeing"]::before {
+      background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+    }
+    .btn-activity-category[data-category="wellbeing"]:hover {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: linear-gradient(145deg, rgba(14, 165, 233, 0.28) 0%, rgba(8, 47, 73, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="trouble"] {
+      background: linear-gradient(145deg, rgba(220, 38, 38, 0.2) 0%, rgba(69, 10, 10, 0.88) 100%), var(--bg-card);
+      border: 1px solid rgba(220, 38, 38, 0.38);
+    }
+    .btn-activity-category[data-category="trouble"]::before {
+      background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+    .btn-activity-category[data-category="trouble"]:hover {
+      border-color: rgba(248, 113, 113, 0.65);
+      background: linear-gradient(145deg, rgba(220, 38, 38, 0.3) 0%, rgba(69, 10, 10, 0.98) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="digital_life"] {
+      background: linear-gradient(145deg, rgba(99, 102, 241, 0.18) 0%, rgba(30, 27, 75, 0.85) 100%), var(--bg-card);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+    .btn-activity-category[data-category="digital_life"]::before {
+      background: linear-gradient(90deg, #6366f1, #818cf8);
+    }
+    .btn-activity-category[data-category="digital_life"]:hover {
+      border-color: rgba(129, 140, 248, 0.55);
+      background: linear-gradient(145deg, rgba(99, 102, 241, 0.28) 0%, rgba(30, 27, 75, 0.95) 100%), var(--bg-card-hover);
+    }
+
+    .btn-activity-category[data-category="paranormal"] {
+      background: linear-gradient(145deg, rgba(147, 51, 234, 0.26) 0%, rgba(46, 16, 101, 0.9) 100%), var(--bg-card);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 18px rgba(88, 28, 135, 0.32);
+    }
+    .btn-activity-category[data-category="paranormal"]::before {
+      background: linear-gradient(90deg, #a855f7, #c084fc, #e879f9);
+    }
+    .btn-activity-category[data-category="paranormal"]:hover {
+      border-color: rgba(192, 132, 252, 0.7);
+      background: linear-gradient(145deg, rgba(147, 51, 234, 0.38) 0%, rgba(46, 16, 101, 0.98) 100%), var(--bg-card-hover);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 26px rgba(88, 28, 135, 0.45);
+    }
+
+    /* Light Mode Category Gradients */
+    [data-mode="light"] .btn-activity-category[data-category="occupation"] {
+      background: linear-gradient(145deg, #dbeafe 0%, #eff6ff 100%);
+      border-color: #93c5fd;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="daily_life"] {
+      background: linear-gradient(145deg, #d1fae5 0%, #ecfdf5 100%);
+      border-color: #6ee7b7;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="leisure"] {
+      background: linear-gradient(145deg, #fef3c7 0%, #fffbeb 100%);
+      border-color: #fcd34d;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="explore"] {
+      background: linear-gradient(145deg, #ffe4e6 0%, #fff1f2 100%);
+      border-color: #fda4af;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="wellbeing"] {
+      background: linear-gradient(145deg, #e0f2fe 0%, #f0f9ff 100%);
+      border-color: #7dd3fc;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="trouble"] {
+      background: linear-gradient(145deg, #fee2e2 0%, #fef2f2 100%);
+      border-color: #fca5a5;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="digital_life"] {
+      background: linear-gradient(145deg, #e0e7ff 0%, #eef2ff 100%);
+      border-color: #a5b4fc;
+    }
+    [data-mode="light"] .btn-activity-category[data-category="paranormal"] {
+      background: linear-gradient(145deg, #f3e8ff 0%, #faf5ff 100%);
+      border-color: #d8b4fe;
+    }
+
+    /* Elevated Modal Dialog Containers */
+    #settings-modal > div,
+    #kin-feedback-modal > div,
+    #action-choice-modal > div,
+    #kin-ask-money-modal > div,
+    #godmode-modal > div,
+    #death-modal > div,
+    #dilemma-modal {
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 30%, rgba(0, 0, 0, 0.18) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 20px 40px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--border-main);
+    }
+    [data-mode="light"] #settings-modal > div,
+    [data-mode="light"] #kin-feedback-modal > div,
+    [data-mode="light"] #action-choice-modal > div,
+    [data-mode="light"] #kin-ask-money-modal > div,
+    [data-mode="light"] #godmode-modal > div,
+    [data-mode="light"] #death-modal > div,
+    [data-mode="light"] #dilemma-modal {
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 30%, rgba(0, 0, 0, 0.03) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--border-main);
+    }
 
     /* ==========================================================================
        BITLIFE-STYLE MOTION & TRANSITION ARCHITECTURE
@@ -830,9 +1078,19 @@
       align-items: center;
       min-height: 48px;
       padding: 0.7rem 0.8rem;
-      border: 1px solid var(--border-main);
-      border-radius: 0.75rem;
-      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.85rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 40%, rgba(0, 0, 0, 0.12) 100%), var(--bg-input);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
+      transition: all 0.15s ease;
+    }
+    .profile-stat-row:hover {
+      border-color: var(--border-main);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.06) 100%), var(--bg-card-hover);
+    }
+    [data-mode="light"] .profile-stat-row {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 40%, rgba(0, 0, 0, 0.02) 100%), var(--bg-input);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     /* Batch 5: Modernized Terrible Little Lives visual identity */
@@ -1716,11 +1974,11 @@
 
           <!-- Center-Right: Currency Badges -->
           <div class="flex items-center gap-1.5 shrink-0 text-xs font-mono">
-            <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-inputbg/90 border border-leadborder/70 shadow-xs" title="Mundane Money">
+            <div class="currency-badge-fiat flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs transition-transform active:scale-95" title="Mundane Money">
               <span class="text-xs leading-none shrink-0 select-none">💵</span>
               <span id="char-money" class="font-bold text-fiat text-[11px] truncate">$0</span>
             </div>
-            <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-inputbg/90 border border-leadborder/70 shadow-xs" title="Paranormal Shillings">
+            <div class="currency-badge-shilling flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs transition-transform active:scale-95" title="Paranormal Shillings">
               <span class="text-xs leading-none shrink-0 select-none">🪙</span>
               <span id="char-shillings" class="font-bold text-shilling text-[11px] truncate">0 s.</span>
             </div>
