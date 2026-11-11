@@ -115,7 +115,6 @@
     if (!platform || !account) return { success: false, reason: 'Create an account on that platform first.' };
     if (platform.market || platform.memorial) return { success: false, reason: `${platform.name} does not accept ordinary user publishing.` };
     if (account.bannedUntil && account.bannedUntil > character.age) return { success: false, reason: `The account is suspended until age ${account.bannedUntil}.` };
-    if ((character.actionsLeft || 0) < 1) return { success: false, reason: 'You need 1 Energy to publish.' };
     const type = CONTENT_TYPES.includes(data.type) ? data.type : 'post';
     if (platform.formats && !platform.formats.includes(type)) return { success: false, reason: `${platform.name} does not support ${type} publishing.` };
     const toneId = TONES[data.tone] ? data.tone : 'ordinary';
@@ -125,7 +124,6 @@
     if (text.length < 3) return { success: false, reason: 'Write something before publishing.' };
     if (toneId === 'cruel' && !target) return { success: false, reason: 'Choose who the post targets.' };
     if (type === 'message' && !target) return { success: false, reason: 'Choose who receives the private message.' };
-    character.actionsLeft -= 1;
 
     if (type === 'message') return sendDirectMessage(character, system, account, platform, target, toneId, text);
 

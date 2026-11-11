@@ -2851,7 +2851,7 @@ class TerribleGame {
         </div>
         <div class="text-right shrink-0">
           <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
-            Focus: ${this.character.actionsLeft || 0} / ${this.character.maxActions || 5}
+            👥 Annual Actions
           </span>
         </div>
       </div>
@@ -2881,7 +2881,7 @@ class TerribleGame {
 
     // Button states & quota/diminishing returns display
     const getCount = (key) => window.getActionCount ? window.getActionCount(person, key) : (person.actionsDone && person.actionsDone[key] ? (typeof person.actionsDone[key] === 'number' ? person.actionsDone[key] : 1) : 0);
-    const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
+    const noEnergy = false;
     const relationshipMind = window.ensureNpcMemory ? window.ensureNpcMemory(person) : { resentment: 0 };
 
     const setupBtn = (btn, count, maxQuota, normalLabel, doneLabel) => {
@@ -2897,12 +2897,12 @@ class TerribleGame {
         title.textContent = `${title.dataset.baseTitle} (${count}/${maxQuota})`;
       }
 
-      if (noEnergy || isCapped) {
+      if (isCapped) {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         btn.classList.remove('hover:bg-cardhover');
         if (desc) {
-          desc.textContent = isCapped ? doneLabel : "Exhausted for this year (0 Focus left).";
+          desc.textContent = doneLabel;
         }
       } else {
         btn.disabled = false;
@@ -3162,11 +3162,6 @@ class TerribleGame {
       return;
     }
 
-    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
-
     // Modal-based interactive flows
     if (actionType === 'ask_money') {
       if (this.character.age < 5) {
@@ -3246,9 +3241,6 @@ class TerribleGame {
       result = window.finalizeNpcInteraction(person, this.character, actionType, result);
     }
     if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: result.title || person.name, outcome: result.body || result.message, effects: result.effects, engaged: true });
-
-    // Deduct 1 action point
-    this.character.actionsLeft -= 1;
 
     // Apply stat effects
     if (result.effects) {
@@ -3428,11 +3420,6 @@ class TerribleGame {
     this.askMoneyTarget = person;
     if (!this.dom.kinAskMoneyModal) return;
 
-    if (this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
-
     const askCount = person.actionsDone ? (person.actionsDone.askedMoney || 0) : 0;
     if (askCount >= 2) {
       this.openFeedbackModal({
@@ -3522,12 +3509,6 @@ class TerribleGame {
       return;
     }
 
-    if (this.character.actionsLeft <= 0) {
-      this.closeAskMoneyModal();
-      this.notifyExhausted();
-      return;
-    }
-
     const usdVal = parseInt(this.dom.slideAskMoney ? this.dom.slideAskMoney.value : 25, 10);
     const country = window.COUNTRIES_DATA[this.character.countryCode] || window.COUNTRIES_DATA.USA;
     const mult = country.wageMultiplier || 1.0;
@@ -3540,9 +3521,6 @@ class TerribleGame {
       alert(result ? (result.reason || result.message) : "Could not ask for money.");
       return;
     }
-
-    // Deduct 1 action
-    this.character.actionsLeft -= 1;
 
     // Apply effects
     if (result.effects) {
@@ -3589,11 +3567,6 @@ class TerribleGame {
   openGiftModal(person) {
     this.giftTarget = person;
     if (!this.dom.kinGiftModal) return;
-
-    if (this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
 
     const giftCount = person.actionsDone ? (person.actionsDone.gifted || 0) : 0;
     if (giftCount >= 2) {
@@ -3719,12 +3692,6 @@ class TerribleGame {
       return;
     }
 
-    if (this.character.actionsLeft <= 0) {
-      this.closeGiftModal();
-      this.notifyExhausted();
-      return;
-    }
-
     const result = window.giveGiftToKin(person, this.character, gift);
     this.closeGiftModal();
 
@@ -3732,9 +3699,6 @@ class TerribleGame {
       alert(result ? (result.reason || result.message) : "Could not give gift.");
       return;
     }
-
-    // Deduct 1 action
-    this.character.actionsLeft -= 1;
 
     // Apply stat effects
     if (result.effects) {
@@ -3908,10 +3872,6 @@ class TerribleGame {
   }
 
   triggerFeedMilkChoice(person) {
-    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
     this.openActionChoiceModal({
       icon: 'cup-soda',
       title: 'Warm Milk Formula',
@@ -3955,12 +3915,6 @@ class TerribleGame {
   }
 
   handleDirectCustomAction(person, actionDef) {
-    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
-    this.character.actionsLeft -= 1;
-
     if (!person.actionCounts) person.actionCounts = {};
     person.actionCounts.fedMilk = (person.actionCounts.fedMilk || 0) + 1;
 
@@ -4378,11 +4332,6 @@ class TerribleGame {
     if (!this.selectedPet) return;
     const pet = this.selectedPet;
 
-    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
-
     let result = null;
     if (actionType === 'feed') {
       result = window.feedPet(pet, this.character);
@@ -4400,8 +4349,6 @@ class TerribleGame {
       alert(result ? (result.reason || result.message) : "Could not complete pet action.");
       return;
     }
-
-    this.character.actionsLeft -= 1;
 
     if (result.effects) {
       for (const [stat, val] of Object.entries(result.effects)) {
@@ -4548,7 +4495,7 @@ class TerribleGame {
       const used = (entity.actionsDone?.[id] || 0) >= 1;
       const button = document.createElement('button');
       button.type = 'button';
-      button.disabled = used || this.character.actionsLeft <= 0;
+      button.disabled = used;
       button.className = 'rounded-xl border border-leadborder bg-inputbg hover:border-purple-600/60 px-3 py-2.5 text-xs text-parchment disabled:opacity-40 flex items-center justify-center gap-2 transition-all';
       button.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i><span>${used ? 'Done this year' : label}</span>`;
       button.addEventListener('click', () => this.handleCreatureAction(id));
@@ -4557,7 +4504,7 @@ class TerribleGame {
   }
 
   handleCreatureAction(action) {
-    if (!this.selectedEntityId || this.character.actionsLeft <= 0 || !window.interactWithEntity) return;
+    if (!this.selectedEntityId || !window.interactWithEntity) return;
     const result = window.interactWithEntity(this.character, this.selectedEntityId, action);
     if (!result.success) {
       alert(result.reason || 'The creature refused to respond.');
@@ -4571,7 +4518,6 @@ class TerribleGame {
         Object.entries(finding.effects || {}).forEach(([key, value]) => result.effects[key] = (result.effects[key] || 0) + value);
       }
     }
-    this.character.actionsLeft -= 1;
     Object.entries(result.effects || {}).forEach(([stat, value]) => {
       if (stat === 'money') this.character.money = Math.max(0, this.character.money + value);
       else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + value);
@@ -4661,8 +4607,6 @@ class TerribleGame {
     this.dom.caseConclusionSelect.value = file.conclusion?.type || 'genuine_paranormal';
     this.syncCaseConclusionUI();
     this.dom.caseIncidents.innerHTML = file.incidents.length ? [...file.incidents].reverse().map(incident => `<div class="rounded-xl border-l-2 border-purple-700 bg-inputbg p-3"><p class="text-[9px] font-mono uppercase text-purple-400">Age ${incident.age} · ${incident.title}</p><p class="text-[10px] text-dust mt-1 leading-relaxed">${incident.detail}</p></div>`).join('') : '<p class="text-xs text-dust/70">No incidents linked.</p>';
-    const noActions = this.character.actionsLeft <= 0;
-    [this.dom.btnInvestigateAlone, this.dom.btnInvestigateTeam, this.dom.btnAnalyzeEvidence, this.dom.btnCaseRecruit, this.dom.btnPublishCase, this.dom.btnSubmitCase].forEach(button => { if (button) button.disabled = noActions; });
     if (window.lucide) try { window.lucide.createIcons(); } catch (e) {}
   }
 
@@ -4676,7 +4620,6 @@ class TerribleGame {
       alert(result.reason || 'The archive rejected the request.');
       return false;
     }
-    if (actionCost) this.character.actionsLeft = Math.max(0, this.character.actionsLeft - actionCost);
     Object.entries(result.effects || {}).forEach(([stat, value]) => {
       if (!value) return;
       if (stat === 'money') this.character.money = Math.max(0, this.character.money + value);
@@ -4692,7 +4635,6 @@ class TerribleGame {
 
   handleCaseAction(action) {
     if (!this.selectedCaseId) return;
-    if (action !== 'conclude' && this.character.actionsLeft <= 0) { this.notifyExhausted('You have no focus left to work this case this year.'); return; }
     let result;
     if (action === 'investigate_alone') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'alone');
     else if (action === 'investigate_team') result = window.collectCaseEvidence(this.character, this.selectedCaseId, 'team');
@@ -4725,8 +4667,7 @@ class TerribleGame {
   }
 
   renderActivitiesHub() {
-    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5} Focus`;
-    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
+    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = `Year ${this.character.age} Activities`;
     const schoolStatus = this.character.education && this.character.education.graduationStatus;
     const educationCard = this.dom.activitiesModal && this.dom.activitiesModal.querySelector('[data-category="education"]');
     if (educationCard) educationCard.classList.toggle('hidden', schoolStatus === 'expelled' || schoolStatus === 'dropped_out');
@@ -4876,8 +4817,7 @@ class TerribleGame {
   }
 
   renderActivitiesList(categoryKey) {
-    const stamina = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5} Focus`;
-    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = stamina;
+    if (this.dom.activitiesStaminaText) this.dom.activitiesStaminaText.textContent = `Year ${this.character.age} Activities`;
 
     if (!this.dom.activitiesList) return;
     this.dom.activitiesList.innerHTML = '';
@@ -4896,8 +4836,8 @@ class TerribleGame {
     if (filtered.length === 0) {
       this.dom.activitiesList.innerHTML = `
         <div class="text-center py-10 px-4 bg-inputbg rounded-2xl border border-leadborder space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-dust">
-            <i data-lucide="clock" class="w-5 h-5"></i>
+          <div class="w-10 h-10 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-dust text-base">
+            <span>⏰</span>
           </div>
           <div class="font-serif font-bold text-sm text-parchment">No Pursuits Available Yet</div>
           <p class="text-xs text-dust leading-relaxed font-sans max-w-xs mx-auto">
@@ -4910,8 +4850,6 @@ class TerribleGame {
       }
       return;
     }
-
-    const noEnergy = !this.character.actionsLeft || this.character.actionsLeft <= 0;
 
     filtered.forEach(act => {
       const isLockedByAge = this.character.age < act.minAge;
@@ -4928,31 +4866,32 @@ class TerribleGame {
       const uses = (this.character.activityUses && this.character.activityUses[act.id]) || 0;
       const maxUses = act.maxPerYear !== undefined ? act.maxPerYear : 1;
       const isCapped = uses >= maxUses;
-      const isDisabled = isLockedByAge || noEnergy || isCapped || !!consequenceRestriction;
+      const isDisabled = isLockedByAge || isCapped || !!consequenceRestriction;
 
       let btnLabel = 'Engage';
       if (isLockedByAge) {
         btnLabel = `Locked (Age ${act.minAge})`;
       } else if (isCapped) {
-        btnLabel = 'Capped this Year';
+        btnLabel = 'Done this Year';
       } else if (consequenceRestriction) {
         btnLabel = 'Restricted';
       }
 
       const ageBadge = isLockedByAge 
-        ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1"><i data-lucide="lock" class="w-2.5 h-2.5"></i>Req Age ${act.minAge}</span>`
+        ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1">🔒 Req Age ${act.minAge}</span>`
         : `<span class="text-[10px] font-mono text-dust/80">Age ${act.minAge}–${act.maxAge}</span>`;
 
-      const energyCost = act.energyCost || 1;
+      const actEmoji = isLockedByAge ? '🔒' : (window.getActivityEmoji ? window.getActivityEmoji(act) : '🎯');
+
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-xl ${isLockedByAge ? 'bg-leadborder/20 text-dust/50' : 'bg-slatecard text-amber-400 border border-leadborder'} flex items-center justify-center shrink-0">
-              <i data-lucide="${isLockedByAge ? 'lock' : (act.icon || 'compass')}" class="w-4 h-4"></i>
+            <div class="w-9 h-9 rounded-xl ${isLockedByAge ? 'bg-leadborder/20 text-dust/50' : 'bg-slatecard text-amber-400 border border-leadborder'} flex items-center justify-center shrink-0 text-base">
+              <span>${actEmoji}</span>
             </div>
             <div class="min-w-0">
               <h4 class="font-serif font-bold text-xs ${isLockedByAge ? 'text-parchment/60' : 'text-parchment'} truncate">${act.name}</h4>
-              <span class="text-[9px] font-mono text-dust">${isLockedByAge ? 'Milestone' : `Quota: ${uses}/${maxUses} used`}</span>
+              <span class="text-[9px] font-mono text-dust">${isLockedByAge ? 'Milestone' : `Points: ${maxUses - uses}/${maxUses} remaining`}</span>
             </div>
           </div>
           ${ageBadge}
@@ -4962,9 +4901,8 @@ class TerribleGame {
         ${consequenceRestriction ? `<p class="text-[10px] text-crimson font-mono leading-relaxed">${consequenceRestriction}</p>` : ''}
 
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
-          <span class="text-[10px] font-mono text-dust/90 flex items-center gap-1">
-            <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>
-            Cost: ${energyCost} Focus
+          <span class="text-[10px] font-mono ${isCapped ? 'text-emerald-400 font-semibold' : 'text-dust/90'} flex items-center gap-1">
+            ${isCapped ? '✅ Completed this year' : `🎯 Points: ${maxUses - uses}/${maxUses} available`}
           </span>
           <button class="btn-do-activity px-3.5 py-1.5 rounded-xl text-xs font-serif font-bold transition-all ${
             isDisabled 
@@ -4992,12 +4930,23 @@ class TerribleGame {
   }
 
   handleActivityClick(activityId) {
-    if (!this.character.actionsLeft || this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
+    const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
+    if (!activity) return;
+
+    const uses = (this.character.activityUses && this.character.activityUses[activityId]) || 0;
+    const maxUses = activity.maxPerYear !== undefined ? activity.maxPerYear : 1;
+    if (uses >= maxUses) {
+      this.openFeedbackModal({
+        tag: "ANNUAL LIMIT",
+        title: "Done For This Year",
+        icon: "check",
+        iconColor: "text-amber-400",
+        body: `You have already pursued ${activity.name} this year (${uses}/${maxUses}). Advance the year by tapping Endure to engage again!`,
+        effects: {}
+      });
       return;
     }
 
-    const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
     const consequenceRestriction = activity && window.getActivityRestriction ? window.getActivityRestriction(this.character, activity) : null;
     const socialRestriction = activity && window.getSocialOpportunityRestriction ? window.getSocialOpportunityRestriction(this.character, activity) : null;
     const horrorRestriction = activity && window.getHorrorActivityGate ? window.getHorrorActivityGate(this.character, activity) : null;
@@ -5346,19 +5295,19 @@ class TerribleGame {
     if (this.dom.profileStoryLedger && window.storyLedgerHtml) this.dom.profileStoryLedger.innerHTML = window.storyLedgerHtml(character);
 
     const stats = [
-      ['Health', 'heart', 'text-red-400', character.stats.vitality],
-      ['Happiness', 'smile', 'text-yellow-400', character.stats.happiness],
-      ['Mind', 'eye', 'text-sky-400', character.stats.sanity],
-      ['Humanity', 'sparkles', 'text-amber-500', character.stats.humanity],
-      ['Smarts', 'brain', 'text-emerald-400', character.stats.smarts],
-      ['Looks', 'sparkle', 'text-pink-400', character.stats.looks],
-      ['Occult', 'flame', 'text-purple-400', character.stats.occult]
+      ['Health', '❤️', 'text-red-400', character.stats.vitality],
+      ['Happiness', '😊', 'text-yellow-400', character.stats.happiness],
+      ['Mind', '🧠', 'text-sky-400', character.stats.sanity],
+      ['Humanity', '✨', 'text-amber-500', character.stats.humanity],
+      ['Smarts', '📚', 'text-emerald-400', character.stats.smarts],
+      ['Looks', '👁️', 'text-pink-400', character.stats.looks],
+      ['Occult', '🔮', 'text-purple-400', character.stats.occult]
     ];
-    this.dom.profileStats.innerHTML = stats.map(([label, icon, color, rawValue]) => {
+    this.dom.profileStats.innerHTML = stats.map(([label, emoji, color, rawValue]) => {
       const value = Math.max(0, Math.min(100, Math.round(rawValue || 0)));
       return `<div class="profile-stat-row">
         <div class="min-w-0">
-          <div class="flex items-center gap-2 text-sm ${color}"><i data-lucide="${icon}" class="w-4 h-4"></i><span>${label}</span></div>
+          <div class="flex items-center gap-2 text-sm ${color}"><span class="text-base select-none">${emoji}</span><span>${label}</span></div>
           <div class="primary-stat-track"><div class="h-full rounded-full bg-current ${color}" style="width:${value}%"></div></div>
         </div>
         <strong class="font-mono text-sm text-parchment">${value}%</strong>
@@ -5421,8 +5370,8 @@ class TerribleGame {
       this.dom.btnEndure.disabled = false;
       this.dom.btnEndure.classList.remove('opacity-40', 'cursor-not-allowed');
       this.dom.btnEndure.innerHTML = `
-        <i data-lucide="chevrons-up" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:-translate-y-0.5"></i>
-        <span class="font-serif text-[10px] sm:text-[11px] font-bold whitespace-nowrap leading-none tracking-tight">+ ENDURE</span>
+        <span class="text-xs leading-none font-bold text-red-100 group-hover:scale-110 transition-transform shrink-0 select-none">➕</span>
+        <span class="font-serif text-[8.5px] font-bold whitespace-nowrap leading-none tracking-normal">ENDURE</span>
       `;
     }
 
@@ -5471,28 +5420,28 @@ class TerribleGame {
         const item = document.createElement('div');
         item.className = "flex items-start gap-2 py-1 px-2 rounded-lg hover:bg-slatecard/50 transition-colors";
 
-        let iconHtml = `<span class="mt-0.5 text-dust/60 shrink-0 text-[10px]">✦</span>`;
+        let iconHtml = `<span class="mt-0.5 text-dust/60 shrink-0 text-[10px] select-none">🔹</span>`;
         let textClass = "text-parchment/90 flex-1";
 
         if (entry.startsWith('[')) {
           if (/PROMOTION|SHELTER SECURED|UPGRADE|STABILIZED|RELEASED|PAROLE APPROVED/i.test(entry)) {
-            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="check" class="w-2.5 h-2.5"></i></span>`;
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-xs select-none">🏆</span>`;
             textClass = "text-emerald-300 font-medium flex-1";
           } else if (/EVICTION|TERMINATED|COMMITMENT|ARREST|PENITENTIARY|ASYLUM|CAUGHT|CORNERED/i.test(entry)) {
-            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="alert-triangle" class="w-2.5 h-2.5"></i></span>`;
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center shrink-0 text-xs select-none">🚨</span>`;
             textClass = "text-crimson font-medium flex-1";
           } else if (/AFFLICTION|AILMENT|CONSUMPTION|FEVER|MELANCHOLIA/i.test(entry)) {
-            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="skull" class="w-2.5 h-2.5"></i></span>`;
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-xs select-none">🩺</span>`;
             textClass = "text-amber-300 font-medium flex-1";
           } else {
-            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 text-[9px] font-bold"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i></span>`;
+            iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 text-xs select-none">🔮</span>`;
             textClass = "text-purple-300 font-medium flex-1";
           }
         } else if (entry.startsWith('Deposited salary') || entry.startsWith('Starting Fiat Balance')) {
-          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold font-mono">$</span>`;
+          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 text-xs select-none">💵</span>`;
           textClass = "text-emerald-400 font-medium flex-1";
         } else if (entry.startsWith('Collected') || entry.startsWith('Secret Paranormal Shillings') || entry.startsWith('Signed an occult contract')) {
-          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-[10px] font-bold">🪙</span>`;
+          iconHtml = `<span class="mt-0.5 w-4 h-4 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 text-xs select-none">🪙</span>`;
           textClass = "text-amber-400 font-medium flex-1";
         }
 
@@ -6428,18 +6377,6 @@ class TerribleGame {
                 effects: {}
               });
             } else {
-              if (this.character.actionsLeft <= 0) {
-                this.openFeedbackModal({
-                  tag: "ENERGY EXHAUSTED",
-                  title: "Out of Actions",
-                  icon: "battery-charging",
-                  iconColor: "text-amber-400",
-                  body: "You are too fatigued to join a new club this year! Age up via Endure Year to replenish your energy.",
-                  effects: {}
-                });
-                return;
-              }
-              this.character.actionsLeft--;
               edu.clubs = edu.clubs || [];
               edu.clubs.push(club.id);
               if (latestLog) {
@@ -6925,10 +6862,6 @@ class TerribleGame {
       this.openFeedbackModal({ tag: 'SUSPENDED', title: 'School Access Revoked', icon: 'school', iconColor: 'text-amber-400', body: 'Your suspension prevents school activities until it expires.', effects: {} });
       return;
     }
-    if (this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
 
     let result = null;
     if ((actionType === 'study' || actionType === 'study_harder') && window.studyHarder) {
@@ -6946,7 +6879,6 @@ class TerribleGame {
     if (!result) return;
 
     if (result.success) {
-      this.character.actionsLeft--;
       const latestLog = this.logs[this.logs.length - 1];
       if (latestLog) {
         latestLog.entries.push(`[${result.title}] ${result.body || result.message || ''}`);
@@ -6995,10 +6927,6 @@ class TerribleGame {
       this.openFeedbackModal({ tag: 'CONTACT REFUSED', title: 'They Remember', icon: 'ban', iconColor: 'text-rose-400', body: interactionBlock, effects: {} });
       return;
     }
-    if (this.character.actionsLeft <= 0) {
-      this.notifyExhausted();
-      return;
-    }
 
     let result = null;
     if (actionType === 'apology' && window.apologizeToNpc) {
@@ -7026,7 +6954,6 @@ class TerribleGame {
         result = window.finalizeNpcInteraction(person, this.character, actionType, result);
       }
       if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: result.title || person.name, outcome: result.body || result.message, effects: result.effects, engaged: true });
-      this.character.actionsLeft--;
       const latestLog = this.logs[this.logs.length - 1];
       if (latestLog) {
         latestLog.entries.push(`[${person.name}] ${result.body || result.message || ''}`);
@@ -7265,7 +7192,7 @@ class TerribleGame {
       this.dom.darkAltarPlayerShillings.textContent = `${this.character.shillings || 0} s.`;
     }
     if (this.dom.darkAltarPlayerEnergy) {
-      this.dom.darkAltarPlayerEnergy.textContent = `${this.character.actionsLeft || 0} / ${this.character.maxActions || 5}`;
+      this.dom.darkAltarPlayerEnergy.textContent = "Bound";
     }
     this.renderRitualCabinet();
   }
@@ -7404,7 +7331,7 @@ class TerribleGame {
       const meetsAge = char.age >= crime.minAge;
       const meetsOccult = (char.stats.occult || 0) >= crime.minOccult;
       const meetsShillings = (char.shillings || 0) >= crime.costShillings;
-      const meetsEnergy = (char.actionsLeft || 0) >= crime.energyCost;
+      const meetsEnergy = true;
       const targetCondition = requiresTarget ? (hasTarget && (!isCleanse || targetHasCurse)) : true;
       const canCast = meetsAge && meetsOccult && meetsShillings && meetsEnergy && targetCondition;
 

@@ -526,9 +526,6 @@
     if (crime.costShillings > 0 && (character.shillings || 0) < crime.costShillings) {
       return { success: false, reason: `Requires ${crime.costShillings} Paranormal Shillings.` };
     }
-    if (character.actionsLeft < crime.energyCost) {
-      return { success: false, reason: `You lack the energy for this rite (costs ${crime.energyCost} Energy).` };
-    }
     if (crime.requiresTarget && !targetRaw) {
       return { success: false, reason: "A living target is required for this hex." };
     }
@@ -537,7 +534,6 @@
     if (crime.costShillings > 0) {
       character.shillings -= crime.costShillings;
     }
-    character.actionsLeft -= crime.energyCost;
 
     // Special Cleanse Branch
     if (crime.isCleanse) {

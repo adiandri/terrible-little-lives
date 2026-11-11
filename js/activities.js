@@ -1929,15 +1929,156 @@ const ACTIVITIES_LIST = [
   }
 ];
 
-function performActivity(activityId, character) {
-  if (!character.actionsLeft || character.actionsLeft <= 0) {
-    return {
-      success: false,
-      title: "Exhausted",
-      message: "You are physically and mentally exhausted for this year (0 Focus left). Endure the year to recover."
-    };
-  }
+// Activity Emoji Resolution System (BitLife Style)
+const ACTIVITY_ICON_EMOJIS = {
+  // Occupation / Careers / Education
+  "briefcase-business": "💼",
+  "briefcase": "💼",
+  "clock": "⏰",
+  "hammer": "🔨",
+  "graduation-cap": "🎓",
+  "book-open": "📖",
+  "book": "📕",
+  "library": "📚",
+  "file-text": "📄",
+  "award": "🏅",
+  "trophy": "🏆",
+  "building": "🏢",
+  
+  // Daily Life / Money / Home
+  "house": "🏠",
+  "home": "🏡",
+  "bed": "🛏️",
+  "key": "🔑",
+  "coins": "🪙",
+  "banknote": "💵",
+  "ticket": "🎟️",
+  "shopping-bag": "🛍️",
+  "coffee": "☕",
+  "utensils": "🍽️",
+  "cup-soda": "🥤",
+  "wallet": "👛",
 
+  // Leisure / Media / Hobbies / Games
+  "palette": "🎨",
+  "music": "🎵",
+  "headphones": "🎧",
+  "tv": "📺",
+  "film": "🎬",
+  "radio": "📻",
+  "gamepad-2": "🎮",
+  "gamepad": "🕹️",
+  "dices": "🎲",
+  "puzzle": "🧩",
+  "camera": "📷",
+
+  // Explore / Places / Wildlife / Travel
+  "map": "🗺️",
+  "map-pin": "📍",
+  "compass": "🧭",
+  "car": "🚗",
+  "train": "🚆",
+  "plane": "✈️",
+  "ship": "🚢",
+  "trees": "🌲",
+  "tree": "🌳",
+  "mountain": "⛰️",
+  "sun": "☀️",
+  "paw-print": "🐾",
+  "cat": "🐈",
+  "dog": "🐕",
+  "bird": "🐦",
+  "fish": "🐟",
+
+  // Wellbeing / Health / Mental
+  "heart-pulse": "🩺",
+  "stethoscope": "🩺",
+  "heart": "❤️",
+  "pill": "💊",
+  "syringe": "💉",
+  "smile": "😊",
+  "brain": "🧠",
+  "sparkles": "✨",
+  "dumbbell": "🏋️",
+  "activity": "🏃",
+  "cross": "🏥",
+
+  // Trouble / Crime / Legal
+  "shield-alert": "🚨",
+  "shield": "🛡️",
+  "scale": "⚖️",
+  "gavel": "🔨",
+  "lock": "🔒",
+  "unlock": "🔓",
+  "siren": "🚨",
+  "alert-triangle": "⚠️",
+  "swords": "⚔️",
+  "zap": "⚡",
+
+  // Digital Life / Phones / Net
+  "smartphone": "📱",
+  "phone": "📞",
+  "globe": "🌐",
+  "laptop": "💻",
+  "monitor": "🖥️",
+  "wifi": "📶",
+  "mail": "✉️",
+  "message-square": "💬",
+  "message-circle": "🗨️",
+
+  // Paranormal / Horror / Occult
+  "moon-star": "🔮",
+  "moon": "🌙",
+  "flame": "🕯️",
+  "skull": "💀",
+  "eye": "👁️",
+  "ghost": "👻",
+  "feather": "🪶",
+  "scroll": "📜"
+};
+
+const ACTIVITY_CATEGORY_EMOJIS = {
+  occupation: "💼",
+  work: "💼",
+  education: "🎓",
+  daily_life: "🏠",
+  money: "💵",
+  home: "🏡",
+  leisure: "🎨",
+  media: "📺",
+  hobbies: "🎨",
+  games: "🎲",
+  explore: "🗺️",
+  travel: "🚗",
+  places: "📍",
+  wildlife: "🌲",
+  wellbeing: "🩺",
+  medical: "🩺",
+  mental: "🧠",
+  trouble: "🚨",
+  crime: "🚨",
+  legal: "⚖️",
+  digital_life: "📱",
+  phone: "📱",
+  internet: "🌐",
+  paranormal: "🔮",
+  horror: "🕯️",
+  random: "🎲",
+  relationships: "💖",
+  family: "👨‍👩‍👧",
+  social: "👥",
+  pets: "🐾"
+};
+
+function getActivityEmoji(act) {
+  if (!act) return "✨";
+  if (act.emoji) return act.emoji;
+  if (act.icon && ACTIVITY_ICON_EMOJIS[act.icon]) return ACTIVITY_ICON_EMOJIS[act.icon];
+  if (act.category && ACTIVITY_CATEGORY_EMOJIS[act.category]) return ACTIVITY_CATEGORY_EMOJIS[act.category];
+  return "🎯";
+}
+
+function performActivity(activityId, character) {
   const activity = ACTIVITIES_LIST.find(a => a.id === activityId);
   if (!activity) {
     return { success: false, title: "Error", message: "Activity not found." };
@@ -1948,15 +2089,6 @@ function performActivity(activityId, character) {
       success: false,
       title: "Unavailable",
       message: `You must be between age ${activity.minAge} and ${activity.maxAge} for this activity.`
-    };
-  }
-
-  const cost = activity.energyCost || 1;
-  if (character.actionsLeft < cost) {
-    return {
-      success: false,
-      title: "Insufficient Focus",
-      message: `This pursuit requires ${cost} Focus points (you have ${character.actionsLeft} left).`
     };
   }
 
@@ -1979,7 +2111,6 @@ function performActivity(activityId, character) {
   }
 
   if (result && result.success !== false) {
-    character.actionsLeft = Math.max(0, character.actionsLeft - cost);
     character.activityUses[activityId] = currentUses + 1;
   }
 
@@ -1988,4 +2119,5 @@ function performActivity(activityId, character) {
 
 window.ACTIVITY_CATEGORIES_DATA = ACTIVITY_CATEGORIES_DATA;
 window.ACTIVITIES_LIST = ACTIVITIES_LIST;
+window.getActivityEmoji = getActivityEmoji;
 window.performActivity = performActivity;

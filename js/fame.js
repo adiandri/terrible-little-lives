@@ -162,9 +162,7 @@
 
   function publicAppearance(character, kind) {
     const system = ensureFameSystem(character);
-    if ((character.actionsLeft || 0) < 1) return { success: false, reason: 'A public appearance requires 1 Energy.' };
     if (system.publicReach < 80) return { success: false, reason: 'No outlet currently considers your identity newsworthy.' };
-    character.actionsLeft -= 1;
     const activeScandal = system.scandals.find(item => item.active);
     const credibility = averageAccount(character, 'credibility');
     const options = {
@@ -183,10 +181,8 @@
 
   function makeStatement(character, stance) {
     const system = ensureFameSystem(character);
-    if ((character.actionsLeft || 0) < 1) return { success: false, reason: 'Preparing a public statement requires 1 Energy.' };
     const scandal = system.scandals.find(item => item.active);
     if (!scandal) return { success: false, reason: 'There is no active scandal requiring a public statement.' };
-    character.actionsLeft -= 1;
     let esteem = 0, notoriety = 0, message = '';
     if (stance === 'apologize') {
       esteem = scandal.documented ? 5 : 1; notoriety = -2; scandal.heat = clamp(scandal.heat - (scandal.documented ? 18 : 8));

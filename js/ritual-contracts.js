@@ -69,8 +69,6 @@
 
   function acquireMaterials(character) {
     const system = ensureRitualSystem(character);
-    if ((character.actionsLeft || 0) < 1) return { success: false, reason: 'You have no energy left to search the occult markets.' };
-    character.actionsLeft -= 1;
     const common = ['salt', 'tallow', 'thread', 'soil', 'link', 'ink', 'bell'];
     const found = [pick(common), pick(common), (character.stats?.occult || 0) >= 45 && Math.random() < 0.18 ? 'paw' : pick(['blood', ...common])];
     found.forEach(id => { system.materials[id] = (system.materials[id] || 0) + 1; });
@@ -98,8 +96,6 @@
     ensureRitualSystem(character);
     if (!target?.curse) return { success: false, reason: 'There is no curse to trace.' };
     if (target.curse.origin?.discovered) return { success: false, reason: `The origin is already known: ${target.curse.origin.label}.` };
-    if ((character.actionsLeft || 0) < 1) return { success: false, reason: 'You need 1 Energy to trace the binding.' };
-    character.actionsLeft -= 1;
     const chance = clamp(0.28 + (character.stats?.smarts || 0) * 0.003 + (character.stats?.occult || 0) * 0.005, 0.35, 0.92);
     if (Math.random() > chance) {
       character.stats.sanity = clamp((character.stats.sanity || 0) - 2);
@@ -124,7 +120,6 @@
     if (!ritual || !meta) return { success: false, reason: 'The contract could not be assembled.' };
     if (character.age < ritual.minAge) return { success: false, reason: `You must be at least age ${ritual.minAge}.` };
     if ((character.stats?.occult || 0) < ritual.minOccult) return { success: false, reason: `Requires ${ritual.minOccult}% Occult knowledge.` };
-    if ((character.actionsLeft || 0) < ritual.energyCost) return { success: false, reason: `Requires ${ritual.energyCost} Energy.` };
     if ((character.shillings || 0) < ritual.costShillings) return { success: false, reason: `Requires ${ritual.costShillings} Paranormal Shillings.` };
     if (ritual.requiresTarget && !target) return { success: false, reason: 'A living target is required.' };
     const missing = materialStatus(character, ritualId).filter(item => !item.met);
@@ -140,7 +135,6 @@
     system.contracts.unshift(contract);
     const interference = findInterference(character, target);
     if (interference && ['interrupt', 'report', 'steal'].includes(interference.action)) {
-      character.actionsLeft = Math.max(0, (character.actionsLeft || 0) - ritual.energyCost);
       character.shillings = Math.max(0, (character.shillings || 0) - ritual.costShillings);
       contract.status = interference.action;
       contract.interference = { name: interference.witness.name, action: interference.action };
@@ -197,7 +191,7 @@
   }
 
   function executeBargain(character, contract) {
-    character.actionsLeft -= 1; character.shillings -= 5;
+    character.shillings -= 5;
     const chance = clamp(0.42 + (character.stats?.occult || 0) * 0.004, 0.45, 0.86);
     if (Math.random() > chance) {
       contract.loophole = 'signature_without_consideration';
@@ -215,7 +209,6 @@
   }
 
   function executeWish(character, contract) {
-    character.actionsLeft -= 1;
     const wording = contract.wording.toLowerCase();
     let message;
     if (/love|adore/.test(wording)) {
