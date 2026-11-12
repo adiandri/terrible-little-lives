@@ -1194,6 +1194,10 @@ function spendTimeToKin(person, character) {
     }
   }
 
+  if (window.getSpendTimeLine) {
+    message = window.getSpendTimeLine(person, character, relGain);
+  }
+
   return { success: true, message, effects };
 }
 
@@ -1237,9 +1241,13 @@ function talkToKin(person, character) {
         `A brief murmur of mutual prayer ended the short exchange.`
       ];
     }
+    let lightMsg = `${window.getRandomElement(lightChats)} (+${relGain}% Closeness).`;
+    if (window.getTalkLightLine) {
+      lightMsg = `${window.getTalkLightLine(person, character, relGain)} (+${relGain}% Closeness).`;
+    }
     return {
       success: true,
-      message: `${window.getRandomElement(lightChats)} (+${relGain}% Closeness).`,
+      message: lightMsg,
       quote: "",
       effects
     };
@@ -1474,6 +1482,10 @@ function complimentKin(person, character) {
       `You complimented their fearless attitude. They laughed and promised they've always got your back (+${relGain}% Closeness).`
     ];
     message = window.getRandomElement(friendCompliments);
+  }
+
+  if (window.getComplimentLine) {
+    message = window.getComplimentLine(person, character, relGain);
   }
 
   return { success: true, message, effects };
@@ -1747,10 +1759,14 @@ function bickerWithSibling(person, character) {
       const relLoss = Math.floor(Math.random() * 4) + 6;
       person.relationship = Math.max(0, person.relationship - relLoss);
       applyKinStatEffect(character, 'happiness', -5);
+      let tattleMsg = `During a mild disagreement, ${person.name} immediately burst into theatrical tears and screamed for your parents, claiming you shoved them! You were harshly reprimanded (-${relLoss}% Closeness, -5% Happiness).`;
+      if (window.getSiblingBickerLine) {
+        tattleMsg = window.getSiblingBickerLine(person, character, role, 'tattle', relLoss);
+      }
       return {
         success: true,
         title: `Tattled by ${person.name}!`,
-        message: `During a mild disagreement, ${person.name} immediately burst into theatrical tears and screamed for your parents, claiming you shoved them! You were harshly reprimanded (-${relLoss}% Closeness, -5% Happiness).`,
+        message: tattleMsg,
         effects: { relationship: -relLoss, happiness: -5 }
       };
     }
@@ -1759,20 +1775,28 @@ function bickerWithSibling(person, character) {
     person.relationship = Math.min(100, person.relationship + relGain);
     applyKinStatEffect(character, 'happiness', 5);
     applyKinStatEffect(character, 'smarts', 2);
+    let rebelMsg = `You and ${person.name} wrestled in the hallway until the coats fell. They grinned with a split lip and slipped a contraband peppermint into your palm: "Don't let them hear us." (+${relGain}% Closeness, +Smarts).`;
+    if (window.getSiblingBickerLine) {
+      rebelMsg = window.getSiblingBickerLine(person, character, role, 'rebel', relGain);
+    }
     return {
       success: true,
       title: `Secret Pact with ${person.name}`,
-      message: `You and ${person.name} wrestled in the hallway until the coats fell. They grinned with a split lip and slipped a contraband peppermint into your palm: "Don't let them hear us." (+${relGain}% Closeness, +Smarts).`,
+      message: rebelMsg,
       effects: { relationship: relGain, happiness: 5, smarts: 2 }
     };
   } else if (role === 'Trauma-Bonded Protector') {
     const relGain = Math.floor(Math.random() * 4) + 6;
     person.relationship = Math.min(100, person.relationship + relGain);
     applyKinStatEffect(character, 'sanity', 3);
+    let protMsg = `A sudden petty squabble ended when an angry shout echoed from upstairs. You and ${person.name} instantly fell silent, huddling shoulder to shoulder in the dim corridor (+${relGain}% Closeness, +Sanity).`;
+    if (window.getSiblingBickerLine) {
+      protMsg = window.getSiblingBickerLine(person, character, role, 'protector', relGain);
+    }
     return {
       success: true,
       title: `Quiet Truce with ${person.name}`,
-      message: `A sudden petty squabble ended when an angry shout echoed from upstairs. You and ${person.name} instantly fell silent, huddling shoulder to shoulder in the dim corridor (+${relGain}% Closeness, +Sanity).`,
+      message: protMsg,
       effects: { relationship: relGain, sanity: 3 }
     };
   }
@@ -1783,20 +1807,28 @@ function bickerWithSibling(person, character) {
     person.relationship = Math.min(100, person.relationship + relGain);
     applyKinStatEffect(character, 'vitality', 2);
     applyKinStatEffect(character, 'happiness', 4);
+    let playMsg = `You and your ${person.role.toLowerCase()} ${person.name} got into an energetic pillow fight in the hallway, laughing breathlessly (+${relGain}% Closeness, +Vitality, +Happiness).`;
+    if (window.getSiblingBickerLine) {
+      playMsg = window.getSiblingBickerLine(person, character, role, 'playful', relGain);
+    }
     return {
       success: true,
       title: `Wrestled with ${person.name}`,
-      message: `You and your ${person.role.toLowerCase()} ${person.name} got into an energetic pillow fight in the hallway, laughing breathlessly (+${relGain}% Closeness, +Vitality, +Happiness).`,
+      message: playMsg,
       effects: { relationship: relGain, vitality: 2, happiness: 4 }
     };
   } else {
     // Minor argument
     const relLoss = Math.floor(Math.random() * 4) + 4;
     person.relationship = Math.max(0, person.relationship - relLoss);
+    let argueMsg = `You and ${person.name} fought over who got the bigger slice of pie, sulking in separate corners for an hour (-${relLoss}% Closeness).`;
+    if (window.getSiblingBickerLine) {
+      argueMsg = window.getSiblingBickerLine(person, character, role, 'argument', relLoss);
+    }
     return {
       success: true,
       title: `Sibling Spat`,
-      message: `You and ${person.name} fought over who got the bigger slice of pie, sulking in separate corners for an hour (-${relLoss}% Closeness).`,
+      message: argueMsg,
       effects: { relationship: -relLoss, happiness: -2 }
     };
   }
@@ -1824,6 +1856,9 @@ function shareSecretWithSibling(person, character) {
     message = `Under the blankets with a flashlight, your ${person.role.toLowerCase()} ${person.name} whispered: 'Promise not to tell mom, but I can hear what the crows say when they roost on the chimney.' (+${relGain}% Closeness, +Occult).`;
   } else {
     message = `Under the covers with a flashlight, you and ${person.name} confessed your deepest childhood fears and swore a solemn pact of loyalty (+${relGain}% Closeness, +Happiness).`;
+    if (window.getSiblingSecretLine) {
+      message = window.getSiblingSecretLine(person, character, relGain);
+    }
   }
 
   return {
@@ -1855,10 +1890,15 @@ function listenGrandparentFolktale(person, character) {
     `"${person.name} unlatched an antique cedar music box: 'Listen closely to the third chime. That melody was taught to our great-grandmother by a woman who walked out of the lake.' (+Occult, +Closeness)"`
   ];
 
+  let folktaleMsg = window.getRandomElement(tales);
+  if (window.getGrandparentFolktaleLine) {
+    folktaleMsg = window.getGrandparentFolktaleLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Ancient Lore from ${person.name}`,
-    message: window.getRandomElement(tales),
+    message: folktaleMsg,
     effects: { relationship: relGain, occult: 5, sanity: 2 }
   };
 }
@@ -1929,10 +1969,18 @@ function helpWithChores(person, character) {
     ];
   }
 
+  let choreMsg = window.getRandomElement(choreList);
+  if (window.getChoresLine) {
+    choreMsg = window.getChoresLine(person, character, relGain);
+    if (tip > 0) {
+      choreMsg += ` They slipped you ${window.formatMoney(tip, character.countryCode)} for your honest effort.`;
+    }
+  }
+
   return {
     success: true,
     title: `Helped ${person.name} with Chores`,
-    message: window.getRandomElement(choreList),
+    message: choreMsg,
     effects: { relationship: relGain, humanity: 3, vitality: 2, money: tip }
   };
 }
@@ -1959,26 +2007,38 @@ function begForPetOrToy(person, character) {
       const pet = window.generateStrayPet(character);
       character.pets = character.pets || [];
       character.pets.push(pet);
+      let petAdoptMsg = `${person.name} sighed, looked into your pleading eyes, and brought home a stray ${pet.species}: ${pet.name}! (+Happiness, +Closeness)`;
+      if (window.getBegPetLine) {
+        petAdoptMsg = window.getBegPetLine(person, character, true, pet);
+      }
       return {
         success: true,
         title: `Plea Granted! A New Pet!`,
-        message: `${person.name} sighed, looked into your pleading eyes, and brought home a stray ${pet.species}: ${pet.name}! (+Happiness, +Closeness)`,
+        message: petAdoptMsg,
         effects: { relationship: 5, happiness: 12 }
       };
+    }
+    let toyMsg = `${person.name} gave in to your persistence and bought you a beautiful antique wooden puzzle toy and sweet treats (+12% Happiness, +5% Closeness).`;
+    if (window.getBegPetLine) {
+      toyMsg = window.getBegPetLine(person, character, true, null);
     }
     return {
       success: true,
       title: `Plea Granted!`,
-      message: `${person.name} gave in to your persistence and bought you a beautiful antique wooden puzzle toy and sweet treats (+12% Happiness, +5% Closeness).`,
+      message: toyMsg,
       effects: { relationship: 5, happiness: 12 }
     };
   } else {
     person.relationship = Math.max(0, person.relationship - 4);
     applyKinStatEffect(character, 'happiness', -4);
+    let denyMsg = `${person.name} firmly crossed their arms: 'We cannot afford frivolous luxuries or extra mouths to feed in this house. Absolutely not.' (-4% Happiness, -4% Closeness).`;
+    if (window.getBegPetLine) {
+      denyMsg = window.getBegPetLine(person, character, false, null);
+    }
     return {
       success: true,
       title: `Plea Denied`,
-      message: `${person.name} firmly crossed their arms: 'We cannot afford frivolous luxuries or extra mouths to feed in this house. Absolutely not.' (-4% Happiness, -4% Closeness).`,
+      message: denyMsg,
       effects: { relationship: -4, happiness: -4 }
     };
   }
@@ -2006,10 +2066,15 @@ function askForDrivingLessons(person, character) {
     `You navigated the industrial bypass at night. ${person.name} praised your steady hands and spatial awareness (+Smarts, +Closeness).`
   ];
 
+  let driveMsg = window.getRandomElement(scenarios);
+  if (window.getDrivingLessonLine) {
+    driveMsg = window.getDrivingLessonLine(person, character, true);
+  }
+
   return {
     success: true,
     title: `Driving Practice with ${person.name}`,
-    message: window.getRandomElement(scenarios),
+    message: driveMsg,
     effects: { relationship: relGain, smarts: 4, sanity: 2 }
   };
 }
@@ -2045,10 +2110,15 @@ function discussCollegePlans(person, character) {
     `"${person.name} poured two mugs of tea: 'Whatever path you choose, make sure you can look at yourself in the mirror every morning.' (+Smarts, +Closeness)"`
   ];
 
+  let adviceMsg = window.getRandomElement(adviceQuotes);
+  if (window.getDiscussCollegeLine) {
+    adviceMsg = window.getDiscussCollegeLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Future Planning with ${person.name}`,
-    message: window.getRandomElement(adviceQuotes),
+    message: adviceMsg,
     effects: { relationship: relGain, smarts: 4, sanity: 3 }
   };
 }
@@ -2078,20 +2148,28 @@ function requestFamilyLoan(person, character, requestedAmount = 1000) {
     character.money = (character.money || 0) + amount;
     person.familyDebt = (person.familyDebt || 0) + amount;
     person.relationship = Math.max(0, person.relationship - 2);
+    let loanMsg = `${person.name} counted out ${window.formatMoney(amount, character.countryCode)}: "Take this to get yourself on your feet. Repay me when your harvest comes in." (Debt Recorded: ${window.formatMoney(person.familyDebt, character.countryCode)})`;
+    if (window.getRequestLoanLine) {
+      loanMsg = `${window.getRequestLoanLine(person, character, true, window.formatMoney(amount, character.countryCode))} (Debt Recorded: ${window.formatMoney(person.familyDebt, character.countryCode)})`;
+    }
     return {
       success: true,
       granted: true,
       title: `Family Loan Approved`,
-      message: `${person.name} counted out ${window.formatMoney(amount, character.countryCode)}: "Take this to get yourself on your feet. Repay me when your harvest comes in." (Debt Recorded: ${window.formatMoney(person.familyDebt, character.countryCode)})`,
+      message: loanMsg,
       effects: { money: amount, relationship: -2 }
     };
   } else {
     person.relationship = Math.max(0, person.relationship - 6);
+    let denyLoanMsg = `${person.name} shook their head: "I cannot risk ${window.formatMoney(amount, character.countryCode)}. Money lent to kin often burns the bridge between them." (-6% Closeness).`;
+    if (window.getRequestLoanLine) {
+      denyLoanMsg = window.getRequestLoanLine(person, character, false, window.formatMoney(amount, character.countryCode));
+    }
     return {
       success: true,
       granted: false,
       title: `Loan Request Denied`,
-      message: `${person.name} shook their head: "I cannot risk ${window.formatMoney(amount, character.countryCode)}. Money lent to kin often burns the bridge between them." (-6% Closeness).`,
+      message: denyLoanMsg,
       effects: { relationship: -6 }
     };
   }
@@ -2119,10 +2197,15 @@ function careForAgingParent(person, character) {
     `You spent the Sunday afternoon organizing their household ledgers and reading old correspondence aloud (+${relGain}% Closeness).`
   ];
 
+  let elderMsg = window.getRandomElement(scenarios);
+  if (window.getCareElderLine) {
+    elderMsg = window.getCareElderLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Cared for Aging ${person.role}`,
-    message: window.getRandomElement(scenarios),
+    message: elderMsg,
     effects: { relationship: relGain, humanity: 5, sanity: 3 }
   };
 }
@@ -2142,10 +2225,15 @@ function coverSiblingAlibi(person, character) {
   person.siblingLoyalty = 'unshakeable';
   applyKinStatEffect(character, 'humanity', 3);
 
+  let alibiMsg = `When parents investigated the broken latch and missing rations, you took the heat and fabricated an airtight alibi. Your ${person.role.toLowerCase()} squeezed your arm with tearful gratitude (+${relGain}% Closeness, Loyalty: Unshakeable).`;
+  if (window.getSiblingAlibiLine) {
+    alibiMsg = window.getSiblingAlibiLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Covered for ${person.name}`,
-    message: `When parents investigated the broken latch and missing rations, you took the heat and fabricated an airtight alibi. Your ${person.role.toLowerCase()} squeezed your arm with tearful gratitude (+${relGain}% Closeness, Loyalty: Unshakeable).`,
+    message: alibiMsg,
     effects: { relationship: relGain, humanity: 3 }
   };
 }
@@ -2165,10 +2253,15 @@ function siblingBrawl(person, character) {
   applyKinStatEffect(character, 'happiness', -5);
   applyKinStatEffect(character, 'vitality', -3);
 
+  let brawlMsg = `A vicious dispute over jealousy and past slights boiled over into a physical fight in the courtyard. You traded heavy blows before slamming doors in bitter fury (-${relLoss}% Closeness, -Vitality, -Happiness).`;
+  if (window.getSiblingBrawlLine) {
+    brawlMsg = window.getSiblingBrawlLine(person, character, relLoss);
+  }
+
   return {
     success: true,
     title: `Heated Sibling Brawl`,
-    message: `A vicious dispute over jealousy and past slights boiled over into a physical fight in the courtyard. You traded heavy blows before slamming doors in bitter fury (-${relLoss}% Closeness, -Vitality, -Happiness).`,
+    message: brawlMsg,
     effects: { relationship: -relLoss, happiness: -5, vitality: -3 }
   };
 }
@@ -2190,10 +2283,15 @@ function siblingDrinks(person, character) {
     `You split hot ramen and cold cider under glowing red paper lanterns with ${person.name}, catching up on work, heartaches, and city rumors (+${relGain}% Closeness, +Sanity).`
   ];
 
+  let drinkMsg = window.getRandomElement(venues);
+  if (window.getSiblingDrinksLine) {
+    drinkMsg = window.getSiblingDrinksLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Drinks & Dinner with ${person.name}`,
-    message: window.getRandomElement(venues),
+    message: drinkMsg,
     effects: { relationship: relGain, happiness: 6, sanity: 3 }
   };
 }
@@ -2244,10 +2342,15 @@ function exploreGrandparentAttic(person, character) {
     ];
   }
 
+  let atticMsg = window.getRandomElement(findings);
+  if (window.getGrandparentAtticLine) {
+    atticMsg = window.getGrandparentAtticLine(person, character);
+  }
+
   return {
     success: true,
     title: `Attic Expedition with ${person.name}`,
-    message: window.getRandomElement(findings),
+    message: atticMsg,
     effects: { relationship: relGain, smarts: 3, occult: 4 }
   };
 }
@@ -2273,7 +2376,10 @@ function prayWithFamily(person, character) {
   let sanityDelta = 3;
   let text = "";
 
-  if (charOccult > 25) {
+  if (window.getPrayLine) {
+    text = window.getPrayLine(person, character, relGain, charOccult);
+    if (charOccult > 25) sanityDelta = -5;
+  } else if (charOccult > 25) {
     sanityDelta = -5;
     text = `You knelt on the cold hardwood beside ${person.name}, bowing before the dark iron crucifix. As you murmured the holy verses, your occult senses burned like lye; shadows coiled along the baseboard, repelled by the prayer (+${relGain}% Closeness, +Humanity, -5% Sanity).`;
   } else {
@@ -2314,10 +2420,15 @@ function walkOnEggshells(person, character) {
     `You spoke only in soft, gentle whispers and quickly served ${person.name} black coffee without making eye contact. Their volatile temper softened into exhausted silence (+${relGain}% Closeness, +Smarts, -3% Sanity).`
   ];
 
+  let eggMsg = window.getRandomElement(scenarios);
+  if (window.getEggshellsLine) {
+    eggMsg = window.getEggshellsLine(person, character);
+  }
+
   return {
     success: true,
     title: `Walked on Eggshells around ${person.name}`,
-    message: window.getRandomElement(scenarios),
+    message: eggMsg,
     effects: { relationship: relGain, smarts: 2, sanity: -3, happiness: -4 }
   };
 }
@@ -2346,10 +2457,15 @@ function presentReportCard(person, character) {
     applyKinStatEffect(character, 'happiness', 8);
     applyKinStatEffect(character, 'smarts', 3);
 
+    let reportMsg = `${person.name} adjusted their spectacles and scrutinized your ledger line by line. A rare, crisp nod of genuine approval followed: "Exemplary. You are upholding our family standard." They handed you a ${window.formatMoney(bonus, character.countryCode)} academic commendation (+${relGain}% Closeness, +Happiness).`;
+    if (window.getReportCardLine) {
+      reportMsg = `${window.getReportCardLine(person, character, 'good', relGain)} They handed you a ${window.formatMoney(bonus, character.countryCode)} academic commendation.`;
+    }
+
     return {
       success: true,
       title: `Academic Inspection: Approved`,
-      message: `${person.name} adjusted their spectacles and scrutinized your ledger line by line. A rare, crisp nod of genuine approval followed: "Exemplary. You are upholding our family standard." They handed you a ${window.formatMoney(bonus, character.countryCode)} academic commendation (+${relGain}% Closeness, +Happiness).`,
+      message: reportMsg,
       effects: { relationship: relGain, happiness: 8, smarts: 3, money: bonus }
     };
   } else {
@@ -2358,10 +2474,15 @@ function presentReportCard(person, character) {
     applyKinStatEffect(character, 'happiness', -12);
     applyKinStatEffect(character, 'sanity', -5);
 
+    let failMsg = `${person.name} slammed your report card down onto the mahogany desk with a thunderous crack: "Mediocre! Shameful! In this city, weakness is ground to dust. No privileges until these numbers improve!" (-${relLoss}% Closeness, -12% Happiness, -5% Sanity).`;
+    if (window.getReportCardLine) {
+      failMsg = window.getReportCardLine(person, character, 'bad', relLoss);
+    }
+
     return {
       success: true,
       title: `Academic Inspection: Severe Reprimand`,
-      message: `${person.name} slammed your report card down onto the mahogany desk with a thunderous crack: "Mediocre! Shameful! In this city, weakness is ground to dust. No privileges until these numbers improve!" (-${relLoss}% Closeness, -12% Happiness, -5% Sanity).`,
+      message: failMsg,
       effects: { relationship: -relLoss, happiness: -12, sanity: -5 }
     };
   }
@@ -2389,10 +2510,15 @@ function seekGrandparentHaven(person, character) {
     `You spent the weekend sleeping in ${person.name}'s lavender-scented guest room, far from household strife. You awoke refreshed and full of calm resolve (+14% Happiness, +Vitality).`
   ];
 
+  let havenMsg = window.getRandomElement(havMessages);
+  if (window.getGrandparentHavenLine) {
+    havenMsg = window.getGrandparentHavenLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Sanctuary with ${person.name}`,
-    message: window.getRandomElement(havMessages),
+    message: havenMsg,
     effects: { relationship: relGain, happiness: 14, sanity: 8, vitality: 4 }
   };
 }
@@ -2419,10 +2545,15 @@ function inheritGrandparentKeepsake(person, character) {
   character.keepsakes = character.keepsakes || [];
   character.keepsakes.push(chosen.name);
 
+  let keepsakeMsg = `${person.name} unlocked an iron safe beneath the floorboards and placed the ${chosen.name} into your trembling hands: "This kept me alive through the dark winter of '62. Wear it close, and never let a stranger touch it." (${chosen.buff}) (+15% Closeness, +8% Occult, +6% Sanity).`;
+  if (window.getGrandparentKeepsakeLine) {
+    keepsakeMsg = `${window.getGrandparentKeepsakeLine(person, character)} (${chosen.buff}) (+15% Closeness, +8% Occult, +6% Sanity).`;
+  }
+
   return {
     success: true,
     title: `Heirloom Received: ${chosen.name}`,
-    message: `${person.name} unlocked an iron safe beneath the floorboards and placed the ${chosen.name} into your trembling hands: "This kept me alive through the dark winter of '62. Wear it close, and never let a stranger touch it." (${chosen.buff}) (+15% Closeness, +8% Occult, +6% Sanity).`,
+    message: keepsakeMsg,
     effects: { relationship: 15, sanity: 6, occult: 8 }
   };
 }
@@ -2449,10 +2580,18 @@ function visitNursingHome(person, character) {
     character.money = (character.money || 0) + secretCash;
   }
 
+  let nurseMsg = `You brought fresh tea and lavender biscuits to ${person.name}'s bedside. They smiled weakly through the window fog, holding your hand${secretCash > 0 ? ` and secretly pressing ${window.formatMoney(secretCash, character.countryCode)} into your palm` : ''} (+${relGain}% Closeness, +Humanity, +Sanity).`;
+  if (window.getNursingHomeLine) {
+    nurseMsg = window.getNursingHomeLine(person, character, relGain);
+    if (secretCash > 0) {
+      nurseMsg += ` Before you stepped away, they secretly pressed ${window.formatMoney(secretCash, character.countryCode)} into your palm.`;
+    }
+  }
+
   return {
     success: true,
     title: `Bedside Visit with ${person.name}`,
-    message: `You brought fresh tea and lavender biscuits to ${person.name}'s bedside. They smiled weakly through the window fog, holding your hand${secretCash > 0 ? ` and secretly pressing ${window.formatMoney(secretCash, character.countryCode)} into your palm` : ''} (+${relGain}% Closeness, +Humanity, +Sanity).`,
+    message: nurseMsg,
     effects: { relationship: relGain, humanity: 5, sanity: 3, money: secretCash }
   };
 }
@@ -2482,10 +2621,15 @@ function dateLover(person, character, dateType = 'casual') {
     `You caught a late-night double feature at the vintage cinema with ${person.name}, sharing buttery popcorn in the dim velvet balcony (+${relGain}% Closeness, +Happiness).`
   ];
 
+  let dateMsg = window.getRandomElement(dates);
+  if (window.getDateLoverLine) {
+    dateMsg = window.getDateLoverLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Romantic Date with ${person.name}`,
-    message: window.getRandomElement(dates),
+    message: dateMsg,
     effects: { relationship: relGain, happiness: 7, sanity: 3 }
   };
 }
@@ -2510,10 +2654,15 @@ function flirtKissLover(person, character) {
     `You whispered sweet promises to ${person.name} in the dark, feeling their heartbeat sync with your own (+${relGain}% Closeness, +Sanity).`
   ];
 
+  let kissMsg = window.getRandomElement(moments);
+  if (window.getFlirtKissLine) {
+    kissMsg = window.getFlirtKissLine(person, character, relGain);
+  }
+
   return {
     success: true,
     title: `Passion with ${person.name}`,
-    message: window.getRandomElement(moments),
+    message: kissMsg,
     effects: { relationship: relGain, happiness: 8, sanity: 4 }
   };
 }
@@ -2542,21 +2691,32 @@ function confessToFriend(person, character) {
     }
     character.kin.friends = (character.kin.friends || []).filter(f => f.id !== person.id);
 
+    let confessMsg = `With trembling hands, you confessed your love to ${person.name}. Their face flushed with joy as they threw their arms around your neck: "I've waited so long for you to say that!" (${person.name} is now your ${person.role}!) (+15% Happiness, +18% Closeness).`;
+    if (window.getFriendConfessLine) {
+      confessMsg = `${window.getFriendConfessLine(person, character, true, 18)} (${person.name} is now your ${person.role}!) (+15% Happiness, +18% Closeness).`;
+    }
+
     return {
       success: true,
       accepted: true,
       title: `Feelings Reciprocated!`,
-      message: `With trembling hands, you confessed your love to ${person.name}. Their face flushed with joy as they threw their arms around your neck: "I've waited so long for you to say that!" (${person.name} is now your ${person.role}!) (+15% Happiness, +18% Closeness).`,
+      message: confessMsg,
       effects: { relationship: 18, happiness: 15 }
     };
   } else {
     person.relationship = Math.max(0, person.relationship - 12);
     applyKinStatEffect(character, 'happiness', -10);
+
+    let rejectMsg = `${person.name} looked down awkwardly and sighed: "You mean the world to me as a friend, but I don't see us that way. I'm sorry." The silence between you grew painfully heavy (-10% Happiness, -12% Closeness).`;
+    if (window.getFriendConfessLine) {
+      rejectMsg = window.getFriendConfessLine(person, character, false, 12);
+    }
+
     return {
       success: true,
       accepted: false,
       title: `Gentle Rejection`,
-      message: `${person.name} looked down awkwardly and sighed: "You mean the world to me as a friend, but I don't see us that way. I'm sorry." The silence between you grew painfully heavy (-10% Happiness, -12% Closeness).`,
+      message: rejectMsg,
       effects: { relationship: -12, happiness: -10 }
     };
   }
@@ -2581,20 +2741,32 @@ function askMoveInTogether(person, character) {
     person.relationship = Math.min(100, person.relationship + 12);
     applyKinStatEffect(character, 'happiness', 10);
     applyKinStatEffect(character, 'sanity', 5);
+
+    let moveMsg = `${person.name} excitedly packed their cardboard boxes and moved into your flat! Domestic bills will now be shared equally (+10% Happiness, +12% Closeness).`;
+    if (window.getMoveInLine) {
+      moveMsg = `${window.getMoveInLine(person, character, true)} Domestic bills will now be shared equally (+10% Happiness, +12% Closeness).`;
+    }
+
     return {
       success: true,
       agreed: true,
       title: `Moved in Together!`,
-      message: `${person.name} excitedly packed their cardboard boxes and moved into your flat! Domestic bills will now be shared equally (+10% Happiness, +12% Closeness).`,
+      message: moveMsg,
       effects: { relationship: 12, happiness: 10, sanity: 5 }
     };
   } else {
     person.relationship = Math.max(0, person.relationship - 5);
+
+    let refuseMsg = `${person.name} hesitated: "I love you, but our relationship needs more time before taking such a serious leap." (-5% Closeness).`;
+    if (window.getMoveInLine) {
+      refuseMsg = window.getMoveInLine(person, character, false);
+    }
+
     return {
       success: true,
       agreed: false,
       title: `Not Ready Yet`,
-      message: `${person.name} hesitated: "I love you, but our relationship needs more time before taking such a serious leap." (-5% Closeness).`,
+      message: refuseMsg,
       effects: { relationship: -5 }
     };
   }
@@ -2638,21 +2810,33 @@ function proposeMarriage(person, character, ringTier = 'silver') {
     person.relationship = Math.min(100, person.relationship + 20);
     applyKinStatEffect(character, 'happiness', 20);
     applyKinStatEffect(character, 'sanity', 6);
+
+    let propMsg = `Down on one knee in the lamplight, you presented the ring. Tears filled ${person.name}'s eyes as they gasped: "YES! A thousand times, yes!" (${person.name} is now your ${person.role}!) (+20% Happiness, +20% Closeness).`;
+    if (window.getProposeMarriageLine) {
+      propMsg = `${window.getProposeMarriageLine(person, character, true, ringTier)} (${person.name} is now your ${person.role}!) (+20% Happiness, +20% Closeness).`;
+    }
+
     return {
       success: true,
       accepted: true,
       title: `SHE/HE SAID YES!`,
-      message: `Down on one knee in the lamplight, you presented the ring. Tears filled ${person.name}'s eyes as they gasped: "YES! A thousand times, yes!" (${person.name} is now your ${person.role}!) (+20% Happiness, +20% Closeness).`,
+      message: propMsg,
       effects: { relationship: 20, happiness: 20, sanity: 6, money: -cost }
     };
   } else {
     person.relationship = Math.max(0, person.relationship - 15);
     applyKinStatEffect(character, 'happiness', -12);
+
+    let rejMsg = `${person.name} stepped backward, looking pained: "I can't wear this. We aren't ready for marriage." The rejection cuts deep (-12% Happiness, -15% Closeness).`;
+    if (window.getProposeMarriageLine) {
+      rejMsg = window.getProposeMarriageLine(person, character, false, ringTier);
+    }
+
     return {
       success: true,
       accepted: false,
       title: `Proposal Rejected`,
-      message: `${person.name} stepped backward, looking pained: "I can't wear this. We aren't ready for marriage." The rejection cuts deep (-12% Happiness, -15% Closeness).`,
+      message: rejMsg,
       effects: { relationship: -15, happiness: -12, money: -cost }
     };
   }
@@ -2692,10 +2876,15 @@ function planWeddingCeremony(person, character, venueType = 'courthouse') {
     grand_estate: `At a breathtaking private manor overlooking the lake, you celebrated an opulent wedding gala with orchestra and champagne.`
   };
 
+  let weddingMsg = `${venues[venueType] || venues.courthouse} You are officially married to your ${person.role}, ${person.name}! (+25% Happiness, 100% Closeness).`;
+  if (window.getWeddingCeremonyLine) {
+    weddingMsg = `${window.getWeddingCeremonyLine(person, character, venueType)} You are officially married to your ${person.role}, ${person.name}! (+25% Happiness, 100% Closeness).`;
+  }
+
   return {
     success: true,
     title: `Just Married!`,
-    message: `${venues[venueType] || venues.courthouse} You are officially married to your ${person.role}, ${person.name}! (+25% Happiness, 100% Closeness).`,
+    message: weddingMsg,
     effects: { relationship: 25, happiness: 25, sanity: 8, money: -cost }
   };
 }
@@ -2737,11 +2926,16 @@ function conceiveChildWithLover(person, character) {
     applyKinStatEffect(character, 'happiness', 20);
     applyKinStatEffect(character, 'humanity', 10);
 
+    let babyMsg = `A healthy baby ${child.role.toLowerCase()} was welcomed into the world: ${child.name}! You and ${person.name} wept with profound joy (+20% Happiness, +10% Humanity).`;
+    if (window.getConceiveChildLine) {
+      babyMsg = `A healthy baby ${child.role.toLowerCase()} was welcomed into the world: ${child.name}! ${window.getConceiveChildLine(person, character)} (+20% Happiness, +10% Humanity).`;
+    }
+
     return {
       success: true,
       conceived: true,
       title: `A New Soul is Born!`,
-      message: `A healthy baby ${child.role.toLowerCase()} was welcomed into the world: ${child.name}! You and ${person.name} wept with profound joy (+20% Happiness, +10% Humanity).`,
+      message: babyMsg,
       effects: { happiness: 20, humanity: 10, relationship: 15 }
     };
   } else {
@@ -2775,16 +2969,23 @@ function breakupWithLover(person, character) {
     character.money -= settlement;
   }
 
+  let breakMsg = wasMarried
+    ? `After bitter court arguments, the marriage was legally dissolved. Assets were split and ${person.name} walked out of your life${settlement > 0 ? ` (Settlement Paid: ${window.formatMoney(settlement, character.countryCode)})` : ''} (-18% Happiness, -5% Sanity).`
+    : `You and ${person.name} had a tearful, heartbreaking conversation and packed your separate bags. You are no longer together (-18% Happiness).`;
+  if (window.getBreakupLine) {
+    breakMsg = window.getBreakupLine(person, character, wasMarried);
+    if (wasMarried && settlement > 0) {
+      breakMsg += ` (Settlement Paid: ${window.formatMoney(settlement, character.countryCode)})`;
+    }
+  }
+
   return {
     success: true,
     title: wasMarried ? `Divorce Finalized` : `Relationship Ended`,
-    message: wasMarried
-      ? `After bitter court arguments, the marriage was legally dissolved. Assets were split and ${person.name} walked out of your life${settlement > 0 ? ` (Settlement Paid: ${window.formatMoney(settlement, character.countryCode)})` : ''} (-18% Happiness, -5% Sanity).`
-      : `You and ${person.name} had a tearful, heartbreaking conversation and packed your separate bags. You are no longer together (-18% Happiness).`,
+    message: breakMsg,
     effects: { relationship: -45, happiness: -18, sanity: -5, money: -settlement }
   };
 }
-
 
 function argueWithKin(person, character) {
   const count = getActionCount(person, 'argued');
@@ -2801,7 +3002,10 @@ function argueWithKin(person, character) {
     `You snapped at ${person.name} and slammed your bedroom door in their face.`,
     `You accused ${person.name} of ignoring the strange noises in the walls, resulting in a cold, hostile silence.`
   ];
-  const message = `${window.getRandomElement(insults)} (-${relLoss}% Relationship, -2% Happiness).`;
+  let message = `${window.getRandomElement(insults)} (-${relLoss}% Relationship, -2% Happiness).`;
+  if (window.getArgueLine) {
+    message = window.getArgueLine(person, character, relLoss);
+  }
 
   return { success: true, message, effects: { relationship: -relLoss, happiness: -2, sanity: -1 } };
 }
@@ -2839,6 +3043,10 @@ function investigateKin(person, character) {
     person.isRevealed = true;
   }
 
+  if (window.getInvestigateLine) {
+    clue = window.getInvestigateLine(person, character, revealed);
+  }
+
   return {
     success: true,
     message: clue,
@@ -2869,7 +3077,10 @@ function offerTributeToEntity(person, character) {
     `You offered an antique tarnished coin and three drops of your own blood to ${person.name} in the cellar.`
   ];
 
-  const message = `${window.getRandomElement(tributes)}\nIn return, they bestowed +${shillingsGained} Paranormal Shillings upon you (+20% Relationship, +12% Occult, -2% Humanity).`;
+  let message = `${window.getRandomElement(tributes)}\nIn return, they bestowed +${shillingsGained} Paranormal Shillings upon you (+20% Relationship, +12% Occult, -2% Humanity).`;
+  if (window.getTributeLine) {
+    message = `${window.getTributeLine(person, character)}\nIn return, they bestowed +${shillingsGained} Paranormal Shillings upon you (+20% Relationship, +12% Occult, -2% Humanity).`;
+  }
 
   return {
     success: true,
@@ -3019,6 +3230,10 @@ function cuddleKin(person, character) {
     effects = { relationship: relGain, happiness: +8, vitality: +3, sanity: +3 };
   }
 
+  if (window.getCuddleLine) {
+    message = window.getCuddleLine(person, character);
+  }
+
   return {
     success: true,
     message,
@@ -3165,6 +3380,10 @@ function babbleToKin(person, character) {
     effects = { relationship: relGain, smarts: +5, happiness: +5 };
   }
 
+  if (window.getBabbleLine) {
+    message = window.getBabbleLine(person, character, chosen);
+  }
+
   return {
     success: true,
     message,
@@ -3213,6 +3432,10 @@ function feedMilkFromKin(person, character) {
   } else {
     // Loving default
     message = `${person.name} prepared a warm bottle and gently supported your head while you drank, rocking you until you were full and sleepy.`;
+  }
+
+  if (window.getFeedMilkLine) {
+    message = window.getFeedMilkLine(person, character);
   }
 
   return {
@@ -3269,6 +3492,10 @@ function peekabooWithKin(person, character) {
   } else {
     // Loving default
     message = `${person.name} covered their face with both hands, waited two seconds, and shouted 'PEEK-A-BOO!' with a funny grin, sending you into fits of giggles.`;
+  }
+
+  if (window.getPeekabooLine) {
+    message = window.getPeekabooLine(person, character);
   }
 
   return {
