@@ -1204,35 +1204,35 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* Double-Ruled Grimoire Border & Cathedral Arch SVG Backdrop */
+    /* Cathedral Arch Backdrop (Soft/Blurry Background Layer) */
     .landing-frame-hairline {
       position: absolute;
       inset: 9px;
       z-index: 0;
       pointer-events: none;
-      border: 1px solid color-mix(in srgb, var(--accent-shilling) 28%, var(--border-main));
+      border: 1px solid color-mix(in srgb, var(--border-main) 50%, transparent);
       border-radius: 1.15rem;
-      box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 85%, transparent), inset 0 0 0 4px color-mix(in srgb, var(--border-main) 45%, transparent);
     }
     .landing-cathedral-svg {
       position: absolute;
-      inset: 10px 10px auto 10px;
-      height: 74%;
-      width: calc(100% - 20px);
+      inset: 12px 12px auto 12px;
+      height: 72%;
+      width: calc(100% - 24px);
       z-index: 0;
       pointer-events: none;
-      color: color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
-      opacity: 0.55;
+      color: color-mix(in srgb, var(--accent-shilling) 34%, var(--border-main));
+      opacity: 0.36;
+      filter: blur(0.6px);
     }
     [data-mode="light"] .landing-cathedral-svg {
-      opacity: 0.42;
+      opacity: 0.28;
     }
     .landing-corner {
       position: absolute;
-      width: 16px;
-      height: 16px;
-      border-color: color-mix(in srgb, var(--accent-shilling) 55%, var(--accent-primary));
-      opacity: 0.82;
+      width: 14px;
+      height: 14px;
+      border-color: color-mix(in srgb, var(--accent-shilling) 45%, var(--border-main));
+      opacity: 0.72;
     }
     .landing-corner-tl { top: -1px; left: -1px; border-top: 1.5px solid; border-left: 1.5px solid; border-top-left-radius: 6px; }
     .landing-corner-tr { top: -1px; right: -1px; border-top: 1.5px solid; border-right: 1.5px solid; border-top-right-radius: 6px; }
@@ -1265,49 +1265,29 @@
       100% { transform: translateY(-760px) translateX(var(--drift, 18px)) scale(1.1); opacity: 0; }
     }
 
-    /* Tarot Cartouche & Cathedral Reliquary Showcase */
+    /* Open Tarot Frontispiece & Reliquary Showcase (No heavy front arch box) */
     .landing-tarot-cartouche {
       position: relative;
       width: 100%;
-      max-width: 326px;
+      max-width: 320px;
       margin: 0 auto;
-      padding: 0.85rem 1rem 0.9rem;
-      border-radius: 9rem 9rem 1.15rem 1.15rem;
-      border: 1px solid color-mix(in srgb, var(--accent-shilling) 36%, var(--border-main));
-      background:
-        radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--accent-primary) 16%, transparent) 0%, transparent 68%),
-        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 82%, rgba(0,0,0,0.35)) 0%, color-mix(in srgb, var(--bg-input) 88%, transparent) 100%);
-      box-shadow:
-        0 18px 42px -12px rgba(0, 0, 0, 0.58),
-        inset 0 1px 0 rgba(255, 245, 220, 0.14),
-        inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 65%, transparent),
-        inset 0 0 0 4px color-mix(in srgb, var(--border-main) 45%, transparent);
-      backdrop-filter: blur(6px);
-    }
-    [data-mode="light"] .landing-tarot-cartouche {
-      background:
-        radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--accent-primary) 9%, transparent) 0%, transparent 68%),
-        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 92%, #ffffff) 0%, color-mix(in srgb, var(--bg-input) 94%, transparent) 100%);
-      box-shadow:
-        0 14px 32px -12px rgba(45, 32, 20, 0.18),
-        inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 75%, transparent),
-        inset 0 0 0 4px color-mix(in srgb, var(--border-main) 50%, transparent);
+      padding: 0.25rem 0.5rem;
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
     .landing-arcana-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.15rem 0.65rem;
-      border-radius: 9999px;
-      border: 1px solid color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
-      background: color-mix(in srgb, var(--bg-chassis) 85%, transparent);
+      gap: 0.45rem;
+      padding: 0.1rem 0.5rem;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 9px;
+      font-size: 9.5px;
       font-weight: 700;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      color: var(--accent-shilling);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      color: color-mix(in srgb, var(--accent-shilling) 85%, var(--text-primary));
+      opacity: 0.9;
     }
 
     /* Mourning Locket Emblem Showcase (Artwork kept 100% intact) */
@@ -1569,9 +1549,9 @@
         </div>
       </header>
 
-      <!-- Centerpiece: Arched Tarot Cartouche & Suspended Reliquary Medallion -->
+      <!-- Centerpiece: Open Reliquary Medallion & Arcana Frontispiece -->
       <div class="relative z-10 my-auto py-2 flex flex-col items-center justify-center">
-        <div class="landing-tarot-cartouche flex flex-col items-center text-center space-y-2.5">
+        <div class="landing-tarot-cartouche flex flex-col items-center text-center space-y-3">
           <!-- Arcana Numerals Header -->
           <div class="landing-arcana-pill">
             <span>☾</span>
@@ -1584,7 +1564,7 @@
             <div class="landing-logo-glow" aria-hidden="true"></div>
             <div class="landing-ring-outer" aria-hidden="true"></div>
             <div class="landing-ring-inner" aria-hidden="true"></div>
-            <div class="landing-logo-frame w-32 h-32 sm:w-36 sm:h-36" aria-label="Terrible Little Lives illustrated emblem">
+            <div class="landing-logo-frame w-36 h-36 sm:w-42 sm:h-42" aria-label="Terrible Little Lives illustrated emblem">
               <img src="assets/brand/terrible-little-lives-emblem.webp" alt="Terrible Little Lives illustrated emblem" width="768" height="768" class="landing-logo-img">
             </div>
           </div>
@@ -1594,10 +1574,10 @@
             <p class="text-[8.5px] font-mono tracking-[0.28em] uppercase text-dust/80">
               Liber Vitae &amp; Mortis
             </p>
-            <h1 class="landing-title-text font-serif font-black text-[1.75rem] sm:text-[2rem] tracking-[0.13em] text-parchment leading-[1.05] uppercase">
+            <h1 class="landing-title-text font-serif font-black text-[1.9rem] sm:text-[2.15rem] tracking-[0.13em] text-parchment leading-[1.05] uppercase">
               Terrible<br><span class="text-parchment/90">Little Lives</span>
             </h1>
-            <div class="flex items-center justify-center gap-2 px-5 pt-0.5" aria-hidden="true">
+            <div class="flex items-center justify-center gap-2 px-6 pt-0.5" aria-hidden="true">
               <span class="landing-rule"></span>
               <svg class="w-3.5 h-3.5 text-crimson/85 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/>
@@ -1609,9 +1589,9 @@
             </p>
           </div>
 
-          <!-- Footnoted Grimoire Epigraph Plate -->
-          <div class="w-full pt-1.5 border-t border-leadborder/55 px-2">
-            <p id="landing-epigraph" class="landing-epigraph text-[11px] text-parchment/80 font-serif italic leading-snug min-h-[2.5em] flex items-center justify-center">
+          <!-- Poetic Gothic Epigraph -->
+          <div class="w-full pt-1 px-3">
+            <p id="landing-epigraph" class="landing-epigraph text-[11px] text-parchment/75 font-serif italic leading-relaxed min-h-[2.5em] flex items-center justify-center">
               "Rent is due on the first. The baby monitor whispers backwards at 3 AM."
             </p>
           </div>
