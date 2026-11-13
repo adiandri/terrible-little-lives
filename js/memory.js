@@ -160,38 +160,50 @@
     const mind = ensureNpcMemory(person);
     const state = getRelationshipState(person);
     const stateStyles = {
-      trusting: 'text-emerald-300 border-emerald-500/30 bg-emerald-950/25',
-      wary: 'text-amber-300 border-amber-500/30 bg-amber-950/25',
-      resentful: 'text-orange-300 border-orange-500/30 bg-orange-950/25',
-      hostile: 'text-rose-300 border-rose-500/30 bg-rose-950/25',
-      afraid: 'text-purple-300 border-purple-500/30 bg-purple-950/25',
-      estranged: 'text-dust border-leadborder bg-ebon/30'
+      trusting: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
+      wary: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+      resentful: 'text-orange-400 border-orange-500/30 bg-orange-500/10',
+      hostile: 'text-rose-400 border-rose-500/30 bg-rose-500/10',
+      afraid: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+      estranged: 'text-dust border-leadborder bg-inputbg'
     };
     const memories = person.memories.slice(0, 4);
     const rows = memories.length ? memories.map(memory => {
       const marker = memory.tone === 'harmful' ? 'text-rose-400' : (memory.tone === 'repair' ? 'text-sky-400' : 'text-emerald-400');
       const when = memory.age !== null ? `Age ${memory.age}` : (memory.year !== null ? `${memory.year}` : 'Earlier');
       return `<li class="flex gap-2 text-[10px] leading-snug"><span class="${marker}">●</span><span class="text-dust"><span class="text-parchment">${memory.summary}</span> · ${when}${memory.softened ? ' · acknowledged' : ''}</span></li>`;
-    }).join('') : '<li class="text-[10px] text-dust/70 italic">No important history recorded yet.</li>';
+    }).join('') : '<li class="text-[10px] text-dust/70 italic">No notable shared history recorded yet.</li>';
     const entityCondition = person.entityCondition
-      ? `<div class="rounded-lg border border-purple-500/30 bg-purple-950/25 p-2 text-[10px] text-purple-200"><span class="font-mono uppercase tracking-wider">Unnatural change:</span> ${person.entityCondition.type} since age ${person.entityCondition.sinceAge}</div>`
+      ? `<div class="rounded-lg border border-purple-500/30 bg-purple-500/10 px-2.5 py-1.5 text-[10px] text-purple-300"><span class="font-mono uppercase tracking-wider">Unnatural change:</span> ${person.entityCondition.type} since age ${person.entityCondition.sinceAge}</div>`
       : '';
     return `
-      <div class="rounded-lg border ${stateStyles[state]} p-2.5 space-y-2">
+      <div class="rounded-xl border border-leadborder/80 bg-inputbg/90 p-2.5 space-y-2">
         ${entityCondition}
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[9px] font-mono uppercase tracking-wider text-dust">Relationship state</span>
-          <span class="text-[10px] font-mono font-bold uppercase">${state}</span>
+        <div class="grid grid-cols-4 gap-1.5 items-center text-center font-mono">
+          <div class="rounded-lg border px-1.5 py-1 ${stateStyles[state]}">
+            <div class="text-[8px] uppercase opacity-80">Stance</div>
+            <div class="text-[10px] font-bold uppercase truncate">${state}</div>
+          </div>
+          <div class="rounded-lg bg-slatecard/80 border border-leadborder/60 px-1.5 py-1">
+            <div class="text-[8px] uppercase text-dust">Trust</div>
+            <div class="text-[10px] text-parchment font-bold">${mind.trust}%</div>
+          </div>
+          <div class="rounded-lg bg-slatecard/80 border border-leadborder/60 px-1.5 py-1">
+            <div class="text-[8px] uppercase text-dust">Grudge</div>
+            <div class="text-[10px] text-parchment font-bold">${mind.resentment}%</div>
+          </div>
+          <div class="rounded-lg bg-slatecard/80 border border-leadborder/60 px-1.5 py-1">
+            <div class="text-[8px] uppercase text-dust">Fear</div>
+            <div class="text-[10px] text-parchment font-bold">${mind.fear}%</div>
+          </div>
         </div>
-        <div class="grid grid-cols-3 gap-2 text-center font-mono">
-          <div><div class="text-[8px] uppercase text-dust">Trust</div><div class="text-[10px] text-parchment font-bold">${mind.trust}%</div></div>
-          <div><div class="text-[8px] uppercase text-dust">Resentment</div><div class="text-[10px] text-parchment font-bold">${mind.resentment}%</div></div>
-          <div><div class="text-[8px] uppercase text-dust">Fear</div><div class="text-[10px] text-parchment font-bold">${mind.fear}%</div></div>
-        </div>
-        <div class="border-t border-current/15 pt-2">
-          <div class="text-[9px] font-mono uppercase tracking-wider text-dust mb-1.5">Recent history</div>
-          <ul class="space-y-1.5">${rows}</ul>
-        </div>
+        <details class="group pt-1 border-t border-leadborder/50">
+          <summary class="list-none cursor-pointer flex items-center justify-between text-[9px] font-mono uppercase tracking-wider text-dust hover:text-parchment select-none">
+            <span>Shared Memory Ledger (${memories.length})</span>
+            <span class="text-[10px] transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <ul class="space-y-1.5 pt-2">${rows}</ul>
+        </details>
       </div>`;
   }
 

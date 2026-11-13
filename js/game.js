@@ -2795,11 +2795,8 @@ class TerribleGame {
     const residenceBanner = document.getElementById('family-residence-banner');
     if (residenceBanner) residenceBanner.classList.toggle('hidden', !['all', 'family'].includes(filter));
     this.dom.kinFilterBtns.forEach(btn => {
-      if (btn.dataset.filter === filter) {
-        btn.className = "kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all whitespace-nowrap";
-      } else {
-        btn.className = "kin-filter-btn min-h-[40px] px-3 text-xs rounded-lg text-dust hover:text-parchment transition-all whitespace-nowrap";
-      }
+      const isSelected = btn.dataset.filter === filter;
+      btn.className = `kin-filter-btn profile-filter-pill${isSelected ? ' is-active' : ''}`;
     });
     this.renderKinList(filter);
   }
@@ -2848,95 +2845,132 @@ class TerribleGame {
     if (filtered.length === 0) {
       if (filter === 'lovers') {
         this.dom.kinList.innerHTML = `
-          <div class="text-center py-10 px-4 space-y-3 bg-inputbg/40 border border-leadborder/60 rounded-2xl">
-            <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl shadow-xs">
-              💔
+          <div class="text-center py-8 px-4 space-y-2.5 bg-inputbg/60 border border-leadborder/70 rounded-2xl">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400 shadow-xs">
+              <i data-lucide="heart-off" class="w-5 h-5"></i>
             </div>
             <div class="font-serif font-bold text-sm text-parchment">No Romantic Partner</div>
-            <p class="text-dust text-xs leading-relaxed max-w-xs mx-auto font-serif">
-              You are currently single. Look for love through spontaneous encounters as you age, blind dates in Activities, or by confessing feelings to a friend!
+            <p class="text-dust text-xs leading-relaxed max-w-xs mx-auto">
+              You are currently unattached. Seek courtship through blind dates in Activities, spontaneous encounters, or by confessing feelings to a close friend.
             </p>
           </div>
         `;
+        if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
         return;
       }
       this.dom.kinList.innerHTML = `
         <div class="text-center py-8 text-dust/70 text-xs italic font-serif">
-          No acquaintances found under this category.
+          No acquaintances recorded under this circle.
         </div>
       `;
       return;
     }
 
+    const getGroupLabel = (person) => {
+      if (person.category === 'lover') return 'Romantic Bonds';
+      if (person.category === 'friend') return 'Companions & Friends';
+      const role = String(person.role || '');
+      if (role.includes('Mother') || role.includes('Father') || role.includes('Parent')) return 'Parents & Guardians';
+      if (role.includes('Brother') || role.includes('Sister') || role.includes('Sibling')) return 'Siblings';
+      if (role.includes('Son') || role.includes('Daughter') || role.includes('Child')) return 'Children';
+      if (role.includes('Grand')) return 'Grandparents & Elders';
+      return 'Family & Kin';
+    };
+
+    const showGroups = filter === 'all' || filter === 'family';
+    const groupCounts = {};
+    if (showGroups) {
+      filtered.forEach(p => {
+        const g = getGroupLabel(p);
+        groupCounts[g] = (groupCounts[g] || 0) + 1;
+      });
+    }
+    let lastGroup = null;
+
     filtered.forEach(person => {
+      if (showGroups) {
+        const currentGroup = getGroupLabel(person);
+        if (currentGroup !== lastGroup) {
+          lastGroup = currentGroup;
+          const groupHeader = document.createElement('div');
+          groupHeader.className = 'kin-group-header';
+          groupHeader.innerHTML = `
+            <span class="text-[9px] font-mono uppercase tracking-[0.18em] text-dust font-bold">${currentGroup}</span>
+            <span class="text-[9px] font-mono text-dust/70">${groupCounts[currentGroup] || 1}</span>
+          `;
+          this.dom.kinList.appendChild(groupHeader);
+        }
+      }
+
       const card = document.createElement('div');
       const isAlive = person.alive;
+      const rel = Math.max(0, Math.min(100, Math.round(person.relationship || 0)));
 
-      card.className = `kin-card p-3 rounded-xl border transition-all ${
+      card.className = `kin-card p-2.5 rounded-xl border transition-all ${
         isAlive 
           ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
-          : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
+          : 'bg-inputbg/40 border-leadborder/40 opacity-55 cursor-default'
       }`;
 
-      const relColor = person.relationship > 75 ? 'bg-emerald-500' : (person.relationship > 40 ? 'bg-amber-500' : 'bg-red-500');
+      const relColor = rel > 75 ? 'bg-emerald-500' : (rel > 40 ? 'bg-amber-500' : 'bg-red-500');
 
       let statusBadge = '';
       if (!isAlive) {
-        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-500/30">Deceased</span>`;
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/30">Deceased</span>`;
       } else if (person.missing) {
-        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">Missing</span>`;
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/35">Missing</span>`;
       } else if (person.entityCondition) {
-        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">${person.entityCondition.type}</span>`;
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/35">${person.entityCondition.type}</span>`;
       } else if (person.isRevealed && person.entityType !== 'human') {
         const entityLabel = person.entityType === 'disguised_mimic' ? 'Disguised Mimic' : (person.entityType === 'blatant_entity' ? 'Abyssal Entity' : 'Anomaly');
-        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40 animate-pulse">👁️ ${entityLabel}</span>`;
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/35 animate-pulse">${entityLabel}</span>`;
       } else if (person.category === 'lover') {
         if (person.married) {
-          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-500/30">💍 Spouse</span>`;
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30">Spouse</span>`;
         } else if (person.engaged) {
-          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-pink-950/40 text-pink-300 border border-pink-500/30">💍 Fiancé</span>`;
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-pink-500/15 text-pink-400 border border-pink-500/30">Fiancé</span>`;
         } else if (person.cohabitating) {
-          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">🏠 Cohabitating</span>`;
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">Cohabitating</span>`;
         } else if (person.role.includes('Ex')) {
-          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard text-dust border border-leadborder">💔 Ex</span>`;
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard text-dust border border-leadborder">Former</span>`;
         } else {
-          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-500/30">💖 Partner</span>`;
+          statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30">Partner</span>`;
         }
       } else if (person.suspicion > 30) {
-        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">Suspicion: ${person.suspicion}%</span>`;
+        statusBadge = `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">Suspicion ${person.suspicion}%</span>`;
       }
 
-      const roleIcon = person.role.includes('Mother') || person.role.includes('Father') ? 'users' : (person.category === 'friend' ? 'user-plus' : 'user');
+      const subtitleParts = [
+        person.role,
+        `Age ${person.age}`,
+        person.dynamicTrait ? `<span class="text-shilling font-semibold">${person.dynamicTrait}</span>` : (person.occupation || '')
+      ].filter(Boolean);
 
       card.innerHTML = `
-        <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center justify-between gap-2.5">
           <div class="flex items-center space-x-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-xl border border-leadborder/60 overflow-hidden bg-slatecard shrink-0 shadow-xs">
+            <div class="w-10 h-10 rounded-xl border border-leadborder overflow-hidden bg-slatecard shrink-0 shadow-xs">
               <canvas class="kin-thumb-canvas w-full h-full" width="80" height="80"></canvas>
             </div>
-            <div class="truncate">
-              <h4 class="font-serif font-bold text-xs text-parchment truncate">${person.name}</h4>
-              <p class="text-[10px] text-dust font-mono truncate">${person.role} • Age ${person.age} ${person.dynamicTrait ? `• <span class="text-amber-400 font-semibold">${person.dynamicTrait}</span>` : (person.occupation ? `• ${person.occupation}` : '')}</p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h4 class="font-serif font-bold text-xs text-parchment truncate">${person.name}</h4>
+                ${statusBadge}
+              </div>
+              <p class="text-[10px] text-dust font-mono truncate mt-0.5">${subtitleParts.join(' · ')}</p>
             </div>
           </div>
-          <div class="shrink-0 flex items-center space-x-1.5">
-            ${statusBadge}
-            ${isAlive ? `<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-dust/60"></i>` : ''}
+          <div class="shrink-0 flex items-center gap-2">
+            ${isAlive ? `<span class="text-[10px] font-mono font-bold text-parchment">${rel}%</span><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-dust/60"></i>` : ''}
           </div>
         </div>
 
         ${isAlive ? `
-          <div class="mt-2 space-y-1">
-            <div class="flex justify-between items-center text-[9px] font-mono text-dust">
-              <span>Closeness / Bond</span>
-              <span class="font-bold text-parchment">${person.relationship}%</span>
-            </div>
-            <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
-              <div class="h-full ${relColor} transition-all duration-300 rounded-full" style="width: ${person.relationship}%"></div>
-            </div>
+          <div class="mt-2 w-full h-1 bg-trackbg rounded-full overflow-hidden">
+            <div class="h-full ${relColor} transition-all duration-300 rounded-full" style="width: ${rel}%"></div>
           </div>
         ` : `
-          <p class="text-[10px] italic text-dust/80 mt-1">${person.deathCause || 'Passed away.'}</p>
+          <p class="text-[10px] italic text-dust/80 mt-1.5 pt-1 border-t border-leadborder/40">${person.deathCause || 'Passed away.'}</p>
         `}
       `;
 
@@ -3069,32 +3103,25 @@ class TerribleGame {
     }
 
     this.dom.kinDetailDossier.innerHTML = `
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-start space-x-3 min-w-0">
-          <div class="w-14 h-14 rounded-xl border border-leadborder overflow-hidden bg-slatecard shadow-md shrink-0">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center space-x-3 min-w-0">
+          <div class="w-12 h-12 rounded-xl border border-leadborder overflow-hidden bg-slatecard shadow-sm shrink-0">
             <canvas id="kin-detail-avatar-canvas" width="120" height="120" class="w-full h-full"></canvas>
           </div>
           <div class="min-w-0">
             <h4 class="font-serif font-bold text-sm text-parchment truncate">${person.name}</h4>
-            <p class="text-[11px] text-dust font-mono">${person.role} • Age ${person.age} ${person.dynamicTrait ? `• <span class="text-amber-400 font-semibold">${person.dynamicTrait}</span>` : ''}</p>
-            ${person.occupation ? `<p class="text-[10px] text-dust/80 italic font-mono mt-0.5 truncate">Employed: ${person.occupation} ${person.salaryUSD ? `<span class="text-emerald-400 font-bold not-italic">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
+            <p class="text-[10px] text-dust font-mono truncate">${person.role} · Age ${person.age}${person.dynamicTrait ? ` · <span class="text-shilling font-semibold">${person.dynamicTrait}</span>` : ''}</p>
+            ${person.occupation ? `<p class="text-[10px] text-dust/85 font-mono truncate">${person.occupation}${person.salaryUSD ? ` <span class="text-fiat font-bold">($${person.salaryUSD.toLocaleString()}/yr)</span>` : ''}</p>` : ''}
           </div>
         </div>
         <div class="text-right shrink-0">
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slatecard border border-leadborder text-dust">
-            👥 Annual Actions
-          </span>
+          <span class="block text-[8px] font-mono uppercase tracking-wider text-dust">Bond</span>
+          <strong class="font-mono text-sm text-parchment">${person.relationship}%</strong>
         </div>
       </div>
 
-      <div class="space-y-1 pt-1">
-        <div class="flex justify-between items-center text-[9px] font-mono text-dust">
-          <span>Closeness / Relationship</span>
-          <span class="font-bold text-parchment">${person.relationship}%</span>
-        </div>
-        <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
-          <div class="h-full ${relColor} rounded-full" style="width: ${person.relationship}%"></div>
-        </div>
+      <div class="w-full h-1.5 bg-trackbg rounded-full overflow-hidden">
+        <div class="h-full ${relColor} rounded-full transition-all duration-300" style="width: ${person.relationship}%"></div>
       </div>
 
       ${entityInfo}
