@@ -58,7 +58,7 @@ class TerribleGame {
     
     // Creator draft state
     this.creatorState = {
-      avatar: window.generateRandomAvatar(),
+      avatar: window.generateRandomAvatar({ age: 18, gender: "Male" }),
       countryCode: "USA",
       city: "Seattle, WA",
       name: { first: "Alex", surname: "Mercer" },
@@ -785,6 +785,18 @@ class TerribleGame {
       if (sel) sel.addEventListener('change', updateAvatarFromSelects);
     });
 
+    // Gender selection change
+    if (this.dom.selGender) {
+      this.dom.selGender.addEventListener('change', () => {
+        const g = this.dom.selGender.value || 'Male';
+        this.creatorState.gender = g;
+        this.creatorState.avatar = window.generateRandomAvatar({ age: 18, gender: g });
+        this.randomizeName();
+        this.syncCreatorUI();
+        this.renderCreatorAvatar();
+      });
+    }
+
     // Randomize appearance button
     this.dom.btnRandomAvatar.addEventListener('click', () => {
       window.soundEngine.playClick();
@@ -818,7 +830,7 @@ class TerribleGame {
     // Randomize entire soul
     this.dom.btnCreatorRandomizeAll.addEventListener('click', () => {
       window.soundEngine.playClick();
-      this.creatorState.avatar = window.generateRandomAvatar();
+      this.creatorState.avatar = window.generateRandomAvatar({ age: 18, gender: this.dom.selGender ? this.dom.selGender.value : 'Male' });
       
       const countryKeys = Object.keys(window.COUNTRIES_DATA);
       const randomCode = window.getRandomElement(countryKeys);
@@ -1678,6 +1690,7 @@ class TerribleGame {
     if (!this.dom.creatorAvatarCanvas) return;
     window.drawGothicAvatar(this.dom.creatorAvatarCanvas, {
       ...this.creatorState.avatar,
+      gender: this.dom.selGender ? this.dom.selGender.value : (this.creatorState.gender || 'Male'),
       age: (this.creatorState.avatar && this.creatorState.avatar.age !== undefined) ? this.creatorState.avatar.age : 18
     });
   }

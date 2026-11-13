@@ -331,22 +331,23 @@ function generateRandomAvatar(options = {}) {
     chosenHairColor = getRandomElement(dyedHairColors);
   }
 
-  const shortHairStyles = ['pixie', 'crop', 'short_bob', 'shag', 'buzz_cut', 'parted'];
-  const mediumLongHairStyles = ['bob', 'wolf_cut', 'mullet', 'braids', 'box_braids', 'dreadlocks', 'space_buns', 'messy_bun', 'long', 'loose_waves', 'straight_long'];
-  const femaleHairPool = gender === 'Female' ? [...mediumLongHairStyles, 'hijab'] : mediumLongHairStyles;
-  const hairStyles = (gender === 'Male' && Math.random() < 0.78)
-    ? shortHairStyles
-    : (gender === 'Female' && Math.random() < 0.78 ? femaleHairPool : [...shortHairStyles, ...femaleHairPool]);
+  const maleHairStyles = ['parted', 'crop', 'buzz_cut', 'shag', 'wolf_cut', 'mullet', 'dreadlocks', 'long'];
+  const femaleHairStyles = ['long', 'loose_waves', 'straight_long', 'bob', 'short_bob', 'pixie', 'wolf_cut', 'braids', 'box_braids', 'space_buns', 'messy_bun', 'hijab'];
+  const neutralHairStyles = ['parted', 'crop', 'short_bob', 'bob', 'shag', 'wolf_cut', 'mullet', 'braids', 'box_braids', 'dreadlocks', 'messy_bun', 'long', 'loose_waves'];
+  const hairStyles = gender === 'Male' ? maleHairStyles : (gender === 'Female' ? femaleHairStyles : neutralHairStyles);
+  const chosenHairStyle = options.hairStyle || getRandomElement(hairStyles);
 
   const hairTextures = ['straight', 'wavy', 'curly', 'coily'];
-  const bangsOptions = ['none', 'none', 'curtain', 'straight', 'wispy', 'micro'];
+  const bangsPool = (chosenHairStyle === 'buzz_cut' || chosenHairStyle === 'hijab')
+    ? ['none']
+    : ['none', 'none', 'curtain', 'straight', 'wispy', 'micro'];
   const noseStyles = ['straight', 'button', 'roman', 'aquiline', 'broad', 'snub'];
   const lipsStyles = ['thin', 'medium', 'full', 'heart', 'wide', 'upturned', 'downturned'];
   const eyebrows = ['straight', 'arched', 'soft_arch', 'rounded', 'angled', 'thick', 'thin', 'feathered'];
   
-  // Facial hair for mature males
+  // Facial hair for mature males only
   let facialHair = 'clean';
-  if (gender === 'Male' && age >= 18 && Math.random() < 0.55) {
+  if (gender === 'Male' && age >= 18 && Math.random() < 0.48) {
     facialHair = getRandomElement(['stubble', 'mustache', 'chevron_mustache', 'handlebar', 'short_beard', 'full_beard', 'goatee', 'mutton_chops']);
     if (isElder && Math.random() < 0.3) facialHair = 'wizard';
   }
@@ -365,28 +366,22 @@ function generateRandomAvatar(options = {}) {
     clothing = getRandomElement(['casual', 'hoodie', 'sweater', 'turtleneck', 'prep_blazer', 'elite_uniform', 'suit', 'goth']);
   }
 
-  // Accessories
-  const glasses = (Math.random() < (isElder ? 0.65 : 0.22)) 
+  // Accessories (harmonized with hairStyle)
+  const glasses = (Math.random() < (isElder ? 0.65 : 0.20)) 
     ? getRandomElement(['round_wire', 'square', 'thick_frame', 'cat_eye', 'sunglasses']) 
     : 'none';
-  const piercing = (!isChild && Math.random() < 0.20)
-    ? getRandomElement(['nose_stud', 'septum', 'eyebrow', 'labret', 'earrings'])
+  const piercingPool = chosenHairStyle === 'hijab'
+    ? ['nose_stud', 'septum', 'eyebrow', 'labret']
+    : ['nose_stud', 'septum', 'eyebrow', 'labret', 'earrings'];
+  const piercing = (!isChild && Math.random() < 0.18)
+    ? getRandomElement(piercingPool)
     : 'none';
-  let headwear = (Math.random() < 0.15)
+  const headwear = (chosenHairStyle !== 'hijab' && chosenHairStyle !== 'space_buns' && Math.random() < 0.12)
     ? getRandomElement(['beanie', 'beret', 'baseball_cap'])
     : 'none';
-  const necklace = (!isChild && Math.random() < 0.18)
+  const necklace = (!isChild && chosenHairStyle !== 'hijab' && Math.random() < 0.18)
     ? getRandomElement(['choker', 'chain', 'pendant', 'pearls'])
     : 'none';
-
-  const chosenHairStyle = options.hairStyle || getRandomElement(hairStyles);
-  let chosenBangs = options.bangs || getRandomElement(bangsOptions);
-  if (chosenHairStyle === 'hijab' || chosenHairStyle === 'buzz_cut') {
-    chosenBangs = 'none';
-  }
-  if (chosenHairStyle === 'hijab' || chosenHairStyle === 'space_buns' || chosenHairStyle === 'messy_bun') {
-    headwear = 'none';
-  }
 
   return {
     skin: options.skin || getRandomElement(skins),
@@ -401,7 +396,7 @@ function generateRandomAvatar(options = {}) {
     hairStyle: chosenHairStyle,
     hairTexture: options.hairTexture || getRandomElement(hairTextures),
     hairColor: options.hairColor || chosenHairColor,
-    bangs: chosenBangs,
+    bangs: options.bangs || getRandomElement(bangsPool),
     facialHair: options.facialHair || facialHair,
     mark: options.mark || getRandomElement(marks),
     clothing: options.clothing || clothing,
