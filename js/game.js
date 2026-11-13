@@ -6935,6 +6935,26 @@ class TerribleGame {
     const targetLevel = this.pendingSchoolChoiceTargetLevel || (this.character.education ? this.character.education.level : 'elementary');
 
     if (tuitionPayer === 'self') {
+      const edu = this.character.education || {};
+      const currGrades = edu.grades !== undefined ? edu.grades : 75;
+      const currDisc = edu.disciplinaryRecord || 0;
+      if (trackId === 'private' && (currGrades < 75 || currDisc > 1)) {
+        this.showSchoolChoiceFeedback(`ADMISSIONS REJECTED: Private Preparatory Academies require 75%+ Grades (Current: ${currGrades}%) and at most 1 Disciplinary Mark (Current: ${currDisc}).`, "text-rose-400");
+        window.soundEngine.playDread();
+        return;
+      }
+      if (trackId === 'elite') {
+        if (this.character.age < 6 || targetLevel === 'nursery' || targetLevel === 'daycare' || targetLevel === 'kindergarten') {
+          this.showSchoolChoiceFeedback("ADMISSIONS REJECTED: The Elite Aristocratic Academy does not matriculate students before Elementary School (Age 6+).", "text-rose-400");
+          window.soundEngine.playDread();
+          return;
+        }
+        if (currGrades < 90 || currDisc > 0) {
+          this.showSchoolChoiceFeedback(`ADMISSIONS REJECTED: The Elite Academy requires 90%+ Grades (Current: ${currGrades}%) and 0 Disciplinary Marks (Current: ${currDisc}).`, "text-rose-400");
+          window.soundEngine.playDread();
+          return;
+        }
+      }
       const cost = window.getTuitionCost ? window.getTuitionCost(this.character, trackId, targetLevel) : 0;
       if ((this.character.money || 0) < cost) {
         this.showSchoolChoiceFeedback("You do not have enough funds in your personal savings to pay the tuition fee.", "text-rose-400");
@@ -7080,7 +7100,7 @@ class TerribleGame {
       }
     }
     if (this.dom.btnEduTransferTrack) {
-      if (edu.level === 'daycare' || edu.level === 'university') {
+      if (edu.level === 'nursery' || edu.level === 'daycare' || edu.level === 'university') {
         this.dom.btnEduTransferTrack.classList.add('hidden');
       } else {
         this.dom.btnEduTransferTrack.classList.remove('hidden');
@@ -7088,7 +7108,8 @@ class TerribleGame {
     }
     if (this.dom.eduSchoolLevelBadge) {
       const levelLabels = {
-        daycare: this.character.age <= 1 ? 'Infant Care' : 'Toddler Daycare',
+        nursery: 'Home Nursery & Crib',
+        daycare: 'Toddler Creche & Playgroup',
         kindergarten: 'Kindergarten',
         elementary: 'Elementary School',
         middle: 'Middle School',
@@ -7098,7 +7119,8 @@ class TerribleGame {
       this.dom.eduSchoolLevelBadge.textContent = levelLabels[edu.level] || 'School';
     }
     if (this.dom.eduSchoolGradeLabel) {
-      if (edu.level === 'daycare') this.dom.eduSchoolGradeLabel.textContent = this.character.age <= 1 ? 'Infant Room' : `Toddler Room ${Math.max(1, this.character.age - 1)}`;
+      if (edu.level === 'nursery') this.dom.eduSchoolGradeLabel.textContent = `Infant Year ${Math.max(1, this.character.age + 1)}`;
+      else if (edu.level === 'daycare') this.dom.eduSchoolGradeLabel.textContent = `Toddler Room ${Math.max(1, this.character.age - 1)}`;
       else if (edu.level === 'kindergarten') this.dom.eduSchoolGradeLabel.textContent = `Kindergarten Year ${edu.gradeYear}`;
       else if (edu.level === 'university') this.dom.eduSchoolGradeLabel.textContent = `${edu.major || 'Undergraduate'} · Year ${edu.gradeYear}`;
       else this.dom.eduSchoolGradeLabel.textContent = `Grade ${edu.gradeYear}`;
@@ -7115,16 +7137,17 @@ class TerribleGame {
     else if (grades >= 50) letter = 'D';
     else letter = 'F';
 
-    const isDaycare = edu.level === 'daycare';
+    const isNursery = edu.level === 'nursery';
+    const isDaycare = edu.level === 'daycare' || isNursery;
     const isKindergarten = edu.level === 'kindergarten';
     const isEarlyYears = isDaycare || isKindergarten;
     if (this.dom.eduLabelGrades) {
-      this.dom.eduLabelGrades.innerHTML = `<i data-lucide="${isEarlyYears ? 'shapes' : 'book-open'}" class="w-3 h-3"></i> ${isDaycare ? 'Development' : (isKindergarten ? 'School Readiness' : 'Academic Grades')}`;
+      this.dom.eduLabelGrades.innerHTML = `<i data-lucide="${isEarlyYears ? 'shapes' : 'book-open'}" class="w-3 h-3"></i> ${isNursery ? 'Sensory Milestones' : (edu.level === 'daycare' ? 'Toddler Development' : (isKindergarten ? 'School Readiness' : 'Academic Grades'))}`;
     }
     if (this.dom.eduValGrades) this.dom.eduValGrades.textContent = isEarlyYears ? `${grades}%` : `${grades}% (${letter})`;
     if (this.dom.eduBarGrades) this.dom.eduBarGrades.style.width = `${grades}%`;
     if (this.dom.eduLabelPopularity) {
-      this.dom.eduLabelPopularity.innerHTML = `<i data-lucide="${isDaycare ? 'heart-handshake' : 'award'}" class="w-3 h-3"></i> ${isDaycare ? 'Comfort & Trust' : (isKindergarten ? 'Classroom Confidence' : 'School Popularity')}`;
+      this.dom.eduLabelPopularity.innerHTML = `<i data-lucide="${isDaycare ? 'heart-handshake' : 'award'}" class="w-3 h-3"></i> ${isNursery ? 'Crib Attachment' : (edu.level === 'daycare' ? 'Comfort & Trust' : (isKindergarten ? 'Classroom Confidence' : 'School Popularity'))}`;
     }
     if (this.dom.eduValPopularity) {
       this.dom.eduValPopularity.textContent = edu.schoolType === 'homeschool' && !isEarlyYears ? `Autonomy` : `${popularity}%`;
@@ -7145,9 +7168,9 @@ class TerribleGame {
       }
     }
 
-    if (this.dom.labelEduStudy) this.dom.labelEduStudy.textContent = isDaycare ? 'Practice a Skill' : (isKindergarten ? 'Practice Letters' : 'Study Harder');
-    if (this.dom.labelEduSkip) this.dom.labelEduSkip.textContent = isDaycare ? 'Refuse Nap' : (isKindergarten ? 'Avoid Circle Time' : 'Skip Class');
-    if (this.dom.tabEduClassmates) this.dom.tabEduClassmates.textContent = isDaycare ? 'Playmates' : 'Classmates';
+    if (this.dom.labelEduStudy) this.dom.labelEduStudy.textContent = isNursery ? 'Observe Crib Mobile' : (edu.level === 'daycare' ? 'Practice a Skill' : (isKindergarten ? 'Practice Letters' : 'Study Harder'));
+    if (this.dom.labelEduSkip) this.dom.labelEduSkip.textContent = isNursery ? 'Fuss in Crib' : (edu.level === 'daycare' ? 'Refuse Nap' : (isKindergarten ? 'Avoid Circle Time' : 'Skip Class'));
+    if (this.dom.tabEduClassmates) this.dom.tabEduClassmates.textContent = isNursery ? 'Cribmates' : (edu.level === 'daycare' ? 'Playmates' : 'Classmates');
     if (this.dom.tabEduTeachers) this.dom.tabEduTeachers.textContent = isDaycare ? 'Caregivers' : 'Teachers';
 
     // Drop out container (High school or University only)
@@ -7200,7 +7223,81 @@ class TerribleGame {
     const edu = this.character.education;
     if (!edu) return;
 
-    // 1. Clubs
+    // 0. Stage-Specific Developmental & Academic Submenu
+    if (this.dom.eduPanelOverview) {
+      let stageSection = document.getElementById('edu-stage-submenu-section');
+      if (!stageSection) {
+        stageSection = document.createElement('div');
+        stageSection.id = 'edu-stage-submenu-section';
+        stageSection.className = 'mb-3';
+        this.dom.eduPanelOverview.insertBefore(stageSection, this.dom.eduPanelOverview.firstChild);
+      }
+      const stageActions = window.getStageSchoolActions ? window.getStageSchoolActions(this.character) : [];
+      const stageTitleMap = {
+        nursery: 'Infant Crib & Sensory Milestones (Ages 0–1)',
+        daycare: 'Toddler Creche & Playgroup Submenu (Ages 2–3)',
+        kindergarten: 'Kindergarten Readiness & Recess (Ages 4–5)',
+        elementary: 'Elementary Classroom & Playground (Ages 6–10)',
+        middle: 'Middle School Cliques & Placement Prep (Ages 11–13)',
+        high: 'High School Honours, Council & Secret Orders (Ages 14–17)',
+        university: 'University Department & Research Submenu (Ages 18+)'
+      };
+      const doneMap = edu.stageActionsThisYear || {};
+      const credBadges = [];
+      if (this.character.hasEarlyReaderBuff) credBadges.push('Early Reader ★');
+      if (edu.academicRibbon || this.character.hasAcademicRibbon) credBadges.push('Academic Ribbon ★');
+      if (edu.socialClique) credBadges.push(edu.socialClique);
+      if (edu.studentCouncilRank) credBadges.push(edu.studentCouncilRank);
+      if (this.character.isPrepAlumni) credBadges.push('Prep Alumni');
+      if (this.character.isEliteAlumni) credBadges.push('Elite Alumni');
+
+      stageSection.innerHTML = `
+        <div class="flex items-center justify-between mb-1.5">
+          <h4 class="text-[10px] font-mono uppercase tracking-wider text-edu-teal flex items-center gap-1.5 font-bold">
+            <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+            <span>${stageTitleMap[edu.level] || 'Stage Activities & Pursuits'}</span>
+          </h4>
+          ${credBadges.length > 0 ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded badge-edu-amber font-bold">${credBadges.join(' · ')}</span>` : ''}
+        </div>
+        <div id="edu-stage-actions-list" class="space-y-1.5"></div>
+      `;
+      const listEl = stageSection.querySelector('#edu-stage-actions-list');
+      stageActions.forEach(act => {
+        const isDone = !!doneMap[act.id];
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs transition-all";
+        row.innerHTML = `
+          <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+            <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-edu-teal shrink-0">
+              <i data-lucide="${(act.icon || 'sparkles').toLowerCase()}" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-serif font-bold text-parchment flex items-center gap-1.5 flex-wrap">
+                <span>${act.label}</span>
+                ${act.badge ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slatecard border border-leadborder text-dust">${act.badge}</span>` : ''}
+              </div>
+              <div class="text-[10px] text-dust leading-snug">${act.desc}</div>
+            </div>
+          </div>
+          <button class="btn-stage-act shrink-0 ml-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
+            isDone
+              ? 'bg-slatecard/50 text-dust border border-leadborder opacity-60 cursor-not-allowed'
+              : 'bg-slatecard hover:bg-cardhover text-edu-teal border border-leadborder active:scale-95'
+          }" ${isDone ? 'disabled' : ''}>
+            ${isDone ? 'Done' : 'Pursue'}
+          </button>
+        `;
+        const btn = row.querySelector('.btn-stage-act');
+        if (btn && !isDone) {
+          btn.addEventListener('click', () => {
+            this.handleSchoolAction('stage_action', act.id);
+          });
+        }
+        listEl.appendChild(row);
+      });
+    }
+
+    // 1. Clubs (with Rank & Interactive Sub-Actions)
     if (this.dom.eduClubsList) {
       this.dom.eduClubsList.innerHTML = '';
       const availableClubs = (window.SCHOOL_CLUBS || []).filter(c => c.reqLevel.includes(edu.level));
@@ -7209,32 +7306,49 @@ class TerribleGame {
       }
 
       if (availableClubs.length === 0) {
-        this.dom.eduClubsList.innerHTML = `<div class="text-[11px] text-dust italic p-2 bg-inputbg rounded-lg border border-leadborder">No extracurricular clubs available at this stage of education.</div>`;
+        this.dom.eduClubsList.innerHTML = `<div class="text-[11px] text-dust italic p-2 bg-inputbg rounded-lg border border-leadborder">Extracurricular clubs unlock in Elementary School (Age 6+). Use your developmental stage activities above!</div>`;
       } else {
         availableClubs.forEach(club => {
           const isMember = (edu.clubs || []).includes(club.id);
+          const rank = (edu.clubRanks && edu.clubRanks[club.id]) || 'Member';
+          const clubActs = edu.clubActionsThisYear || {};
           const card = document.createElement('div');
-          card.className = "flex items-center justify-between p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs";
+          card.className = "p-2.5 rounded-xl bg-inputbg border border-leadborder text-xs space-y-2";
           card.innerHTML = `
-            <div class="flex items-center space-x-2.5">
-              <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-edu-amber shrink-0">
-                <i data-lucide="${club.icon || 'trophy'}" class="w-3.5 h-3.5"></i>
-              </div>
-              <div>
-                <div class="font-serif font-bold text-parchment flex items-center gap-1.5">
-                  <span>${club.name}</span>
-                  ${isMember ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-emerald font-bold">MEMBER</span>` : ''}
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-7 h-7 rounded-lg bg-slatecard border border-leadborder flex items-center justify-center text-edu-amber shrink-0">
+                  <i data-lucide="${club.icon || 'trophy'}" class="w-3.5 h-3.5"></i>
                 </div>
-                <div class="text-[10px] text-dust leading-snug">${club.desc}</div>
+                <div>
+                  <div class="font-serif font-bold text-parchment flex items-center gap-1.5">
+                    <span>${club.name}</span>
+                    ${isMember ? `<span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-emerald font-bold uppercase">${rank}</span>` : ''}
+                  </div>
+                  <div class="text-[10px] text-dust leading-snug">${club.desc}</div>
+                </div>
               </div>
+              <button class="btn-club-toggle shrink-0 ml-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
+                isMember 
+                  ? 'btn-edu-danger' 
+                  : 'bg-slatecard hover:bg-cardhover text-edu-teal border border-leadborder'
+              }">
+                ${isMember ? 'Quit' : 'Join'}
+              </button>
             </div>
-            <button class="btn-club-toggle shrink-0 ml-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
-              isMember 
-                ? 'btn-edu-danger' 
-                : 'bg-slatecard hover:bg-cardhover text-edu-teal border border-leadborder'
-            }">
-              ${isMember ? 'Quit' : 'Join'}
-            </button>
+            ${isMember ? `
+              <div class="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-leadborder/60">
+                <button data-club-sub="session" class="px-2 py-1 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-[9px] font-mono font-bold text-parchment transition-all ${clubActs[club.id + '_session'] ? 'opacity-50' : ''}">
+                  ${clubActs[club.id + '_session'] ? '✓ Session' : 'Attend Session'}
+                </button>
+                <button data-club-sub="project" class="px-2 py-1 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-[9px] font-mono font-bold text-edu-teal transition-all ${clubActs[club.id + '_project'] ? 'opacity-50' : ''}">
+                  ${clubActs[club.id + '_project'] ? '✓ Project' : 'Special Project'}
+                </button>
+                <button data-club-sub="compete" class="px-2 py-1 rounded-lg bg-slatecard hover:bg-cardhover border border-leadborder text-[9px] font-mono font-bold text-edu-amber transition-all ${clubActs[club.id + '_compete'] ? 'opacity-50' : ''}">
+                  ${clubActs[club.id + '_compete'] ? '✓ Competed' : (rank === 'President' ? 'Defend Trophy' : 'Compete / Rank Up')}
+                </button>
+              </div>
+            ` : ''}
           `;
 
           const toggleBtn = card.querySelector('.btn-club-toggle');
@@ -7257,6 +7371,8 @@ class TerribleGame {
             } else {
               edu.clubs = edu.clubs || [];
               edu.clubs.push(club.id);
+              edu.clubRanks = edu.clubRanks || {};
+              if (!edu.clubRanks[club.id]) edu.clubRanks[club.id] = 'Member';
               if (latestLog) {
                 latestLog.entries.push(`[Extracurricular] Joined ${club.name}!`);
               }
@@ -7266,7 +7382,7 @@ class TerribleGame {
                 title: `Joined ${club.name}!`,
                 icon: club.icon || "trophy",
                 iconColor: "text-amber-400",
-                body: `You officially signed the registration sheet for ${club.name}! Active participation will provide annual stat growth.`,
+                body: `You officially signed the registration sheet for ${club.name}! Use the club buttons to attend sessions, lead special projects, and rise from Member to President.`,
                 effects: { happiness: 5 }
               });
             }
@@ -7274,21 +7390,31 @@ class TerribleGame {
             this.renderEducationModal('overview');
           });
 
+          card.querySelectorAll('[data-club-sub]').forEach(subBtn => {
+            subBtn.addEventListener('click', () => {
+              this.handleSchoolAction('club_sub', { clubId: club.id, subAction: subBtn.dataset.clubSub });
+            });
+          });
+
           this.dom.eduClubsList.appendChild(card);
         });
       }
     }
 
-    // 2. School Supernatural Mysteries
+    // 2. School Supernatural Mysteries (3-Chapter Progression)
     if (this.dom.eduMysteriesSection) this.dom.eduMysteriesSection.classList.toggle('hidden', this.character.age < 6);
     if (this.dom.eduMysteriesList && this.character.age >= 6) {
       this.dom.eduMysteriesList.innerHTML = '';
       const availableMysteries = (window.SCHOOL_MYSTERIES || []).filter(m => m.reqLevel.includes(edu.level));
+      const chapMap = edu.mysteryChapters || {};
 
       if (availableMysteries.length === 0) {
         this.dom.eduMysteriesList.innerHTML = `<div class="text-[11px] text-dust italic p-2 bg-inputbg rounded-lg border border-leadborder">No unusual school anomalies documented at this institution yet.</div>`;
       } else {
         availableMysteries.forEach(mystery => {
+          const chap = chapMap[mystery.id] || 0;
+          const isSolved = chap >= 3;
+          const chapLabels = ['Ch. 1: Gather Clues', 'Ch. 2: Unlock Cipher', 'Ch. 3: Confront Anomaly', 'Resolved (3/3)'];
           const card = document.createElement('div');
           card.className = "flex items-center justify-between p-2.5 rounded-xl edu-mystery-card text-xs transition-all";
           card.innerHTML = `
@@ -7297,20 +7423,25 @@ class TerribleGame {
                 <i data-lucide="${mystery.icon || 'eye'}" class="w-3.5 h-3.5"></i>
               </div>
               <div>
-                <div class="font-serif font-bold text-edu-purple-title">${mystery.title}</div>
+                <div class="font-serif font-bold text-edu-purple-title flex items-center gap-1.5">
+                  <span>${mystery.title}</span>
+                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded badge-edu-purple font-bold">${chap}/3</span>
+                </div>
                 <div class="text-[10px] text-dust leading-snug">${mystery.desc}</div>
               </div>
             </div>
-            <button class="btn-investigate shrink-0 ml-2 px-2.5 py-1 rounded-lg btn-edu-mystery text-[10px] font-mono font-bold transition-all flex items-center gap-1">
+            <button class="btn-investigate shrink-0 ml-2 px-2.5 py-1 rounded-lg btn-edu-mystery text-[10px] font-mono font-bold transition-all flex items-center gap-1 ${isSolved ? 'opacity-60 cursor-not-allowed' : ''}" ${isSolved ? 'disabled' : ''}>
               <i data-lucide="compass" class="w-3 h-3"></i>
-              <span>Investigate</span>
+              <span>${chapLabels[chap] || 'Investigate'}</span>
             </button>
           `;
 
           const invBtn = card.querySelector('.btn-investigate');
-          invBtn.addEventListener('click', () => {
-            this.handleSchoolAction('mystery', mystery.id);
-          });
+          if (invBtn && !isSolved) {
+            invBtn.addEventListener('click', () => {
+              this.handleSchoolAction('mystery', mystery.id);
+            });
+          }
 
           this.dom.eduMysteriesList.appendChild(card);
         });
@@ -7748,6 +7879,10 @@ class TerribleGame {
       result = window.skipClass(this.character);
     } else if (actionType === 'mystery' && window.investigateMystery) {
       result = window.investigateMystery(this.character, param);
+    } else if (actionType === 'stage_action' && window.performStageSchoolAction) {
+      result = window.performStageSchoolAction(this.character, param);
+    } else if (actionType === 'club_sub' && window.performClubSubAction && param) {
+      result = window.performClubSubAction(this.character, param.clubId, param.subAction);
     } else if (actionType === 'apply_university' && window.applyToUniversity) {
       result = window.applyToUniversity(this.character, param);
     } else if (actionType === 'drop_out' && window.dropOutOfSchool) {

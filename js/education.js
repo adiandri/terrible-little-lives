@@ -7,7 +7,8 @@
   // --- School Name Tables by Region ---
   const SCHOOL_NAMES = {
     USA: {
-      daycare: ["Little Sprouts Nursery", "Sunny Days Infant Center", "St. Jude's Parish Creche", "Pinewood Early Care"],
+      nursery: ["Home Nursery & Cedar Crib", "Domestic Infant Parlor", "Quiet Hearth Nursery"],
+      daycare: ["Little Sprouts Toddler Creche", "Sunny Days Playgroup", "St. Jude's Parish Creche", "Pinewood Early Care"],
       kindergarten: ["West District Kindergarten", "Maple Valley Primary Academy", "Arkham Heights Kindergarten", "Blackwood Kinder"],
       elementary: ["Blackwood Municipal Elementary", "Providence Public Elementary", "Willow Creek Primary", "Hawthorne Grammar School", "St. Jude Elementary"],
       middle: ["Blackwood Middle School", "Arkham Central Junior High", "Dunwich Valley Middle", "Providence Middle School"],
@@ -27,6 +28,7 @@
       }
     },
     IDN: {
+      nursery: ["Kamar Bayi Keluarga", "Ayunan Kayu Rumah", "Ruang Asuh Keluarga"],
       daycare: ["PAUD Kasih Bunda", "Penitipan Anak Bintang Kecil", "Daycare Melati Suci"],
       kindergarten: ["TK Pertiwi Nusantara", "TK Bintang Timur", "TK Harapan Bangsa"],
       elementary: ["SD Negeri 01 Menteng", "SD Swasta Bhakti Pertiwi", "SD Kristen Kasih Mulia", "SD Negeri 04 Pagi"],
@@ -47,7 +49,8 @@
       }
     },
     GBR: {
-      daycare: ["St. Bartholomew's Creche", "Little Lambs Nursery", "Briarwood Early Years"],
+      nursery: ["The Upstairs Nursery Parlor", "Hearthside Wicker Cradle", "Domestic Infant Nursery"],
+      daycare: ["St. Bartholomew's Creche", "Little Lambs Toddler Nursery", "Briarwood Early Years"],
       kindergarten: ["Eldritch Green Infant Academy", "St. Dunstan's Church Kindergarten", "Kensington Nursery"],
       elementary: ["Blackfriars Primary School", "St. Jude Church of England School", "Eldritch Green Grammar"],
       middle: ["Wormwood Scrubs Preparatory", "Blackfriars Lower Collegiate", "St. Jude Middle Academy"],
@@ -67,7 +70,8 @@
       }
     },
     DEFAULT: {
-      daycare: ["Little Blossoms Daycare", "St. Jude's Nursery", "Morning Mist Infant Care"],
+      nursery: ["Home Nursery & Crib", "Domestic Infant Parlor", "Quiet Hearth Cradle"],
+      daycare: ["Little Blossoms Toddler Creche", "St. Jude's Playgroup", "Morning Mist Early Care"],
       kindergarten: ["West District Kindergarten", "St. Jude's Kindergarten", "Cloverleaf Academy"],
       elementary: ["Municipal Primary School", "St. Jude Elementary", "Blackwood Public School"],
       middle: ["District Central Middle School", "Miskatonic Junior Academy"],
@@ -521,7 +525,30 @@
       return finalizeTeachers(teachers, schoolType);
     }
 
-    if (level === 'daycare') {
+    if (level === 'nursery') {
+      const parentList = (character.kin && character.kin.parents) ? character.kin.parents.filter(p => p.alive !== false) : [];
+      const primaryParent = parentList[0];
+      teachers.push({
+        id: 'teach_nursery_parent',
+        category: 'teacher',
+        role: 'Primary Parent Caregiver',
+        name: primaryParent ? `${primaryParent.name} (${primaryParent.role || 'Parent'})` : `Matron ${window.getRandomLastName(country)}`,
+        gender: primaryParent && primaryParent.gender ? primaryParent.gender : 'Female',
+        strictness: primaryParent && primaryParent.strictness !== undefined ? primaryParent.strictness : 25,
+        relationship: primaryParent && primaryParent.relationship !== undefined ? primaryParent.relationship : 75,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+      teachers.push({
+        id: 'teach_nursery_nursemaid',
+        category: 'teacher',
+        role: 'Visiting Parish Nursemaid',
+        name: `Nurse ${window.getRandomLastName(country)}`,
+        gender: 'Female',
+        strictness: 20,
+        relationship: 60,
+        actionsDone: { praise: 0, ask_help: 0, complain: 0, bribe: 0 }
+      });
+    } else if (level === 'daycare') {
       teachers.push({
         id: 'teach_caretaker_1',
         category: 'teacher',
@@ -750,24 +777,28 @@
       return finalizeStaff(staff, schoolType);
     }
 
-    if (level === 'daycare' || level === 'kindergarten') {
+    if (level === 'nursery' || level === 'daycare' || level === 'kindergarten') {
       staff.push({
         id: 'staff_daycare_matron',
         category: 'staff',
-        role: 'Nursery Matron',
+        role: level === 'nursery' ? 'Household Nursemaid' : 'Nursery Matron',
         name: `Sister ${window.getRandomFirstName(country, 'Female')}`,
         gender: 'Female',
-        quirk: 'Dispenses warm chamomile tea and soft biscuits during tantrums.',
+        quirk: level === 'nursery'
+          ? 'Hums old minor-key lullabies while adjusting the crib blankets and checking for drafts.'
+          : 'Dispenses warm chamomile tea and soft biscuits during tantrums.',
         relationship: 60,
         actionsDone: { nurture: 0, ask_snack: 0 }
       });
       staff.push({
         id: 'staff_daycare_custodian',
         category: 'staff',
-        role: 'Facility Caretaker',
+        role: level === 'nursery' ? 'House Caretaker' : 'Facility Caretaker',
         name: `Mr. ${window.getRandomLastName(country)}`,
         gender: 'Male',
-        quirk: 'Quietly mops spilled fruit juice with smelling salts.',
+        quirk: level === 'nursery'
+          ? 'Keeps the coal stove banked and checks the nursery window latches before dusk.'
+          : 'Quietly mops spilled fruit juice with smelling salts.',
         relationship: 50,
         actionsDone: { help_clean: 0 }
       });
@@ -845,6 +876,33 @@
       };
     }
 
+    const edu = character.education || {};
+    const currGrades = edu.grades !== undefined ? edu.grades : 75;
+    const currDisc = edu.disciplinaryRecord || 0;
+
+    // Strict Institutional Admission Gates (applies before parents can even wire tuition)
+    if (schoolType === 'private') {
+      if (currGrades < 75 || currDisc > 1) {
+        return {
+          granted: false,
+          reason: `ADMISSIONS REJECTED: Private Preparatory Academies require a minimum 75% Academic Standing (Current: ${currGrades}%) and at most 1 Disciplinary Mark (Current: ${currDisc}).`
+        };
+      }
+    } else if (schoolType === 'elite') {
+      if (character.age < 6 || level === 'nursery' || level === 'daycare' || level === 'kindergarten') {
+        return {
+          granted: false,
+          reason: "ADMISSIONS REJECTED: The Elite Aristocratic Academy does not matriculate students prior to Elementary School (Age 6+)."
+        };
+      }
+      if (currGrades < 90 || currDisc > 0) {
+        return {
+          granted: false,
+          reason: `ADMISSIONS REJECTED: The Elite Aristocratic Academy demands a spotless transcript of 90%+ Academic Grades (Current: ${currGrades}%) and 0 Disciplinary Marks (Current: ${currDisc}).`
+        };
+      }
+    }
+
     const parents = (character.kin && character.kin.parents) ? character.kin.parents.filter(p => p.alive !== false) : [];
     if (parents.length === 0) {
       return {
@@ -862,77 +920,55 @@
     const avgRel = totalRel / parents.length;
     const avgGen = totalGen / parents.length;
 
-    let economicScore = 50;
-    if (character.kin && character.kin.wealthTier === 'affluent') {
-      economicScore = 90;
-    } else if (character.kin && character.kin.wealthTier === 'comfortable') {
-      economicScore = 65;
-    } else if (character.kin && character.kin.wealthTier === 'modest') {
-      economicScore = 25;
-    } else {
-      const highIncomeKeywords = ["Doctor", "Surgeon", "Attorney", "Lawyer", "Executive", "Director", "Professor", "Architect", "Specialist", "Engineer"];
-      const lowIncomeKeywords = ["Forklift", "Cleaner", "Courier", "Morgue", "Meat Processing", "Clerk", "Technician"];
-
-      parents.forEach(p => {
-        const occ = p.occupation || "";
-        if (p.salaryUSD && p.salaryUSD >= 100000) {
-          economicScore += 30;
-        } else if (p.salaryUSD && p.salaryUSD <= 35000) {
-          economicScore -= 20;
-        } else if (highIncomeKeywords.some(kw => occ.includes(kw))) {
-          economicScore += 25;
-        } else if (lowIncomeKeywords.some(kw => occ.includes(kw))) {
-          economicScore -= 15;
-        }
-      });
-    }
-
-    const smarts = getStat(character, 'smarts');
-    let smartsBonus = 0;
-    if (smarts >= 80) smartsBonus = 25;
-    else if (smarts >= 65) smartsBonus = 12;
-    else if (smarts < 40) smartsBonus = -15;
-
-    const totalScore = (avgRel * 0.35) + (avgGen * 0.35) + (economicScore * 0.3) + smartsBonus;
+    const wealthTier = (character.kin && character.kin.wealthTier) || 'modest';
+    const householdType = (character.upbringing && character.upbringing.householdType) || (character.kin && character.kin.householdAtmosphere) || 'ordinary';
 
     if (schoolType === 'private') {
-      if (totalScore >= 45) {
-        parents.forEach(p => {
-          if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 4);
-        });
-        return {
-          granted: true,
-          message: smarts >= 70
-            ? "Your parents were overjoyed by your intellectual aptitude and proudly agreed to fund your private preparatory tuition!"
-            : "After carefully reviewing household savings, your parents agreed to finance your private preparatory tuition."
-        };
-      } else {
+      if (wealthTier !== 'comfortable' && wealthTier !== 'affluent') {
         return {
           granted: false,
-          reason: economicScore < 40
-            ? "Your parents explained with heavy hearts that the household budget cannot stretch to cover private school tuition on their current wages."
-            : "Your parents declined: they feel private academy tuition is an unnecessary extravagance and insist you attend public school."
+          reason: `Your parents explained that Private Preparatory tuition is beyond a ${wealthTier} household budget. Only Comfortable or Affluent families can finance private tuition directly (or you must earn a Merit Scholarship).`
         };
       }
+      if ((householdType === 'neglectful' || householdType === 'alcoholic' || householdType === 'volatile') && avgRel < 85) {
+        return {
+          granted: false,
+          reason: "Given the strained, volatile atmosphere at home, your parents flatly refused to sign a private preparatory tuition contract for you."
+        };
+      }
+      if (avgRel < 55 && avgGen < 60) {
+        return {
+          granted: false,
+          reason: "Your parents declined to fund private preparatory tuition due to your strained relationship with them."
+        };
+      }
+      parents.forEach(p => {
+        if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 3);
+      });
+      return {
+        granted: true,
+        message: "After verifying your strong academic transcript and reviewing family accounts, your parents agreed to finance your Private Preparatory Academy tuition."
+      };
     } else if (schoolType === 'elite') {
-      if (totalScore >= 75) {
-        parents.forEach(p => {
-          if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 5);
-        });
-        return {
-          granted: true,
-          message: economicScore >= 70
-            ? "Your aristocratic family beamed with pride and immediately wired the extensive tuition deposit to the Elite Academy bursar."
-            : "Astonished by your intellectual gifts, your parents took out a secondary loan on the house to fund your Elite Academy enrollment!"
-        };
-      } else {
+      if (wealthTier !== 'affluent') {
         return {
           granted: false,
-          reason: economicScore < 60
-            ? "Your parents gasped at the exorbitant tuition figure: 'Twenty-five thousand dollars a year?! That is more than half our annual take-home pay!'"
-            : "Your parents firmly refused to pay for the elite academy, citing the institution's haughty reputation and astronomical costs."
+          reason: "Your parents gasped at the $25,000/yr aristocratic endowment fee: 'Only dynastic Affluent families can pay Elite Academy tuition outright! You will need to qualify for the Founder's or Prodigy Scholarship.'"
         };
       }
+      if (avgRel < 65) {
+        return {
+          granted: false,
+          reason: "Despite your family's wealth, your parents refused to pledge the Elite Academy endowment until you show greater filial respect (Requires 65%+ Parental Closeness)."
+        };
+      }
+      parents.forEach(p => {
+        if (p.relationship !== undefined) p.relationship = Math.min(100, p.relationship + 4);
+      });
+      return {
+        granted: true,
+        message: "Your aristocratic family beamed at your spotless academic dossier and wired the full tuition endowment to the Elite Academy bursar."
+      };
     }
 
     return { granted: false, reason: "Admissions inquiry could not be completed." };
@@ -943,71 +979,68 @@
       return { granted: true, message: "No scholarship needed; education is already cost-free." };
     }
 
+    const edu = character.education || {};
+    const currGrades = edu.grades !== undefined ? edu.grades : 75;
+    const currDisc = edu.disciplinaryRecord || 0;
     const smarts = getStat(character, 'smarts');
     const occult = getStat(character, 'occult');
+    const hasRibbon = !!(edu.academicRibbon || character.hasAcademicRibbon);
 
     if (schoolType === 'private') {
-      if (smarts >= 80) {
-        return {
-          granted: true,
-          type: "Merit Academic Honors Scholarship",
-          message: `You placed in the 98th percentile on the preparatory admissions examination (${smarts}% Smarts). The admissions board awarded you a 100% full-tuition merit scholarship!`
-        };
-      } else if (smarts >= 65) {
-        const roll = Math.random() * 100;
-        const passChance = (smarts - 60) * 4;
-        if (roll < passChance) {
-          return {
-            granted: true,
-            type: "Academic Tuition Waiver",
-            message: `Following a rigorous standardized testing session, you secured the final available academic tuition scholarship for this term!`
-          };
-        } else {
-          return {
-            granted: false,
-            reason: `Your test score (${smarts}% Smarts) fell just short of the competitive scholarship quota. All scholarship allocations were awarded to higher-scoring candidates.`
-          };
-        }
-      } else {
+      if (currDisc > 1) {
         return {
           granted: false,
-          reason: `Your entrance examination score (${smarts}% Smarts) was below the minimum 65% threshold required for academic scholarship consideration.`
+          reason: `SCHOLARSHIP DENIED: Private Preparatory scholarship candidates cannot have more than 1 Disciplinary Mark on their record (Current: ${currDisc}).`
         };
       }
+      if (currGrades < 85 || smarts < 80) {
+        return {
+          granted: false,
+          reason: `SCHOLARSHIP DENIED: The Preparatory Merit Committee requires at least 85% Academic Grades (Current: ${currGrades}%) and 80% Smarts (Current: ${smarts}%) to qualify for a full tuition waiver.`
+        };
+      }
+      return {
+        granted: true,
+        type: "Preparatory Merit Honors Scholarship",
+        message: `You passed the rigorous classical entrance examination (${smarts}% Smarts, ${currGrades}% Grades). The Preparatory Board awarded you a 100% Merit Honors Scholarship!`
+      };
     } else if (schoolType === 'elite') {
-      if (occult >= 60) {
+      if (character.age < 6 || level === 'nursery' || level === 'daycare' || level === 'kindergarten') {
+        return {
+          granted: false,
+          reason: "SCHOLARSHIP DENIED: The Elite Aristocratic Academy does not admit students before Elementary School (Age 6+)."
+        };
+      }
+      if (currDisc > 0) {
+        return {
+          granted: false,
+          reason: `SCHOLARSHIP DENIED: The Elite Academy Board immediately disqualifies any scholarship petitioner with a disciplinary blemish (Current Marks: ${currDisc}).`
+        };
+      }
+      if (currGrades < 94) {
+        return {
+          granted: false,
+          reason: `SCHOLARSHIP DENIED: Elite Academy Fellowship seats require a near-flawless 94%+ Academic Grade average (Current: ${currGrades}%).`
+        };
+      }
+      if (occult >= 75) {
         return {
           granted: true,
           type: "Founder's Esoteric Fellowship",
-          message: `During the cryptic admissions interview, you effortlessly deciphered the antique sigils engraved on the academy's founder charter. The cloaked committee inducted you under the secret Founder's Fellowship with full tuition coverage!`
+          message: `During the candlelit Admissions Inquest, you translated the Latin and Enochian sigils carved beneath the Chancellor's lectern (${occult}% Occult, ${currGrades}% Grades). The Order of the Gilded Bell quietly underwrote 100% of your tuition!`
         };
       }
-      if (smarts >= 85) {
+      if (smarts >= 92 || (smarts >= 88 && hasRibbon)) {
         return {
           granted: true,
-          type: "Aristocratic Academic Prodigy Scholarship",
-          message: `Your flawless score on the classical Latin and analytical mathematics exam set a multi-year academy record (${smarts}% Smarts). The Board granted you the prestigious Aristocratic Honors Scholarship with all tuition waived!`
-        };
-      } else if (smarts >= 75) {
-        const roll = Math.random() * 100;
-        if (roll < 35) {
-          return {
-            granted: true,
-            type: "Civic Endowment Fellowship",
-            message: `A prominent alumnus endowment selected your application for full tuition sponsorship based on your exceptional aptitude (${smarts}% Smarts)!`
-          };
-        } else {
-          return {
-            granted: false,
-            reason: `Elite Academy scholarship competition was ruthless. Despite strong marks (${smarts}% Smarts), the remaining endowed seats went to candidates with dynastic legacy connections.`
-          };
-        }
-      } else {
-        return {
-          granted: false,
-          reason: `The Elite Academy admissions board rejected your scholarship petition. Candidates must demonstrate prodigy-level intellect (85+ Smarts) or rare esoteric credentials.`
+          type: "Aristocratic Prodigy Fellowship",
+          message: `Your extraordinary examination defense (${smarts}% Smarts, ${currGrades}% Grades${hasRibbon ? ', Academic Ribbon Laureate' : ''}) stunned the High Chancellor's inquest panel. You were awarded the rare Aristocratic Prodigy Fellowship!`
         };
       }
+      return {
+        granted: false,
+        reason: `SCHOLARSHIP DENIED: Despite your 94%+ grades, the Elite Academy Inquest requires either Prodigy Intellect (92%+ Smarts, or 88%+ with an Academic Ribbon) or Deep Esoteric Resonance (75%+ Occult).`
+      };
     }
 
     return { granted: false, reason: "Admissions board did not accept application." };
@@ -1017,7 +1050,8 @@
   function enrollInSchool(character, targetLevel = null, major = null, schoolType = null, tuitionPayer = null) {
     let level = targetLevel;
     if (!level) {
-      if (character.age >= 0 && character.age <= 3) level = 'daycare';
+      if (character.age >= 0 && character.age <= 1) level = 'nursery';
+      else if (character.age >= 2 && character.age <= 3) level = 'daycare';
       else if (character.age >= 4 && character.age <= 5) level = 'kindergarten';
       else if (character.age >= 6 && character.age <= 10) level = 'elementary';
       else if (character.age >= 11 && character.age <= 13) level = 'middle';
@@ -1027,14 +1061,17 @@
 
     if (!level) return null;
 
-    const chosenTrack = schoolType || (character.education && character.education.schoolType) || 'public';
+    const chosenTrack = (level === 'nursery' || level === 'daycare') ? 'public' : (schoolType || (character.education && character.education.schoolType) || 'public');
     const chosenPayer = tuitionPayer || (chosenTrack === 'homeschool' || chosenTrack === 'public' ? 'free' : ((character.education && character.education.tuitionPayer) || 'parents'));
 
     let gradeYear = 1;
     let maxGradeYears = 5;
-    if (level === 'daycare') {
-      gradeYear = Math.max(1, character.age);
-      maxGradeYears = 3;
+    if (level === 'nursery') {
+      gradeYear = Math.max(1, character.age + 1);
+      maxGradeYears = 2;
+    } else if (level === 'daycare') {
+      gradeYear = Math.max(1, character.age - 1);
+      maxGradeYears = 2;
     } else if (level === 'kindergarten') {
       gradeYear = character.age === 5 ? 2 : 1;
       maxGradeYears = 2;
@@ -1052,6 +1089,7 @@
       maxGradeYears = 4;
     }
 
+    const prevEdu = character.education || {};
     const schoolObj = {
       enrolled: true,
       level,
@@ -1062,11 +1100,19 @@
       major: major || (level === 'university' ? UNIVERSITY_MAJORS[0].name : null),
       gradeYear,
       maxGradeYears,
-      grades: Math.floor(Math.random() * 30) + 60, // 60 - 90%
-      popularity: chosenTrack === 'homeschool' ? 50 : Math.floor(Math.random() * 30) + 40, // 40 - 70%
-      disciplinaryRecord: 0,
+      grades: prevEdu.grades !== undefined && prevEdu.level === level ? prevEdu.grades : (Math.floor(Math.random() * 25) + 62),
+      popularity: chosenTrack === 'homeschool' ? 50 : (prevEdu.popularity !== undefined && prevEdu.level === level ? prevEdu.popularity : (Math.floor(Math.random() * 30) + 40)),
+      disciplinaryRecord: prevEdu.level === level ? (prevEdu.disciplinaryRecord || 0) : 0,
       clubs: [],
-      classmates: generateClassmates(character, 6, chosenTrack),
+      clubRanks: prevEdu.clubRanks || {},
+      clubActionsThisYear: {},
+      mysteryChapters: prevEdu.mysteryChapters || {},
+      stageActionsThisYear: {},
+      socialClique: prevEdu.socialClique || null,
+      academicRibbon: prevEdu.academicRibbon || false,
+      studentCouncilRank: prevEdu.studentCouncilRank || null,
+      gildedBellMember: prevEdu.gildedBellMember || false,
+      classmates: generateClassmates(character, level === 'nursery' ? 3 : 6, chosenTrack),
       teachers: generateTeachers(character, level, chosenTrack),
       staff: generateStaff(character, level, chosenTrack),
       graduationStatus: 'enrolled'
@@ -1086,7 +1132,8 @@
       if (character.age >= 0 && character.age <= 17) {
         enrollInSchool(character);
         const levelLabels = {
-          daycare: 'Toddler Daycare & Nursery',
+          nursery: 'Home Nursery & Crib',
+          daycare: 'Toddler Creche & Playgroup',
           kindergarten: 'Kindergarten',
           elementary: 'Elementary School',
           middle: 'Middle School',
@@ -1101,6 +1148,10 @@
     const edu = character.education;
     const logs = [];
 
+    // Reset annual stage & club action quotas
+    edu.stageActionsThisYear = {};
+    edu.clubActionsThisYear = {};
+
     // Reset interaction action quotas for peers/teachers/staff each year
     if (edu.classmates) {
       edu.classmates.forEach(c => { c.actionsDone = { chat: 0, study: 0, gossip: 0, dare: 0, prank: 0, insult: 0, befriend: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(c); });
@@ -1112,7 +1163,7 @@
       edu.staff.forEach(s => { s.actionsDone = { help_clean: 0, ask_boiler_room: 0, search_lost_found: 0, reorganize_shelves: 0, catalog_archives: 0, restricted_tomes: 0, rest_cot: 0, report_anomaly: 0, appeal_discipline: 0, school_pride: 0, nurture: 0, ask_snack: 0 }; if (window.ageNpcMemories) window.ageNpcMemories(s); });
     }
 
-    // Process annual tuition payment
+    // Process annual tuition payment & strict scholarship retention
     const cost = edu.tuitionCost !== undefined ? edu.tuitionCost : getTuitionCost(character, edu.schoolType, edu.level);
     if (cost > 0) {
       if (edu.tuitionPayer === 'self') {
@@ -1127,17 +1178,26 @@
       } else if (edu.tuitionPayer === 'parents') {
         logs.push(`Your parents paid the annual tuition of ${window.formatMoney ? window.formatMoney(cost, character.countryCode) : '$' + cost} for ${edu.name}.`);
       } else if (edu.tuitionPayer === 'scholarship') {
-        if (edu.grades < 60) {
-          logs.push(`SCHOLARSHIP PROBATION: Your grades dropped below 60% at ${edu.name}. The board issued a strict academic probation warning!`);
+        if (edu.schoolType === 'elite' && (edu.grades < 80 || (edu.disciplinaryRecord || 0) >= 2)) {
+          logs.push(`FELLOWSHIP REVOKED: Your academic standing (${edu.grades}% Grades, ${edu.disciplinaryRecord || 0} Disciplinary Marks) fell below the Elite Academy's strict retention standard. Your scholarship was revoked and you were transferred to Public School.`);
+          enrollInSchool(character, edu.level, edu.major, 'public', 'free');
+          return logs;
+        } else if (edu.schoolType === 'private' && (edu.grades < 70 || (edu.disciplinaryRecord || 0) >= 3)) {
+          logs.push(`SCHOLARSHIP REVOKED: Due to low marks (${edu.grades}%) or conduct violations, your Preparatory Merit Scholarship at ${edu.name} was terminated. You were transferred to Public School.`);
+          enrollInSchool(character, edu.level, edu.major, 'public', 'free');
+          return logs;
+        } else if (edu.grades < 85 && edu.schoolType === 'elite') {
+          logs.push(`SCHOLARSHIP WARNING: The Elite Academy Board warned that your ${edu.grades}% average is dangerously close to the 80% revocation threshold.`);
         } else {
-          logs.push(`Your full scholarship at ${edu.name} was successfully renewed for your academic standing.`);
+          logs.push(`Your full scholarship at ${edu.name} was renewed after transcript inspection.`);
         }
       }
     }
 
-    // Natural grade fluctuation influenced by character smarts
+    // Natural grade fluctuation influenced by character smarts & Early Reader buff
     const charSmarts = getStat(character, 'smarts');
-    const smartsDelta = Math.floor((charSmarts - 50) / 10);
+    const earlyReaderBonus = character.hasEarlyReaderBuff ? 2 : 0;
+    const smartsDelta = Math.floor((charSmarts - 50) / 10) + earlyReaderBonus;
     const naturalVariance = Math.floor(Math.random() * 9) - 4; // -4 to +4
     edu.grades = Math.max(5, Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + smartsDelta + naturalVariance));
 
@@ -1151,8 +1211,10 @@
     else gradeLetter = 'F';
 
     let reportVignette;
-    if (edu.level === 'daycare') {
-      reportVignette = `Received a caregiver development note from ${edu.name}: ${edu.grades}% progress in play, communication, and daily routines.`;
+    if (edu.level === 'nursery') {
+      reportVignette = `Infant Nursery Observation (${edu.name}): ${edu.grades}% sensory milestones, crib attachment, and early vocalization.`;
+    } else if (edu.level === 'daycare') {
+      reportVignette = `Received a toddler creche note from ${edu.name}: ${edu.grades}% progress in play, early phonetics, and temperament.`;
     } else if (edu.level === 'kindergarten') {
       reportVignette = `Received a kindergarten progress note from ${edu.name}: ${edu.grades}% school readiness in letters, numbers, and classroom routines.`;
     } else {
@@ -1195,15 +1257,17 @@
       logs.push(getRandomItem(eliteLogs));
     }
 
-    // Club activities log
+    // Club activities log (scaled by Club Rank)
     if (edu.clubs && edu.clubs.length > 0) {
       const clubId = getRandomItem(edu.clubs);
       const clubDef = SCHOOL_CLUBS.find(c => c.id === clubId);
       if (clubDef) {
-        logs.push(`Participated actively in the ${clubDef.name}. ${clubDef.desc}`);
-        if (clubDef.stat === 'smarts') modStat(character, 'smarts', 1);
-        if (clubDef.stat === 'vitality') modStat(character, 'vitality', 1);
-        if (clubDef.stat === 'occult') modStat(character, 'occult', 2);
+        const rank = (edu.clubRanks && edu.clubRanks[clubId]) || 'Member';
+        const rankMult = rank === 'President' ? 2 : (rank === 'Officer' ? 1.5 : 1);
+        logs.push(`Participated in ${clubDef.name} as ${rank}. ${clubDef.desc}`);
+        if (clubDef.stat === 'smarts') modStat(character, 'smarts', Math.round(1 * rankMult));
+        if (clubDef.stat === 'vitality') modStat(character, 'vitality', Math.round(1 * rankMult));
+        if (clubDef.stat === 'occult') modStat(character, 'occult', Math.round(2 * rankMult));
       }
     }
 
@@ -1211,8 +1275,11 @@
     edu.gradeYear += 1;
 
     // Check level graduations & transitions
-    if (edu.level === 'daycare' && character.age >= 4) {
-      logs.push(`Graduated from Daycare at ${edu.name}! You are now ready to choose your Kindergarten education pathway.`);
+    if (edu.level === 'nursery' && character.age >= 2) {
+      logs.push(`Outgrew the infant crib at ${edu.name}! You took your first steady steps into Toddler Creche & Playgroup.`);
+      enrollInSchool(character, 'daycare', null, 'public', 'free');
+    } else if (edu.level === 'daycare' && character.age >= 4) {
+      logs.push(`Graduated from Toddler Creche at ${edu.name}! You are now ready to choose your Kindergarten education pathway.`);
       character.pendingSchoolChoice = { targetLevel: 'kindergarten', reason: 'graduation' };
       enrollInSchool(character, 'kindergarten', null, edu.schoolType === 'homeschool' ? 'homeschool' : 'public', 'free');
     } else if (edu.level === 'kindergarten' && character.age >= 6) {
@@ -1231,6 +1298,14 @@
       edu.enrolled = false;
       edu.graduationStatus = 'graduated';
       character.hasHighSchoolDiploma = true;
+      if (edu.schoolType === 'private') {
+        character.isPrepAlumni = true;
+        logs.push(`PREPARATORY HONORS: Graduated with Private Preparatory Alumni credentials (+University & Career prestige).`);
+      } else if (edu.schoolType === 'elite') {
+        character.isEliteAlumni = true;
+        character.shillings = (character.shillings || 0) + 12;
+        logs.push(`ARISTOCRATIC FELLOWSHIP: Graduated as an Elite Academy Alumnus! The Order of the Gilded Bell presented you with a signet ring and 12 Antique Shillings (s.).`);
+      }
       logs.push(`HIGH SCHOOL COMMENCEMENT: You walked the stage at ${edu.name} and received your High School Diploma! You are now eligible for University or full-time employment.`);
     } else if (edu.level === 'university' && edu.gradeYear > edu.maxGradeYears) {
       edu.enrolled = false;
@@ -1249,6 +1324,17 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
+    if (edu.level === 'nursery') {
+      edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + 4);
+      modStat(character, 'smarts', 1);
+      modStat(character, 'happiness', 2);
+      return {
+        success: true,
+        title: "Focused on Crib Mobile & Sounds",
+        body: "You tracked the slow rotation of the carved nursery mobile above your crib and mimicked the cadence of household voices.",
+        effects: { smarts: 1, happiness: 2, development: 4 }
+      };
+    }
     if (edu.level === 'daycare') {
       edu.grades = Math.min(100, (edu.grades !== undefined ? edu.grades : 75) + 4);
       modStat(character, 'smarts', 1);
@@ -1277,7 +1363,7 @@
     return {
       success: true,
       title: "Diligent Study",
-      body: `You spent hours in the school library poreing over textbooks and lecture notes. Your academic understanding deepened.`,
+      body: `You spent hours in the school library poring over textbooks and lecture notes. Your academic understanding deepened.`,
       effects: { smarts: 2, happiness: -2, grades: 8 }
     };
   }
@@ -1287,6 +1373,16 @@
       return { success: false, reason: "You are not currently enrolled in school." };
     }
     const edu = character.education;
+    if (edu.level === 'nursery') {
+      edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - 1);
+      modStat(character, 'happiness', 2);
+      return {
+        success: true,
+        title: "Fussed Through Crib Rest",
+        body: "You kicked off your knitted blanket and babbled at the wallpaper shadows instead of sleeping.",
+        effects: { happiness: 2, development: -1 }
+      };
+    }
     if (edu.level === 'daycare') {
       edu.grades = Math.max(0, (edu.grades !== undefined ? edu.grades : 75) - 1);
       modStat(character, 'happiness', 2);
@@ -1343,6 +1439,7 @@
     };
   }
 
+  // --- 3-Chapter School Supernatural Mysteries ---
   function investigateMystery(character, mysteryId) {
     if (!character.education || !character.education.enrolled) {
       return { success: false, reason: "You are not currently enrolled in school." };
@@ -1350,50 +1447,602 @@
     if (character.age < 6) {
       return { success: false, reason: "You are too young to deliberately investigate school grounds without an adult." };
     }
+    const edu = character.education;
+    edu.mysteryChapters = edu.mysteryChapters || {};
+    edu.stageActionsThisYear = edu.stageActionsThisYear || {};
+
+    const actionKey = 'mystery_' + mysteryId;
+    if (edu.stageActionsThisYear[actionKey]) {
+      return { success: false, reason: "You have already pushed as far into this school mystery as you safely can this year. Wait until next year for the trail to cool." };
+    }
+
     const mystery = SCHOOL_MYSTERIES.find(m => m.id === mysteryId) || SCHOOL_MYSTERIES[0];
-    let title = mystery.title;
+    const currentChap = edu.mysteryChapters[mystery.id] || 0;
+    if (currentChap >= 3) {
+      return { success: false, reason: `You have already resolved all 3 chapters of "${mystery.title}". Its truth is etched into your memory.` };
+    }
+
+    const nextChap = currentChap + 1;
+    edu.mysteryChapters[mystery.id] = nextChap;
+    edu.stageActionsThisYear[actionKey] = 1;
+
+    let title = `${mystery.title} — Chapter ${nextChap}/3`;
     let body = "";
     const effects = {};
 
     if (mystery.id === 'boiler_crawlspace') {
-      modStat(character, 'occult', 6);
-      modStat(character, 'sanity', -2);
-      effects.occult = 6;
-      effects.sanity = -2;
-      body = "You slipped behind the furnace pipes. Amidst spiderwebs and hot asbestos pipes, you discovered charcoal sigils drawn onto the floorboards and a child's silver locket that still ticks faintly.";
-      if (Math.random() < 0.3) {
-        character.shillings = (character.shillings || 0) + 2;
-        effects.shillings = 2;
-        body += " Inside the locket, you found 2 antique shillings.";
+      if (nextChap === 1) {
+        modStat(character, 'occult', 4);
+        modStat(character, 'sanity', -2);
+        effects.occult = 4; effects.sanity = -2;
+        body = "Chapter I (Gather Clues): You slipped behind the hissing iron boilers during lunch. Scratched into the soot-blackened brick beside the hazard tape were tally marks and the initials of three students from 1954.";
+      } else if (nextChap === 2) {
+        modStat(character, 'occult', 6);
+        modStat(character, 'smarts', 2);
+        modStat(character, 'sanity', -2);
+        effects.occult = 6; effects.smarts = 2; effects.sanity = -2;
+        body = "Chapter II (The Janitor's Ash-Key): Using a wax impression of the custodian's iron ring, you unlatched the crawlspace grate. Inside lay a circle of melted tallow candles and a brass ledger recording subterranean furnace offerings.";
+      } else {
+        modStat(character, 'occult', 10);
+        modStat(character, 'sanity', -3);
+        character.shillings = (character.shillings || 0) + 8;
+        effects.occult = 10; effects.sanity = -3; effects.shillings = 8;
+        body = "Chapter III (Confront the Flue Entity): At the dead end of the crawlspace, a pair of ember-bright eyes blinked from the coal chute. Instead of fleeing, you held your ground until it dropped a velvet pouch containing 8 antique Shillings (s.) and receded into the foundation.";
       }
     } else if (mystery.id === 'drained_pool') {
-      modStat(character, 'occult', 5);
-      modStat(character, 'sanity', -2);
-      effects.occult = 5;
-      effects.sanity = -2;
-      body = "You climbed down the rusted brass ladder into the dry deep end. In the center drain, a wet handprint was visible that evaporated under your flashlight beam.";
+      if (nextChap === 1) {
+        modStat(character, 'occult', 4);
+        modStat(character, 'sanity', -2);
+        effects.occult = 4; effects.sanity = -2;
+        body = "Chapter I (Gather Clues): Peering through the rusted chainlink fence around the 1980s natatorium, you noticed wet footprints circling the diving board despite the pool being bone-dry for decades.";
+      } else if (nextChap === 2) {
+        modStat(character, 'occult', 6);
+        modStat(character, 'smarts', 2);
+        modStat(character, 'sanity', -2);
+        effects.occult = 6; effects.smarts = 2; effects.sanity = -2;
+        body = "Chapter II (Locker 00 Cipher): In the mildewed changing rooms, you pried open Locker 00 and recovered a waterlogged whistle and a maintenance log warning never to unscrew the deep-end bronze drain cover.";
+      } else {
+        modStat(character, 'occult', 10);
+        modStat(character, 'sanity', -4);
+        character.shillings = (character.shillings || 0) + 9;
+        effects.occult = 10; effects.sanity = -4; effects.shillings = 9;
+        body = "Chapter III (The Deep-End Drain): You descended the rusted ladder at dusk. A translucent hand rose from the dry iron grate, pressing 9 barnacle-encrusted Shillings (s.) into your palm before the tiles echoed with a phantom splash.";
+      }
     } else if (mystery.id === 'sealed_stairwell') {
-      modStat(character, 'smarts', 2);
-      modStat(character, 'occult', 4);
-      modStat(character, 'sanity', -2);
-      effects.smarts = 2;
-      effects.occult = 4;
-      effects.sanity = -2;
-      body = "You managed to slip a brass wire into the padlock. Behind the door lay an architectural blueprint from 1922 indicating an entire subterranean annex erased from modern maps.";
-    } else if (mystery.id === 'pa_broadcast') {
-      modStat(character, 'occult', 7);
-      modStat(character, 'sanity', -3);
-      effects.occult = 7;
-      effects.sanity = -3;
-      body = "You waited alone until 5:45 PM. The speakers hissed with white noise, followed by rhythmic whispering in an unearthly cadence that made your teeth hum. When you looked out the window, all the crows on the power lines were facing the transmitter tower.";
+      if (nextChap === 1) {
+        modStat(character, 'smarts', 2);
+        modStat(character, 'occult', 4);
+        effects.smarts = 2; effects.occult = 4;
+        body = "Chapter I (Architectural Discrepancy): Measuring the third-floor corridor paces against the exterior windows, you proved an entire 14-foot stairwell shaft was bricked over behind the fire door.";
+      } else if (nextChap === 2) {
+        modStat(character, 'smarts', 3);
+        modStat(character, 'occult', 5);
+        modStat(character, 'sanity', -2);
+        effects.smarts = 3; effects.occult = 5; effects.sanity = -2;
+        body = "Chapter II (Pick the Brass Padlock): You picked the tarnished 1922 padlock. Behind the iron door, dust-choked marble steps spiraled *upward* into a bell tower that cannot be seen from outside the school.";
+      } else {
+        modStat(character, 'occult', 9);
+        modStat(character, 'smarts', 4);
+        modStat(character, 'sanity', -3);
+        character.shillings = (character.shillings || 0) + 10;
+        effects.occult = 9; effects.smarts = 4; effects.sanity = -3; effects.shillings = 10;
+        body = "Chapter III (The Unmapped Annex): At the top of the impossible staircase, you found a desk with your own surname carved into the oak a century ago, alongside a wax-sealed envelope holding 10 antique Shillings (s.).";
+      }
+    } else {
+      if (nextChap === 1) {
+        modStat(character, 'occult', 4);
+        modStat(character, 'sanity', -2);
+        effects.occult = 4; effects.sanity = -2;
+        body = "Chapter I (Record the 5:45 PM Static): You stayed late and recorded the PA speaker crackle on a cassette tape. Played backward, the static resolved into Latin roll-call numbers.";
+      } else if (nextChap === 2) {
+        modStat(character, 'occult', 6);
+        modStat(character, 'smarts', 2);
+        modStat(character, 'sanity', -2);
+        effects.occult = 6; effects.smarts = 2; effects.sanity = -2;
+        body = "Chapter II (Trace the Copper Conduit): Following the speaker wire behind the acoustic ceiling tiles, you discovered the intercom wasn't wired to the principal's office—it ran straight down into the earth beneath the flagpole.";
+      } else {
+        modStat(character, 'occult', 11);
+        modStat(character, 'sanity', -4);
+        character.shillings = (character.shillings || 0) + 9;
+        effects.occult = 11; effects.sanity = -4; effects.shillings = 9;
+        body = "Chapter III (Answer the Roll Call): At 5:45 PM, you pressed the wall talk-back switch and spoke your name into the static. The voice on the intercom paused, whispered 'Excused,' and 9 silver Shillings (s.) clattered out of the speaker grille.";
+      }
     }
 
     return {
       success: true,
-      title: `Investigated: ${title}`,
+      title,
       body,
       effects
     };
+  }
+
+  // --- Interactive Club Sub-Actions & Rank Progression ---
+  function performClubSubAction(character, clubId, subAction) {
+    if (!character.education || !character.education.enrolled) {
+      return { success: false, reason: "You are not currently enrolled in school." };
+    }
+    const edu = character.education;
+    if (!edu.clubs || !edu.clubs.includes(clubId)) {
+      return { success: false, reason: "You must join this club first before participating in its activities." };
+    }
+    const club = SCHOOL_CLUBS.find(c => c.id === clubId);
+    if (!club) return { success: false, reason: "Club not found." };
+
+    edu.clubRanks = edu.clubRanks || {};
+    edu.clubActionsThisYear = edu.clubActionsThisYear || {};
+    const key = `${clubId}_${subAction}`;
+    if ((edu.clubActionsThisYear[key] || 0) >= 1) {
+      return { success: false, reason: `You have already completed "${subAction.replace('_', ' ')}" for ${club.name} this school year.` };
+    }
+    edu.clubActionsThisYear[key] = 1;
+
+    const currentRank = edu.clubRanks[clubId] || 'Member';
+    const effects = {};
+    let title = `${club.name}`;
+    let body = "";
+
+    if (subAction === 'session') {
+      modStat(character, club.stat || 'smarts', 3);
+      modStat(character, 'happiness', 3);
+      edu.popularity = Math.min(100, (edu.popularity || 50) + 2);
+      effects[club.stat || 'smarts'] = 3;
+      effects.happiness = 3;
+      effects.popularity = 2;
+      title = `${club.name}: Weekly Session`;
+      body = `You attended an intensive after-school session with the ${club.name} as a ${currentRank}, sharpening your ${club.stat || 'academic'} skills and bonding with fellow members.`;
+    } else if (subAction === 'project') {
+      modStat(character, club.stat || 'smarts', 4);
+      edu.grades = Math.min(100, (edu.grades || 75) + 4);
+      effects[club.stat || 'smarts'] = 4;
+      effects.grades = 4;
+      if (club.id === 'occult_lit') {
+        character.shillings = (character.shillings || 0) + 3;
+        effects.shillings = 3;
+        title = `${club.name}: Candlelight Translation`;
+        body = `You led a special translation of a water-damaged grimoire for the ${club.name}, uncovering 3 antique Shillings (s.) tucked inside the spine!`;
+      } else {
+        title = `${club.name}: Showcase Project`;
+        body = `You spearheaded a special exhibition project for the ${club.name}. Faculty advisors praised your initiative and awarded extra credit!`;
+      }
+    } else if (subAction === 'compete') {
+      if (currentRank === 'Member') {
+        edu.clubRanks[clubId] = 'Officer';
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+        modStat(character, club.stat || 'smarts', 3);
+        effects.popularity = 5;
+        effects[club.stat || 'smarts'] = 3;
+        title = `Promoted to Club Officer!`;
+        body = `Your standout performance in the regional ${club.name} tournament earned unanimous applause. You have been elected **Club Officer**!`;
+      } else if (currentRank === 'Officer') {
+        edu.clubRanks[clubId] = 'President';
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 8);
+        modStat(character, club.stat || 'smarts', 5);
+        modStat(character, 'happiness', 5);
+        effects.popularity = 8;
+        effects[club.stat || 'smarts'] = 5;
+        effects.happiness = 5;
+        title = `Elected ${club.name} President!`;
+        body = `You led the ${club.name} to a regional championship victory! The faculty advisor officially named you **Club President / Captain**—a prestigious credential on your academic transcript.`;
+      } else {
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+        modStat(character, club.stat || 'smarts', 4);
+        effects.popularity = 5;
+        effects[club.stat || 'smarts'] = 4;
+        title = `${club.name}: Championship Defense`;
+        body = `As President of the ${club.name}, you presided over the annual inter-school invitational and defended the institution's trophy!`;
+      }
+    }
+
+    return { success: true, title, body, effects };
+  }
+
+  // --- 7-Stage Developmental & Academic Submenu System ---
+  function getStageSchoolActions(character) {
+    if (!character || !character.education || !character.education.enrolled) return [];
+    const edu = character.education;
+    const lvl = edu.level;
+
+    if (lvl === 'nursery') {
+      return [
+        { id: 'nursery_mobile', label: 'Observe Shadows & Crib Mobile', desc: 'Track the slow rotation of carved wooden figures above your crib (+Smarts, +Development).', icon: 'sparkles', badge: 'Sensory' },
+        { id: 'nursery_cry', label: 'Cry for Comfort vs. Self-Soothe', desc: 'Call out for your caregiver’s embrace to build early parental attachment (+Happiness, +Comfort).', icon: 'heart', badge: 'Attachment' },
+        { id: 'nursery_crawl', label: 'Crawl & Explore Floorboards', desc: 'Venture across the nursery rug to inspect loose floorboards and dust motes (+Vitality, +Development).', icon: 'footprints', badge: 'Motor' },
+        { id: 'nursery_mimic', label: 'Mimic Household Words & Sounds', desc: 'Repeat syllables overheard from the hallway (+Smarts, +Comfort).', icon: 'message-circle', badge: 'Speech' },
+        { id: 'nursery_corner', label: 'Stare at the Unlit Nursery Corner', desc: 'Gaze silently at the tall shadow standing behind the rocking chair (+Occult, -Sanity).', icon: 'eye', badge: 'Eerie' }
+      ];
+    }
+    if (lvl === 'daycare') {
+      return [
+        { id: 'toddler_blocks', label: 'Imaginative Block Architecture', desc: 'Construct tall, crooked towers on the playgroup rug (+Smarts, +Development).', icon: 'blocks', badge: 'Cognitive' },
+        { id: 'toddler_phonetics', label: 'Picture-Book Phonetics', desc: 'Sound out illustrated letters with the caregiver (Unlocks Early Reader Buff at 65%+ Smarts).', icon: 'book-open', badge: character.hasEarlyReaderBuff ? 'Early Reader ★' : 'Literacy' },
+        { id: 'toddler_share', label: 'Share vs. Hoard Playgroup Toys', desc: 'Negotiate wooden train sets with other toddlers (+Comfort & Trust, +Peer Closeness).', icon: 'gift', badge: 'Social' },
+        { id: 'toddler_hide', label: 'Hide Behind Coats During Naptime', desc: 'Slip into the cloakroom while the matron dims the lights (+Happiness, +Occult).', icon: 'moon', badge: 'Stealth' },
+        { id: 'toddler_tantrum', label: 'Throw a Defiant Tantrum', desc: 'Hurl your cup across the linoleum to test adult boundaries (+Vitality, -Development).', icon: 'Flame', badge: 'Temperament' }
+      ];
+    }
+    if (lvl === 'kindergarten') {
+      return [
+        { id: 'kg_painting', label: 'Alphabet & Finger-Painting Studio', desc: 'Practice letter strokes and paint vivid scenes on newsprint (+Smarts, +School Readiness).', icon: 'palette', badge: 'Readiness' },
+        { id: 'kg_recess', label: 'Recess Playground Games', desc: 'Lead hopscotch and tag by the iron fence (+Vitality, +Classroom Confidence).', icon: 'sun', badge: 'Playground' },
+        { id: 'kg_show_tell', label: 'Classroom Show-and-Tell', desc: 'Present a prized item from home—or something unearthed in the garden (+Popularity, +Occult/Smarts).', icon: 'award', badge: 'Presentation' },
+        { id: 'kg_imaginary', label: 'Commune with Imaginary Playmate', desc: 'Whisper at the empty chair during snack time (+Occult, +Happiness, -Sanity).', icon: 'ghost', badge: 'Uncanny' }
+      ];
+    }
+    if (lvl === 'elementary') {
+      return [
+        { id: 'elem_homework', label: 'Complete Homework & Extra Credit', desc: 'Finish arithmetic sets and spelling worksheets before dinner (+Grades, +Smarts).', icon: 'book-check', badge: 'Academics' },
+        { id: 'elem_competition', label: 'Annual Spelling Bee / Science Fair', desc: 'Compete for the Elementary Academic Ribbon (Boosts Private/Elite Scholarship odds!).', icon: 'trophy', badge: edu.academicRibbon ? 'Ribbon Winner ★' : 'Competition' },
+        { id: 'elem_playground', label: 'Playground Politics & Recess Court', desc: 'Stand up to the schoolyard bully or trade lunchbox treats (+Popularity, +Vitality).', icon: 'shield', badge: 'Social' },
+        { id: 'elem_prank', label: 'Chalkboard & Cloakroom Mischief', desc: 'Swap the teacher’s chalk with wax crayons (Risk of Detention vs. +Popularity).', icon: 'zap', badge: 'Mischief' }
+      ];
+    }
+    if (lvl === 'middle') {
+      return [
+        { id: 'mid_exam_prep', label: 'Preparatory Placement Exam Prep', desc: 'Drill algebra and Latin roots to qualify for Private/Elite Academy scholarships (+Grades, +Smarts).', icon: 'file-check-2', badge: 'Admissions Prep' },
+        { id: 'mid_clique', label: `Align with Adolescent Clique${edu.socialClique ? ' (' + edu.socialClique + ')' : ''}`, desc: 'Join or rise within Honors Society, Varsity Jocks, Goth Outcasts, or Hallway Rebels.', icon: 'users', badge: edu.socialClique || 'Choose Clique' },
+        { id: 'mid_locker_note', label: 'Pass Folded Note in Corridor', desc: 'Slip a secret note through a classmate’s locker louvers (+Popularity, +Happiness).', icon: 'mail', badge: 'Social' },
+        { id: 'mid_trophy_heist', label: 'Pick the Trophy Case Lock After Hours', desc: 'Steal an antique silver medal from the 1960s display (+Shillings, risk of Detention).', icon: 'key', badge: 'Risk' }
+      ];
+    }
+    if (lvl === 'high') {
+      return [
+        { id: 'high_sat_prep', label: 'Matriculation & SAT Honors Seminar', desc: 'Intensive exam prep for University admissions and scholarship retention (+Grades, +Smarts).', icon: 'graduation-cap', badge: 'Honors' },
+        { id: 'high_council', label: 'Campaign for Student Council', desc: 'Deliver auditorium speeches to win Student Body Office (+Popularity, +Transcript Prestige).', icon: 'megaphone', badge: edu.studentCouncilRank || 'Leadership' },
+        { id: 'high_prom', label: 'Attend Annual Prom / Formal Gala', desc: 'Dress in formal attire for an unforgettable night in the gymnasium (+Happiness, +Popularity).', icon: 'sparkles', badge: 'Milestone' },
+        {
+          id: 'high_secret_society',
+          label: edu.schoolType === 'elite' ? 'Convene with The Order of the Gilded Bell' : 'Print Underground Midnight Zine',
+          desc: edu.schoolType === 'elite'
+            ? 'Attend a masked sub-chapel conclave with aristocratic seniors (+Shillings s., +Occult, +Elite Network).'
+            : 'Distribute forbidden student pamphlets exposing town and faculty secrets (+Popularity, +Occult).',
+          icon: 'eye',
+          badge: edu.schoolType === 'elite' ? 'Gilded Bell' : 'Underground'
+        }
+      ];
+    }
+    if (lvl === 'university') {
+      return [
+        { id: 'uni_thesis', label: 'Honors Thesis & Archival Seminar', desc: 'Defend your departmental research chapter before faculty (+Grades, +Smarts).', icon: 'scroll-text', badge: 'Research' },
+        { id: 'uni_ra_shift', label: 'Professor’s Research Assistantship', desc: 'Grade papers and catalog restricted specimens for a faculty stipend (+$280 & +Shillings s.).', icon: 'briefcase', badge: 'Paid Stipend' },
+        { id: 'uni_symposium', label: 'Present at Undergraduate Symposium', desc: 'Publish a monograph in the collegiate journal (+Popularity, +Smarts, +Career Prestige).', icon: 'award', badge: 'Publication' },
+        { id: 'uni_shortcut', label: 'Forbidden Archive / Plagiarism Gamble', desc: 'Copy from a sealed 19th-century dissertation (High Grade boost vs. Dean’s Tribunal risk).', icon: 'alert-triangle', badge: 'Gamble' }
+      ];
+    }
+    return [];
+  }
+
+  function performStageSchoolAction(character, actionId) {
+    if (!character || !character.education || !character.education.enrolled) {
+      return { success: false, reason: "You are not currently enrolled." };
+    }
+    const edu = character.education;
+    edu.stageActionsThisYear = edu.stageActionsThisYear || {};
+    if ((edu.stageActionsThisYear[actionId] || 0) >= 1) {
+      return { success: false, reason: "You have already completed this milestone activity during the current year." };
+    }
+    edu.stageActionsThisYear[actionId] = 1;
+
+    const effects = {};
+    let title = "School Milestone";
+    let body = "";
+
+    switch (actionId) {
+      // STAGE 1: INFANT NURSERY (0-1)
+      case 'nursery_mobile':
+        edu.grades = Math.min(100, (edu.grades || 75) + 5);
+        modStat(character, 'smarts', 2);
+        effects.smarts = 2; effects.development = 5;
+        title = "Observed Shadows & Crib Mobile";
+        body = "Lying on your back in the cedar crib, you studied the brass mobile and the shifting geometry of afternoon shadows across the ceiling plaster.";
+        break;
+      case 'nursery_cry':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+        modStat(character, 'happiness', 4);
+        effects.happiness = 4; effects.comfort = 5;
+        title = "Sought Warmth & Reassurance";
+        body = "Your cries brought footsteps hurrying up the stairs. You were lifted from the crib, rocked gently by the window, and wrapped in a warm shawl.";
+        break;
+      case 'nursery_crawl':
+        edu.grades = Math.min(100, (edu.grades || 75) + 4);
+        modStat(character, 'vitality', 3);
+        effects.vitality = 3; effects.development = 4;
+        title = "Crawled Across the Nursery Floorboards";
+        body = "You pushed yourself onto hands and knees, exploring the braided rug and discovering a cold draft whistling from a knot in the oak floorboards.";
+        break;
+      case 'nursery_mimic':
+        edu.grades = Math.min(100, (edu.grades || 75) + 5);
+        modStat(character, 'smarts', 2);
+        modStat(character, 'happiness', 2);
+        effects.smarts = 2; effects.happiness = 2; effects.development = 5;
+        title = "Mimicked Early Words";
+        body = "You babbled and formed your first distinct syllables in response to household voices, earning delighted gasps from your caregivers.";
+        break;
+      case 'nursery_corner':
+        modStat(character, 'occult', 5);
+        modStat(character, 'sanity', -2);
+        effects.occult = 5; effects.sanity = -2;
+        title = "Stared at the Unlit Nursery Corner";
+        body = "While the house slept, you stood holding the crib rails and stared silently into the dark corner by the wardrobe. Something tall tilted its head back at you.";
+        break;
+
+      // STAGE 2: TODDLER CRECHE (2-3)
+      case 'toddler_blocks':
+        edu.grades = Math.min(100, (edu.grades || 75) + 5);
+        modStat(character, 'smarts', 3);
+        effects.smarts = 3; effects.development = 5;
+        title = "Imaginative Block Architecture";
+        body = "You arranged painted wooden blocks into an eerily symmetrical cathedral spire on the playgroup mat. The head caregiver took notes in her ledger.";
+        break;
+      case 'toddler_phonetics':
+        edu.grades = Math.min(100, (edu.grades || 75) + 6);
+        modStat(character, 'smarts', 3);
+        effects.smarts = 3; effects.development = 6;
+        if (getStat(character, 'smarts') >= 65 && !character.hasEarlyReaderBuff) {
+          character.hasEarlyReaderBuff = true;
+          title = "Unlocked: Early Reader Prodigy!";
+          body = "You sounded out entire sentences from the illustrated primer all by yourself! You gained the permanent **Early Reader** buff (+2% automatic grade growth every school year).";
+        } else {
+          title = "Picture-Book Phonetics";
+          body = "You traced woodcut illustrations of owls, bells, and keys while sounding out letters with the caregiver.";
+        }
+        break;
+      case 'toddler_share':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+        modStat(character, 'happiness', 3);
+        effects.happiness = 3; effects.comfort = 6;
+        title = "Playgroup Toy Diplomacy";
+        body = "You shared the painted tin train with your playmates during free play, earning gold star stickers and warm approval.";
+        break;
+      case 'toddler_hide':
+        modStat(character, 'happiness', 3);
+        modStat(character, 'occult', 3);
+        effects.happiness = 3; effects.occult = 3;
+        title = "Hid in the Cloakroom";
+        body = "While the other toddlers napped on their cots, you slipped behind a row of heavy wool raincoats and listened to the pipes knocking inside the wall.";
+        break;
+      case 'toddler_tantrum':
+        edu.grades = Math.max(0, (edu.grades || 75) - 3);
+        modStat(character, 'vitality', 2);
+        modStat(character, 'happiness', 2);
+        effects.vitality = 2; effects.happiness = 2; effects.development = -3;
+        title = "Defiant Creche Tantrum";
+        body = "You overturned a basket of wooden blocks and refused to sit on the circle rug until the matron brought chamomile tea.";
+        break;
+
+      // STAGE 3: KINDERGARTEN (4-5)
+      case 'kg_painting':
+        edu.grades = Math.min(100, (edu.grades || 75) + 6);
+        modStat(character, 'smarts', 2);
+        modStat(character, 'happiness', 3);
+        effects.smarts = 2; effects.happiness = 3; effects.readiness = 6;
+        title = "Alphabet & Finger-Painting";
+        body = "You practiced uppercase cursive strokes and painted a striking crimson-and-indigo landscape that the teacher pinned to the hallway bulletin board.";
+        break;
+      case 'kg_recess':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+        modStat(character, 'vitality', 3);
+        modStat(character, 'happiness', 3);
+        effects.vitality = 3; effects.happiness = 3; effects.popularity = 6;
+        title = "Recess Playground Champion";
+        body = "You led a spirited game of tag around the rusted merry-go-round, winning the admiration of your kindergarten peers.";
+        break;
+      case 'kg_show_tell':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+        edu.grades = Math.min(100, (edu.grades || 75) + 4);
+        modStat(character, 'occult', 3);
+        modStat(character, 'smarts', 2);
+        effects.popularity = 5; effects.readiness = 4; effects.occult = 3; effects.smarts = 2;
+        title = "Unforgettable Show-and-Tell";
+        body = "You brought a tarnished brass pocket-compass and a curiously carved stone from the garden. The entire class leaned forward in hushed fascination.";
+        break;
+      case 'kg_imaginary':
+        modStat(character, 'occult', 5);
+        modStat(character, 'happiness', 2);
+        modStat(character, 'sanity', -2);
+        effects.occult = 5; effects.happiness = 2; effects.sanity = -2;
+        title = "Communed with Imaginary Playmate";
+        body = "You set an extra paper cup at the snack table for your unseen friend. Curiously, when the bell rang, the apple slices on that plate were gone.";
+        break;
+
+      // STAGE 4: ELEMENTARY SCHOOL (6-10)
+      case 'elem_homework':
+        edu.grades = Math.min(100, (edu.grades || 75) + 7);
+        modStat(character, 'smarts', 3);
+        effects.grades = 7; effects.smarts = 3;
+        title = "Completed Extra-Credit Worksheets";
+        body = "You completed every long-division and grammar exercise neatly in fountain ink, earning a gold star on the homeroom honour roll.";
+        break;
+      case 'elem_competition': {
+        const score = getStat(character, 'smarts') + (edu.grades || 75) * 0.5 + (character.hasEarlyReaderBuff ? 10 : 0);
+        if (score >= 105) {
+          edu.academicRibbon = true;
+          character.hasAcademicRibbon = true;
+          edu.grades = Math.min(100, (edu.grades || 75) + 6);
+          modStat(character, 'smarts', 4);
+          modStat(character, 'happiness', 5);
+          effects.grades = 6; effects.smarts = 4; effects.happiness = 5;
+          title = "Won First-Place Academic Ribbon!";
+          body = "You outlasted every competitor in the district Spelling Bee & Science Exhibition! The Principal pinned the **First-Place Academic Ribbon** to your lapel—unlocking favourable consideration from Elite Academy scholarship boards.";
+        } else {
+          edu.grades = Math.min(100, (edu.grades || 75) + 4);
+          modStat(character, 'smarts', 2);
+          effects.grades = 4; effects.smarts = 2;
+          title = "Competed in Academic Fair";
+          body = "You presented a baking-soda volcano and competed through four rounds of the Spelling Bee. Though you missed the first-place ribbon, your teachers praised your effort.";
+        }
+        break;
+      }
+      case 'elem_playground':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 7);
+        modStat(character, 'vitality', 2);
+        modStat(character, 'happiness', 3);
+        effects.popularity = 7; effects.vitality = 2; effects.happiness = 3;
+        title = "Ruled the Recess Blacktop";
+        body = "You stood your ground during a heated four-square match and brokered a legendary lunchbox trade by the swings.";
+        break;
+      case 'elem_prank':
+        if (Math.random() < 0.35) {
+          edu.disciplinaryRecord = (edu.disciplinaryRecord || 0) + 1;
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 4);
+          effects.popularity = 4;
+          title = "Caught in Cloakroom Prank!";
+          body = `Your frog-in-the-desk prank sent the classroom into uproarious laughter, but the homeroom teacher marched you to the office (+1 Disciplinary Mark, Total: ${edu.disciplinaryRecord}).`;
+        } else {
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 8);
+          modStat(character, 'happiness', 4);
+          effects.popularity = 8; effects.happiness = 4;
+          title = "Masterful Classroom Prank";
+          body = "You rigged the pull-down world map to roll up with a loud snap right in the middle of geography lecture. The class cheered and the teacher never suspected you!";
+        }
+        break;
+
+      // STAGE 5: MIDDLE SCHOOL (11-13)
+      case 'mid_exam_prep':
+        edu.grades = Math.min(100, (edu.grades || 75) + 8);
+        modStat(character, 'smarts', 4);
+        effects.grades = 8; effects.smarts = 4;
+        title = "Preparatory Placement Exam Drill";
+        body = "You worked through past Private and Elite Academy entrance examination booklets, mastering geometry proofs and classical vocabulary.";
+        break;
+      case 'mid_clique': {
+        const cliques = ['Honors Society', 'Varsity Athletes', 'Goth & Art Outcasts', 'Hallway Rebels'];
+        const idx = cliques.indexOf(edu.socialClique);
+        const chosen = cliques[(idx + 1) % cliques.length];
+        edu.socialClique = chosen;
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+        effects.popularity = 6;
+        if (chosen === 'Honors Society') { modStat(character, 'smarts', 3); effects.smarts = 3; }
+        else if (chosen === 'Varsity Athletes') { modStat(character, 'vitality', 3); effects.vitality = 3; }
+        else if (chosen === 'Goth & Art Outcasts') { modStat(character, 'occult', 4); effects.occult = 4; }
+        else { modStat(character, 'happiness', 4); effects.happiness = 4; }
+        title = `Clique Alignment: ${chosen}`;
+        body = `You claimed a regular table in the cafeteria with the **${chosen}**, shaping your middle-school reputation and peer circle.`;
+        break;
+      }
+      case 'mid_locker_note':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+        modStat(character, 'happiness', 4);
+        effects.popularity = 6; effects.happiness = 4;
+        title = "Folded Corridor Note";
+        body = "You slipped an origami note through the vents of a locker between bells. By afternoon recess, half the hallway was whispering about your charm.";
+        break;
+      case 'mid_trophy_heist':
+        if (Math.random() < 0.4) {
+          edu.disciplinaryRecord = (edu.disciplinaryRecord || 0) + 1;
+          modStat(character, 'sanity', -2);
+          effects.sanity = -2;
+          title = "Caught by the Hall Monitor!";
+          body = `A flashlight beam caught you picking the 1962 trophy cabinet lock! You were written up for tampering with school property (+1 Disciplinary Mark, Total: ${edu.disciplinaryRecord}).`;
+        } else {
+          character.shillings = (character.shillings || 0) + 4;
+          modStat(character, 'occult', 3);
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+          effects.shillings = 4; effects.occult = 3; effects.popularity = 5;
+          title = "The Trophy Case Relic";
+          body = "You jimmied the brass showcase and recovered a tarnished 1928 Debate Medal and 4 antique Shillings (s.) hidden beneath the velvet lining.";
+        }
+        break;
+
+      // STAGE 6: HIGH SCHOOL (14-17)
+      case 'high_sat_prep':
+        edu.grades = Math.min(100, (edu.grades || 75) + 8);
+        modStat(character, 'smarts', 4);
+        effects.grades = 8; effects.smarts = 4;
+        title = "Matriculation & SAT Honors Seminar";
+        body = "You completed timed analytical essays and advanced calculus problem sets, solidifying your transcript for University admissions.";
+        break;
+      case 'high_council':
+        if ((edu.popularity || 50) >= 65 || (edu.grades || 75) >= 85) {
+          edu.studentCouncilRank = edu.studentCouncilRank === 'Class Representative' ? 'Student Body President' : 'Class Representative';
+          character.wasStudentCouncil = true;
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 8);
+          modStat(character, 'smarts', 2);
+          modStat(character, 'happiness', 4);
+          effects.popularity = 8; effects.smarts = 2; effects.happiness = 4;
+          title = `Elected ${edu.studentCouncilRank}!`;
+          body = `Your campaign posters and sharp auditorium speech won over the student body! Serving as **${edu.studentCouncilRank}** adds major distinction to your permanent dossier.`;
+        } else {
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 4);
+          effects.popularity = 4;
+          title = "Student Council Campaign";
+          body = "You handed out campaign buttons and debated in the auditorium. Though you fell short of a majority vote this term, your name recognition grew (Requires 65%+ Popularity or 85%+ Grades to win).";
+        }
+        break;
+      case 'high_prom':
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 7);
+        modStat(character, 'happiness', 6);
+        modStat(character, 'looks', 2);
+        effects.popularity = 7; effects.happiness = 6; effects.looks = 2;
+        title = "Midnight Velvet Prom";
+        body = "Under paper lanterns and a slow-turning mirror ball, you danced through the formal gala while punch bowls gleamed and flashbulbs popped.";
+        break;
+      case 'high_secret_society':
+        if (edu.schoolType === 'elite') {
+          edu.gildedBellMember = true;
+          character.isGildedBellInitiate = true;
+          character.shillings = (character.shillings || 0) + 7;
+          modStat(character, 'occult', 6);
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 5);
+          effects.shillings = 7; effects.occult = 6; effects.popularity = 5;
+          title = "Conclave of the Gilded Bell";
+          body = "Wearing a velvet half-mask beneath the academy chapel, you recited the Founder's catechism with fellow aristocratic seniors and received a stipend of 7 antique Shillings (s.).";
+        } else {
+          character.shillings = (character.shillings || 0) + 3;
+          modStat(character, 'occult', 4);
+          edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+          effects.shillings = 3; effects.occult = 4; effects.popularity = 6;
+          title = "Printed Underground Midnight Zine";
+          body = "Using the mimeograph machine after hours, you printed copies of 'The Blackwood Bellwether' detailing local anomalies and slipped them into every locker (+3 Shillings s. from anonymous subscribers).";
+        }
+        break;
+
+      // STAGE 7: UNIVERSITY (18+)
+      case 'uni_thesis':
+        edu.grades = Math.min(100, (edu.grades || 75) + 8);
+        modStat(character, 'smarts', 4);
+        effects.grades = 8; effects.smarts = 4;
+        title = "Defended Honours Thesis Chapter";
+        body = `You presented primary-source findings for your ${edu.major || 'Undergraduate'} thesis before the departmental committee, earning high distinction.`;
+        break;
+      case 'uni_ra_shift': {
+        const stipend = 280;
+        character.money = (character.money || 0) + stipend;
+        character.shillings = (character.shillings || 0) + 3;
+        modStat(character, 'smarts', 2);
+        effects.money = stipend; effects.shillings = 3; effects.smarts = 2;
+        title = "Professor's Research Assistantship";
+        body = `You spent late nights indexing departmental monographs and locked archive crates. The chair paid your $${stipend} research stipend—plus 3 antique Shillings (s.) found in an uncatalogued folio.`;
+        break;
+      }
+      case 'uni_symposium':
+        edu.grades = Math.min(100, (edu.grades || 75) + 5);
+        edu.popularity = Math.min(100, (edu.popularity || 50) + 6);
+        modStat(character, 'smarts', 3);
+        character.hasPublishedPaper = true;
+        effects.grades = 5; effects.popularity = 6; effects.smarts = 3;
+        title = "Published in Collegiate Journal";
+        body = "Your undergraduate paper was selected for the annual University Symposium proceedings, impressing faculty and future employers alike.";
+        break;
+      case 'uni_shortcut':
+        if (Math.random() < 0.42) {
+          edu.disciplinaryRecord = (edu.disciplinaryRecord || 0) + 2;
+          edu.grades = Math.max(0, (edu.grades || 75) - 12);
+          modStat(character, 'sanity', -4);
+          effects.grades = -12; effects.sanity = -4;
+          title = "Dean's Academic Integrity Tribunal!";
+          body = `Your advisor recognized passages lifted from an 1899 dissertation in the restricted stacks! Your paper was voided and the Dean recorded 2 Disciplinary Marks (Total: ${edu.disciplinaryRecord}).`;
+        } else {
+          edu.grades = Math.min(100, (edu.grades || 75) + 12);
+          modStat(character, 'occult', 4);
+          effects.grades = 12; effects.occult = 4;
+          title = "Unsealed the 1899 Dissertation";
+          body = "You adapted forgotten theorems from an unindexed 19th-century manuscript in the basement stacks. The faculty hailed your paper as uncannily original!";
+        }
+        break;
+    }
+
+    return { success: true, title, body, effects };
   }
 
   // --- School Classmate Interactions ---
@@ -1817,9 +2466,12 @@
     }
     const major = UNIVERSITY_MAJORS.find(m => m.id === majorId) || UNIVERSITY_MAJORS[0];
     
-    // Check acceptance roll based on smarts
+    // Check acceptance roll based on smarts + Prep/Elite Alumni credentials
     const charSmarts = getStat(character, 'smarts');
-    const accepted = charSmarts >= 40 || Math.random() < 0.75;
+    const alumniBonus = character.isEliteAlumni ? 25 : (character.isPrepAlumni ? 12 : 0);
+    const councilBonus = character.wasStudentCouncil ? 8 : 0;
+    const effectiveSmarts = charSmarts + alumniBonus + councilBonus;
+    const accepted = character.isEliteAlumni || effectiveSmarts >= 55 || Math.random() < 0.72;
     if (!accepted) {
       return {
         success: false,
@@ -1829,10 +2481,13 @@
 
     // Enroll
     enrollInSchool(character, 'university', major.name);
+    const alumniNote = character.isEliteAlumni
+      ? " As an Elite Academy Alumnus, the University Board granted you priority fellowship seating!"
+      : (character.isPrepAlumni ? " Your Private Preparatory Alumni transcript earned commendation from the admissions dean." : "");
     return {
       success: true,
       title: "Accepted into University!",
-      body: `Congratulations! You have been formally matriculated into the Department of ${major.name} at ${character.education.name}!`,
+      body: `Congratulations! You have been formally matriculated into the Department of ${major.name} at ${character.education.name}!${alumniNote}`,
       effects: { smarts: 4, happiness: 10 }
     };
   }
@@ -1871,6 +2526,9 @@
   window.studyHarder = studyHarder;
   window.skipClass = skipClass;
   window.investigateMystery = investigateMystery;
+  window.performClubSubAction = performClubSubAction;
+  window.getStageSchoolActions = getStageSchoolActions;
+  window.performStageSchoolAction = performStageSchoolAction;
   window.interactWithClassmate = interactWithClassmate;
   window.interactWithTeacher = interactWithTeacher;
   window.interactWithStaff = interactWithStaff;
