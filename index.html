@@ -1005,6 +1005,7 @@
     [data-mode="light"] .bar-fill-amber { background-color: #d97706 !important; }
 
     /* Full-Screen Modals Solid Opaque Themed Backgrounds (Zero Transparency) */
+    #profile-modal,
     #education-modal,
     #school-choice-modal,
     #school-person-modal,
@@ -1145,26 +1146,127 @@
 
     .core-nav-button.is-active i { color: var(--accent-primary); }
 
-    .profile-stat-row {
+    /* Sleek Gothic Soul Dossier (Profile Modal) */
+    .profile-dossier-card {
+      position: relative;
+      border: 1px solid var(--border-main);
+      border-radius: 1rem;
+      background:
+        radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--accent-primary) 9%, transparent) 0%, transparent 70%),
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-header) 92%, transparent) 0%, var(--bg-input) 100%);
+      box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+    [data-mode="light"] .profile-dossier-card {
+      box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .profile-portrait-locket {
+      position: relative;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 0.9rem;
+      padding: 2px;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--accent-shilling) 75%, var(--border-main)), color-mix(in srgb, var(--accent-primary) 55%, var(--border-main)));
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      flex-shrink: 0;
+    }
+    .profile-portrait-locket-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.78rem;
+      overflow: hidden;
+      background: var(--bg-input);
+      border: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .profile-stat-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 0.75rem;
-      align-items: center;
-      min-height: 48px;
-      padding: 0.7rem 0.8rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+    .profile-stat-row {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.4rem;
+      padding: 0.6rem 0.7rem;
       border: 1px solid var(--border-subtle);
-      border-radius: 0.85rem;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 40%, rgba(0, 0, 0, 0.12) 100%), var(--bg-input);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
-      transition: all 0.15s ease;
+      border-radius: 0.75rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.1) 100%), var(--bg-input);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .profile-stat-row.profile-stat-wide {
+      grid-column: span 2 / span 2;
+      background:
+        radial-gradient(90% 120% at 100% 0%, rgba(168, 85, 247, 0.11), transparent 70%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.12) 100%),
+        var(--bg-input);
+      border-color: color-mix(in srgb, #a855f7 32%, var(--border-subtle));
     }
     .profile-stat-row:hover {
       border-color: var(--border-main);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.06) 100%), var(--bg-card-hover);
     }
     [data-mode="light"] .profile-stat-row {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 40%, rgba(0, 0, 0, 0.02) 100%), var(--bg-input);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 3px rgba(0, 0, 0, 0.05);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(0, 0, 0, 0.02) 100%), var(--bg-input);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    [data-mode="light"] .profile-stat-row.profile-stat-wide {
+      background:
+        radial-gradient(90% 120% at 100% 0%, rgba(147, 51, 234, 0.08), transparent 70%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(0, 0, 0, 0.02) 100%),
+        var(--bg-input);
+    }
+
+    .profile-registry-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 65%, transparent);
+    }
+    .profile-registry-row:last-child {
+      border-bottom: none;
+    }
+
+    .profile-section-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.9rem;
+      background: var(--bg-header);
+      overflow: hidden;
+    }
+    .profile-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem 0.8rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+      background: color-mix(in srgb, var(--bg-input) 65%, transparent);
+    }
+    .profile-filter-pill {
+      padding: 0.35rem 0.65rem;
+      border-radius: 0.55rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .profile-filter-pill:hover {
+      color: var(--text-primary);
+    }
+    .profile-filter-pill.is-active {
+      color: var(--text-primary);
+      background: var(--bg-card);
+      border-color: var(--border-main);
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     /* Eerie & Beautiful: Tarot Frontispiece & Gothic Cathedral Reliquary (Option C + A Hybrid) */
@@ -2575,65 +2677,173 @@
       </main>
     </div>
 
-    <!-- CHARACTER PROFILE -->
+    <!-- CHARACTER PROFILE (GOTHIC SOUL DOSSIER) -->
     <div id="profile-modal" class="hidden absolute inset-0 bg-slatecard z-40 flex flex-col overflow-hidden">
       <header class="flex items-center justify-between border-b border-leadborder px-4 py-3 bg-headerbg shrink-0 safe-top">
-        <div>
-          <p class="text-xs uppercase tracking-[0.18em] text-dust font-mono">Character</p>
-          <h3 class="font-serif font-bold text-lg text-parchment">Profile</h3>
-        </div>
-        <button id="btn-close-profile" class="game-shell-button rounded-xl bg-inputbg border border-leadborder text-dust hover:text-parchment flex items-center justify-center" aria-label="Back to life timeline">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </header>
-      <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-4">
-        <section class="bg-headerbg border border-leadborder rounded-2xl p-4 flex items-center gap-4">
-          <div class="w-16 h-16 rounded-2xl overflow-hidden border border-[#85754e]/90 bg-inputbg shrink-0">
-            <canvas id="profile-avatar" width="128" height="128" class="w-full h-full"></canvas>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-shilling shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2L14.5 7.5L20 10L14.5 12.5L12 18L9.5 12.5L4 10L9.5 7.5L12 2Z"/>
+              <circle cx="12" cy="10" r="2"/>
+              <path d="M7 21H17"/>
+            </svg>
           </div>
           <div class="min-w-0">
-            <h4 id="profile-name" class="font-serif font-bold text-lg text-parchment truncate">Unknown Soul</h4>
-            <p id="profile-life-summary" class="text-sm text-dust mt-1">Age 0 · Infant</p>
-            <p id="profile-location" class="text-xs text-dust mt-1 truncate">Unknown birthplace</p>
+            <p class="text-[9px] uppercase tracking-[0.24em] text-dust font-mono">☾ Soul Dossier · Registry ☽</p>
+            <h3 class="font-serif font-bold text-base text-parchment leading-tight truncate">Mortal Record</h3>
+          </div>
+        </div>
+        <button id="btn-close-profile" class="game-shell-button rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment flex items-center justify-center transition-colors" aria-label="Back to life timeline">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </header>
+
+      <!-- Sleek Dossier Section Filter Bar -->
+      <div class="px-4 py-2 bg-headerbg/70 border-b border-leadborder/70 shrink-0 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar" id="profile-dossier-tabs" role="tablist" aria-label="Profile dossier sections">
+        <button type="button" data-profile-tab="all" class="profile-filter-pill is-active">All Records</button>
+        <button type="button" data-profile-tab="vitals" class="profile-filter-pill">I · Vitals</button>
+        <button type="button" data-profile-tab="standing" class="profile-filter-pill">II · Standing</button>
+        <button type="button" data-profile-tab="chronicle" class="profile-filter-pill">III · Whispers</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-3.5">
+        <!-- Identity Reliquary & Dual-Currency Ledger Card -->
+        <section class="profile-dossier-card p-3.5 space-y-3">
+          <div class="flex items-center gap-3.5">
+            <div class="profile-portrait-locket">
+              <div class="profile-portrait-locket-inner">
+                <canvas id="profile-avatar" width="128" height="128" class="w-full h-full"></canvas>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-mono uppercase tracking-[0.18em] text-shilling/90">Inscribed Soul</span>
+              </div>
+              <h4 id="profile-name" class="font-serif font-bold text-lg text-parchment leading-snug truncate">Unknown Soul</h4>
+              <p id="profile-life-summary" class="text-xs font-mono text-parchment/90 mt-0.5">Age 0 · Infant</p>
+              <p id="profile-location" class="text-[11px] text-dust mt-0.5 truncate">Unknown birthplace</p>
+            </div>
+          </div>
+
+          <!-- Dual-Economy Treasury Strip -->
+          <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-leadborder/60">
+            <div class="rounded-xl bg-inputbg/90 border border-leadborder/80 px-3 py-2 flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <span class="block text-[9px] font-mono uppercase tracking-wider text-dust">Mundane Treasury</span>
+                <dd id="profile-money" class="text-fiat font-mono font-bold text-xs truncate mt-0.5">—</dd>
+              </div>
+              <i data-lucide="banknote" class="w-4 h-4 text-fiat/80 shrink-0"></i>
+            </div>
+            <div class="rounded-xl bg-inputbg/90 border border-leadborder/80 px-3 py-2 flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <span class="block text-[9px] font-mono uppercase tracking-wider text-dust">Occult Shillings</span>
+                <dd id="profile-shillings" class="text-shilling font-mono font-bold text-xs truncate mt-0.5">—</dd>
+              </div>
+              <i data-lucide="Flame" class="w-4 h-4 text-shilling/80 shrink-0"></i>
+            </div>
           </div>
         </section>
-        <section>
-          <h4 class="font-serif font-bold text-sm text-parchment mb-2">Complete Attributes</h4>
-          <div id="profile-stats" class="space-y-2"></div>
+
+        <!-- PANE I: VITALS & FACULTIES -->
+        <section data-profile-pane="vitals" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono font-bold text-shilling">I</span>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Complete Attributes</h4>
+            </div>
+            <span class="text-[9px] font-mono uppercase tracking-wider text-dust">Body, Mind & Veil</span>
+          </div>
+          <div class="p-2.5">
+            <div id="profile-stats" class="profile-stat-grid"></div>
+          </div>
         </section>
-        <section class="bg-headerbg border border-leadborder rounded-2xl p-4">
-          <h4 class="font-serif font-bold text-sm text-parchment">Life Details</h4>
-          <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-            <dt class="text-dust">Occupation</dt><dd id="profile-occupation" class="text-parchment text-right">—</dd>
-            <dt class="text-dust">Trait</dt><dd id="profile-trait" class="text-parchment text-right">—</dd>
-            <dt class="text-dust">Money</dt><dd id="profile-money" class="text-fiat text-right font-mono">—</dd>
-            <dt class="text-dust">Shillings</dt><dd id="profile-shillings" class="text-shilling text-right font-mono">—</dd>
-            <dt class="text-dust">Housing</dt><dd id="profile-housing" class="text-parchment text-right">—</dd>
+
+        <!-- PANE II: CIVIL & MORTAL STANDING -->
+        <section data-profile-pane="standing" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono font-bold text-shilling">II</span>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Life Details</h4>
+            </div>
+            <span class="text-[9px] font-mono uppercase tracking-wider text-dust">Civil Registry</span>
+          </div>
+          <dl class="divide-y divide-leadborder/40 text-xs">
+            <div class="profile-registry-row">
+              <dt class="text-dust font-mono text-[11px] flex items-center gap-2"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-dust/80"></i>Occupation</dt>
+              <dd id="profile-occupation" class="text-parchment font-medium text-right truncate max-w-[62%]">—</dd>
+            </div>
+            <div class="profile-registry-row">
+              <dt class="text-dust font-mono text-[11px] flex items-center gap-2"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-shilling/80"></i>Inherent Trait</dt>
+              <dd id="profile-trait" class="text-parchment font-medium text-right truncate max-w-[62%]">—</dd>
+            </div>
+            <div class="profile-registry-row">
+              <dt class="text-dust font-mono text-[11px] flex items-center gap-2"><i data-lucide="home" class="w-3.5 h-3.5 text-dust/80"></i>Sanctuary / Housing</dt>
+              <dd id="profile-housing" class="text-parchment font-medium text-right truncate max-w-[62%]">—</dd>
+            </div>
           </dl>
         </section>
-        <section class="space-y-2">
-          <div><h4 class="font-serif font-bold text-sm text-parchment">Consequences</h4><p class="text-[10px] text-dust mt-0.5">Active conditions and permanent history</p></div>
-          <div id="profile-consequences" class="space-y-2"></div>
+
+        <!-- Active Conditions & Consequences -->
+        <section data-profile-pane="standing" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <i data-lucide="skull" class="w-3.5 h-3.5 text-crimson"></i>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Consequences</h4>
+            </div>
+            <p class="text-[9px] font-mono text-dust">Conditions & permanent marks</p>
+          </div>
+          <div id="profile-consequences" class="p-2.5 space-y-2"></div>
         </section>
-        <section class="space-y-2">
-          <div><h4 class="font-serif font-bold text-sm text-parchment">Lasting Advantages</h4><p class="text-[10px] text-dust mt-0.5">Mentorship, loyalty, protection, and recommendations earned through play</p></div>
-          <div id="profile-benefits" class="space-y-2"></div>
+
+        <!-- Lasting Advantages -->
+        <section data-profile-pane="standing" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Lasting Advantages</h4>
+            </div>
+            <p class="text-[9px] font-mono text-dust">Patronage, oaths & boons</p>
+          </div>
+          <div id="profile-benefits" class="p-2.5 space-y-2"></div>
         </section>
-        <section class="space-y-2">
-          <div><h4 class="font-serif font-bold text-sm text-parchment">Reputation by Circle</h4><p class="text-[10px] text-dust mt-0.5">Esteem, fear, and notoriety do not mean the same thing</p></div>
-          <div id="profile-reputation" class="space-y-2"></div>
+
+        <!-- PANE III: REPUTATION, RUMORS & UNFINISHED LEDGER -->
+        <section data-profile-pane="chronicle" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <i data-lucide="crown" class="w-3.5 h-3.5 text-shilling"></i>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Reputation by Circle</h4>
+            </div>
+            <p class="text-[9px] font-mono text-dust">Esteem, fear & notoriety</p>
+          </div>
+          <div id="profile-reputation" class="p-2.5 space-y-2"></div>
         </section>
-        <section class="space-y-2">
-          <div><h4 class="font-serif font-bold text-sm text-parchment">Rumor Network</h4><p class="text-[10px] text-dust mt-0.5">Who heard the story—and who believed it</p></div>
-          <div id="profile-rumors" class="space-y-2"></div>
+
+        <section data-profile-pane="chronicle" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <i data-lucide="ear" class="w-3.5 h-3.5 text-purple-400"></i>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Rumor Network</h4>
+            </div>
+            <p class="text-[9px] font-mono text-dust">Whispers & witnesses</p>
+          </div>
+          <div id="profile-rumors" class="p-2.5 space-y-2"></div>
         </section>
-        <section class="space-y-2">
-          <div><h4 class="font-serif font-bold text-sm text-parchment">Unfinished Stories</h4><p class="text-[10px] text-dust mt-0.5">Choices that may return later</p></div>
-          <div id="profile-story-ledger" class="space-y-2"></div>
+
+        <section data-profile-pane="chronicle" class="profile-section-card">
+          <div class="profile-section-header">
+            <div class="flex items-center gap-2">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+              <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-parchment">Unfinished Stories</h4>
+            </div>
+            <p class="text-[9px] font-mono text-dust">Oaths awaiting reckoning</p>
+          </div>
+          <div id="profile-story-ledger" class="p-2.5 space-y-2"></div>
         </section>
       </div>
-      <footer class="border-t border-leadborder bg-headerbg px-4 py-3 safe-bottom">
-        <button id="btn-profile-done" class="w-full min-h-[48px] rounded-xl bg-crimson text-parchment font-serif font-bold tracking-wider">RETURN TO LIFE</button>
+
+      <footer class="border-t border-leadborder bg-headerbg px-4 py-2.5 safe-bottom shrink-0">
+        <button id="btn-profile-done" class="w-full min-h-[44px] rounded-xl bg-crimson hover:opacity-95 text-parchment font-serif font-bold text-xs tracking-[0.16em] uppercase shadow-sm transition-all active:scale-[0.99]">Return to Chronicle</button>
       </footer>
     </div>
 

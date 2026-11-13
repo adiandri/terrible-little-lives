@@ -6173,24 +6173,50 @@ class TerribleGame {
     if (this.dom.profileStoryLedger && window.storyLedgerHtml) this.dom.profileStoryLedger.innerHTML = window.storyLedgerHtml(character);
 
     const stats = [
-      ['Health', '❤️', 'text-red-400', character.stats.vitality],
-      ['Happiness', '😊', 'text-yellow-400', character.stats.happiness],
-      ['Mind', '🧠', 'text-sky-400', character.stats.sanity],
-      ['Humanity', '✨', 'text-amber-500', character.stats.humanity],
-      ['Smarts', '📚', 'text-emerald-400', character.stats.smarts],
-      ['Looks', '👁️', 'text-pink-400', character.stats.looks],
-      ['Occult', '🔮', 'text-purple-400', character.stats.occult]
+      ['Vitality', 'heart-pulse', 'text-red-400', character.stats.vitality, false],
+      ['Happiness', 'smile', 'text-amber-400', character.stats.happiness, false],
+      ['Sanity', 'brain', 'text-sky-400', character.stats.sanity, false],
+      ['Humanity', 'scale', 'text-amber-500', character.stats.humanity, false],
+      ['Smarts', 'book-open', 'text-emerald-400', character.stats.smarts, false],
+      ['Looks', 'sparkles', 'text-pink-400', character.stats.looks, false],
+      ['Occult Attunement', 'eye', 'text-purple-400', character.stats.occult, true]
     ];
-    this.dom.profileStats.innerHTML = stats.map(([label, emoji, color, rawValue]) => {
+    this.dom.profileStats.innerHTML = stats.map(([label, iconName, color, rawValue, isWide]) => {
       const value = Math.max(0, Math.min(100, Math.round(rawValue || 0)));
-      return `<div class="profile-stat-row">
-        <div class="min-w-0">
-          <div class="flex items-center gap-2 text-sm ${color}"><span class="text-base select-none">${emoji}</span><span>${label}</span></div>
-          <div class="primary-stat-track"><div class="h-full rounded-full bg-current ${color}" style="width:${value}%"></div></div>
+      const tierLabel = isWide
+        ? (value >= 75 ? 'Veil-Touched' : value >= 40 ? 'Initiated' : value >= 15 ? 'Sensitive' : 'Unawakened')
+        : (value >= 80 ? 'High' : value >= 45 ? 'Steady' : value >= 25 ? 'Strained' : 'Critical');
+      return `<div class="profile-stat-row${isWide ? ' profile-stat-wide' : ''}">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5 text-xs font-serif font-bold ${color} truncate">
+            <i data-lucide="${iconName}" class="w-3.5 h-3.5 shrink-0"></i>
+            <span class="truncate">${label}</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-dust">${tierLabel}</span>
+            <strong class="font-mono text-xs text-parchment">${value}%</strong>
+          </div>
         </div>
-        <strong class="font-mono text-sm text-parchment">${value}%</strong>
+        <div class="primary-stat-track"><div class="h-full rounded-full bg-current ${color}" style="width:${value}%"></div></div>
       </div>`;
     }).join('');
+
+    const tabsContainer = document.getElementById('profile-dossier-tabs');
+    if (tabsContainer && !tabsContainer.dataset.bound) {
+      tabsContainer.dataset.bound = 'true';
+      tabsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-profile-tab]');
+        if (!btn) return;
+        const tab = btn.dataset.profileTab || 'all';
+        tabsContainer.querySelectorAll('[data-profile-tab]').forEach(pill => {
+          pill.classList.toggle('is-active', pill === btn);
+        });
+        this.dom.profileModal?.querySelectorAll('[data-profile-pane]').forEach(pane => {
+          const match = tab === 'all' || pane.dataset.profilePane === tab;
+          pane.classList.toggle('hidden', !match);
+        });
+      });
+    }
     if (window.lucide) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
