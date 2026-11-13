@@ -1167,32 +1167,33 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    /* Eerie & Beautiful: Victorian Mourning Locket & Candlelit Archive */
+    /* Eerie & Beautiful: Tarot Frontispiece & Gothic Cathedral Reliquary (Option C + A Hybrid) */
     .landing-archive {
       position: relative;
       isolation: isolate;
       background:
-        radial-gradient(ellipse 85% 48% at 50% 28%, color-mix(in srgb, var(--accent-primary) 16%, transparent) 0%, transparent 66%),
-        radial-gradient(ellipse 70% 45% at 50% 72%, rgba(124, 99, 150, 0.09) 0%, transparent 64%),
-        radial-gradient(circle at 50% 45%, transparent 38%, rgba(0, 0, 0, 0.58) 100%),
-        linear-gradient(180deg, var(--bg-header) 0%, var(--bg-chassis) 42%, var(--bg-app) 100%);
+        radial-gradient(ellipse 82% 45% at 50% 24%, color-mix(in srgb, var(--accent-primary) 19%, transparent) 0%, transparent 66%),
+        radial-gradient(ellipse 72% 42% at 50% 62%, color-mix(in srgb, var(--accent-shilling) 12%, transparent) 0%, transparent 65%),
+        radial-gradient(circle at 50% 45%, transparent 34%, rgba(0, 0, 0, 0.65) 100%),
+        linear-gradient(180deg, var(--bg-header) 0%, var(--bg-chassis) 44%, var(--bg-app) 100%);
     }
     [data-mode="light"] .landing-archive {
       background:
-        radial-gradient(ellipse 85% 48% at 50% 28%, color-mix(in srgb, var(--accent-primary) 10%, transparent) 0%, transparent 66%),
+        radial-gradient(ellipse 82% 45% at 50% 24%, color-mix(in srgb, var(--accent-primary) 11%, transparent) 0%, transparent 66%),
+        radial-gradient(ellipse 72% 42% at 50% 62%, color-mix(in srgb, var(--accent-shilling) 10%, transparent) 0%, transparent 65%),
         radial-gradient(circle at 50% 45%, transparent 45%, rgba(40, 28, 20, 0.14) 100%),
-        linear-gradient(180deg, var(--bg-header) 0%, var(--bg-chassis) 42%, var(--bg-app) 100%);
+        linear-gradient(180deg, var(--bg-header) 0%, var(--bg-chassis) 44%, var(--bg-app) 100%);
     }
     .landing-archive::before {
       content: "";
       position: absolute;
       inset: 0;
       z-index: -2;
-      opacity: .20;
+      opacity: 0.18;
       pointer-events: none;
       background-image: radial-gradient(color-mix(in srgb, var(--border-main) 75%, transparent) 1px, transparent 1px);
-      background-size: 22px 22px;
-      mask-image: radial-gradient(ellipse 78% 72% at 50% 40%, black 25%, transparent 82%);
+      background-size: 20px 20px;
+      mask-image: radial-gradient(ellipse 80% 74% at 50% 38%, black 22%, transparent 82%);
     }
     .landing-grain {
       position: absolute;
@@ -1202,20 +1203,36 @@
       opacity: 0.035;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
+
+    /* Double-Ruled Grimoire Border & Cathedral Arch SVG Backdrop */
     .landing-frame-hairline {
       position: absolute;
-      inset: 10px;
+      inset: 9px;
       z-index: 0;
       pointer-events: none;
-      border: 1px solid color-mix(in srgb, var(--border-main) 45%, transparent);
-      border-radius: 1.1rem;
+      border: 1px solid color-mix(in srgb, var(--accent-shilling) 28%, var(--border-main));
+      border-radius: 1.15rem;
+      box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 85%, transparent), inset 0 0 0 4px color-mix(in srgb, var(--border-main) 45%, transparent);
+    }
+    .landing-cathedral-svg {
+      position: absolute;
+      inset: 10px 10px auto 10px;
+      height: 74%;
+      width: calc(100% - 20px);
+      z-index: 0;
+      pointer-events: none;
+      color: color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
+      opacity: 0.55;
+    }
+    [data-mode="light"] .landing-cathedral-svg {
+      opacity: 0.42;
     }
     .landing-corner {
       position: absolute;
-      width: 12px;
-      height: 12px;
-      border-color: color-mix(in srgb, var(--accent-primary) 45%, var(--border-main));
-      opacity: 0.7;
+      width: 16px;
+      height: 16px;
+      border-color: color-mix(in srgb, var(--accent-shilling) 55%, var(--accent-primary));
+      opacity: 0.82;
     }
     .landing-corner-tl { top: -1px; left: -1px; border-top: 1.5px solid; border-left: 1.5px solid; border-top-left-radius: 6px; }
     .landing-corner-tr { top: -1px; right: -1px; border-top: 1.5px solid; border-right: 1.5px solid; border-top-right-radius: 6px; }
@@ -1248,15 +1265,60 @@
       100% { transform: translateY(-760px) translateX(var(--drift, 18px)) scale(1.1); opacity: 0; }
     }
 
+    /* Tarot Cartouche & Cathedral Reliquary Showcase */
+    .landing-tarot-cartouche {
+      position: relative;
+      width: 100%;
+      max-width: 326px;
+      margin: 0 auto;
+      padding: 0.85rem 1rem 0.9rem;
+      border-radius: 9rem 9rem 1.15rem 1.15rem;
+      border: 1px solid color-mix(in srgb, var(--accent-shilling) 36%, var(--border-main));
+      background:
+        radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--accent-primary) 16%, transparent) 0%, transparent 68%),
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 82%, rgba(0,0,0,0.35)) 0%, color-mix(in srgb, var(--bg-input) 88%, transparent) 100%);
+      box-shadow:
+        0 18px 42px -12px rgba(0, 0, 0, 0.58),
+        inset 0 1px 0 rgba(255, 245, 220, 0.14),
+        inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 65%, transparent),
+        inset 0 0 0 4px color-mix(in srgb, var(--border-main) 45%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    [data-mode="light"] .landing-tarot-cartouche {
+      background:
+        radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--accent-primary) 9%, transparent) 0%, transparent 68%),
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 92%, #ffffff) 0%, color-mix(in srgb, var(--bg-input) 94%, transparent) 100%);
+      box-shadow:
+        0 14px 32px -12px rgba(45, 32, 20, 0.18),
+        inset 0 0 0 3px color-mix(in srgb, var(--bg-chassis) 75%, transparent),
+        inset 0 0 0 4px color-mix(in srgb, var(--border-main) 50%, transparent);
+    }
+    .landing-arcana-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.15rem 0.65rem;
+      border-radius: 9999px;
+      border: 1px solid color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
+      background: color-mix(in srgb, var(--bg-chassis) 85%, transparent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-shilling);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
     /* Mourning Locket Emblem Showcase (Artwork kept 100% intact) */
     .landing-logo-glow {
       position: absolute;
-      inset: -22px;
+      inset: -18px;
       border-radius: 9999px;
       background:
-        radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 42%, transparent) 0%, rgba(124, 99, 150, 0.16) 45%, transparent 72%);
-      filter: blur(22px);
-      opacity: 0.72;
+        radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 42%, transparent) 0%, color-mix(in srgb, var(--accent-shilling) 18%, transparent) 48%, transparent 72%);
+      filter: blur(20px);
+      opacity: 0.75;
       animation: logoPulse 5s ease-in-out infinite alternate;
       pointer-events: none;
       z-index: 0;
@@ -1267,10 +1329,10 @@
     }
     .landing-ring-outer {
       position: absolute;
-      inset: -13px;
+      inset: -11px;
       border-radius: 9999px;
-      border: 1px dashed color-mix(in srgb, var(--accent-shilling) 32%, var(--border-main));
-      opacity: 0.65;
+      border: 1px dashed color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
+      opacity: 0.72;
       pointer-events: none;
       animation: orbitSlow 68s linear infinite;
       z-index: 0;
@@ -1284,17 +1346,17 @@
       height: 4px;
       margin-left: -2px;
       border-radius: 9999px;
-      background: color-mix(in srgb, var(--accent-shilling) 70%, var(--text-primary));
-      box-shadow: 0 0 6px color-mix(in srgb, var(--accent-shilling) 55%, transparent);
+      background: color-mix(in srgb, var(--accent-shilling) 75%, var(--text-primary));
+      box-shadow: 0 0 6px color-mix(in srgb, var(--accent-shilling) 60%, transparent);
     }
     .landing-ring-outer::before { top: -2.5px; }
     .landing-ring-outer::after { bottom: -2.5px; }
     .landing-ring-inner {
       position: absolute;
-      inset: -6px;
+      inset: -5px;
       border-radius: 9999px;
-      border: 1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent);
-      opacity: 0.75;
+      border: 1px solid color-mix(in srgb, var(--accent-primary) 38%, transparent);
+      opacity: 0.78;
       pointer-events: none;
       animation: orbitSlow 46s linear infinite reverse;
       z-index: 0;
@@ -1308,19 +1370,19 @@
       z-index: 1;
       border-radius: 9999px;
       padding: 3px;
-      background: linear-gradient(145deg, rgba(212, 185, 130, 0.35) 0%, rgba(255, 255, 255, 0.06) 45%, rgba(0, 0, 0, 0.65) 100%);
+      background: linear-gradient(145deg, rgba(212, 185, 130, 0.42) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(0, 0, 0, 0.7) 100%);
       box-shadow:
-        0 20px 50px -8px color-mix(in srgb, var(--accent-primary) 38%, rgba(0,0,0,0.78)),
-        0 0 0 1px color-mix(in srgb, var(--border-main) 90%, transparent),
-        inset 0 1px 1px rgba(255, 245, 220, 0.25);
+        0 18px 44px -8px color-mix(in srgb, var(--accent-primary) 40%, rgba(0,0,0,0.78)),
+        0 0 0 1px color-mix(in srgb, var(--accent-shilling) 35%, var(--border-main)),
+        inset 0 1px 1px rgba(255, 245, 220, 0.28);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
     }
     .landing-logo-frame:hover {
       transform: translateY(-2px) scale(1.02);
       box-shadow:
-        0 26px 60px -6px color-mix(in srgb, var(--accent-primary) 52%, rgba(0,0,0,0.85)),
-        0 0 0 1px color-mix(in srgb, var(--accent-shilling) 45%, var(--accent-primary)),
-        inset 0 1px 2px rgba(255, 245, 220, 0.35);
+        0 24px 54px -6px color-mix(in srgb, var(--accent-primary) 54%, rgba(0,0,0,0.85)),
+        0 0 0 1px color-mix(in srgb, var(--accent-shilling) 55%, var(--accent-primary)),
+        inset 0 1px 2px rgba(255, 245, 220, 0.38);
     }
     .landing-logo-img {
       width: 100%;
@@ -1347,7 +1409,7 @@
     .landing-rule {
       height: 1px;
       flex: 1;
-      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-primary) 55%, var(--border-main)), transparent);
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-shilling) 55%, var(--border-main)), transparent);
     }
     .landing-epigraph {
       transition: opacity 0.55s ease, transform 0.55s ease;
@@ -1357,22 +1419,22 @@
       transform: translateY(2px);
     }
 
-    /* Tactile Velvet & Tarnished Brass Action Plates */
+    /* Grimoire & Altar Tablet Action Plates */
     .landing-action {
       position: relative;
       overflow: hidden;
-      min-height: 58px;
-      border-radius: 0.95rem;
+      min-height: 54px;
+      border-radius: 0.9rem;
       border: 1px solid color-mix(in srgb, var(--border-main) 92%, rgba(255, 255, 255, 0.08));
       background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, rgba(255,255,255,0.03)) 0%, var(--bg-card) 100%);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       transition: transform 0.18s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
     .landing-action:hover, .landing-action:focus-visible {
       transform: translateY(-1.5px);
-      border-color: color-mix(in srgb, var(--accent-shilling) 32%, var(--border-main));
+      border-color: color-mix(in srgb, var(--accent-shilling) 42%, var(--border-main));
       background: var(--bg-card-hover);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 245, 220, 0.09);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 245, 220, 0.1);
       outline: none;
     }
     .landing-action:active {
@@ -1380,9 +1442,10 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
     }
     .landing-action-primary {
-      border-color: color-mix(in srgb, var(--accent-primary) 85%, rgba(245, 210, 160, 0.3));
+      min-height: 58px;
+      border-color: color-mix(in srgb, var(--accent-primary) 82%, rgba(245, 210, 160, 0.38));
       background: linear-gradient(135deg, color-mix(in srgb, var(--accent-primary) 92%, #240709) 0%, color-mix(in srgb, var(--accent-primary) 64%, #090305) 100%);
-      box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--accent-primary) 55%, rgba(0,0,0,0.6)), inset 0 1px 0 rgba(255, 235, 210, 0.2);
+      box-shadow: 0 10px 28px -6px color-mix(in srgb, var(--accent-primary) 55%, rgba(0,0,0,0.6)), inset 0 1px 0 rgba(255, 235, 210, 0.22);
       color: #fffaf0 !important;
     }
     .landing-action-primary::after {
@@ -1403,25 +1466,27 @@
       box-shadow: 0 14px 34px -4px color-mix(in srgb, var(--accent-primary) 70%, transparent), inset 0 1px 0 rgba(255, 240, 215, 0.3);
     }
     .landing-resume-card {
-      border-color: color-mix(in srgb, var(--accent-fiat) 45%, var(--border-main));
+      border-color: color-mix(in srgb, var(--accent-fiat) 48%, var(--border-main));
       background: linear-gradient(135deg, color-mix(in srgb, var(--accent-fiat-bg) 88%, var(--bg-card)) 0%, var(--bg-card) 100%);
     }
-    .landing-crypt-btn {
-      min-height: 42px;
-      border-radius: 0.75rem;
-      border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, transparent);
-      background: color-mix(in srgb, var(--bg-input) 55%, transparent);
-      backdrop-filter: blur(8px);
+    .landing-tablet-secondary {
+      position: relative;
+      overflow: hidden;
+      min-height: 62px;
+      border-radius: 0.85rem;
+      border: 1px solid color-mix(in srgb, var(--border-main) 92%, rgba(255, 255, 255, 0.06));
+      background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 94%, rgba(255,255,255,0.02)) 0%, color-mix(in srgb, var(--bg-input) 92%, transparent) 100%);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
       transition: all 0.2s ease;
     }
-    .landing-crypt-btn:hover {
-      border-color: color-mix(in srgb, var(--accent-primary) 40%, var(--border-main));
-      background: color-mix(in srgb, var(--bg-card) 85%, transparent);
-      color: var(--text-primary);
-      transform: translateY(-1px);
+    .landing-tablet-secondary:hover {
+      transform: translateY(-1.5px);
+      border-color: color-mix(in srgb, var(--accent-shilling) 45%, var(--border-main));
+      background: var(--bg-card-hover);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
     }
-    .landing-crypt-btn:active {
-      transform: scale(0.99);
+    .landing-tablet-secondary:active {
+      transform: scale(0.985);
     }
     [data-mode="light"] .landing-action-primary { color: #fffaf0 !important; }
     .identity-theme-card[aria-pressed="true"] { border-color: var(--accent-primary); box-shadow: 0 0 0 1px var(--accent-primary); }
@@ -1441,9 +1506,9 @@
   <div id="phone-screen" class="w-full sm:max-w-[420px] h-full sm:h-[94vh] sm:max-h-[890px] bg-morgue sm:rounded-3xl border border-leadborder sm:shadow-[0_20px_60px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden transition-colors duration-300">
     
     <!-- ========================================== -->
-    <!-- 1. LANDING SCREEN (GOTHIC ARCHIVE)         -->
+    <!-- 1. LANDING SCREEN (TAROT & CATHEDRAL ARCH) -->
     <!-- ========================================== -->
-    <section id="screen-landing" class="landing-archive h-full flex flex-col justify-between p-5 sm:p-6 safe-top safe-bottom z-10 overflow-y-auto custom-scroll">
+    <section id="screen-landing" class="landing-archive h-full flex flex-col justify-between p-4 sm:p-5 safe-top safe-bottom z-10 overflow-y-auto custom-scroll">
       <!-- Atmospheric Layers (Behind UI, Non-Interactive) -->
       <div class="landing-grain" aria-hidden="true"></div>
       <div class="landing-frame-hairline" aria-hidden="true">
@@ -1452,6 +1517,23 @@
         <span class="landing-corner landing-corner-bl"></span>
         <span class="landing-corner landing-corner-br"></span>
       </div>
+
+      <!-- Option A + C Architectural Gothic Lancet Arch & Tarot Filigree SVG -->
+      <svg class="landing-cathedral-svg" viewBox="0 0 380 520" fill="none" preserveAspectRatio="none" aria-hidden="true">
+        <!-- Outer Gothic Lancet Arch -->
+        <path d="M 14 510 L 14 215 Q 14 42 190 12 Q 366 42 366 215 L 366 510" stroke="currentColor" stroke-width="1" stroke-opacity="0.48"/>
+        <!-- Inner Pointed Tracery Arch -->
+        <path d="M 24 505 L 24 220 Q 24 58 190 26 Q 356 58 356 220 L 356 505" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 3" stroke-opacity="0.38"/>
+        <!-- Cathedral Rose & Spire Crown -->
+        <circle cx="190" cy="26" r="4" fill="currentColor" fill-opacity="0.55"/>
+        <path d="M 190 4 L 190 46 M 172 26 L 208 26" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.45"/>
+        <!-- Corner Astral Rosettes -->
+        <circle cx="36" cy="52" r="9" stroke="currentColor" stroke-width="0.75" stroke-opacity="0.35"/>
+        <path d="M 36 39 L 36 65 M 23 52 L 49 52" stroke="currentColor" stroke-width="0.6" stroke-opacity="0.35"/>
+        <circle cx="344" cy="52" r="9" stroke="currentColor" stroke-width="0.75" stroke-opacity="0.35"/>
+        <path d="M 344 39 L 344 65 M 331 52 L 357 52" stroke="currentColor" stroke-width="0.6" stroke-opacity="0.35"/>
+      </svg>
+
       <div class="landing-motes" aria-hidden="true">
         <span class="landing-mote" style="left:9%; width:2px; height:2px; --dur:15s; --delay:-2s; --drift:14px; --peak:0.42;"></span>
         <span class="landing-mote ember" style="left:19%; width:2.5px; height:2.5px; --dur:13s; --delay:-7s; --drift:-16px; --peak:0.5;"></span>
@@ -1465,106 +1547,148 @@
         <span class="landing-mote" style="left:93%; width:2px; height:2px; --dur:15s; --delay:-6s; --drift:-10px; --peak:0.38;"></span>
       </div>
 
-      <!-- Top Navigation Bar (Case Dossier Header) -->
-      <header class="relative z-10 flex justify-between items-center shrink-0 pt-1">
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slatecard/55 backdrop-blur-md border border-leadborder/70 text-dust text-[9.5px] font-mono tracking-[0.16em] uppercase shadow-xs">
+      <!-- Top Navigation Bar (Grimoire & Reliquary Header) -->
+      <header class="relative z-10 flex justify-between items-center shrink-0 pt-0.5 px-1">
+        <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slatecard/65 backdrop-blur-md border border-leadborder/80 text-dust text-[9px] font-mono tracking-[0.16em] uppercase shadow-xs">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-crimson opacity-70"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-crimson shadow-[0_0_8px_var(--accent-primary)]"></span>
           </span>
-          <span class="font-semibold text-parchment/90">Archive No. IV</span>
+          <span class="font-semibold text-parchment/90">Folio IV</span>
           <span class="text-dust/45">·</span>
-          <span class="text-dust/80">Est. 1924</span>
+          <span class="text-shilling/90">MCMXXIV</span>
         </div>
 
-        <div class="flex items-center space-x-2">
-          <button id="btn-landing-mute" class="game-shell-button w-9 h-9 rounded-xl bg-slatecard/75 hover:bg-cardhover border border-leadborder/80 text-dust hover:text-parchment transition-all flex items-center justify-center shadow-xs active:scale-95" title="Toggle Sound" aria-label="Toggle Sound">
-            <i id="landing-mute-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+        <div class="flex items-center space-x-1.5">
+          <button id="btn-landing-mute" class="game-shell-button w-8 h-8 rounded-xl bg-slatecard/75 hover:bg-cardhover border border-leadborder/80 text-dust hover:text-parchment transition-all flex items-center justify-center shadow-xs active:scale-95" title="Toggle Sound" aria-label="Toggle Sound">
+            <i id="landing-mute-icon" data-lucide="volume-2" class="w-3.5 h-3.5"></i>
           </button>
-          <button id="btn-landing-settings" class="game-shell-button w-9 h-9 rounded-xl bg-slatecard/75 hover:bg-cardhover border border-leadborder/80 text-dust hover:text-parchment transition-all flex items-center justify-center shadow-xs active:scale-95" title="Game Settings" aria-label="Game Settings">
-            <i data-lucide="settings" class="w-4 h-4"></i>
+          <button id="btn-landing-settings" class="game-shell-button w-8 h-8 rounded-xl bg-slatecard/75 hover:bg-cardhover border border-leadborder/80 text-dust hover:text-parchment transition-all flex items-center justify-center shadow-xs active:scale-95" title="Game Settings" aria-label="Game Settings">
+            <i data-lucide="settings" class="w-3.5 h-3.5"></i>
           </button>
         </div>
       </header>
 
-      <!-- Centerpiece: Mourning Locket Emblem & Gothic Typography -->
-      <div class="relative z-10 text-center my-auto py-4 sm:py-5 flex flex-col items-center justify-center space-y-4">
-        <!-- Hand-drawn Logo Centerpiece (Drawing Kept 100% Intact) -->
-        <div class="relative flex items-center justify-center my-1">
-          <div class="landing-logo-glow" aria-hidden="true"></div>
-          <div class="landing-ring-outer" aria-hidden="true"></div>
-          <div class="landing-ring-inner" aria-hidden="true"></div>
-          <div class="landing-logo-frame w-36 h-36 sm:w-44 sm:h-44" aria-label="Terrible Little Lives illustrated emblem">
-            <img src="assets/brand/terrible-little-lives-emblem.webp" alt="Terrible Little Lives illustrated emblem" width="768" height="768" class="landing-logo-img">
+      <!-- Centerpiece: Arched Tarot Cartouche & Suspended Reliquary Medallion -->
+      <div class="relative z-10 my-auto py-2 flex flex-col items-center justify-center">
+        <div class="landing-tarot-cartouche flex flex-col items-center text-center space-y-2.5">
+          <!-- Arcana Numerals Header -->
+          <div class="landing-arcana-pill">
+            <span>☾</span>
+            <span>Arcana 0 · The Mortal</span>
+            <span>☽</span>
           </div>
-        </div>
 
-        <!-- Gothic Title & Understated Subtitle -->
-        <div class="space-y-2 w-full max-w-[310px]">
-          <h1 class="landing-title-text font-serif font-black text-[2rem] sm:text-[2.3rem] tracking-[0.14em] text-parchment leading-[1.06] uppercase">
-            Terrible<br><span class="text-parchment/90">Little Lives</span>
-          </h1>
-          <div class="flex items-center justify-center gap-2.5 px-4 pt-0.5" aria-hidden="true">
-            <span class="landing-rule"></span>
-            <span class="text-[9px] text-crimson/80">✦</span>
-            <span class="landing-rule"></span>
+          <!-- Hand-drawn Logo Centerpiece (Drawing Kept 100% Intact) -->
+          <div class="relative flex items-center justify-center my-1.5">
+            <div class="landing-logo-glow" aria-hidden="true"></div>
+            <div class="landing-ring-outer" aria-hidden="true"></div>
+            <div class="landing-ring-inner" aria-hidden="true"></div>
+            <div class="landing-logo-frame w-32 h-32 sm:w-36 sm:h-36" aria-label="Terrible Little Lives illustrated emblem">
+              <img src="assets/brand/terrible-little-lives-emblem.webp" alt="Terrible Little Lives illustrated emblem" width="768" height="768" class="landing-logo-img">
+            </div>
           </div>
-          <p class="text-[10px] sm:text-[10.5px] font-mono tracking-[0.22em] uppercase text-crimson/90 font-semibold">
-            Live ordinarily · Die strangely
-          </p>
-        </div>
 
-        <!-- Rotating Poetic Gothic Epigraph -->
-        <div class="max-w-[295px] w-full px-3 pt-0.5 text-center">
-          <p id="landing-epigraph" class="landing-epigraph text-[11.5px] text-parchment/75 font-serif italic leading-relaxed min-h-[2.6em] flex items-center justify-center">
-            "Rent is due on the first. The baby monitor whispers backwards at 3 AM."
-          </p>
+          <!-- Grimoire Frontispiece Typography -->
+          <div class="space-y-1.5 w-full pt-0.5">
+            <p class="text-[8.5px] font-mono tracking-[0.28em] uppercase text-dust/80">
+              Liber Vitae &amp; Mortis
+            </p>
+            <h1 class="landing-title-text font-serif font-black text-[1.75rem] sm:text-[2rem] tracking-[0.13em] text-parchment leading-[1.05] uppercase">
+              Terrible<br><span class="text-parchment/90">Little Lives</span>
+            </h1>
+            <div class="flex items-center justify-center gap-2 px-5 pt-0.5" aria-hidden="true">
+              <span class="landing-rule"></span>
+              <svg class="w-3.5 h-3.5 text-crimson/85 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/>
+              </svg>
+              <span class="landing-rule"></span>
+            </div>
+            <p class="text-[9.5px] font-mono tracking-[0.22em] uppercase text-crimson/90 font-semibold">
+              Live ordinarily · Die strangely
+            </p>
+          </div>
+
+          <!-- Footnoted Grimoire Epigraph Plate -->
+          <div class="w-full pt-1.5 border-t border-leadborder/55 px-2">
+            <p id="landing-epigraph" class="landing-epigraph text-[11px] text-parchment/80 font-serif italic leading-snug min-h-[2.5em] flex items-center justify-center">
+              "Rent is due on the first. The baby monitor whispers backwards at 3 AM."
+            </p>
+          </div>
         </div>
       </div>
 
-      <!-- Action Buttons Stack (Tactile Velvet & Tarnished Brass Plates) -->
-      <div class="relative z-10 space-y-2.5 pt-1 pb-1 shrink-0">
+      <!-- Altar Ledger & Grimoire Bookplate Action Deck -->
+      <div class="relative z-10 space-y-2 pt-1 pb-0.5 shrink-0 px-0.5">
         <!-- RESUME LIFE (Dynamically shown when active save exists) -->
-        <button id="btn-landing-resume" class="landing-action landing-resume-card hidden w-full px-4 text-parchment shadow-md items-center gap-3.5 text-left group">
-          <span class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-            <i data-lucide="play" class="w-4 h-4 fill-emerald-400/30"></i>
+        <button id="btn-landing-resume" class="landing-action landing-resume-card hidden w-full px-3.5 py-2 text-parchment shadow-md items-center gap-3 text-left group">
+          <span class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-center text-emerald-400 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M5 7h14M5 17h14"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.25"/>
+            </svg>
           </span>
           <span class="min-w-0 flex-1">
-            <strong id="label-resume-life" class="block font-serif text-sm font-bold tracking-wide text-parchment truncate">RESUME LIFE</strong>
-            <small class="block text-[10px] text-emerald-400/80 font-mono tracking-wider uppercase mt-0.5">● Soul in progress</small>
+            <span class="block text-[8.5px] font-mono tracking-[0.2em] text-emerald-400 uppercase font-bold">● Active Chronicle</span>
+            <strong id="label-resume-life" class="block font-serif text-xs sm:text-sm font-bold tracking-wide text-parchment truncate">RESUME LIFE</strong>
           </span>
           <i data-lucide="chevron-right" class="w-4 h-4 text-dust group-hover:text-parchment group-hover:translate-x-0.5 transition-all"></i>
         </button>
 
-        <!-- CREATE A LIFE (Primary CTA) -->
-        <button id="btn-to-creator" class="landing-action landing-action-primary w-full px-4 shadow-lg flex items-center gap-3.5 text-left group">
+        <!-- I. CREATE A LIFE (Primary Grimoire Wax-Seal Bookplate) -->
+        <button id="btn-to-creator" class="landing-action landing-action-primary w-full px-4 py-2.5 shadow-lg flex items-center gap-3.5 text-left group">
           <span class="w-10 h-10 rounded-xl bg-white/12 border border-white/25 flex items-center justify-center text-white shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-            <i data-lucide="fingerprint" class="w-5 h-5"></i>
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <circle cx="12" cy="14" r="2.8" fill="currentColor" fill-opacity="0.25"/>
+              <path d="M10.5 16.5L9.5 20l2.5-1 2.5 1-1-3.5"/>
+            </svg>
           </span>
           <span class="min-w-0 flex-1">
+            <span class="block text-[8.5px] font-mono tracking-[0.22em] text-amber-200/85 uppercase">Bookplate I · Soul Inquest</span>
             <strong class="block font-serif font-black text-sm tracking-wider text-white">CREATE A LIFE</strong>
-            <small class="block text-[10.5px] text-white/80 font-sans tracking-normal mt-0.5">Choose identity, appearance &amp; fate</small>
+            <small class="block text-[10px] text-white/80 font-sans tracking-normal">Inscribe identity, lineage &amp; fate</small>
           </span>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-white/75 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
         </button>
 
-        <!-- RANDOM LIFE (Secondary CTA) -->
-        <button id="btn-quick-life" class="landing-action w-full px-4 text-parchment flex items-center gap-3.5 text-left group">
-          <span class="w-10 h-10 rounded-xl bg-shilling/12 border border-shilling/25 flex items-center justify-center text-shilling shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-            <i data-lucide="dice-5" class="w-5 h-5"></i>
-          </span>
-          <span class="min-w-0 flex-1">
-            <strong class="block font-serif font-bold text-xs tracking-wider text-parchment">RANDOM LIFE</strong>
-            <small class="block text-[10px] text-dust font-sans mt-0.5">Quickstart · Let the archive decide</small>
-          </span>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-dust group-hover:text-parchment group-hover:translate-x-0.5 transition-all"></i>
-        </button>
+        <!-- II & III. Split 2-Column Altar Tablets (Random Life + Mortuary Archives) -->
+        <div class="grid grid-cols-2 gap-2">
+          <!-- II. RANDOM LIFE -->
+          <button id="btn-quick-life" class="landing-tablet-secondary px-3 py-2.5 text-parchment flex items-center gap-2.5 text-left group">
+            <span class="w-8 h-8 rounded-lg bg-shilling/12 border border-shilling/30 flex items-center justify-center text-shilling shrink-0 group-hover:scale-105 transition-transform">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <circle cx="8.5" cy="8.5" r="1" fill="currentColor"/>
+                <circle cx="15.5" cy="8.5" r="1" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                <circle cx="8.5" cy="15.5" r="1" fill="currentColor"/>
+                <circle cx="15.5" cy="15.5" r="1" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[8px] font-mono tracking-[0.18em] text-shilling uppercase">II · Lots</span>
+              <strong class="block font-serif font-bold text-[11px] tracking-wider text-parchment truncate">RANDOM LIFE</strong>
+              <small class="block text-[9.5px] text-dust truncate">Cast the bones</small>
+            </span>
+          </button>
 
-        <!-- PAST RECORDS (Tertiary Engraved Plaque) -->
-        <button id="btn-to-crypt" class="landing-crypt-btn w-full px-4 text-dust hover:text-parchment text-[10px] font-mono tracking-[0.14em] uppercase flex items-center justify-center gap-2 group">
-          <i data-lucide="archive" class="w-3.5 h-3.5 text-crimson group-hover:scale-110 transition-transform"></i>
-          <span>Mortuary Archives &amp; Past Lives</span>
-        </button>
+          <!-- III. MORTUARY ARCHIVES & PAST LIVES -->
+          <button id="btn-to-crypt" class="landing-tablet-secondary px-3 py-2.5 text-parchment flex items-center gap-2.5 text-left group">
+            <span class="w-8 h-8 rounded-lg bg-crimson/12 border border-crimson/30 flex items-center justify-center text-crimson shrink-0 group-hover:scale-105 transition-transform">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 21h14M7 21V9a5 5 0 0 1 10 0v12"/>
+                <path d="M12 7v5M9.5 9.5h5"/>
+              </svg>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[8px] font-mono tracking-[0.18em] text-crimson uppercase">III · Crypt</span>
+              <strong class="block font-serif font-bold text-[11px] tracking-wider text-parchment truncate">PAST LIVES</strong>
+              <small class="block text-[9.5px] text-dust truncate">Necrology ledger</small>
+            </span>
+          </button>
+        </div>
       </div>
     </section>
 
