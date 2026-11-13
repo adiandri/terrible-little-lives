@@ -265,6 +265,7 @@ class TerribleGame {
       careersModal: document.getElementById('careers-modal'),
       btnCloseCareers: document.getElementById('btn-close-careers'),
       tabCareerMundane: document.getElementById('tab-career-mundane'),
+      tabCareerParttime: document.getElementById('tab-career-parttime'),
       tabCareerParanormal: document.getElementById('tab-career-paranormal'),
       currentMundaneJob: document.getElementById('txt-current-mundane-job'),
       btnQuitMundane: document.getElementById('btn-quit-mundane'),
@@ -1039,6 +1040,13 @@ class TerribleGame {
       this.activeCareerTab = 'mundane';
       this.renderCareersList();
     });
+
+    if (this.dom.tabCareerParttime) {
+      this.dom.tabCareerParttime.addEventListener('click', () => {
+        this.activeCareerTab = 'parttime';
+        this.renderCareersList();
+      });
+    }
 
     this.dom.tabCareerParanormal.addEventListener('click', () => {
       this.activeCareerTab = 'paranormal';
@@ -2042,12 +2050,20 @@ class TerribleGame {
       currentYearLog.entries.push(window.getRandomElement(unemploymentVignettes));
     }
 
-    // 3. Living Expenses & Economy
+    // 3. Living Expenses, Part-Time Wages & Occult Syndicate Stipend
+    if (this.character.partTimeJob && window.TLLSubsystems) {
+      const ptPay = window.TLLSubsystems.getActiveMundaneAnnualPay(this.character);
+      this.character.money = (this.character.money || 0) + ptPay;
+      currentYearLog.entries.push(`Earned +${window.formatMoney(ptPay, this.character.countryCode)} from part-time shifts as ${this.character.partTimeJob.title}.`);
+    }
+
     if (this.character.paranormalGig) {
       const gig = this.character.paranormalGig;
-      this.character.shillings += gig.payoutShillings;
+      const bonusS = (this.character.occultWorkplace && this.character.occultWorkplace.bonusShillings) || 0;
+      const totalS = (gig.payoutShillings || 0) + bonusS;
+      this.character.shillings += totalS;
       this.modifyStat('sanity', -gig.sanityCost);
-      currentYearLog.entries.push(`Collected +${gig.payoutShillings} s. from occult contract (${gig.title}). The ordeal drained -${gig.sanityCost}% Sanity.`);
+      currentYearLog.entries.push(`Collected +${totalS} s. from occult contract (${gig.title}). The ordeal drained -${gig.sanityCost}% Sanity.`);
     }
 
     if (this.character.age >= 18 && (!this.character.institution || !this.character.institution.active)) {
@@ -2485,32 +2501,47 @@ class TerribleGame {
   }
 
   renderCareersList() {
-    // Tab active states
-    if (this.activeCareerTab === 'mundane') {
-      this.dom.tabCareerMundane.className = "py-1.5 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
-      this.dom.tabCareerParanormal.className = "py-1.5 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
-    } else {
-      this.dom.tabCareerMundane.className = "py-1.5 rounded-lg text-dust hover:text-emerald-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
-      this.dom.tabCareerParanormal.className = "py-1.5 rounded-lg bg-slatecard text-amber-300 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5";
-    }
+    const activeClass = "py-2 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1 shadow-xs";
+    const inactiveClass = "py-2 rounded-lg text-dust hover:text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1";
+
+    if (this.dom.tabCareerMundane) this.dom.tabCareerMundane.className = this.activeCareerTab === 'mundane' ? activeClass : inactiveClass;
+    if (this.dom.tabCareerParttime) this.dom.tabCareerParttime.className = this.activeCareerTab === 'parttime' ? activeClass : inactiveClass;
+    if (this.dom.tabCareerParanormal) this.dom.tabCareerParanormal.className = this.activeCareerTab === 'paranormal' ? activeClass : inactiveClass;
 
     // Update current employment banner
-    if (this.character.job) {
-      const sal = window.getAdjustedSalary(this.character.job.baseSalary || this.character.job.baseSalaryUSD, this.character.countryCode);
-      this.dom.currentMundaneJob.textContent = `${this.character.job.title} (${window.formatMoney(sal, this.character.countryCode)}/yr)`;
+    const activeDayJob = this.character.job || this.character.partTimeJob;
+    if (activeDayJob) {
+      const sal = window.TLLSubsystems
+        ? window.TLLSubsystems.getActiveMundaneAnnualPay(this.character)
+        : window.getAdjustedSalary(activeDayJob.baseSalary || activeDayJob.baseSalaryUSD || 10000, this.character.countryCode);
+      this.dom.currentMundaneJob.textContent = `${activeDayJob.title} (${window.formatMoney(sal, this.character.countryCode)}/yr)`;
       this.dom.btnQuitMundane.classList.remove('hidden');
       this.dom.btnQuitMundane.style.display = 'inline-block';
     } else {
-      this.dom.currentMundaneJob.textContent = "Unemployed (No Income)";
+      this.dom.currentMundaneJob.textContent = this.character.age < 14 ? "Unemployed (Part-Time unlocks Age 14)" : "Unemployed (No Income)";
       this.dom.btnQuitMundane.classList.add('hidden');
       this.dom.btnQuitMundane.style.display = 'none';
     }
 
     this.dom.careersList.innerHTML = '';
 
-    if (this.activeCareerTab === 'mundane') {
-      window.MUNDANE_CAREERS.forEach(job => {
-        const isEmployed = this.character.job && this.character.job.id === job.id;
+    // Mount active Workplace Submenu Dashboard at the top of the list
+    if (window.TLLSubsystems) {
+      const wpHtml = (this.activeCareerTab === 'paranormal')
+        ? window.TLLSubsystems.renderOccultWorkplaceHTML(this.character, this._selectedColleagueId)
+        : window.TLLSubsystems.renderMundaneWorkplaceHTML(this.character, this._selectedColleagueId);
+      if (wpHtml) {
+        const wpWrap = document.createElement('div');
+        wpWrap.innerHTML = wpHtml;
+        this.dom.careersList.appendChild(wpWrap);
+        window.TLLSubsystems.bindSubsystemEvents(wpWrap, this, () => this.renderCareersList());
+      }
+    }
+
+    if (this.activeCareerTab === 'mundane' || this.activeCareerTab === 'parttime') {
+      const pool = this.activeCareerTab === 'parttime' ? (window.PART_TIME_JOBS || []) : (window.MUNDANE_CAREERS || []);
+      pool.forEach(job => {
+        const isEmployed = (this.character.job && this.character.job.id === job.id) || (this.character.partTimeJob && this.character.partTimeJob.id === job.id);
         const check = window.checkJobEligibility(this.character, job);
         const salary = window.getAdjustedSalary(job.baseSalary, this.character.countryCode);
 
@@ -2531,7 +2562,7 @@ class TerribleGame {
           <div class="flex justify-between items-start">
             <div class="min-w-0 flex-1 pr-2">
               <h4 class="font-serif font-bold text-xs text-parchment">${job.title}</h4>
-              <span class="text-[11px] font-mono text-fiat font-bold">${window.formatMoney(salary, this.character.countryCode)} / year</span>
+              <span class="text-[11px] font-mono text-fiat font-bold">${window.formatMoney(salary, this.character.countryCode)} / year${job.isPartTime ? ` · ~${job.defaultHours}h/wk` : ''}</span>
             </div>
             <div class="flex flex-wrap justify-end gap-1 shrink-0">
               ${badgesHtml}
@@ -2539,13 +2570,13 @@ class TerribleGame {
           </div>
           <p class="text-[11px] text-dust leading-relaxed">${job.desc}</p>
           <div class="flex items-center justify-between pt-2 border-t border-leadborder/60 text-[10px]">
-            <span class="text-dust/80 font-mono italic">${job.stress > 25 ? '⚠️ High Stress' : 'Standard Routine'}</span>
+            <span class="text-dust/80 font-mono italic">${job.isPartTime ? 'Part-Time Shift (Age 14+)' : (job.stress > 25 ? 'High Stress' : 'Full-Time Career')}</span>
             ${isEmployed 
-              ? `<span class="text-fiat font-serif font-bold text-xs">✓ Currently Employed</span>`
+              ? `<span class="text-fiat font-serif font-bold text-xs">✓ Active Position (See Workplace Above)</span>`
               : `<button class="btn-apply-job px-3 py-1.5 rounded-lg text-xs font-serif font-bold active:scale-95 transition-all ${
                   check.eligible ? 'btn-apply-active shadow-xs' : 'btn-apply-locked cursor-not-allowed'
                 }" ${!check.eligible ? 'disabled' : ''}>
-                  ${check.eligible ? 'Apply' : check.reason}
+                  ${check.eligible ? (job.isPartTime ? 'Take Shift' : 'Apply') : check.reason}
                 </button>`
             }
           </div>
@@ -2554,7 +2585,20 @@ class TerribleGame {
         const applyBtn = card.querySelector('.btn-apply-job');
         if (applyBtn && check.eligible) {
           applyBtn.addEventListener('click', () => {
-            this.applyMundaneJob(job);
+            if (job.isPartTime) {
+              this.character.partTimeJob = job;
+              this.character.job = null;
+              if (window.TLLSubsystems) window.TLLSubsystems.ensureMundaneWorkplace(this.character);
+              window.soundEngine.playClick();
+              const latestLog = this.logs[this.logs.length - 1];
+              if (latestLog) latestLog.entries.push(`Started part-time shifts as ${job.title} (${window.formatMoney(salary, this.character.countryCode)}/yr).`);
+              this.renderCareersList();
+              this.renderAll();
+              this.saveGame();
+            } else {
+              this.character.partTimeJob = null;
+              this.applyMundaneJob(job);
+            }
           });
         }
 
@@ -2644,9 +2688,12 @@ class TerribleGame {
   }
 
   quitMundaneJob() {
-    if (!this.character.job) return;
-    const oldTitle = this.character.job.title;
+    const active = this.character.job || this.character.partTimeJob;
+    if (!active) return;
+    const oldTitle = active.title;
     this.character.job = null;
+    this.character.partTimeJob = null;
+    this.character.workplace = null;
     window.soundEngine.playClick();
 
     const latestLog = this.logs[this.logs.length - 1];
@@ -2661,6 +2708,7 @@ class TerribleGame {
 
   applyParanormalGig(gig) {
     this.character.paranormalGig = gig;
+    if (window.TLLSubsystems) window.TLLSubsystems.ensureOccultWorkplace(this.character);
     window.soundEngine.playDread();
 
     const latestLog = this.logs[this.logs.length - 1];
@@ -2677,6 +2725,7 @@ class TerribleGame {
     if (!this.character.paranormalGig) return;
     const oldTitle = this.character.paranormalGig.title;
     this.character.paranormalGig = null;
+    this.character.occultWorkplace = null;
     window.soundEngine.playClick();
 
     const latestLog = this.logs[this.logs.length - 1];
@@ -5579,29 +5628,39 @@ class TerribleGame {
     if (!this.dom.activitiesList) return;
     this.dom.activitiesList.innerHTML = '';
 
+    // 1. Mount Interactive Sector Submenu Dashboard at top of category view
+    if (window.TLLSubsystems && categoryKey) {
+      const subHtml = window.TLLSubsystems.renderSectorSubmenuHTML(this.character, categoryKey, this._selectedColleagueId);
+      if (subHtml) {
+        const subWrap = document.createElement('div');
+        subWrap.innerHTML = subHtml;
+        this.dom.activitiesList.appendChild(subWrap);
+        window.TLLSubsystems.bindSubsystemEvents(subWrap, this, () => this.renderActivitiesList(categoryKey));
+      }
+    }
+
     const list = window.ACTIVITIES_LIST || [];
     const categoryData = window.ACTIVITY_CATEGORIES_DATA && window.ACTIVITY_CATEGORIES_DATA[categoryKey];
     const includedCategories = categoryData && categoryData.categories ? categoryData.categories : [categoryKey];
     const filtered = list.filter(act => {
-      // If past maxAge, omit
       if (this.character.age > act.maxAge) return false;
-      // Category match
       if (categoryKey && !includedCategories.includes(act.category)) return false;
       return true;
     });
 
     if (filtered.length === 0) {
-      this.dom.activitiesList.innerHTML = `
-        <div class="text-center py-10 px-4 bg-inputbg rounded-2xl border border-leadborder space-y-2">
-          <div class="w-10 h-10 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-dust text-base">
-            <span>⏰</span>
-          </div>
-          <div class="font-serif font-bold text-sm text-parchment">No Pursuits Available Yet</div>
-          <p class="text-xs text-dust leading-relaxed font-sans max-w-xs mx-auto">
-            Your character is currently Age ${this.character.age}. Age up by tapping <span class="font-mono text-crimson font-bold">Endure Year</span> to unlock more advanced activities in this sector.
-          </p>
+      const emptyCard = document.createElement('div');
+      emptyCard.className = "text-center py-8 px-4 bg-inputbg rounded-2xl border border-leadborder space-y-2";
+      emptyCard.innerHTML = `
+        <div class="w-10 h-10 mx-auto rounded-full bg-slatecard border border-leadborder flex items-center justify-center text-dust">
+          <i data-lucide="hourglass" class="w-4 h-4"></i>
         </div>
+        <div class="font-serif font-bold text-sm text-parchment">No Additional Pursuits at Age ${this.character.age}</div>
+        <p class="text-xs text-dust leading-relaxed font-sans max-w-xs mx-auto">
+          Advance the year by tapping <span class="font-mono text-crimson font-bold">Endure</span> to unlock older milestones in this sector.
+        </p>
       `;
+      this.dom.activitiesList.appendChild(emptyCard);
       if (window.lucide) {
         try { window.lucide.createIcons(); } catch (e) {}
       }
@@ -5624,31 +5683,34 @@ class TerribleGame {
       const maxUses = act.maxPerYear !== undefined ? act.maxPerYear : 1;
       const isCapped = uses >= maxUses;
       const isDisabled = isLockedByAge || isCapped || !!consequenceRestriction;
+      const isExpanded = this._expandedActivityId === act.id && !isDisabled;
 
-      let btnLabel = 'Engage';
+      let btnLabel = isExpanded ? 'Close Submenu' : 'Open Submenu';
       if (isLockedByAge) {
         btnLabel = `Locked (Age ${act.minAge})`;
       } else if (isCapped) {
-        btnLabel = 'Done this Year';
+        btnLabel = 'Completed';
       } else if (consequenceRestriction) {
         btnLabel = 'Restricted';
       }
 
       const ageBadge = isLockedByAge 
-        ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1">🔒 Req Age ${act.minAge}</span>`
+        ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md border font-semibold text-amber-400 bg-amber-500/10 border-amber-500/30 flex items-center gap-1">Req Age ${act.minAge}</span>`
         : `<span class="text-[10px] font-mono text-dust/80">Age ${act.minAge}–${act.maxAge}</span>`;
 
-      const actEmoji = isLockedByAge ? '🔒' : (window.getActivityEmoji ? window.getActivityEmoji(act) : '🎯');
+      const svgIcon = window.TLLSubsystems
+        ? window.TLLSubsystems.getActivitySVGIcon(act, isLockedByAge)
+        : `<i data-lucide="compass" class="w-4 h-4"></i>`;
 
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div class="flex items-center space-x-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-xl ${isLockedByAge ? 'bg-leadborder/20 text-dust/50' : 'bg-slatecard text-amber-400 border border-leadborder'} flex items-center justify-center shrink-0 text-base">
-              <span>${actEmoji}</span>
+            <div class="w-9 h-9 rounded-xl ${isLockedByAge ? 'bg-leadborder/20 text-dust/50' : 'bg-slatecard text-amber-400 border border-leadborder'} flex items-center justify-center shrink-0">
+              ${svgIcon}
             </div>
             <div class="min-w-0">
               <h4 class="font-serif font-bold text-xs ${isLockedByAge ? 'text-parchment/60' : 'text-parchment'} truncate">${act.name}</h4>
-              <span class="text-[9px] font-mono text-dust">${isLockedByAge ? 'Milestone' : `Points: ${maxUses - uses}/${maxUses} remaining`}</span>
+              <span class="text-[9px] font-mono text-dust">${isLockedByAge ? 'Milestone' : `Uses: ${maxUses - uses}/${maxUses} remaining`}</span>
             </div>
           </div>
           ${ageBadge}
@@ -5657,9 +5719,38 @@ class TerribleGame {
         <p class="text-[11px] text-dust font-sans leading-relaxed">${act.desc}</p>
         ${consequenceRestriction ? `<p class="text-[10px] text-crimson font-mono leading-relaxed">${consequenceRestriction}</p>` : ''}
 
+        ${isExpanded ? `
+          <div class="pt-2.5 border-t border-leadborder/70 space-y-1.5">
+            <span class="text-[9px] font-mono uppercase tracking-wider text-amber-300/90 block">Choose Approach</span>
+            <div class="grid grid-cols-1 gap-1.5">
+              <button data-act-approach="methodical" class="p-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-left flex items-center justify-between transition-all active:scale-[0.99]">
+                <div>
+                  <strong class="block font-serif text-xs text-parchment">Methodical &amp; Careful</strong>
+                  <span class="text-[10px] text-dust font-mono">Balanced outcome · Preserves Sanity &amp; Composure (+Smarts)</span>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-400 font-bold shrink-0">Safe</span>
+              </button>
+              <button data-act-approach="intense" class="p-2.5 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder text-left flex items-center justify-between transition-all active:scale-[0.99]">
+                <div>
+                  <strong class="block font-serif text-xs text-parchment">Bold &amp; All-In</strong>
+                  <span class="text-[10px] text-dust font-mono">Amplified rewards · Higher physical/emotional intensity (+Happy)</span>
+                </div>
+                <span class="text-[10px] font-mono text-amber-300 font-bold shrink-0">Bold</span>
+              </button>
+              <button data-act-approach="occult" class="p-2.5 rounded-xl bg-purple-950/30 hover:bg-purple-900/40 border border-purple-700/50 text-left flex items-center justify-between transition-all active:scale-[0.99]">
+                <div>
+                  <strong class="block font-serif text-xs text-purple-200">Uncanny / Nocturnal Focus</strong>
+                  <span class="text-[10px] text-purple-300/80 font-mono">Watch the shadows while acting · Chance for +Shillings (s.) &amp; +Occult</span>
+                </div>
+                <span class="text-[10px] font-mono text-shilling font-bold shrink-0">+Occult / s.</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
         <div class="flex justify-between items-center pt-2 border-t border-leadborder/60">
           <span class="text-[10px] font-mono ${isCapped ? 'text-emerald-400 font-semibold' : 'text-dust/90'} flex items-center gap-1">
-            ${isCapped ? '✅ Completed this year' : `🎯 Points: ${maxUses - uses}/${maxUses} available`}
+            ${isCapped ? 'Completed this year' : `Available (${maxUses - uses}/${maxUses})`}
           </span>
           <button class="btn-do-activity px-3.5 py-1.5 rounded-xl text-xs font-serif font-bold transition-all ${
             isDisabled 
@@ -5674,9 +5765,18 @@ class TerribleGame {
       const btn = card.querySelector('.btn-do-activity');
       if (btn && !isDisabled) {
         btn.addEventListener('click', () => {
-          this.handleActivityClick(act.id);
+          this._expandedActivityId = (this._expandedActivityId === act.id) ? null : act.id;
+          this.renderActivitiesList(categoryKey);
         });
       }
+
+      card.querySelectorAll('[data-act-approach]').forEach(appBtn => {
+        appBtn.addEventListener('click', () => {
+          const approach = appBtn.dataset.actApproach;
+          this._expandedActivityId = null;
+          this.handleActivityClick(act.id, approach);
+        });
+      });
 
       this.dom.activitiesList.appendChild(card);
     });
@@ -5686,7 +5786,7 @@ class TerribleGame {
     }
   }
 
-  handleActivityClick(activityId) {
+  handleActivityClick(activityId, approach = 'methodical') {
     const activity = (window.ACTIVITIES_LIST || []).find(item => item.id === activityId);
     if (!activity) return;
 
@@ -5723,6 +5823,27 @@ class TerribleGame {
         effects: {}
       });
       return;
+    }
+
+    // Apply tactical approach modifier from the Activity Submenu
+    result.effects = result.effects || {};
+    if (approach === 'methodical') {
+      this.modifyStat('smarts', 2);
+      result.effects.Smarts = (result.effects.Smarts || 0) + 2;
+      result.message += " Your methodical caution kept your nerves steady (+2% Smarts).";
+    } else if (approach === 'intense') {
+      this.modifyStat('happiness', 3);
+      result.effects.Happiness = (result.effects.Happiness || 0) + 3;
+      result.message += " Throwing yourself wholeheartedly into the pursuit left you invigorated (+3% Happiness).";
+    } else if (approach === 'occult') {
+      this.modifyStat('occult', 3);
+      result.effects.Occult = (result.effects.Occult || 0) + 3;
+      if (Math.random() < 0.45) {
+        this.character.shillings = (this.character.shillings || 0) + 1;
+        result.message += " Keeping your eyes peeled to the margins yielded +1 Paranormal Shilling (s.) and uncanny insight (+3% Occult).";
+      } else {
+        result.message += " Watching the shadows as you acted deepened your sensitivity to the unseen (+3% Occult).";
+      }
     }
 
     if (activityId === 'sneak_basement' || activityId === 'radio_static' || activityId === 'midnight_seance' || activityId === 'ouija_board_communion') {

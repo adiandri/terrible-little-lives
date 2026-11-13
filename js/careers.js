@@ -781,12 +781,120 @@ function getAdjustedSalary(baseSalary, countryCode) {
 
 function getPromotionForJob(job) {
   if (!job || !job.nextTierId) return null;
-  const all = (window.MUNDANE_CAREERS || []).concat(window.PARANORMAL_CAREERS || []);
+  const all = (window.MUNDANE_CAREERS || []).concat(window.PARANORMAL_CAREERS || []).concat(window.PART_TIME_JOBS || []);
   return all.find(j => j.id === job.nextTierId) || null;
 }
 
+const PART_TIME_JOBS = [
+  {
+    id: "pt_paper_route",
+    title: "Dawn Fog Paper Courier",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 11,
+    defaultHours: 10,
+    baseSalary: 5720,
+    stress: 8,
+    reqs: {},
+    desc: "Pedaling through 5 AM mist before school, tossing bundled newsprint onto sagging porches while porch-lights flicker."
+  },
+  {
+    id: "pt_diner_dish",
+    title: "Late-Night Diner Dishwasher",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 13,
+    defaultHours: 15,
+    baseSalary: 10140,
+    stress: 14,
+    reqs: {},
+    desc: "Scraping congealed gravy and lipstick off porcelain plates in a steam-choked back kitchen until midnight."
+  },
+  {
+    id: "pt_cinema_usher",
+    title: "Revival Cinema Ticket Usher",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 13.5,
+    defaultHours: 15,
+    baseSalary: 10530,
+    stress: 9,
+    reqs: {},
+    desc: "Sweeping popcorn between velvet aisles while grainy black-and-white reels project flickering shadows across empty rows."
+  },
+  {
+    id: "pt_laundromat",
+    title: "24-Hour Laundromat Attendant",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 15,
+    hourlyRate: 14,
+    defaultHours: 15,
+    baseSalary: 10920,
+    stress: 11,
+    reqs: {},
+    desc: "Making change under buzzing fluorescent tubes and cleaning lint traps while insomniacs watch their clothes spin."
+  },
+  {
+    id: "pt_gas_station",
+    title: "Highway Gas Station Night Clerk",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 16,
+    hourlyRate: 15.5,
+    defaultHours: 20,
+    baseSalary: 16120,
+    stress: 18,
+    reqs: { minSanity: 35 },
+    desc: "Watching rain lash the fuel pumps behind bulletproof plexiglass. Long-haul truckers buy stale coffee and warn you not to look at the treeline."
+  },
+  {
+    id: "pt_cemetery_grounds",
+    title: "Parish Cemetery Grounds-Sweeper",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 15,
+    defaultHours: 15,
+    baseSalary: 11700,
+    stress: 12,
+    reqs: { minVitality: 35 },
+    desc: "Raking wet autumn leaves off sunken headstones and righting toppled iron vases before dusk locks the gates."
+  },
+  {
+    id: "pt_library_page",
+    title: "Municipal Archive Sub-Basement Page",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 14,
+    defaultHours: 12,
+    baseSalary: 8736,
+    stress: 7,
+    reqs: { minSmarts: 45 },
+    desc: "Reshelving brittle parish registries and microfiche reels in windowless stacks that smell of vanilla and mildew."
+  },
+  {
+    id: "pt_florist_assistant",
+    title: "Funeral Florist Wreath-Wrapper",
+    track: "part_time",
+    isPartTime: true,
+    minAge: 14,
+    hourlyRate: 14.5,
+    defaultHours: 15,
+    baseSalary: 11310,
+    stress: 10,
+    reqs: { minLooks: 35 },
+    desc: "Trimming thorns from white lilies and wiring black satin ribbons inside a walk-in cooler."
+  }
+];
+
 window.MUNDANE_CAREERS = MUNDANE_CAREERS;
 window.PARANORMAL_CAREERS = PARANORMAL_CAREERS;
+window.PART_TIME_JOBS = PART_TIME_JOBS;
 window.checkJobEligibility = checkJobEligibility;
 window.getAdjustedSalary = getAdjustedSalary;
 window.getPromotionForJob = getPromotionForJob;

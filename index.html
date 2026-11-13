@@ -2973,14 +2973,18 @@
       <!-- Main Scrollable Body -->
       <div class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 safe-bottom flex flex-col">
         <!-- Career Tabs -->
-        <div class="grid grid-cols-2 gap-1.5 bg-inputbg p-1 rounded-xl border border-leadborder text-xs shrink-0">
-          <button id="tab-career-mundane" class="py-2 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5 shadow-xs">
-            <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>Mundane Jobs (Fiat)</span>
+        <div class="grid grid-cols-3 gap-1.5 bg-inputbg p-1 rounded-xl border border-leadborder text-[11px] shrink-0">
+          <button id="tab-career-mundane" class="py-2 rounded-lg bg-slatecard text-parchment font-serif font-bold transition-all text-center flex items-center justify-center gap-1 shadow-xs">
+            <i data-lucide="building" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+            <span class="truncate">Full-Time ($)</span>
           </button>
-          <button id="tab-career-paranormal" class="py-2 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1.5">
-            <i data-lucide="moon" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>Paranormal (Shillings)</span>
+          <button id="tab-career-parttime" class="py-2 rounded-lg text-dust hover:text-sky-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400 shrink-0"></i>
+            <span class="truncate">Part-Time (14+)</span>
+          </button>
+          <button id="tab-career-paranormal" class="py-2 rounded-lg text-dust hover:text-amber-400 font-serif font-bold transition-all text-center flex items-center justify-center gap-1">
+            <i data-lucide="moon" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+            <span class="truncate">Occult (s.)</span>
           </button>
         </div>
 
@@ -3697,8 +3701,10 @@
           <button id="btn-back-activities-hub" class="hidden p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 mr-1" title="Back to City Hub" aria-label="Back">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
           </button>
-          <div id="activities-header-icon-box" class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-base shrink-0">
-            <span id="activities-header-icon">🎡</span>
+          <div id="activities-header-icon-box" class="w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center text-amber-400 shrink-0">
+            <span id="activities-header-icon" class="inline-flex items-center justify-center">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10,10 16,8 14,14 8,16"/></svg>
+            </span>
           </div>
           <div class="min-w-0">
             <h3 id="activities-header-title" class="font-serif font-bold text-base text-parchment tracking-wider truncate">Activities</h3>
@@ -3707,7 +3713,7 @@
         </div>
         <div class="flex items-center space-x-2 shrink-0">
           <div id="activities-stamina-badge" class="font-mono text-xs font-bold text-parchment bg-amber-500/20 border border-amber-500/40 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
-            <span class="text-xs select-none">✨</span>
+            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
             <span id="activities-stamina-text">Annual Activities</span>
           </div>
           <button id="btn-close-activities" class="p-2 min-w-[36px] min-h-[36px] rounded-xl bg-inputbg hover:bg-cardhover border border-leadborder text-dust hover:text-parchment active:scale-95 transition-all flex items-center justify-center shrink-0 ml-1" title="Close" aria-label="Close">
@@ -3716,48 +3722,64 @@
         </div>
       </div>
 
-      <!-- VIEW 1: THE CITY OF BUTTONS HUB -->
+      <!-- VIEW 1: THE CITY OF BUTTONS HUB (Custom Gothic SVG Emblems) -->
       <div id="activities-hub-view" class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-4 safe-bottom">
         <div class="grid grid-cols-2 gap-3" aria-label="Activity categories">
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="occupation">
-            <span class="text-3xl block select-none">💼</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Occupation</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">School, work and careers</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-sky-400">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="26" height="18" rx="3" fill="currentColor" fill-opacity="0.12"/><path d="M13 11V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/><path d="M5 18h26"/><circle cx="18" cy="18" r="2.2" fill="currentColor"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Occupation</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Full-time, part-time &amp; workplace</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="daily_life">
-            <span class="text-3xl block select-none">🏠</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Daily Life</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Home, money and routines</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-emerald-400">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17L18 7l12 10"/><path d="M9 15v14h18V15" fill="currentColor" fill-opacity="0.12"/><path d="M15 29v-8h6v8"/><circle cx="18" cy="12.5" r="1.5" fill="currentColor"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Daily Life</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Quarters, ledger &amp; loan sharks</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="leisure">
-            <span class="text-3xl block select-none">🎨</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Leisure</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Hobbies, media and games</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-amber-400">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6C11.4 6 6 11 6 17.2c0 6.2 5.4 11.2 12 11.2 2 0 3.4-1.5 3.4-3.2 0-.8-.3-1.5-.8-2.1-.5-.5-.7-1.2-.7-1.9 0-1.7 1.4-3 3.1-3H25c3.3 0 5-2.2 5-5C30 9.4 24.6 6 18 6z" fill="currentColor" fill-opacity="0.12"/><circle cx="12.5" cy="14.5" r="1.4" fill="currentColor"/><circle cx="17.5" cy="11.5" r="1.4" fill="currentColor"/><circle cx="22.5" cy="13.5" r="1.4" fill="currentColor"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Leisure</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Craft mastery, arts &amp; pastimes</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="explore">
-            <span class="text-3xl block select-none">🗺️</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Explore</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Travel, places and wildlife</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-rose-400">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="12" fill="currentColor" fill-opacity="0.12"/><polygon points="15.5,15.5 23,13 20.5,20.5 13,23" fill="currentColor" fill-opacity="0.25"/><path d="M18 6v2M18 28v2M6 18h2M28 18h2"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Explore</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Expeditions, ruins &amp; specimens</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="wellbeing">
-            <span class="text-3xl block select-none">🧘</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Wellbeing</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Physical and mental health</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-sky-300">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 29s-10-6.2-10-13.5C8 11.4 11.2 8.5 14.8 8.5c2.1 0 3.2 1.2 3.2 2.5 0-1.3 1.1-2.5 3.2-2.5 3.6 0 6.8 2.9 6.8 7C28 22.8 18 29 18 29z" fill="currentColor" fill-opacity="0.12"/><path d="M11 18h4l2-3.5 2.5 7 2-3.5H25"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Wellbeing</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Infirmary, sanitarium &amp; remedies</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="trouble">
-            <span class="text-3xl block select-none">🚨</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Trouble</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Crime, law and consequences</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-crimson">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l10 4.5v7.5c0 6.8-4.3 11.2-10 13-5.7-1.8-10-6.2-10-13v-7.5L18 6z" fill="currentColor" fill-opacity="0.12"/><path d="M18 12v7"/><circle cx="18" cy="23" r="1.2" fill="currentColor"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Trouble</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Heists, casing, heat &amp; fences</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-inputbg hover:bg-cardhover border border-leadborder text-left transition-all active:scale-[0.98]" data-category="digital_life">
-            <span class="text-3xl block select-none">📱</span>
-            <strong class="block mt-2 font-serif text-sm text-parchment">Digital Life</strong>
-            <span class="block mt-1 text-xs text-dust leading-snug">Phone, internet and signals</span>
+            <span class="w-10 h-10 rounded-xl bg-slatecard border border-leadborder flex items-center justify-center text-teal-400">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="6" width="14" height="24" rx="2.5" fill="currentColor" fill-opacity="0.12"/><path d="M15 9.5h6"/><circle cx="18" cy="26.5" r="1" fill="currentColor"/><path d="M7 13a11 11 0 0 1 0 10M29 13a11 11 0 0 0 0 10" opacity="0.6"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-parchment">Digital Life</strong>
+            <span class="block mt-1 text-xs text-dust leading-snug">Phone, TerribleNet &amp; signals</span>
           </button>
           <button class="btn-activity-category min-h-[116px] p-4 rounded-2xl bg-purple-950/25 hover:bg-purple-900/40 border border-purple-700/50 text-left transition-all active:scale-[0.98]" data-category="paranormal">
-            <span class="text-3xl block select-none">🔮</span>
-            <strong class="block mt-2 font-serif text-sm text-purple-200">Paranormal</strong>
-            <span class="block mt-1 text-xs text-purple-300/80 leading-snug">Occult rites and strange fate</span>
+            <span class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-700/50 flex items-center justify-center text-purple-300">
+              <svg viewBox="0 0 36 36" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18s5-8 13-8 13 8 13 8-5 8-13 8-13-8-13-8z" fill="currentColor" fill-opacity="0.14"/><circle cx="18" cy="18" r="4.2"/><circle cx="18" cy="18" r="1.6" fill="currentColor"/><path d="M18 6v2.5M18 27.5V30M9 9.5l1.8 1.8M27 9.5l-1.8 1.8"/></svg>
+            </span>
+            <strong class="block mt-2.5 font-serif text-sm text-purple-200">Paranormal</strong>
+            <span class="block mt-1 text-xs text-purple-300/80 leading-snug">Occult rites &amp; syndicate pacts</span>
           </button>
         </div>
         
@@ -4937,7 +4959,7 @@
   <script src="js/audio.js?v=24"></script>
   <script src="js/avatar.js?v=26"></script>
   <script src="js/names.js?v=25"></script>
-  <script src="js/careers.js?v=24"></script>
+  <script src="js/careers.js?v=25"></script>
   <script src="js/gifts.js?v=24"></script>
   <script src="js/memory.js?v=26"></script>
   <script src="js/consequences.js?v=28"></script>
@@ -4952,13 +4974,14 @@
   <script src="js/kin.js?v=27"></script>
   <script src="js/pets.js?v=24"></script>
   <script src="js/activities.js?v=37"></script>
+  <script src="js/subsystems.js?v=1"></script>
   <script src="js/crimes.js?v=24"></script>
   <script src="js/ritual-contracts.js?v=36"></script>
   <script src="js/terriblenet.js?v=37"></script>
   <script src="js/fame.js?v=38"></script>
   <script src="js/events.js?v=24"></script>
   <script src="js/education.js?v=26"></script>
-  <script src="js/game.js?v=39"></script>
+  <script src="js/game.js?v=40"></script>
   <script>
     (function () {
       const el = document.getElementById('landing-epigraph');
