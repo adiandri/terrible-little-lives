@@ -548,15 +548,12 @@ class TerribleGame {
       // Pets Modals
       petsModal: document.getElementById('pets-modal'),
       btnClosePetsModal: document.getElementById('btn-close-pets-modal'),
+      btnRefreshPets: document.getElementById('btn-refresh-pets'),
       btnCancelPets: document.getElementById('btn-cancel-pets'),
       petDetailModal: document.getElementById('pet-detail-modal'),
       btnClosePetDetail: document.getElementById('btn-close-pet-detail'),
       btnBackPetDetail: document.getElementById('btn-back-pet-detail'),
-      btnPetFeed: document.getElementById('btn-pet-feed'),
-      btnPetCuddle: document.getElementById('btn-pet-cuddle'),
-      btnPetStroll: document.getElementById('btn-pet-stroll'),
-      btnPetCommune: document.getElementById('btn-pet-commune'),
-      btnPetVet: document.getElementById('btn-pet-vet'),
+      petActionsList: document.getElementById('pet-actions-list'),
 
       // Dynamic Occupation Tab
       occupationTabIcon: document.getElementById('occupation-tab-icon'),
@@ -1231,6 +1228,13 @@ class TerribleGame {
     if (this.dom.btnClosePetsModal) {
       this.dom.btnClosePetsModal.addEventListener('click', () => this.closePetsModal());
     }
+    if (this.dom.btnRefreshPets) {
+      this.dom.btnRefreshPets.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.refreshPetCandidates();
+        this.filterPetAdoptions(this.petAdoptionTab || 'mundane', this.petAdoptionSubFilter || 'all');
+      });
+    }
     if (this.dom.btnCancelPets) {
       this.dom.btnCancelPets.addEventListener('click', () => this.closePetsModal());
     }
@@ -1240,25 +1244,11 @@ class TerribleGame {
     if (this.dom.btnBackPetDetail) {
       this.dom.btnBackPetDetail.addEventListener('click', () => this.closePetDetailModal());
     }
-    if (this.dom.btnPetFeed) {
-      this.dom.btnPetFeed.addEventListener('click', () => this.handlePetAction('feed'));
-    }
-    if (this.dom.btnPetCuddle) {
-      this.dom.btnPetCuddle.addEventListener('click', () => this.handlePetAction('cuddle'));
-    }
-    if (this.dom.btnPetStroll) {
-      this.dom.btnPetStroll.addEventListener('click', () => this.handlePetAction('stroll'));
-    }
-    if (this.dom.btnPetCommune) {
-      this.dom.btnPetCommune.addEventListener('click', () => this.handlePetAction('commune'));
-    }
-    if (this.dom.btnPetVet) {
-      this.dom.btnPetVet.addEventListener('click', () => this.handlePetAction('vet'));
-    }
     document.querySelectorAll('.pet-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        window.soundEngine.playClick();
         const tab = e.currentTarget.dataset.tab || 'mundane';
-        this.filterPetAdoptions(tab);
+        this.filterPetAdoptions(tab, 'all');
       });
     });
     if (this.dom.btnCloseDarkAltar) {
@@ -4792,27 +4782,31 @@ class TerribleGame {
   }
 
   // ==========================================
-  // PETS & FAMILIARS SYSTEM
+  // PETS, EXOTICS & FAMILIARS SYSTEM
   // ==========================================
 
   renderPetsList() {
     this.dom.kinList.innerHTML = '';
     const pets = this.character.pets || [];
+    const livingCount = pets.filter(p => p.alive !== false).length;
 
-    // Header Action to Adopt or Summon
+    // Header Action to Adopt, License Exotics, or Summon Familiars
     const adoptBanner = document.createElement('button');
-    adoptBanner.className = 'w-full text-left p-3 rounded-xl bg-slatecard hover:bg-cardhover border border-leadborder flex items-center justify-between group transition-all mb-2';
+    adoptBanner.className = 'kin-action-btn group mb-2.5';
     adoptBanner.innerHTML = `
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+      <div class="flex items-center space-x-3 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-500 dark:text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
           <i data-lucide="paw-print" class="w-4 h-4"></i>
         </div>
-        <div>
-          <div class="text-xs font-bold text-parchment group-hover:text-emerald-300 transition-colors">Adopt or Summon Companion</div>
-          <div class="text-[10px] text-dust">Visit municipal shelter or bind an occult familiar entity.</div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-parchment group-hover:text-emerald-500 dark:group-hover:text-emerald-300 transition-colors">Menagerie & Familiar Registry</span>
+            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust">${livingCount}/6</span>
+          </div>
+          <div class="text-[10px] text-dust truncate">Breeds, exotic permits, mythological beasts & cursed familiars</div>
         </div>
       </div>
-      <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60"></i>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 shrink-0"></i>
     `;
     adoptBanner.addEventListener('click', () => {
       window.soundEngine.playClick();
@@ -4822,11 +4816,11 @@ class TerribleGame {
 
     if (pets.length === 0) {
       const emptyCard = document.createElement('div');
-      emptyCard.className = 'text-center py-8 text-dust/70 text-xs italic font-serif bg-inputbg rounded-xl border border-leadborder p-4';
+      emptyCard.className = 'profile-section-card text-center py-8 text-dust/75 text-xs italic font-serif';
       emptyCard.innerHTML = `
         <i data-lucide="ghost" class="w-8 h-8 mx-auto mb-2 text-dust/40"></i>
-        <p>You have no domestic pets or supernatural familiars in your keeping.</p>
-        <p class="text-[10px] text-dust/60 mt-1 font-mono">Click above to visit the shelter or summon a familiar.</p>
+        <p>You keep neither hound, exotic beast, nor bound familiar.</p>
+        <p class="text-[10px] text-dust/60 mt-1 font-mono not-italic">Open the Menagerie above to adopt, license, or summon a companion.</p>
       `;
       this.dom.kinList.appendChild(emptyCard);
       if (window.lucide) {
@@ -4836,40 +4830,58 @@ class TerribleGame {
     }
 
     pets.forEach(pet => {
+      if (window.ensurePetStats) window.ensurePetStats(pet);
       const card = document.createElement('div');
       const isAlive = pet.alive !== false;
-      card.className = `pet-card p-3 rounded-xl border transition-all ${
-        isAlive 
-          ? 'bg-inputbg hover:bg-cardhover border-leadborder cursor-pointer shadow-xs active:scale-[0.99]' 
-          : 'bg-ebon/20 border-leadborder/40 opacity-60 cursor-default'
+      const cat = pet.category || pet.type || 'mundane';
+      const isOccult = cat === 'supernatural';
+      const isExotic = cat === 'exotic';
+
+      card.className = `profile-section-card transition-all ${
+        isAlive
+          ? 'hover:bg-cardhover cursor-pointer active:scale-[0.99]'
+          : 'opacity-60 cursor-default'
       }`;
 
-      const typeBadge = pet.type === 'supernatural'
-        ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-500/40">🔮 Familiar</span>`
-        : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slatecard text-dust border border-leadborder">Mundane</span>`;
+      const badgeHtml = isOccult
+        ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/30">${pet.mythOrigin ? 'Mythic' : 'Occult'}</span>`
+        : (isExotic
+          ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${pet.smuggled ? 'bg-red-500/10 text-red-500 border-red-500/30' : 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/30'}">${pet.smuggled ? 'Smuggled' : 'Exotic'}</span>`
+          : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg text-dust border border-leadborder">${pet.breedGroup || 'Domestic'}</span>`);
+
+      const iconBoxClass = isOccult
+        ? 'bg-purple-500/10 border border-purple-500/30 text-purple-500 dark:text-purple-300'
+        : (isExotic
+          ? 'bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-300'
+          : 'bg-inputbg border border-leadborder text-parchment');
 
       const healthColor = pet.health > 70 ? 'bg-emerald-500' : (pet.health > 35 ? 'bg-amber-500' : 'bg-red-500');
       const affColor = pet.affection > 70 ? 'bg-rose-500' : (pet.affection > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const satiety = Math.max(0, 100 - (pet.hunger || 0));
+      const satColor = satiety > 60 ? 'bg-amber-500' : (satiety > 30 ? 'bg-orange-500' : 'bg-red-500');
 
       card.innerHTML = `
-        <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center justify-between gap-2 mb-2">
           <div class="flex items-center space-x-2.5 min-w-0">
-            <div class="w-8 h-8 rounded-lg ${pet.type === 'supernatural' ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
+            <div class="w-9 h-9 rounded-xl ${iconBoxClass} flex items-center justify-center shrink-0">
               <i data-lucide="${pet.icon || 'paw-print'}" class="w-4 h-4"></i>
             </div>
-            <div class="truncate">
-              <h4 class="font-serif font-bold text-xs text-parchment truncate">${pet.name}</h4>
-              <p class="text-[10px] text-dust font-mono">${pet.species} • Age ${pet.age}</p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h4 class="font-serif font-bold text-xs text-parchment truncate">${pet.name}</h4>
+                ${isAlive && isOccult && !pet.powerUsedThisYear ? `<span class="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" title="Familiar Power Ready"></span>` : ''}
+              </div>
+              <p class="text-[10px] text-dust font-mono truncate">${pet.species} • Age ${pet.age} • ${pet.temperament || 'Watchful'}</p>
             </div>
           </div>
           <div class="shrink-0 flex items-center space-x-1.5">
-            ${isAlive ? typeBadge : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-950/40 text-red-400 border border-red-500/30">Deceased</span>`}
+            ${isAlive ? badgeHtml : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/10 text-red-500 border border-red-500/30">Deceased</span>`}
             ${isAlive ? `<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-dust/60"></i>` : ''}
           </div>
         </div>
 
         ${isAlive ? `
-          <div class="grid grid-cols-2 gap-2 mt-2 pt-1 border-t border-leadborder/30">
+          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-leadborder/40">
             <div class="space-y-0.5">
               <div class="flex justify-between text-[8px] font-mono text-dust">
                 <span>Health</span>
@@ -4881,11 +4893,20 @@ class TerribleGame {
             </div>
             <div class="space-y-0.5">
               <div class="flex justify-between text-[8px] font-mono text-dust">
-                <span>Affection</span>
+                <span>Bond</span>
                 <span class="font-bold text-parchment">${pet.affection}%</span>
               </div>
               <div class="w-full h-1 bg-leadborder/40 rounded-full overflow-hidden">
                 <div class="h-full ${affColor} rounded-full" style="width: ${pet.affection}%"></div>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[8px] font-mono text-dust">
+                <span>Satiety</span>
+                <span class="font-bold text-parchment">${satiety}%</span>
+              </div>
+              <div class="w-full h-1 bg-leadborder/40 rounded-full overflow-hidden">
+                <div class="h-full ${satColor} rounded-full" style="width: ${satiety}%"></div>
               </div>
             </div>
           </div>
@@ -4910,10 +4931,10 @@ class TerribleGame {
   }
 
   openPetsModal() {
-    if (!this.character.petsCandidates) {
+    if (!this.character.petsCandidates || !this.character.petsCandidates.exotic) {
       this.refreshPetCandidates();
     }
-    this.filterPetAdoptions('mundane');
+    this.filterPetAdoptions(this.petAdoptionTab || 'mundane', 'all');
     this.dom.petsModal.classList.remove('modal-closing', 'hidden');
     this.dom.petsModal.style.display = 'flex';
   }
@@ -4924,76 +4945,266 @@ class TerribleGame {
   }
 
   refreshPetCandidates() {
-    this.character.petsCandidates = {
-      mundane: [
-        window.generateRandomPet('mundane'),
-        window.generateRandomPet('mundane'),
-        window.generateRandomPet('mundane')
-      ],
-      supernatural: [
-        window.generateRandomPet('supernatural'),
-        window.generateRandomPet('supernatural'),
-        window.generateRandomPet('supernatural')
-      ]
-    };
+    if (window.generatePetCatalogBatch) {
+      this.character.petsCandidates = window.generatePetCatalogBatch(this.character);
+    } else {
+      this.character.petsCandidates = {
+        mundane: [window.generateRandomPet('mundane', this.character)],
+        exotic: [window.generateRandomPet('exotic', this.character)],
+        supernatural: [window.generateRandomPet('supernatural', this.character)]
+      };
+    }
   }
 
-  filterPetAdoptions(tab = 'mundane') {
+  handleBuyExoticPermit() {
+    if (!window.purchaseExoticPermit || !this.character) return;
+    const res = window.purchaseExoticPermit(this.character);
+    if (!res.success) {
+      alert(res.reason || 'Unable to obtain Exotic Keeper Permit.');
+      return;
+    }
+    this.modifyStat('happiness', 3);
+    window.soundEngine.playClick();
+    const latestLog = this.logs[this.logs.length - 1];
+    if (latestLog) {
+      latestLog.entries.push(`[Municipal License] ${res.message}`);
+    }
+    this.renderAll();
+    this.saveGame();
+    this.filterPetAdoptions('exotic', this.petAdoptionSubFilter || 'all');
+    this.openFeedbackModal({
+      tag: 'PERMIT ISSUED',
+      title: res.title || 'Exotic Keeper Permit',
+      icon: 'file-badge',
+      iconColor: 'text-emerald-400',
+      body: res.message,
+      effects: res.effects || {}
+    });
+  }
+
+  filterPetAdoptions(tab = 'mundane', subFilter = 'all') {
+    this.petAdoptionTab = tab;
+    this.petAdoptionSubFilter = subFilter;
+
     const tabs = document.querySelectorAll('.pet-tab-btn');
     tabs.forEach(btn => {
       if (btn.dataset.tab === tab) {
-        btn.className = 'pet-tab-btn flex-1 py-1.5 text-xs font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all';
+        btn.className = 'pet-tab-btn py-1.5 text-[11px] font-mono rounded-lg bg-slatecard text-parchment font-bold shadow-xs transition-all';
       } else {
-        btn.className = 'pet-tab-btn flex-1 py-1.5 text-xs font-mono rounded-lg text-dust hover:text-parchment transition-all';
+        btn.className = 'pet-tab-btn py-1.5 text-[11px] font-mono rounded-lg text-dust hover:text-parchment transition-all';
       }
     });
+
+    // Render Subfilters
+    const subEl = document.getElementById('pets-subfilters');
+    if (subEl) {
+      const filterSets = {
+        mundane: [
+          { id: 'all', label: 'All Breeds' },
+          { id: 'dog', label: 'Dogs' },
+          { id: 'cat', label: 'Cats' },
+          { id: 'bird', label: 'Birds' },
+          { id: 'small_reptile', label: 'Small & Reptiles' }
+        ],
+        exotic: [
+          { id: 'all', label: 'All Exotics' },
+          { id: 'legal', label: 'Permitted' },
+          { id: 'contraband', label: 'Contraband' }
+        ],
+        supernatural: [
+          { id: 'all', label: 'All Entities' },
+          { id: 'mythology', label: 'World Mythology' },
+          { id: 'original', label: 'TLL Originals' }
+        ]
+      };
+      const options = filterSets[tab] || [];
+      subEl.innerHTML = '';
+      options.forEach(opt => {
+        const pill = document.createElement('button');
+        const active = opt.id === subFilter;
+        pill.className = `px-2.5 py-1 rounded-full text-[10px] font-mono border transition-all ${
+          active
+            ? 'bg-cardhover border-parchment/40 text-parchment font-bold'
+            : 'bg-inputbg border-leadborder text-dust hover:text-parchment'
+        }`;
+        pill.textContent = opt.label;
+        pill.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          this.filterPetAdoptions(tab, opt.id);
+        });
+        subEl.appendChild(pill);
+      });
+    }
+
+    // Exotic Keeper Permit Banner
+    const permitEl = document.getElementById('pets-permit-banner');
+    if (permitEl) {
+      if (tab === 'exotic') {
+        permitEl.classList.remove('hidden');
+        const permitCost = window.getExoticPermitCost ? window.getExoticPermitCost(this.character) : 1200;
+        const costLabel = window.formatMoney ? window.formatMoney(permitCost, this.character.countryCode) : `$${permitCost}`;
+        if (this.character.exoticPermit) {
+          permitEl.innerHTML = `
+            <div class="profile-section-card flex items-center justify-between gap-2 border-emerald-500/30">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-parchment">Municipal Exotic Keeper Permit Held</div>
+                  <div class="text-[9px] text-dust font-mono truncate">Legal & inspected specimens cleared for stable housing.</div>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          permitEl.innerHTML = `
+            <div class="profile-section-card flex items-center justify-between gap-2.5 border-amber-500/30">
+              <div class="min-w-0">
+                <div class="text-[11px] font-bold text-parchment">Exotic Keeper Permit Required</div>
+                <div class="text-[9px] text-dust font-mono">Age 16+, non-squalor housing. Avoids smuggling confiscation risks.</div>
+              </div>
+              <button id="btn-buy-exotic-permit" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-600 dark:text-amber-300 font-mono font-bold text-[10px] transition-all active:scale-95">
+                Permit (${costLabel})
+              </button>
+            </div>
+          `;
+          const buyBtn = document.getElementById('btn-buy-exotic-permit');
+          if (buyBtn) {
+            buyBtn.addEventListener('click', () => this.handleBuyExoticPermit());
+          }
+        }
+      } else {
+        permitEl.classList.add('hidden');
+        permitEl.innerHTML = '';
+      }
+    }
 
     const listEl = document.getElementById('pets-available-list');
     if (!listEl) return;
     listEl.innerHTML = '';
 
-    if (!this.character.petsCandidates) {
+    if (!this.character.petsCandidates || !this.character.petsCandidates.exotic) {
       this.refreshPetCandidates();
     }
 
-    const candidates = this.character.petsCandidates[tab] || [];
+    let candidates = (this.character.petsCandidates && this.character.petsCandidates[tab]) || [];
+    if (subFilter && subFilter !== 'all') {
+      candidates = candidates.filter(p => {
+        if (tab === 'exotic') {
+          return subFilter === 'contraband' ? !!p.contraband : !p.contraband;
+        }
+        if (tab === 'supernatural') {
+          return p.mythicClass === subFilter;
+        }
+        return p.animalGroup === subFilter;
+      });
+    }
 
-    candidates.forEach((pet, idx) => {
+    if (candidates.length === 0) {
+      listEl.innerHTML = `
+        <div class="profile-section-card text-center py-6 text-xs text-dust font-serif italic">
+          No matching companions left in this ledger. Click Refresh above for new arrivals.
+        </div>
+      `;
+      if (window.lucide) {
+        try { window.lucide.createIcons(); } catch (e) {}
+      }
+      return;
+    }
+
+    candidates.forEach(pet => {
+      if (window.ensurePetStats) window.ensurePetStats(pet);
       const card = document.createElement('div');
-      card.className = 'p-3.5 rounded-xl bg-inputbg border border-leadborder space-y-2';
+      card.className = 'profile-section-card space-y-2';
 
-      const isOccult = pet.type === 'supernatural';
-      const costText = isOccult ? (pet.costShillings ? `${pet.costShillings} Shillings` : 'Blood Rite / Sanity Toll') : (pet.costUSD ? `$${pet.costUSD} Adoption Fee` : 'Free Adoption');
+      const cat = pet.category || pet.type || 'mundane';
+      const isOccult = cat === 'supernatural';
+      const isExotic = cat === 'exotic';
+
+      const costLocal = pet.costLocal != null ? pet.costLocal : (pet.costUSD || 0);
+      const fmtLocal = window.formatMoney ? window.formatMoney(costLocal, this.character.countryCode) : `$${costLocal}`;
+      const costText = isOccult
+        ? (pet.costShillings ? `${pet.costShillings} Shillings` : 'Sanity & Occult Pact')
+        : (costLocal > 0 ? fmtLocal : 'Free Adoption');
+
+      const iconWrap = isOccult
+        ? 'bg-purple-500/10 border border-purple-500/30 text-purple-500 dark:text-purple-300'
+        : (isExotic
+          ? 'bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-300'
+          : 'bg-inputbg border border-leadborder text-parchment');
+
+      const tagChip = isOccult
+        ? (pet.mythOrigin
+          ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/30">${pet.mythOrigin}</span>`
+          : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/30">Original Entity</span>`)
+        : (isExotic
+          ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${pet.contraband ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30'}">${pet.contraband ? 'Contraband' : 'Licensed Exotic'}</span>`
+          : `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-inputbg text-dust border border-leadborder">${pet.breedGroup || 'Domestic'}</span>`);
+
+      const elig = window.checkPetAdoptionEligibility
+        ? window.checkPetAdoptionEligibility(pet, this.character, false)
+        : { allowed: true, effectiveCost: costLocal };
+
+      const smuggleElig = elig.canSmuggle && window.checkPetAdoptionEligibility
+        ? window.checkPetAdoptionEligibility(pet, this.character, true)
+        : null;
 
       card.innerHTML = `
-        <div class="flex items-start justify-between">
-          <div class="flex items-center space-x-2.5">
-            <div class="w-9 h-9 rounded-xl ${isOccult ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
-              <i data-lucide="${pet.icon || 'paw-print'}" class="w-5 h-5"></i>
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-xl ${iconWrap} flex items-center justify-center shrink-0">
+              <i data-lucide="${pet.icon || 'paw-print'}" class="w-4 h-4"></i>
             </div>
-            <div>
-              <h4 class="font-serif font-bold text-xs text-parchment">${pet.name}</h4>
-              <p class="text-[10px] text-dust font-mono">${pet.species} • Age ${pet.age}</p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4 class="font-serif font-bold text-xs text-parchment truncate">${pet.name}</h4>
+                ${tagChip}
+              </div>
+              <p class="text-[10px] text-dust font-mono truncate">${pet.species} • Age ${pet.age} • ${pet.temperament || 'Watchful'}</p>
             </div>
           </div>
-          <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${isOccult ? 'bg-purple-950/40 text-purple-300 border border-purple-500/30' : 'bg-slatecard text-dust border border-leadborder'}">
+          <span class="shrink-0 text-[9px] font-mono px-2 py-0.5 rounded-full ${isOccult ? 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/30' : 'bg-inputbg text-parchment border border-leadborder'}">
             ${costText}
           </span>
         </div>
 
-        <p class="text-[10px] text-dust/90 italic leading-snug">${pet.quirk || ''}</p>
-        ${pet.omen ? `<div class="p-2 rounded bg-ebon/40 border border-leadborder/40 text-[9px] text-purple-300/90 font-mono">👁️ Omen: ${pet.omen}</div>` : ''}
+        <p class="text-[10px] text-dust leading-snug">${pet.desc || pet.quirk || ''}</p>
+        <div class="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-dust">
+          <span class="px-1.5 py-0.5 rounded bg-inputbg border border-leadborder">Diet: ${pet.diet || 'Standard'}</span>
+          ${pet.quirk ? `<span class="italic truncate max-w-full">"${pet.quirk}"</span>` : ''}
+        </div>
 
-        <button class="btn-adopt-candidate w-full py-2 px-3 rounded-lg ${isOccult ? 'bg-purple-950/60 hover:bg-purple-900/80 border border-purple-700/50 text-purple-200' : 'bg-slatecard hover:bg-cardhover border border-leadborder text-parchment'} font-serif font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]">
-          <i data-lucide="${isOccult ? 'flame' : 'heart'}" class="w-3.5 h-3.5"></i>
-          <span>${isOccult ? 'Bind Familiar' : 'Adopt Companion'}</span>
-        </button>
+        ${pet.powerName ? `<div class="p-2 rounded-lg bg-inputbg border border-purple-500/30 text-[9px] text-parchment font-mono"><span class="text-purple-500 dark:text-purple-300 font-bold">Power: ${pet.powerName}</span> — ${pet.powerDesc}</div>` : ''}
+        ${pet.omen ? `<div class="p-2 rounded-lg bg-inputbg border border-leadborder text-[9px] text-dust font-mono"><span class="font-bold text-parchment">Omen:</span> ${pet.omen}</div>` : ''}
+
+        <div class="pt-1 flex flex-col gap-1.5">
+          ${elig.allowed ? `
+            <button class="btn-adopt-candidate kin-action-btn justify-center !py-2 font-serif font-bold text-xs tracking-wider ${isOccult ? 'border-purple-500/40' : ''}">
+              <i data-lucide="${isOccult ? 'flame' : 'heart'}" class="w-3.5 h-3.5 ${isOccult ? 'text-purple-500 dark:text-purple-300' : 'text-emerald-500'}"></i>
+              <span>${isOccult ? 'Bind Familiar' : (isExotic ? 'Adopt Legal Exotic' : 'Adopt Companion')}</span>
+            </button>
+          ` : `
+            <div class="text-[9px] font-mono text-amber-600 dark:text-amber-300 px-2 py-1 rounded bg-inputbg border border-leadborder">${elig.reason}</div>
+            ${elig.canSmuggle ? `
+              <button class="btn-smuggle-candidate kin-action-btn justify-center !py-2 border-red-500/40 text-xs font-serif font-bold ${smuggleElig && !smuggleElig.allowed ? 'opacity-50 cursor-not-allowed' : ''}" ${smuggleElig && !smuggleElig.allowed ? 'disabled' : ''}>
+                <i data-lucide="package-x" class="w-3.5 h-3.5 text-red-500"></i>
+                <span>Smuggle via Night Broker (${window.formatMoney ? window.formatMoney(Math.round(costLocal * 1.15), this.character.countryCode) : '$' + Math.round(costLocal * 1.15)})</span>
+              </button>
+            ` : ''}
+          `}
+        </div>
       `;
 
       const adoptBtn = card.querySelector('.btn-adopt-candidate');
       if (adoptBtn) {
         adoptBtn.addEventListener('click', () => {
-          this.adoptPet(pet, tab, idx);
+          this.adoptPet(pet, tab, false);
+        });
+      }
+
+      const smuggleBtn = card.querySelector('.btn-smuggle-candidate');
+      if (smuggleBtn && smuggleElig && smuggleElig.allowed) {
+        smuggleBtn.addEventListener('click', () => {
+          this.adoptPet(pet, tab, true);
         });
       }
 
@@ -5005,32 +5216,32 @@ class TerribleGame {
     }
   }
 
-  adoptPet(pet, tab, idx) {
-    if (pet.costUSD && this.character.money < pet.costUSD) {
-      alert(`You do not have enough money ($${pet.costUSD}) to pay this adoption fee!`);
-      return;
-    }
-    if (pet.costShillings && this.character.shillings < pet.costShillings) {
-      alert(`You lack the ${pet.costShillings} Shillings required for this occult binding!`);
-      return;
-    }
-    if (pet.type === 'supernatural' && this.character.occult < 12) {
-      alert(`Your Occult affinity (${this.character.occult}%) is too weak to bind this familiar without losing your mind! (Requires 12% Occult)`);
+  adoptPet(pet, tab, isSmuggled = false) {
+    if (window.ensurePetStats) window.ensurePetStats(pet);
+    const elig = window.checkPetAdoptionEligibility
+      ? window.checkPetAdoptionEligibility(pet, this.character, isSmuggled)
+      : { allowed: true, effectiveCost: pet.costLocal || 0 };
+
+    if (!elig.allowed) {
+      alert(elig.reason || 'Cannot welcome this companion right now.');
       return;
     }
 
-    if (pet.costUSD) this.character.money -= pet.costUSD;
-    if (pet.costShillings) this.character.shillings -= pet.costShillings;
+    const paid = elig.effectiveCost || 0;
+    if (paid > 0) this.character.money = Math.max(0, (this.character.money || 0) - paid);
+    if (pet.costShillings) this.character.shillings = Math.max(0, (this.character.shillings || 0) - pet.costShillings);
 
+    pet.smuggled = !!(isSmuggled && !this.character.exoticPermit);
     if (!this.character.pets) this.character.pets = [];
     this.character.pets.push(pet);
 
-    // Remove from candidates
+    // Remove from candidates by id
     if (this.character.petsCandidates && this.character.petsCandidates[tab]) {
-      this.character.petsCandidates[tab].splice(idx, 1);
+      this.character.petsCandidates[tab] = this.character.petsCandidates[tab].filter(c => c.id !== pet.id);
     }
 
-    if (pet.type === 'supernatural') {
+    const cat = pet.category || pet.type || 'mundane';
+    if (cat === 'supernatural' || pet.smuggled) {
       window.soundEngine.playDread();
     } else {
       window.soundEngine.playClick();
@@ -5038,8 +5249,13 @@ class TerribleGame {
 
     const latestLog = this.logs[this.logs.length - 1];
     if (latestLog) {
-      latestLog.entries.push(`[Companion] Welcomed ${pet.name} (${pet.species}) into your household.`);
+      latestLog.entries.push(`[Companion] ${pet.smuggled ? 'Smuggled' : 'Welcomed'} ${pet.name} (${pet.species}) into your household.`);
     }
+
+    const happyDelta = 7;
+    const sanityDelta = cat === 'supernatural' ? -3 : (pet.smuggled ? -2 : 4);
+    this.modifyStat('happiness', happyDelta);
+    this.modifyStat('sanity', sanityDelta);
 
     this.renderAll();
     this.saveGame();
@@ -5047,103 +5263,146 @@ class TerribleGame {
     this.renderPetsList();
 
     this.openFeedbackModal({
-      tag: pet.type === 'supernatural' ? "FAMILIAR BOUND" : "PET ADOPTED",
+      tag: cat === 'supernatural' ? 'FAMILIAR BOUND' : (pet.smuggled ? 'CONTRABAND ACQUIRED' : 'COMPANION ADOPTED'),
       title: `Welcome, ${pet.name}`,
       icon: pet.icon || 'paw-print',
-      iconColor: pet.type === 'supernatural' ? "text-purple-400" : "text-emerald-400",
-      body: `You brought home ${pet.name} the ${pet.species}. ${pet.quirk || ''}`,
-      effects: { happiness: 8, sanity: pet.type === 'supernatural' ? -3 : 5 }
+      iconColor: cat === 'supernatural' ? 'text-purple-400' : (pet.smuggled ? 'text-amber-400' : 'text-emerald-400'),
+      body: `You brought home ${pet.name} the ${pet.species}. ${pet.smuggled ? 'Keep the blinds drawn—housing an unpermitted exotic carries inspection risks.' : (pet.quirk || '')}`,
+      effects: { happiness: happyDelta, sanity: sanityDelta, ...(paid > 0 ? { money: -paid } : {}) }
     });
   }
 
   openPetDetailModal(pet) {
     this.selectedPet = pet;
+    if (window.ensurePetStats) window.ensurePetStats(pet);
     const modal = this.dom.petDetailModal;
     if (!modal) return;
 
+    const cat = pet.category || pet.type || 'mundane';
+    const isOccult = cat === 'supernatural';
+    const isExotic = cat === 'exotic';
+
     const titleEl = document.getElementById('pet-detail-title');
     const subtitleEl = document.getElementById('pet-detail-subtitle');
+    const headerIconWrap = document.getElementById('pet-detail-header-icon');
     const cardEl = document.getElementById('pet-detail-card');
 
     if (titleEl) titleEl.textContent = pet.name;
-    if (subtitleEl) subtitleEl.textContent = `${pet.species} • Age ${pet.age} • ${pet.type === 'supernatural' ? '🔮 Occult Familiar' : 'Domestic Companion'}`;
+    if (subtitleEl) {
+      subtitleEl.textContent = `${pet.species} • Age ${pet.age} • ${pet.temperament || 'Watchful'}`;
+    }
+    if (headerIconWrap) {
+      headerIconWrap.className = `w-8 h-8 rounded-xl bg-inputbg border border-leadborder flex items-center justify-center shrink-0 ${
+        isOccult ? 'text-purple-400' : (isExotic ? 'text-amber-400' : 'text-emerald-400')
+      }`;
+      headerIconWrap.innerHTML = `<i data-lucide="${pet.icon || 'paw-print'}" class="w-4 h-4"></i>`;
+    }
 
     if (cardEl) {
       const isAlive = pet.alive !== false;
-      const healthColor = pet.health > 70 ? 'bg-emerald-500' : (pet.health > 35 ? 'bg-amber-500' : 'bg-red-500');
-      const affColor = pet.affection > 70 ? 'bg-rose-500' : (pet.affection > 35 ? 'bg-amber-500' : 'bg-red-500');
-      const hungerColor = pet.hunger < 40 ? 'bg-emerald-500' : (pet.hunger < 75 ? 'bg-amber-500' : 'bg-red-500');
+      const satiety = Math.max(0, 100 - (pet.hunger || 0));
 
-      cardEl.innerHTML = `
-        <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 rounded-xl ${pet.type === 'supernatural' ? 'bg-purple-950/40 border border-purple-800/40 text-purple-300' : 'bg-leadborder/30 text-parchment'} flex items-center justify-center shrink-0">
-            <i data-lucide="${pet.icon || 'paw-print'}" class="w-6 h-6"></i>
+      const makeBar = (label, val, colorClass) => `
+        <div class="space-y-1">
+          <div class="flex justify-between text-[9px] font-mono text-dust">
+            <span>${label}</span>
+            <span class="font-bold text-parchment">${Math.round(val)}%</span>
           </div>
-          <div class="min-w-0 flex-1">
-            <h4 class="font-serif font-bold text-sm text-parchment truncate">${pet.name}</h4>
-            <p class="text-[10px] text-dust font-mono">${pet.species} • ${isAlive ? 'Alive & In Service' : 'Deceased'}</p>
+          <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
+            <div class="h-full ${colorClass} rounded-full transition-all duration-300" style="width: ${Math.max(0, Math.min(100, val))}%"></div>
           </div>
         </div>
+      `;
 
-        <p class="text-[10px] text-dust/90 italic pt-1">${pet.quirk || ''}</p>
-        ${pet.omen ? `<div class="p-2 rounded bg-ebon/40 border border-leadborder/40 text-[9px] text-purple-300/90 font-mono">👁️ Supernatural Omen: ${pet.omen}</div>` : ''}
+      const healthColor = pet.health > 70 ? 'bg-emerald-500' : (pet.health > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const affColor = pet.affection > 70 ? 'bg-rose-500' : (pet.affection > 35 ? 'bg-amber-500' : 'bg-red-500');
+      const satColor = satiety > 60 ? 'bg-amber-500' : (satiety > 30 ? 'bg-orange-500' : 'bg-red-500');
+
+      const sixthStat = isOccult
+        ? makeBar('Resonance', pet.supernaturalBond || 50, 'bg-purple-500')
+        : (isExotic
+          ? makeBar('Wildness', pet.wildness || 0, (pet.wildness || 0) > 65 ? 'bg-red-500' : 'bg-amber-500')
+          : makeBar('Lifespan Prog.', Math.min(100, Math.round((pet.age / Math.max(1, pet.maxAge || 12)) * 100)), 'bg-slate-400'));
+
+      cardEl.innerHTML = `
+        <div class="flex items-start justify-between gap-2.5">
+          <div class="flex items-center space-x-3 min-w-0">
+            <div class="w-11 h-11 rounded-xl bg-inputbg border border-leadborder ${isOccult ? 'text-purple-500 dark:text-purple-300' : (isExotic ? 'text-amber-500 dark:text-amber-300' : 'text-parchment')} flex items-center justify-center shrink-0">
+              <i data-lucide="${pet.icon || 'paw-print'}" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+              <h4 class="font-serif font-bold text-sm text-parchment truncate">${pet.name}</h4>
+              <p class="text-[10px] text-dust font-mono truncate">${pet.species} • ${isAlive ? 'Living Companion' : 'Deceased'}</p>
+            </div>
+          </div>
+          <span class="shrink-0 text-[9px] font-mono px-2 py-0.5 rounded bg-inputbg border border-leadborder text-parchment">
+            ${pet.mythOrigin || pet.breedGroup || (isExotic ? 'Exotic' : 'Domestic')}
+          </span>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 text-[9px] font-mono">
+          <span class="px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust">Temper: <strong class="text-parchment">${pet.temperament || 'Watchful'}</strong></span>
+          <span class="px-1.5 py-0.5 rounded bg-inputbg border border-leadborder text-dust">Diet: <strong class="text-parchment">${pet.diet || 'Standard'}</strong></span>
+          ${pet.smuggled ? `<span class="px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-500">Unpermitted Contraband</span>` : ''}
+        </div>
+
+        ${pet.quirk ? `<p class="text-[10px] text-dust italic leading-snug">"${pet.quirk}"</p>` : ''}
+        ${pet.omen ? `<div class="p-2 rounded-lg bg-inputbg border border-leadborder text-[9px] text-dust font-mono"><strong class="text-purple-500 dark:text-purple-300">Omen:</strong> ${pet.omen}</div>` : ''}
+        ${pet.learnedPhrases && pet.learnedPhrases.length > 0 ? `<div class="text-[9px] font-mono text-dust bg-inputbg border border-leadborder rounded-lg p-2"><strong class="text-parchment">Learned Vocalizations:</strong> ${pet.learnedPhrases.map(p => `"${p}"`).join(', ')}</div>` : ''}
 
         ${isAlive ? `
-          <div class="space-y-2 pt-2 border-t border-leadborder/40">
-            <div class="space-y-0.5">
-              <div class="flex justify-between text-[9px] font-mono text-dust">
-                <span>Vital Health</span>
-                <span class="font-bold text-parchment">${pet.health}%</span>
-              </div>
-              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
-                <div class="h-full ${healthColor} rounded-full" style="width: ${pet.health}%"></div>
-              </div>
-            </div>
+          <div class="grid grid-cols-2 gap-x-3 gap-y-2 pt-2 border-t border-leadborder/50">
+            ${makeBar('Vital Health', pet.health, healthColor)}
+            ${makeBar('Affection / Bond', pet.affection, affColor)}
+            ${makeBar('Satiety', satiety, satColor)}
+            ${makeBar('Enrichment', pet.enrichment || 70, 'bg-sky-500')}
+            ${makeBar('Obedience', pet.obedience || 50, 'bg-teal-500')}
+            ${sixthStat}
+          </div>
+        ` : ''}
 
-            <div class="space-y-0.5">
-              <div class="flex justify-between text-[9px] font-mono text-dust">
-                <span>Affection / Bond</span>
-                <span class="font-bold text-parchment">${pet.affection}%</span>
-              </div>
-              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
-                <div class="h-full ${affColor} rounded-full" style="width: ${pet.affection}%"></div>
-              </div>
+        ${isAlive && isOccult && pet.powerName ? `
+          <div class="p-2 rounded-lg bg-inputbg border ${pet.powerUsedThisYear ? 'border-leadborder opacity-75' : 'border-purple-500/35'} flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-[10px] font-bold text-purple-500 dark:text-purple-300">${pet.powerName}</div>
+              <div class="text-[9px] text-dust leading-snug">${pet.powerDesc}</div>
             </div>
-
-            <div class="space-y-0.5">
-              <div class="flex justify-between text-[9px] font-mono text-dust">
-                <span>Hunger (Lower is Fed)</span>
-                <span class="font-bold text-parchment">${pet.hunger}%</span>
-              </div>
-              <div class="w-full h-1.5 bg-leadborder/40 rounded-full overflow-hidden">
-                <div class="h-full ${hungerColor} rounded-full" style="width: ${pet.hunger}%"></div>
-              </div>
-            </div>
-
-            ${pet.type === 'supernatural' ? `
-              <div class="space-y-0.5">
-                <div class="flex justify-between text-[9px] font-mono text-purple-300">
-                  <span>Supernatural Resonance</span>
-                  <span class="font-bold">${pet.supernaturalBond || 50}%</span>
-                </div>
-                <div class="w-full h-1.5 bg-purple-950/60 rounded-full overflow-hidden border border-purple-800/30">
-                  <div class="h-full bg-purple-500 rounded-full" style="width: ${pet.supernaturalBond || 50}%"></div>
-                </div>
-              </div>
-            ` : ''}
+            <span class="shrink-0 text-[8px] font-mono uppercase px-1.5 py-0.5 rounded border ${pet.powerUsedThisYear ? 'border-leadborder text-dust' : 'border-purple-500/40 text-purple-500 dark:text-purple-300'}">
+              ${pet.powerUsedThisYear ? 'Used' : 'Ready'}
+            </span>
           </div>
         ` : ''}
       `;
     }
 
-    // Toggle commune button if supernatural
-    if (this.dom.btnPetCommune) {
-      if (pet.type === 'supernatural') {
-        this.dom.btnPetCommune.classList.remove('hidden');
-        this.dom.btnPetCommune.style.display = 'flex';
-      } else {
-        this.dom.btnPetCommune.classList.add('hidden');
-        this.dom.btnPetCommune.style.display = 'none';
+    // Dynamically render species-specific actions
+    const actionsEl = this.dom.petActionsList || document.getElementById('pet-actions-list');
+    if (actionsEl) {
+      actionsEl.innerHTML = '';
+      if (pet.alive !== false && window.getPetActionsForPet) {
+        const actions = window.getPetActionsForPet(pet, this.character);
+        actions.forEach(act => {
+          const btn = document.createElement('button');
+          const dangerBorder = act.id === 'rehome' ? ' border-red-500/30' : (act.id === 'familiar_power' || act.id === 'commune' ? ' border-purple-500/35' : '');
+          btn.className = `kin-action-btn group${dangerBorder}`;
+          if (act.disabled) btn.disabled = true;
+          btn.innerHTML = `
+            <div class="flex items-center space-x-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform ${act.toneClass || 'bg-inputbg border-leadborder text-parchment'}">
+                <i data-lucide="${act.icon || 'sparkles'}" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0 text-left">
+                <div class="text-xs font-bold text-parchment truncate">${act.label}</div>
+                <div class="text-[10px] text-dust leading-snug">${act.desc}</div>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-dust/60 shrink-0"></i>
+          `;
+          btn.addEventListener('click', () => {
+            this.handlePetAction(act.id);
+          });
+          actionsEl.appendChild(btn);
+        });
       }
     }
 
@@ -5161,37 +5420,21 @@ class TerribleGame {
     });
   }
 
-  handlePetAction(actionType) {
+  handlePetAction(actionId) {
     if (!this.selectedPet) return;
     const pet = this.selectedPet;
 
-    let result = null;
-    if (actionType === 'feed') {
-      result = window.feedPet(pet, this.character);
-    } else if (actionType === 'cuddle') {
-      result = window.cuddlePet(pet, this.character);
-    } else if (actionType === 'stroll') {
-      result = window.strollPet(pet, this.character);
-    } else if (actionType === 'commune') {
-      result = window.communeWithPet(pet, this.character);
-    } else if (actionType === 'vet') {
-      result = window.takePetToVet(pet, this.character);
-    }
+    const result = window.performPetAction
+      ? window.performPetAction(pet, this.character, actionId)
+      : null;
 
     if (!result || !result.success) {
-      alert(result ? (result.reason || result.message) : "Could not complete pet action.");
+      alert(result ? (result.reason || result.message) : 'Could not complete companion action.');
       return;
     }
 
-    if (result.effects) {
-      for (const [stat, val] of Object.entries(result.effects)) {
-        if (stat === 'money') this.character.money = Math.max(0, this.character.money + val);
-        else if (stat === 'shillings') this.character.shillings = Math.max(0, this.character.shillings + val);
-        else this.modifyStat(stat, val);
-      }
-    }
-
-    if (pet.type === 'supernatural' || actionType === 'commune') {
+    const cat = pet.category || pet.type || 'mundane';
+    if (cat === 'supernatural' || actionId === 'commune' || actionId === 'familiar_power') {
       window.soundEngine.playDread();
     } else {
       window.soundEngine.playClick();
@@ -5201,19 +5444,34 @@ class TerribleGame {
     if (latestLog) {
       latestLog.entries.push(`[${pet.name}] ${result.message}`);
     }
-    if (window.recordHorrorOutcome) window.recordHorrorOutcome(this.character, { source: 'relationship', title: `${pet.name}'s Response`, outcome: result.message, effects: result.effects, genuine: pet.category === 'supernatural', engaged: true, investigated: actionType === 'commune' });
+    if (window.recordHorrorOutcome) {
+      window.recordHorrorOutcome(this.character, {
+        source: 'relationship',
+        title: result.title || `${pet.name}'s Response`,
+        outcome: result.message,
+        effects: result.effects,
+        genuine: cat === 'supernatural',
+        engaged: true,
+        investigated: actionId === 'commune' || actionId === 'familiar_power'
+      });
+    }
 
     this.renderAll();
     this.saveGame();
-    this.openPetDetailModal(pet);
+
+    if (result.rehomed) {
+      this.closePetDetailModal();
+    } else {
+      this.openPetDetailModal(pet);
+    }
 
     this.openFeedbackModal({
-      tag: "PET CARE OUTCOME",
-      title: `${pet.name}'s Response`,
+      tag: cat === 'supernatural' ? 'FAMILIAR RITE' : 'COMPANION CARE',
+      title: result.title || `${pet.name}'s Response`,
       icon: pet.icon || 'paw-print',
-      iconColor: pet.type === 'supernatural' ? 'text-purple-400' : 'text-amber-400',
+      iconColor: cat === 'supernatural' ? 'text-purple-400' : (cat === 'exotic' ? 'text-amber-400' : 'text-emerald-400'),
       body: result.message,
-      effects: result.effects
+      effects: result.effects || {}
     });
   }
 
