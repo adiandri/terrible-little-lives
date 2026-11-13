@@ -193,13 +193,13 @@
     }
 
     .stat-track-modern {
-      height: 6px;
+      height: 5px;
       width: 100%;
       background-color: var(--bg-track);
       border-radius: 9999px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+      border: 1px solid color-mix(in srgb, var(--border-main) 65%, transparent);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
     }
     .stat-bar-smooth {
       height: 100%;
@@ -207,34 +207,108 @@
       transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Top Bar Currency Badges with Glass Gradients */
-    .currency-badge-fiat {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0.04) 100%), var(--bg-input);
-      border: 1px solid rgba(16, 185, 129, 0.3) !important;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
+    /* Gothic Dossier Header, Ledger & Vital Gauges (adapts to all 7 themes) */
+    .game-dossier-header {
+      background:
+        radial-gradient(ellipse 90% 120% at 50% 0%, color-mix(in srgb, var(--accent-primary) 10%, transparent) 0%, transparent 70%),
+        color-mix(in srgb, var(--bg-header) 94%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--border-main) 80%, transparent);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
     }
-    .currency-badge-shilling {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.04) 100%), var(--bg-input);
-      border: 1px solid rgba(245, 158, 11, 0.3) !important;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.15);
+    .game-avatar-ring {
+      border: 1px solid color-mix(in srgb, var(--border-main) 90%, transparent);
+      box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--bg-chassis) 90%, transparent),
+        0 0 0 3px color-mix(in srgb, var(--accent-primary) 26%, transparent),
+        0 4px 10px rgba(0, 0, 0, 0.22);
+    }
+    .game-shell-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 0.55rem;
+      background: color-mix(in srgb, var(--bg-input) 88%, transparent);
+      border: 1px solid color-mix(in srgb, var(--border-main) 75%, transparent);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, transform 0.15s ease;
+    }
+    .game-shell-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+      border-color: color-mix(in srgb, var(--accent-primary) 45%, var(--border-main));
+    }
+    .game-ledger-strip {
+      border-top: 1px solid color-mix(in srgb, var(--border-subtle) 85%, transparent);
+      background: color-mix(in srgb, var(--bg-input) 55%, transparent);
+    }
+    .game-vitals-dock {
+      background: color-mix(in srgb, var(--bg-header) 84%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--border-main) 75%, transparent);
+    }
+    .game-vital-card {
+      background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+      border: 1px solid color-mix(in srgb, var(--border-subtle) 85%, transparent);
+      border-radius: 0.55rem;
+      padding: 0.35rem 0.45rem;
+    }
+    .game-chronicle-feed {
+      background:
+        radial-gradient(ellipse 85% 45% at 50% 0%, color-mix(in srgb, var(--accent-primary) 6%, transparent) 0%, transparent 72%),
+        radial-gradient(ellipse 85% 40% at 50% 100%, color-mix(in srgb, var(--accent-primary) 5%, transparent) 0%, transparent 75%),
+        var(--bg-chassis);
+    }
+    .game-bottom-dock {
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-header) 92%, transparent) 0%, var(--bg-header) 100%);
+      border-top: 1px solid color-mix(in srgb, var(--border-main) 80%, transparent);
+      box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.16);
+    }
+    [data-mode="light"] .game-dossier-header,
+    [data-mode="light"] .game-bottom-dock {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
-    /* The Iconic + Endure Action Pill with Crimson Gradient */
+    /* Top Bar Currency Badges with Theme-Adaptive Glass Gradients */
+    .currency-badge-fiat {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent-fiat) 14%, transparent) 0%, color-mix(in srgb, var(--accent-fiat) 4%, transparent) 100%), var(--bg-input);
+      border: 1px solid color-mix(in srgb, var(--accent-fiat) 32%, var(--border-main)) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+    .currency-badge-shilling {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent-shilling) 14%, transparent) 0%, color-mix(in srgb, var(--accent-shilling) 4%, transparent) 100%), var(--bg-input);
+      border: 1px solid color-mix(in srgb, var(--accent-shilling) 34%, var(--border-main)) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Wax-Seal / Mourning Signet Endure Medallion (theme-aware) */
     .btn-endure-pill {
-      min-width: 58px;
-      max-width: 68px;
-      background: linear-gradient(145deg, #dc2626 0%, #991b1b 58%, #7f1d1d 100%) !important;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 12px rgba(185, 28, 28, 0.35) !important;
-      border: 1px solid rgba(254, 202, 202, 0.3) !important;
+      min-width: 62px;
+      max-width: 74px;
+      background: linear-gradient(
+        155deg,
+        color-mix(in srgb, var(--accent-primary) 92%, #ffffff 12%) 0%,
+        var(--accent-primary) 55%,
+        color-mix(in srgb, var(--accent-primary) 75%, #000000 30%) 100%
+      ) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 4px 14px color-mix(in srgb, var(--accent-primary) 35%, transparent) !important;
+      border: 1px solid color-mix(in srgb, var(--accent-primary) 65%, #ffffff 25%) !important;
+      color: #f8f3ec !important;
     }
     .btn-endure-pill:hover {
-      background: linear-gradient(145deg, #ef4444 0%, #b91c1c 58%, #991b1b 100%) !important;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 6px 16px rgba(220, 38, 38, 0.45) !important;
+      filter: brightness(1.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        0 6px 18px color-mix(in srgb, var(--accent-primary) 45%, transparent) !important;
     }
     .btn-endure-pill span {
       font-size: 8.5px !important;
       line-height: 1 !important;
-      letter-spacing: 0.04em !important;
+      letter-spacing: 0.08em !important;
       text-transform: uppercase;
       font-feature-settings: "kern" 1;
     }
@@ -2124,99 +2198,111 @@
     <!-- 3. MAIN GAME SCREEN                        -->
     <!-- ========================================== -->
     <section id="screen-game" class="hidden h-full flex flex-col safe-top safe-bottom z-10 overflow-hidden">
-      <!-- UNIFIED BITLIFE-STYLE STREAMLINED HEADER -->
-      <header class="bg-headerbg/95 backdrop-blur-md border-b border-leadborder/70 px-3.5 py-2 shrink-0 z-10 transition-colors duration-200">
-        <div class="flex items-center justify-between gap-2.5">
-          <!-- Left: Circular Avatar & Character Info -->
-          <div class="flex items-center space-x-2.5 min-w-0 flex-1">
-            <div class="w-10 h-10 rounded-full overflow-hidden border border-leadborder/80 shadow-sm bg-slatecard shrink-0 ring-2 ring-white/5">
+      <!-- TWO-TIER NON-COLLIDING GOTHIC DOSSIER HEADER -->
+      <header class="game-dossier-header backdrop-blur-md shrink-0 z-10 transition-colors duration-200">
+        <!-- Tier 1: Portrait, Character Identity & Utility Controls -->
+        <div class="flex items-center justify-between gap-2 px-3.5 pt-2.5 pb-2">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <div class="game-avatar-ring w-10 h-10 rounded-full overflow-hidden bg-slatecard shrink-0">
               <canvas id="game-header-avatar" width="88" height="88" class="w-full h-full object-cover"></canvas>
             </div>
-            <div class="min-w-0 leading-tight">
-              <div class="flex items-center gap-1.5 truncate">
-                <h1 id="char-name" class="font-serif font-bold text-sm tracking-wide text-parchment truncate">Loading...</h1>
-                <span id="char-age-year" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-inputbg text-dust border border-leadborder/80 shrink-0">Age 0 · 2024</span>
-              </div>
-              <div class="flex items-center gap-2 text-[11px] text-dust mt-0.5 truncate">
-                <span id="char-job-title" class="text-sky-400 font-medium truncate">Infant</span>
+            <div class="min-w-0 flex-1 leading-tight">
+              <h1 id="char-name" class="font-serif font-bold text-[14.5px] tracking-wide text-parchment truncate">Loading...</h1>
+              <div class="flex items-center gap-1.5 text-[10.5px] text-dust mt-0.5 min-w-0">
+                <span id="char-age-year" class="font-mono text-[10px] tracking-tight text-parchment/80 shrink-0">Age 0 · 2024</span>
+                <span class="text-dust/40 shrink-0" aria-hidden="true">·</span>
+                <span id="char-job-title" class="text-dust font-medium truncate">Infant</span>
               </div>
             </div>
           </div>
 
-          <!-- Center-Right: Currency Badges -->
-          <div class="flex items-center gap-1.5 shrink-0 text-xs font-mono">
-            <div class="currency-badge-fiat flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs transition-transform active:scale-95" title="Mundane Money">
-              <span class="text-xs leading-none shrink-0 select-none">💵</span>
-              <span id="char-money" class="font-bold text-fiat text-[11px] truncate">$0</span>
-            </div>
-            <div class="currency-badge-shilling flex items-center gap-1 px-2.5 py-1 rounded-full shadow-xs transition-transform active:scale-95" title="Paranormal Shillings">
-              <span class="text-xs leading-none shrink-0 select-none">🪙</span>
-              <span id="char-shillings" class="font-bold text-shilling text-[11px] truncate">0 s.</span>
-            </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btn-tab-creatures" class="game-shell-btn active:scale-95" title="Municipal Archive (Creatures & Cases)" aria-label="Municipal Archive">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            </button>
+            <button id="btn-game-godmode" class="hidden game-shell-btn !text-amber-400 !border-amber-500/40 active:scale-95" title="Open God Mode Inspector" aria-label="Open God Mode Inspector">
+              <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+            </button>
+            <button id="btn-game-settings" class="game-shell-button game-shell-btn active:scale-95" title="Game Settings" aria-label="Game Settings">
+              <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+            </button>
+            <button id="btn-to-menu" class="game-shell-button game-shell-btn active:scale-95" title="Return to Title" aria-label="Return to Title">
+              <i data-lucide="home" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
+        </div>
 
-          <!-- Top-Right Actions -->
-          <div class="flex items-center space-x-1 shrink-0">
-            <button id="btn-tab-creatures" class="p-1.5 rounded-lg bg-inputbg hover:bg-cardhover text-dust hover:text-purple-300 border border-leadborder transition-colors flex items-center justify-center active:scale-95" title="Municipal Archive (Creatures & Cases)" aria-label="Municipal Archive">
-              <span class="text-xs leading-none select-none">👁️</span>
-            </button>
-            <button id="btn-game-godmode" class="hidden p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all items-center justify-center active:scale-95" title="Open God Mode Inspector" aria-label="Open God Mode Inspector">
-              <span class="text-xs leading-none select-none">⚡</span>
-            </button>
-            <button id="btn-game-settings" class="game-shell-button p-1.5 rounded-lg bg-inputbg hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors flex items-center justify-center active:scale-95" title="Game Settings" aria-label="Game Settings">
-              <span class="text-xs leading-none select-none">⚙️</span>
-            </button>
-            <button id="btn-to-menu" class="game-shell-button p-1.5 rounded-lg bg-inputbg hover:bg-cardhover text-dust hover:text-parchment border border-leadborder transition-colors flex items-center justify-center active:scale-95" title="Return to Title" aria-label="Return to Title">
-              <span class="text-xs leading-none select-none">🏠</span>
-            </button>
+        <!-- Tier 2: Dedicated Ledger Strip (Prevents Currency & Name Collisions) -->
+        <div class="game-ledger-strip flex items-center justify-between gap-2 px-3.5 py-1.5 text-[11px] font-mono">
+          <div class="currency-badge-fiat flex items-center gap-1.5 px-2.5 py-0.5 rounded-full min-w-0" title="Mundane Money">
+            <i data-lucide="banknote" class="w-3 h-3 text-fiat shrink-0"></i>
+            <span class="text-[9px] uppercase tracking-wider text-dust/80 shrink-0">Funds</span>
+            <span id="char-money" class="font-bold text-fiat text-[11px] tabular-nums truncate">$0</span>
+          </div>
+          <div class="currency-badge-shilling flex items-center gap-1.5 px-2.5 py-0.5 rounded-full min-w-0" title="Paranormal Shillings">
+            <i data-lucide="coins" class="w-3 h-3 text-shilling shrink-0"></i>
+            <span class="text-[9px] uppercase tracking-wider text-dust/80 shrink-0">Shillings</span>
+            <span id="char-shillings" class="font-bold text-shilling text-[11px] tabular-nums truncate">0 s.</span>
           </div>
         </div>
       </header>
 
-      <!-- INTEGRATED BITLIFE-STYLE STAT DOCK -->
-      <section class="bg-headerbg/80 border-b border-leadborder/60 px-3 py-1.5 shrink-0 transition-colors duration-200">
-        <div class="grid grid-cols-4 gap-1.5">
+      <!-- GOTHIC VITAL SIGNS DOCK (4-Column Dossier Gauges) -->
+      <section class="game-vitals-dock px-3 py-2 shrink-0 transition-colors duration-200" aria-label="Vital signs">
+        <div class="grid grid-cols-4 gap-2">
           <!-- Vitality / Health -->
-          <div class="stat-pill-wrapper flex flex-col gap-0.5 min-w-0" title="Vitality / Health">
-            <div class="flex items-center justify-between text-[11px] font-mono leading-none">
-              <span class="flex items-center gap-1 text-red-400 font-semibold truncate"><span class="text-xs select-none">❤️</span><span class="hidden sm:inline">Health</span></span>
-              <span id="val-vitality" class="text-dust text-[10px]">90%</span>
+          <div class="game-vital-card stat-pill-wrapper flex flex-col gap-1 min-w-0" title="Vitality / Health">
+            <div class="flex items-center justify-between gap-1 font-mono leading-none">
+              <span class="flex items-center gap-1 text-rose-400/90 font-semibold text-[9px] tracking-wider uppercase truncate">
+                <i data-lucide="heart-pulse" class="w-2.5 h-2.5 shrink-0"></i>
+                <span>Vit</span>
+              </span>
+              <span id="val-vitality" class="text-dust text-[9.5px] tabular-nums shrink-0">90%</span>
             </div>
             <div class="stat-track-modern">
-              <div id="bar-vitality" class="stat-bar-smooth bg-gradient-to-r from-red-600 to-rose-400" style="width: 90%;"></div>
+              <div id="bar-vitality" class="stat-bar-smooth bg-gradient-to-r from-red-700/90 to-rose-400/90" style="width: 90%;"></div>
             </div>
           </div>
 
           <!-- Happiness -->
-          <div class="stat-pill-wrapper flex flex-col gap-0.5 min-w-0" title="Happiness">
-            <div class="flex items-center justify-between text-[11px] font-mono leading-none">
-              <span class="flex items-center gap-1 text-yellow-400 font-semibold truncate"><span class="text-xs select-none">😊</span><span class="hidden sm:inline">Happy</span></span>
-              <span id="val-happiness" class="text-dust text-[10px]">75%</span>
+          <div class="game-vital-card stat-pill-wrapper flex flex-col gap-1 min-w-0" title="Happiness">
+            <div class="flex items-center justify-between gap-1 font-mono leading-none">
+              <span class="flex items-center gap-1 text-amber-400/90 font-semibold text-[9px] tracking-wider uppercase truncate">
+                <i data-lucide="sun" class="w-2.5 h-2.5 shrink-0"></i>
+                <span>Joy</span>
+              </span>
+              <span id="val-happiness" class="text-dust text-[9.5px] tabular-nums shrink-0">75%</span>
             </div>
             <div class="stat-track-modern">
-              <div id="bar-happiness" class="stat-bar-smooth bg-gradient-to-r from-yellow-600 to-amber-400" style="width: 75%;"></div>
+              <div id="bar-happiness" class="stat-bar-smooth bg-gradient-to-r from-amber-700/90 to-amber-400/90" style="width: 75%;"></div>
             </div>
           </div>
 
           <!-- Sanity / Mind -->
-          <div class="stat-pill-wrapper flex flex-col gap-0.5 min-w-0" title="Sanity / Mind">
-            <div class="flex items-center justify-between text-[11px] font-mono leading-none">
-              <span class="flex items-center gap-1 text-sky-400 font-semibold truncate"><span class="text-xs select-none">🧠</span><span class="hidden sm:inline">Mind</span></span>
-              <span id="val-sanity" class="text-dust text-[10px]">85%</span>
+          <div class="game-vital-card stat-pill-wrapper flex flex-col gap-1 min-w-0" title="Sanity / Mind">
+            <div class="flex items-center justify-between gap-1 font-mono leading-none">
+              <span class="flex items-center gap-1 text-sky-400/90 font-semibold text-[9px] tracking-wider uppercase truncate">
+                <i data-lucide="brain" class="w-2.5 h-2.5 shrink-0"></i>
+                <span>Mind</span>
+              </span>
+              <span id="val-sanity" class="text-dust text-[9.5px] tabular-nums shrink-0">85%</span>
             </div>
             <div class="stat-track-modern">
-              <div id="bar-sanity" class="stat-bar-smooth bg-gradient-to-r from-sky-600 to-cyan-400" style="width: 85%;"></div>
+              <div id="bar-sanity" class="stat-bar-smooth bg-gradient-to-r from-slate-500 to-sky-400/90" style="width: 85%;"></div>
             </div>
           </div>
 
           <!-- Humanity -->
-          <div class="stat-pill-wrapper flex flex-col gap-0.5 min-w-0" title="Humanity">
-            <div class="flex items-center justify-between text-[11px] font-mono leading-none">
-              <span class="flex items-center gap-1 text-amber-500 font-semibold truncate"><span class="text-xs select-none">✨</span><span class="hidden sm:inline">Human</span></span>
-              <span id="val-humanity" class="text-dust text-[10px]">95%</span>
+          <div class="game-vital-card stat-pill-wrapper flex flex-col gap-1 min-w-0" title="Humanity">
+            <div class="flex items-center justify-between gap-1 font-mono leading-none">
+              <span class="flex items-center gap-1 text-amber-500/90 font-semibold text-[9px] tracking-wider uppercase truncate">
+                <i data-lucide="flame" class="w-2.5 h-2.5 shrink-0"></i>
+                <span>Soul</span>
+              </span>
+              <span id="val-humanity" class="text-dust text-[9.5px] tabular-nums shrink-0">95%</span>
             </div>
             <div class="stat-track-modern">
-              <div id="bar-humanity" class="stat-bar-smooth bg-gradient-to-r from-amber-600 to-amber-400" style="width: 95%;"></div>
+              <div id="bar-humanity" class="stat-bar-smooth bg-gradient-to-r from-stone-400/80 to-amber-300/90" style="width: 95%;"></div>
             </div>
           </div>
         </div>
@@ -2226,42 +2312,42 @@
         <span id="val-occult" class="sr-only">15%</span><span id="bar-occult" class="hidden"></span>
       </section>
 
-      <!-- Scrollable Event Log -->
-      <main id="log-feed" class="flex-1 overflow-y-auto px-4 py-3 custom-scroll space-y-1 pb-6">
+      <!-- Scrollable Chronicle Log -->
+      <main id="log-feed" class="game-chronicle-feed flex-1 overflow-y-auto px-4 py-3.5 custom-scroll space-y-2 pb-6">
         <!-- Injected dynamically -->
       </main>
 
-      <!-- BITLIFE-STYLE DOCKED BOTTOM NAVIGATION WITH EMBEDDED CENTER ENDURE PILL -->
-      <footer class="bg-headerbg/95 backdrop-blur-md border-t border-leadborder/70 px-2.5 py-1.5 shrink-0 z-20 transition-colors duration-200">
-        <nav class="grid grid-cols-5 gap-1 items-center max-w-lg mx-auto w-full" aria-label="Primary game navigation">
+      <!-- DOCKED BOTTOM NAVIGATION WITH WAX-SEAL ENDURE MEDALLION -->
+      <footer class="game-bottom-dock backdrop-blur-md px-3 py-1.5 shrink-0 z-20 transition-colors duration-200">
+        <nav class="grid grid-cols-5 gap-1.5 items-center max-w-lg mx-auto w-full" aria-label="Primary game navigation">
           <!-- Tab 1: Life / Timeline -->
-          <button id="btn-tab-life" class="core-nav-button is-active col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95" aria-current="page">
-            <span class="text-base leading-none select-none">📖</span>
-            <span class="truncate max-w-full text-center">Life</span>
+          <button id="btn-tab-life" class="core-nav-button is-active col-span-1 w-full py-1 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-dust hover:text-parchment transition-all active:scale-95" aria-current="page">
+            <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate max-w-full text-center tracking-wide">Life</span>
           </button>
 
           <!-- Tab 2: People / Kin -->
-          <button id="btn-tab-kin" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
-            <span class="text-base leading-none select-none">👥</span>
-            <span class="truncate max-w-full text-center">People</span>
+          <button id="btn-tab-kin" class="core-nav-button col-span-1 w-full py-1 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate max-w-full text-center tracking-wide">People</span>
           </button>
 
-          <!-- Center: Iconic BitLife-Style Action Button -->
-          <button id="btn-endure" class="btn-endure-pill col-span-1 w-full max-w-[68px] mx-auto py-1 px-1.5 rounded-2xl bg-crimson hover:brightness-110 active:scale-95 transition-all text-parchment shadow-md shadow-crimson/25 border border-red-500/40 ring-1 ring-crimson/30 flex flex-col items-center justify-center gap-0.5 group cursor-pointer" title="Advance 1 Year">
-            <span class="text-xs leading-none font-bold text-red-100 group-hover:scale-110 transition-transform shrink-0 select-none">➕</span>
-            <span class="font-serif text-[8.5px] font-bold whitespace-nowrap leading-none tracking-normal">ENDURE</span>
+          <!-- Center: Wax-Seal / Signet Action Button -->
+          <button id="btn-endure" class="btn-endure-pill col-span-1 w-full mx-auto py-1.5 px-2 rounded-2xl active:scale-95 transition-all flex flex-col items-center justify-center gap-0.5 group cursor-pointer" title="Advance 1 Year">
+            <i data-lucide="plus" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform shrink-0"></i>
+            <span class="font-serif font-bold whitespace-nowrap leading-none">ENDURE</span>
           </button>
 
           <!-- Tab 3: Activities -->
-          <button id="btn-tab-activities" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
-            <span class="text-base leading-none select-none">🎡</span>
-            <span class="truncate max-w-full text-center">Activities</span>
+          <button id="btn-tab-activities" class="core-nav-button col-span-1 w-full py-1 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate max-w-full text-center tracking-wide">Activities</span>
           </button>
 
           <!-- Tab 4: Profile / Assets -->
-          <button id="btn-tab-profile" class="core-nav-button col-span-1 w-full py-1 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
-            <span class="text-base leading-none select-none">👤</span>
-            <span class="truncate max-w-full text-center">Profile</span>
+          <button id="btn-tab-profile" class="core-nav-button col-span-1 w-full py-1 px-1 rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-dust hover:text-parchment transition-all active:scale-95">
+            <i data-lucide="user" class="w-4 h-4 shrink-0"></i>
+            <span class="truncate max-w-full text-center tracking-wide">Profile</span>
           </button>
         </nav>
       </footer>
